@@ -1,0 +1,26 @@
+# Archive
+
+Historical material kept for reference. **Nothing here is wired into the app** —
+none of it is imported, executed, or deployed.
+
+| Path | What it is | Why it's here |
+|---|---|---|
+| `2026-06-handoff.md` | Session handoff notes from the original build | Superseded by the code itself and `/README.md` |
+| `2026-06-product-review.md` | Full product/architecture audit, June 2026 | Findings still useful as a roadmap; the state it describes is stale |
+| `2026-06-supabase-security-plan.md` | Staged plan to fix Postgres RLS | Obsolete — Postgres is gone; see `firestore.rules` |
+| `supabase-legacy/` | Old Postgres schema, RLS migration, SMTP scripts, email templates | GradLink ran on Supabase until July 2026 |
+
+## About `supabase-legacy/`
+
+GradLink migrated off Supabase because its free tier pauses a project after
+7 days of inactivity, which silently took the live site down twice.
+
+`export-supabase.mjs` produced `migration/data/*.json` and has already been run.
+It needs `@supabase/supabase-js`, which is no longer a project dependency — run
+`npm i @supabase/supabase-js` first if you ever need it again. You would also
+have to un-pause the Supabase project, which is only restorable within 90 days
+of pausing.
+
+The email templates are Supabase-flavoured (`{{ .ConfirmationURL }}`). Firebase
+uses different placeholders, so they're reference material for the visual design
+only, not drop-in files.
