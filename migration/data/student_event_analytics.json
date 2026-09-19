@@ -1,0 +1,26 @@
+[
+  {
+    "id": "fd11db04-20b2-4489-8b3e-9bf991c8390b",
+    "created_at": "2026-06-08T16:36:38.432437+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "student_id": "638ce684-221a-4033-8673-07c85c8ab7b4",
+    "profile_views": 0,
+    "company_scans": 0,
+    "shortlists": 0,
+    "messages_received": 0,
+    "resume_score": 0,
+    "engagement_score": 0
+  },
+  {
+    "id": "ea146e9e-a907-492c-a996-40dee3f02884",
+    "created_at": "2026-06-08T20:01:12.846836+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "student_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "profile_views": 0,
+    "company_scans": 0,
+    "shortlists": 0,
+    "messages_received": 0,
+    "resume_score": 0,
+    "engagement_score": 0
+  }
+]

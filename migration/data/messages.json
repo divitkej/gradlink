@@ -1,0 +1,29 @@
+[
+  {
+    "id": "c63cf815-1f69-4fb0-b532-570d38c61ef7",
+    "created_at": "2026-06-09T07:24:09.425546+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "sender_profile_id": "4903db5c-9cd0-4f3a-b71c-82ff4b45cc0d",
+    "receiver_profile_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "message": "We are glad to connect with you today. I would like to invite you for next round of Interview on 20th June 2026 at our office.",
+    "read_at": null
+  },
+  {
+    "id": "4cee26f2-bde3-4008-86af-3ca28610b0f0",
+    "created_at": "2026-06-09T03:40:04.331472+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "sender_profile_id": "9e2fdd7e-9e72-40b2-8b7d-e2293603f4d6",
+    "receiver_profile_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "message": "You are the best",
+    "read_at": null
+  },
+  {
+    "id": "2eb076cc-5177-4986-9481-38cc992aaf98",
+    "created_at": "2026-06-09T03:49:25.558268+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "sender_profile_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "receiver_profile_id": "9e2fdd7e-9e72-40b2-8b7d-e2293603f4d6",
+    "message": "Thank you Smitta! Means a lot 🙌",
+    "read_at": "2026-07-09T14:19:33.757+00:00"
+  }
+]

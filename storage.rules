@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Résumés, brochures and logos.
+//
+// Paths are written as `{folder}/{profileId}-{timestamp}-{filename}`, so the
+// owner is encoded in the filename prefix. Signed-in users can read (companies
+// need to open a candidate's résumé); only the owner can upload their own file.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Matches the `{profileId}-…` prefix the upload helper generates.
+    function ownsFile(name) {
+      return signedIn() && name.matches(request.auth.uid + '-.*');
+    }
+
+    match /{folder}/{fileName} {
+      allow read: if signedIn();
+
+      allow write: if ownsFile(fileName)
+                   && request.resource.size < 10 * 1024 * 1024
+                   && folder in ['resumes', 'brochures', 'logos', 'avatars'];
+
+      allow delete: if ownsFile(fileName);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

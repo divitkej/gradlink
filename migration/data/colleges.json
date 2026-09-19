@@ -1,0 +1,47 @@
+[
+  {
+    "id": "c8769488-b91d-47b3-81ca-e1612ea57dcf",
+    "created_at": "2026-06-08T09:43:51.14198+00:00",
+    "auth_id": "9ec21ea7-3a99-408e-9b8a-ecb7d2c846c7",
+    "full_name": "Dr. Huda Al Naqbi",
+    "email": "gradlink.demo.host2026@gmail.com",
+    "institution": "Khalifa University Careers Office",
+    "profile_id": null
+  },
+  {
+    "id": "03c794c0-384d-44ba-b0e5-7afbc1323b70",
+    "created_at": "2026-06-08T23:07:28.896264+00:00",
+    "auth_id": "9fe778f0-c392-43ed-b903-b29c0573c324",
+    "full_name": "Divit Kejriwal",
+    "email": "gradlink.host.fresh2026@gmail.com",
+    "institution": "Career Services BITS Dubai",
+    "profile_id": "108bc394-b2e8-4283-99e5-6832cae4de07"
+  },
+  {
+    "id": "28d82030-36d1-45a6-af80-58bba46a9b80",
+    "created_at": "2026-06-09T07:19:29.632622+00:00",
+    "auth_id": "b4259403-5cee-44b2-adee-298cf8b91b7b",
+    "full_name": "Bharat Gupta",
+    "email": "bharatgupta239@gmail.com",
+    "institution": "Career Services Division",
+    "profile_id": "6e56a0fe-c65a-48bf-ac83-0a81136c8723"
+  },
+  {
+    "id": "5b9bd4cb-027e-4538-bdab-af112adb9acd",
+    "created_at": "2026-06-09T07:19:53.082814+00:00",
+    "auth_id": null,
+    "full_name": "Hemali Soni",
+    "email": "Hemali@dubai.bits-pilani.ac.in",
+    "institution": "BITS Pilani",
+    "profile_id": "1f922c77-e695-496b-9c6e-a1710ced66ee"
+  },
+  {
+    "id": "1049929b-cea0-4a73-b95d-fe37b3b165ee",
+    "created_at": "2026-07-13T11:20:31.745257+00:00",
+    "auth_id": "0580903d-86d1-4fce-aaaf-85f99b3c2ee3",
+    "full_name": "Divit Kejriwal",
+    "email": "fu22ylogixc@gmail.com",
+    "institution": "Bits",
+    "profile_id": "bd1281ba-53fd-4b9f-a7d1-122b7c0dfe38"
+  }
+]

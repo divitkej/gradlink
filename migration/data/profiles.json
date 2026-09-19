@@ -1,0 +1,182 @@
+[
+  {
+    "id": "b0000000-0000-0000-0000-000000000001",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Rana Idris",
+    "email": "careers@careem.demo",
+    "avatar_url": null,
+    "organization": "Careem"
+  },
+  {
+    "id": "b0000000-0000-0000-0000-000000000002",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "James Power",
+    "email": "careers@pwc.demo",
+    "avatar_url": null,
+    "organization": "PwC UAE"
+  },
+  {
+    "id": "b0000000-0000-0000-0000-000000000003",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Noura Salem",
+    "email": "careers@g42.demo",
+    "avatar_url": null,
+    "organization": "G42"
+  },
+  {
+    "id": "b0000000-0000-0000-0000-000000000004",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Khalid Obaid",
+    "email": "careers@adnoc.demo",
+    "avatar_url": null,
+    "organization": "ADNOC"
+  },
+  {
+    "id": "b0000000-0000-0000-0000-000000000005",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Mariam Yusuf",
+    "email": "careers@mubadala.demo",
+    "avatar_url": null,
+    "organization": "Mubadala"
+  },
+  {
+    "id": "638ce684-221a-4033-8673-07c85c8ab7b4",
+    "created_at": "2026-06-08T16:36:37.747012+00:00",
+    "auth_id": "13866dc6-e75b-4677-9c17-0202e3338c5a",
+    "role": "student",
+    "full_name": "Test Student Reema",
+    "email": "gradlink.demo.reema2026@gmail.com",
+    "avatar_url": null,
+    "organization": "Ajman University"
+  },
+  {
+    "id": "a8c568de-d2be-43c1-985d-ead5c5c0ff40",
+    "created_at": "2026-06-08T19:59:49.170625+00:00",
+    "auth_id": "36231a71-850c-4eb0-923d-f55364e52eaf",
+    "role": "company",
+    "full_name": "Divit Kejriwal",
+    "email": "divitkej@gmail.com",
+    "avatar_url": null,
+    "organization": "GradLink"
+  },
+  {
+    "id": "108bc394-b2e8-4283-99e5-6832cae4de07",
+    "created_at": "2026-06-08T23:07:28.159776+00:00",
+    "auth_id": "9fe778f0-c392-43ed-b903-b29c0573c324",
+    "role": "event_manager",
+    "full_name": "Divit Kejriwal",
+    "email": "gradlink.host.fresh2026@gmail.com",
+    "avatar_url": null,
+    "organization": "Career Services BITS Dubai"
+  },
+  {
+    "id": "c5a4e10c-c4d7-4595-a64f-834da0082b5c",
+    "created_at": "2026-06-08T23:40:20.095703+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Divit Kejriwal",
+    "email": "kejriwalsmitta@gmail.com",
+    "avatar_url": null,
+    "organization": "Test 1"
+  },
+  {
+    "id": "58a32157-4ed2-477c-a6de-4d88213c02e3",
+    "created_at": "2026-06-08T23:42:59.962925+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Divit Kejriwal",
+    "email": "divitkej07@gmail.com",
+    "avatar_url": null,
+    "organization": "Gradlink"
+  },
+  {
+    "id": "d29db75e-2cee-441a-83ce-99007464b905",
+    "created_at": "2026-06-09T00:01:39.725937+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "test 2",
+    "email": "pradeepjoon94@gmail.com",
+    "avatar_url": null,
+    "organization": "test"
+  },
+  {
+    "id": "9e2fdd7e-9e72-40b2-8b7d-e2293603f4d6",
+    "created_at": "2026-06-09T03:37:20.662569+00:00",
+    "auth_id": "c8c6b8b6-a057-4617-bfea-4c056538d174",
+    "role": "company",
+    "full_name": "Smitta Kejriwal ",
+    "email": "skejriwal@cotality.com",
+    "avatar_url": null,
+    "organization": "Cotality "
+  },
+  {
+    "id": "6e56a0fe-c65a-48bf-ac83-0a81136c8723",
+    "created_at": "2026-06-09T07:19:29.440432+00:00",
+    "auth_id": "b4259403-5cee-44b2-adee-298cf8b91b7b",
+    "role": "event_manager",
+    "full_name": "Bharat Gupta",
+    "email": "bharatgupta239@gmail.com",
+    "avatar_url": null,
+    "organization": "Career Services Division"
+  },
+  {
+    "id": "e4b8dea8-41eb-4de1-9a76-18d566e2b16f",
+    "created_at": "2026-06-09T07:19:44.391337+00:00",
+    "auth_id": "8310b72a-6aff-4d3c-993e-ac0f3fda7f02",
+    "role": "company",
+    "full_name": "Amsal Muneeb",
+    "email": "amsal.m@hotmail.com",
+    "avatar_url": null,
+    "organization": "Birla Institute Of Technology & Science, Pilani, Dubai Campus"
+  },
+  {
+    "id": "4903db5c-9cd0-4f3a-b71c-82ff4b45cc0d",
+    "created_at": "2026-06-09T07:19:48.109158+00:00",
+    "auth_id": null,
+    "role": "company",
+    "full_name": "Abdul Razzak",
+    "email": "abdulrazzaksohail1@gmail.com",
+    "avatar_url": null,
+    "organization": "La La Land LLC"
+  },
+  {
+    "id": "1f922c77-e695-496b-9c6e-a1710ced66ee",
+    "created_at": "2026-06-09T07:19:52.914567+00:00",
+    "auth_id": null,
+    "role": "event_manager",
+    "full_name": "Hemali Soni",
+    "email": "Hemali@dubai.bits-pilani.ac.in",
+    "avatar_url": null,
+    "organization": "BITS Pilani"
+  },
+  {
+    "id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "created_at": "2026-06-08T20:01:12.35459+00:00",
+    "auth_id": "2fe61a78-7514-4b42-928d-7f5513f1ba3c",
+    "role": "student",
+    "full_name": "Divit Kejriwal",
+    "email": "f20250409@dubai.bits-pilani.ac.in",
+    "avatar_url": null,
+    "organization": "Bits Pilani Dubai"
+  },
+  {
+    "id": "bd1281ba-53fd-4b9f-a7d1-122b7c0dfe38",
+    "created_at": "2026-07-13T11:20:31.396563+00:00",
+    "auth_id": "0580903d-86d1-4fce-aaaf-85f99b3c2ee3",
+    "role": "event_manager",
+    "full_name": "Divit Kejriwal",
+    "email": "fu22ylogixc@gmail.com",
+    "avatar_url": null,
+    "organization": "Bits"
+  }
+]

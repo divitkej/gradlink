@@ -1,0 +1,30 @@
+<!-- GradLink — Supabase "Magic Link" email. Subject: Your GradLink sign-in link -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#050B14;padding:32px 16px;margin:0;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#0B1E33;border:1px solid rgba(255,255,255,0.08);border-radius:18px;overflow:hidden;">
+      <tr><td style="height:4px;line-height:0;font-size:0;background:linear-gradient(90deg,#35D3FF,#00C2A8);">&nbsp;</td></tr>
+      <tr><td style="padding:36px 36px 6px;text-align:center;">
+        <img src="https://gradlink-theta.vercel.app/apple-icon" width="56" height="56" alt="GradLink" style="display:inline-block;border-radius:14px;" />
+        <div style="margin-top:14px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:26px;font-weight:700;letter-spacing:-0.5px;"><span style="color:#F5F8FF;">Grad</span><span style="color:#35D3FF;">Link</span></div>
+      </td></tr>
+      <tr><td style="padding:16px 36px 0;text-align:center;">
+        <h1 style="margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:21px;font-weight:700;color:#F5F8FF;">Sign in to GradLink</h1>
+        <p style="margin:14px 0 0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#9FB3C8;">Click below to securely sign in to your GradLink account. This link works once and expires shortly.</p>
+      </td></tr>
+      <tr><td align="center" style="padding:28px 36px 6px;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td align="center" bgcolor="#00C2A8" style="border-radius:12px;background:linear-gradient(100deg,#35D3FF,#00C2A8);">
+            <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block;padding:14px 30px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#021016;text-decoration:none;border-radius:12px;">Sign in to GradLink</a>
+          </td>
+        </tr></table>
+      </td></tr>
+      <tr><td style="padding:10px 36px 0;text-align:center;">
+        <p style="margin:0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6F86A3;">Or paste this link into your browser:<br /><a href="{{ .ConfirmationURL }}" style="color:#35D3FF;word-break:break-all;">{{ .ConfirmationURL }}</a></p>
+      </td></tr>
+      <tr><td style="padding:22px 36px 30px;text-align:center;border-top:1px solid rgba(255,255,255,0.08);">
+        <p style="margin:16px 0 0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#6F86A3;">If you didn't try to sign in, you can safely ignore this email.</p>
+        <p style="margin:10px 0 0;font-family:'Segoe UI',Helvetica,Arial,sans-serif;font-size:11px;color:#6F86A3;">GradLink · Prepare students. Connect employers. Track outcomes.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>

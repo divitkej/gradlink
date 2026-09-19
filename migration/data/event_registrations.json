@@ -1,0 +1,114 @@
+[
+  {
+    "id": "dd368315-d738-4f4a-8147-7be5d360b0ee",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "b0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "checked_in": true
+  },
+  {
+    "id": "f3c380aa-2cbf-47c2-b0b0-df1b336c3e4f",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "b0000000-0000-0000-0000-000000000002",
+    "role": "company",
+    "checked_in": true
+  },
+  {
+    "id": "c16c79b3-c6ae-48dc-9761-9ea6e2f19440",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "b0000000-0000-0000-0000-000000000003",
+    "role": "company",
+    "checked_in": true
+  },
+  {
+    "id": "7e3d2d83-e65a-4058-acf5-fec2c5d9eb71",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "b0000000-0000-0000-0000-000000000004",
+    "role": "company",
+    "checked_in": true
+  },
+  {
+    "id": "d4c76daa-3d0c-4e5b-9e48-c06c6dead4e8",
+    "created_at": "2026-06-08T09:00:18.175101+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "b0000000-0000-0000-0000-000000000005",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "204584fc-cb60-478c-af78-3f254453b88d",
+    "created_at": "2026-06-08T16:36:38.225341+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "638ce684-221a-4033-8673-07c85c8ab7b4",
+    "role": "student",
+    "checked_in": false
+  },
+  {
+    "id": "3c22d78a-060a-4039-a442-7a7f1d383d9b",
+    "created_at": "2026-06-08T19:59:49.524126+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "a8c568de-d2be-43c1-985d-ead5c5c0ff40",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "cf8f2f30-0270-48c8-bf39-e15de8864f6d",
+    "created_at": "2026-06-08T20:01:12.688817+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
+    "role": "student",
+    "checked_in": false
+  },
+  {
+    "id": "581fb756-1264-47d3-b8d6-b893ac5da384",
+    "created_at": "2026-06-08T23:40:20.431894+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "c5a4e10c-c4d7-4595-a64f-834da0082b5c",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "6a7a79bf-2389-4756-91ae-5662278166bd",
+    "created_at": "2026-06-08T23:43:00.285352+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "58a32157-4ed2-477c-a6de-4d88213c02e3",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "12245001-1236-417d-a8a1-540ee85c2189",
+    "created_at": "2026-06-09T00:01:40.083548+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "d29db75e-2cee-441a-83ce-99007464b905",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "1d9ede35-db9b-4776-b07e-66a365e76bb5",
+    "created_at": "2026-06-09T03:37:21.335531+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "9e2fdd7e-9e72-40b2-8b7d-e2293603f4d6",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "a8557881-b58e-4ad1-b1ce-d10a788a2422",
+    "created_at": "2026-06-09T07:19:44.728305+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "e4b8dea8-41eb-4de1-9a76-18d566e2b16f",
+    "role": "company",
+    "checked_in": false
+  },
+  {
+    "id": "c6e6e676-997a-41eb-aa8f-018e84dc6ab7",
+    "created_at": "2026-06-09T07:19:48.615385+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "profile_id": "4903db5c-9cd0-4f3a-b71c-82ff4b45cc0d",
+    "role": "company",
+    "checked_in": false
+  }
+]

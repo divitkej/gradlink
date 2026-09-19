@@ -1,0 +1,382 @@
+[
+  {
+    "id": "f3241fba-0afb-43f1-b4da-6be1b454c338",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Complete your profile",
+    "description": "Fill in degree, graduation year, skills and a short bio.",
+    "phase": "pre_event",
+    "order_index": 1
+  },
+  {
+    "id": "8c7de219-290d-462b-8085-e235433b14e5",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Upload your resume",
+    "description": "Add a PDF so companies can review and download it.",
+    "phase": "pre_event",
+    "order_index": 2
+  },
+  {
+    "id": "1ef66bbd-37ce-4185-a275-ef85565bae18",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Get your AI resume score",
+    "description": "Run the resume analyzer and act on the suggestions.",
+    "phase": "pre_event",
+    "order_index": 3
+  },
+  {
+    "id": "6324a25a-337e-4874-a7d0-2e5c7fb2600f",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Add portfolio / LinkedIn / GitHub",
+    "description": "Link your work so recruiters can go deeper.",
+    "phase": "pre_event",
+    "order_index": 4
+  },
+  {
+    "id": "97c31df7-b21e-4956-b71e-3691c20ba6b2",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Save target companies",
+    "description": "Browse registered companies and save the ones you want to meet.",
+    "phase": "pre_event",
+    "order_index": 5
+  },
+  {
+    "id": "b67adece-e10f-45b5-b040-846b7ec74662",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Prepare your elevator pitch",
+    "description": "A 30-second intro you can give at any booth.",
+    "phase": "pre_event",
+    "order_index": 6
+  },
+  {
+    "id": "3659ab84-c387-4cc4-becf-3fe7325e3bcc",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Show your QR to companies",
+    "description": "Let recruiters scan you to share your profile instantly.",
+    "phase": "during_event",
+    "order_index": 1
+  },
+  {
+    "id": "db3413c1-1c49-4a74-bb78-ccf4c43617e2",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Scan companies of interest",
+    "description": "Scan booth QR codes to save companies and open roles.",
+    "phase": "during_event",
+    "order_index": 2
+  },
+  {
+    "id": "41e978e1-8260-420c-b523-09f2752f1b3a",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Visit your saved companies",
+    "description": "Work through your saved list booth by booth.",
+    "phase": "during_event",
+    "order_index": 3
+  },
+  {
+    "id": "afae92ff-c80a-4107-8f12-1646a318ef60",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Send messages / follow-ups",
+    "description": "Reach out to recruiters you connected with.",
+    "phase": "during_event",
+    "order_index": 4
+  },
+  {
+    "id": "f025e916-ae62-49ff-9118-d0a666ed3352",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Mark booth visits",
+    "description": "Track which booths you have already visited.",
+    "phase": "during_event",
+    "order_index": 5
+  },
+  {
+    "id": "3fda0320-396c-4f53-ac25-ab2069022f2b",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Review companies you scanned",
+    "description": "Revisit the companies and roles you captured.",
+    "phase": "post_event",
+    "order_index": 1
+  },
+  {
+    "id": "f5040fa6-e09b-4a76-9457-547bad578a8b",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Message shortlisted companies",
+    "description": "Follow up with companies that shortlisted you.",
+    "phase": "post_event",
+    "order_index": 2
+  },
+  {
+    "id": "42b894b5-77a9-4f96-a9a7-a3f5554c6fbb",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Send follow-up notes",
+    "description": "Thank recruiters and reinforce your interest.",
+    "phase": "post_event",
+    "order_index": 3
+  },
+  {
+    "id": "2547a58b-76df-4ab9-b19d-81e1cb8a95ca",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "student",
+    "title": "Track responses",
+    "description": "Keep an eye on replies and next steps.",
+    "phase": "post_event",
+    "order_index": 4
+  },
+  {
+    "id": "e4b0f692-ed84-454a-ae37-6e53813f0b3a",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Complete company profile",
+    "description": "Add sector, description, website and logo.",
+    "phase": "pre_event",
+    "order_index": 1
+  },
+  {
+    "id": "f091cc2a-bd56-41f3-ab33-fee383604bbd",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Add hiring roles",
+    "description": "List the roles you are recruiting for at the event.",
+    "phase": "pre_event",
+    "order_index": 2
+  },
+  {
+    "id": "d0101d89-a806-4155-b34a-94da2e9af327",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Review registered students",
+    "description": "Browse the talent pool before the event.",
+    "phase": "pre_event",
+    "order_index": 3
+  },
+  {
+    "id": "5cac3dcb-aae4-4acd-8a26-ed0c862522ef",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Pre-shortlist candidates",
+    "description": "Flag priority candidates to visit your booth.",
+    "phase": "pre_event",
+    "order_index": 4
+  },
+  {
+    "id": "0757f261-99ed-4960-a0ad-b1331f2122c5",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Prepare booth instructions",
+    "description": "Brief your team on the scan-and-shortlist flow.",
+    "phase": "pre_event",
+    "order_index": 5
+  },
+  {
+    "id": "e086367e-fc45-496a-929e-9ceb16d9a9f7",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Scan student QR codes",
+    "description": "Capture each student you meet at the booth.",
+    "phase": "during_event",
+    "order_index": 1
+  },
+  {
+    "id": "93f6c148-7f6b-4086-bfe6-f11ecfdf5f3e",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Shortlist candidates",
+    "description": "Mark students as shortlist, maybe or not a fit.",
+    "phase": "during_event",
+    "order_index": 2
+  },
+  {
+    "id": "21c4b4c3-d3b1-4321-8bd9-3abede5b8efd",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Add notes",
+    "description": "Record context for each candidate while it is fresh.",
+    "phase": "during_event",
+    "order_index": 3
+  },
+  {
+    "id": "c4715ca8-beaa-4e2f-8501-0b08210f7556",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Message strong candidates",
+    "description": "Reach out to your best matches during the event.",
+    "phase": "during_event",
+    "order_index": 4
+  },
+  {
+    "id": "0e1efcf6-5dfc-4acc-8962-2016a7fea88b",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Export your shortlist",
+    "description": "Download the candidate list for your team.",
+    "phase": "post_event",
+    "order_index": 1
+  },
+  {
+    "id": "232386d3-71c3-42d1-89be-509369bc07e2",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Send follow-up messages",
+    "description": "Keep momentum with shortlisted students.",
+    "phase": "post_event",
+    "order_index": 2
+  },
+  {
+    "id": "a67cc180-e205-42c2-bd8b-38ac73f94779",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Review analytics",
+    "description": "See your booth engagement and top skills.",
+    "phase": "post_event",
+    "order_index": 3
+  },
+  {
+    "id": "d3808160-70c6-4e7b-9f8e-1565ebfc960c",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "company",
+    "title": "Update hiring pipeline",
+    "description": "Move candidates into your interview pipeline.",
+    "phase": "post_event",
+    "order_index": 4
+  },
+  {
+    "id": "e7fe5d58-88fa-4b12-9fee-deda0aef31b4",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Approve companies",
+    "description": "Confirm the employers attending the event.",
+    "phase": "pre_event",
+    "order_index": 1
+  },
+  {
+    "id": "ad7d374f-8b12-47b0-90d0-df4c866bb5ee",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Monitor student registrations",
+    "description": "Track sign-ups and check-in readiness.",
+    "phase": "pre_event",
+    "order_index": 2
+  },
+  {
+    "id": "614aa05e-ac1f-4c3e-b511-012537071a3f",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Review readiness",
+    "description": "Check resume readiness across registered students.",
+    "phase": "pre_event",
+    "order_index": 3
+  },
+  {
+    "id": "69d92611-7787-47fb-a1bc-b833bcfd45db",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Confirm QR setup",
+    "description": "Ensure every booth and student has a working QR.",
+    "phase": "pre_event",
+    "order_index": 4
+  },
+  {
+    "id": "dc4d6258-848e-4ffd-8325-e5b0987e9def",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Monitor live scans",
+    "description": "Watch scan and engagement activity in real time.",
+    "phase": "during_event",
+    "order_index": 1
+  },
+  {
+    "id": "fd93c31e-bd5c-4bde-b7e9-96b5ab1941e7",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Help inactive students",
+    "description": "Reach out to students with low or no engagement.",
+    "phase": "during_event",
+    "order_index": 2
+  },
+  {
+    "id": "022f0cf9-0e4f-4da9-8419-6b6a0750f932",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Track booth engagement",
+    "description": "See which employers are drawing the most interest.",
+    "phase": "during_event",
+    "order_index": 3
+  },
+  {
+    "id": "77f076a8-8541-461d-988c-0d298b487ad3",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Generate report",
+    "description": "Compile the post-event outcome report.",
+    "phase": "post_event",
+    "order_index": 1
+  },
+  {
+    "id": "be1015b0-5643-47f9-95fa-0e098ad590a8",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Export analytics",
+    "description": "Download engagement and outcome data.",
+    "phase": "post_event",
+    "order_index": 2
+  },
+  {
+    "id": "9d92d161-4991-4313-a9b2-789eb39fb605",
+    "created_at": "2026-06-08T09:00:47.848574+00:00",
+    "event_id": "e0000000-0000-0000-0000-000000000001",
+    "role": "event_manager",
+    "title": "Review outcomes",
+    "description": "Assess shortlists, offers and follow-up completion.",
+    "phase": "post_event",
+    "order_index": 3
+  }
+]
