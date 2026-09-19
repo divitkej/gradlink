@@ -10,7 +10,8 @@ import QRCard from "@/components/dashboard/QRCard";
 import ViewerGate from "./ViewerGate";
 import { SectionCard, Avatar, LoadingBlock, FlagPill } from "@/components/dashboard/cards";
 import { Button } from "@/components/ui/primitives";
-import { useSession, DEMO_EVENT_ID, ROLE_LABEL } from "@/lib/demo-session";
+import { useSession, ROLE_LABEL } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
 import { getRegisteredStudents, getRegisteredCompanies, type StudentRow, type CompanyRow } from "@/lib/db";
 
 function roleHome(role: string) {
@@ -19,6 +20,7 @@ function roleHome(role: string) {
 
 export default function Scanner() {
   const { session, ready } = useSession();
+  const { eventId, status: eventStatus } = useActiveEvent();
   const viewer = session?.role ?? null;
   const router = useRouter();
 
@@ -32,12 +34,12 @@ export default function Scanner() {
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!viewer) return;
+    if (!viewer || !eventId) return;
     (async () => {
-      if (viewer === "company" || viewer === "event_manager") setStudents(await getRegisteredStudents());
-      if (viewer === "student" || viewer === "event_manager") setCompanies(await getRegisteredCompanies());
+      if (viewer === "company" || viewer === "event_manager") setStudents(await getRegisteredStudents(eventId));
+      if (viewer === "student" || viewer === "event_manager") setCompanies(await getRegisteredCompanies(eventId));
     })();
-  }, [viewer]);
+  }, [viewer, eventId]);
 
   function go(path: string) {
     try {
@@ -53,8 +55,8 @@ export default function Scanner() {
     if (!v) return;
     if (v.includes("/scan/")) return go(v);
     // bare id — guess by viewer
-    if (viewer === "student") go(`/scan/company/${v}?eventId=${DEMO_EVENT_ID}`);
-    else go(`/scan/student/${v}?eventId=${DEMO_EVENT_ID}`);
+    if (viewer === "student") go(`/scan/company/${v}?eventId=${eventId}`);
+    else go(`/scan/student/${v}?eventId=${eventId}`);
   }
 
   async function startCamera() {
@@ -117,22 +119,40 @@ export default function Scanner() {
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}><LoadingBlock /></div>;
   if (!viewer || !session) return <ViewerGate onPick={() => {}} hint="Choose your role to start scanning." />;
+  if (eventStatus !== "ready" || !eventId) {
+    return (
+      <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, position: "relative", zIndex: 1 }}>
+        <div style={{ textAlign: "center", maxWidth: 360 }}>
+          <div style={{ marginBottom: 14, display: "flex", justifyContent: "center" }}><Logo size={24} /></div>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+            Join an event first
+          </h1>
+          <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55, marginBottom: 20 }}>
+            Scanning records who met whom at a specific event, so you need to be in one before the scanner opens.
+          </p>
+          <Link href="/dashboard/events" style={{ display: "inline-flex", alignItems: "center", gap: 7, height: 44, padding: "0 20px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none" }}>
+            Go to events
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const myPayload = viewer === "student"
-    ? `/scan/student/${session.profileId}?eventId=${DEMO_EVENT_ID}`
+    ? `/scan/student/${session.profileId}?eventId=${eventId}`
     : viewer === "company"
-    ? `/scan/company/${session.profileId}?eventId=${DEMO_EVENT_ID}`
+    ? `/scan/company/${session.profileId}?eventId=${eventId}`
     : null;
 
   const peopleTitle = viewer === "student" ? "Companies to scan" : viewer === "company" ? "Students to scan" : "Scan anyone";
   const people: { id: string; name: string; sub: string; route: string; tone?: string }[] =
     viewer === "student"
-      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Booth ${c.booth_number ?? "—"} · ${c.sector ?? ""}`, route: `/scan/company/${c.profile_id}?eventId=${DEMO_EVENT_ID}`, tone: "var(--teal)" }))
+      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Booth ${c.booth_number ?? "—"} · ${c.sector ?? ""}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--teal)" }))
       : viewer === "company"
-      ? students.map((s) => ({ id: s.id, name: s.full_name, sub: [s.degree, s.university].filter(Boolean).join(" · "), route: `/scan/student/${s.profile_id}?eventId=${DEMO_EVENT_ID}` }))
+      ? students.map((s) => ({ id: s.id, name: s.full_name, sub: [s.degree, s.university].filter(Boolean).join(" · "), route: `/scan/student/${s.profile_id}?eventId=${eventId}` }))
       : [
-          ...students.map((s) => ({ id: s.id, name: s.full_name, sub: `Student · ${s.university ?? ""}`, route: `/scan/student/${s.profile_id}?eventId=${DEMO_EVENT_ID}` })),
-          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Company · Booth ${c.booth_number ?? "—"}`, route: `/scan/company/${c.profile_id}?eventId=${DEMO_EVENT_ID}`, tone: "var(--teal)" })),
+          ...students.map((s) => ({ id: s.id, name: s.full_name, sub: `Student · ${s.university ?? ""}`, route: `/scan/student/${s.profile_id}?eventId=${eventId}` })),
+          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Company · Booth ${c.booth_number ?? "—"}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--teal)" })),
         ];
 
   return (

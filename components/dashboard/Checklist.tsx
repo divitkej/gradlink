@@ -8,7 +8,7 @@ import {
   getStudentByProfile, getCompanyByProfile, getScans, listMessagesForProfile, listShortlistsForCompany,
   type ChecklistItemRow,
 } from "@/lib/db";
-import type { AppRole } from "@/lib/demo-session";
+import type { AppRole } from "@/lib/session";
 
 const PHASES: { key: ChecklistItemRow["phase"]; label: string; tone: string }[] = [
   { key: "pre_event", label: "Before the event", tone: "var(--cyan)" },
@@ -40,12 +40,12 @@ interface StudentSignals {
   savedCount: number; visitedCount: number; scannedByCompany: number; scannedCompanies: number; messagesSent: number;
 }
 
-async function loadStudentSignals(profileId: string): Promise<StudentSignals> {
+async function loadStudentSignals(profileId: string, eventId: string): Promise<StudentSignals> {
   const [me, inbound, outbound, msgs] = await Promise.all([
     getStudentByProfile(profileId),
-    getScans({ scannedProfileId: profileId }),
-    getScans({ scannerProfileId: profileId }),
-    listMessagesForProfile(profileId),
+    getScans({ eventId, scannedProfileId: profileId }),
+    getScans({ eventId, scannerProfileId: profileId }),
+    listMessagesForProfile(profileId, eventId),
   ]);
   let saves: Record<string, { saved?: boolean; visited?: boolean }> = {};
   try { saves = JSON.parse(localStorage.getItem(`gradlink.saves.${profileId}`) || "{}"); } catch { /* ignore */ }
@@ -79,12 +79,12 @@ interface CompanySignals {
   shortlistCount: number; hasNotes: boolean; messagesSent: number;
 }
 
-async function loadCompanySignals(profileId: string): Promise<CompanySignals> {
+async function loadCompanySignals(profileId: string, eventId: string): Promise<CompanySignals> {
   const [me, scans, shortlists, msgs] = await Promise.all([
     getCompanyByProfile(profileId),
-    getScans({ scannerProfileId: profileId }),
-    listShortlistsForCompany(profileId),
-    listMessagesForProfile(profileId),
+    getScans({ eventId, scannerProfileId: profileId }),
+    listShortlistsForCompany(profileId, eventId),
+    listMessagesForProfile(profileId, eventId),
   ]);
   return {
     profileComplete: !!(me?.sector && me?.description && (me?.website || me?.logo_url)),
@@ -96,7 +96,15 @@ async function loadCompanySignals(profileId: string): Promise<CompanySignals> {
   };
 }
 
-export default function Checklist({ role, profileId }: { role: AppRole; profileId: string }) {
+export default function Checklist({
+  role,
+  profileId,
+  eventId,
+}: {
+  role: AppRole;
+  profileId: string;
+  eventId: string;
+}) {
   const [items, setItems] = useState<ChecklistItemRow[]>([]);
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [autoIds, setAutoIds] = useState<Set<string>>(new Set());
@@ -107,7 +115,7 @@ export default function Checklist({ role, profileId }: { role: AppRole; profileI
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const list = await getChecklistItems(role);
+      const list = await getChecklistItems(role, eventId);
       const dbProgress = await getChecklistProgress(profileId);
       let local: Record<string, boolean> = {};
       try { local = JSON.parse(localStorage.getItem(lsKey(profileId)) || "{}"); } catch { /* ignore */ }
@@ -121,10 +129,10 @@ export default function Checklist({ role, profileId }: { role: AppRole; profileI
         base[id] = val;
       };
       if (role === "student") {
-        const sig = await loadStudentSignals(profileId);
+        const sig = await loadStudentSignals(profileId, eventId);
         for (const it of list) { const a = autoRule(it.title, sig); if (a !== null) apply(it.id, a); }
       } else if (role === "company") {
-        const sig = await loadCompanySignals(profileId);
+        const sig = await loadCompanySignals(profileId, eventId);
         for (const it of list) { const a = companyAutoRule(it.title, sig); if (a !== null) apply(it.id, a); }
       }
       if (cancelled) return;
@@ -134,7 +142,7 @@ export default function Checklist({ role, profileId }: { role: AppRole; profileI
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [role, profileId]);
+  }, [role, profileId, eventId]);
 
   async function toggle(item: ChecklistItemRow) {
     if (autoIds.has(item.id)) return; // auto items reflect real activity — not manually toggled

@@ -246,7 +246,29 @@ for (const c of colleges) {
 }
 console.log(`   colleges: ${colleges.length}`);
 
+/**
+ * Events predate the join-code model, so give each imported one a code and an
+ * owner. Without a code nobody can join it; without an owner it never appears
+ * in a college's "my events" list.
+ */
+const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const codeFor = (seed) => {
+  // Derived from the event id so re-running the import is idempotent.
+  let h = 0;
+  for (const ch of String(seed)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  let out = "";
+  for (let i = 0; i < 6; i++) {
+    out += CODE_ALPHABET[h % CODE_ALPHABET.length];
+    h = Math.floor(h / CODE_ALPHABET.length) + 7919;
+  }
+  return out;
+};
+
+// Fall back to the first event manager so legacy events have an owner.
+const firstManager = profiles.find((p) => p.role === "event_manager")?.id ?? null;
+
 for (const e of events) {
+  const owner = e.created_by ?? firstManager;
   await set(db.doc(`events/${e.id}`), doc({
     created_at: e.created_at,
     title: e.title,
@@ -255,8 +277,11 @@ for (const e of events) {
     start_date: e.start_date ?? null,
     end_date: e.end_date ?? null,
     status: e.status,
-    created_by: e.created_by ?? null,
+    created_by: owner,
+    host_org: profiles.find((p) => p.id === owner)?.organization ?? null,
+    join_code: codeFor(e.id),
   }));
+  console.log(`   event "${e.title}" -> join code ${codeFor(e.id)}`);
 }
 console.log(`   events: ${events.length}`);
 

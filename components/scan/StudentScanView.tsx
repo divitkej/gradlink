@@ -9,7 +9,7 @@ import ScanLayout from "./ScanLayout";
 import ViewerGate from "./ViewerGate";
 import { SectionCard, StatTile, FlagPill, ScoreRing, MeterBar, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
 import { Button } from "@/components/ui/primitives";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 import {
   getStudentByProfile, getAnalytics, getScans, getShortlist, upsertShortlist, sendMessage,
   getRegisteredCompanies, recordScan, normalizeFeedback,
@@ -25,7 +25,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
   const [student, setStudent] = useState<StudentRow | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsRow | null>(null);
   const [scanHistory, setScanHistory] = useState<ScanRow[]>([]);
-  const [shortlist, setShortlist] = useState<ShortlistRow | null>(null);
+  const [, setShortlist] = useState<ShortlistRow | null>(null);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [loading, setLoading] = useState(true);
   const scanned = useRef(false);

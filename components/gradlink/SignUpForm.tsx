@@ -9,7 +9,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import PasswordChecklist, { passwordIsStrong } from "./PasswordChecklist";
 import { signUpUser, type Role } from "@/lib/auth";
-import { setSession, DEMO_IDENTITIES, type AppRole } from "@/lib/demo-session";
+import { setSession, type AppRole } from "@/lib/session";
 
 function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -99,10 +99,11 @@ export default function SignUpForm({ role }: { role: Role }) {
       // Continue into the user's OWN connected workspace (real profile, empty to start).
       setSession({
         role: appRole,
-        profileId: res.profileId ?? DEMO_IDENTITIES[appRole].profileId,
+        profileId: res.profileId!,
         name: fullName,
         org,
-        mode: "auth",
+        // Brand new account — they pick or create an event next.
+        activeEventId: null,
       });
       setDone(true);
       router.push(roleHome(appRole));

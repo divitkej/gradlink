@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LogIn, UserPlus } from "lucide-react";
 import Logo from "@/components/Logo";
-import type { AppRole } from "@/lib/demo-session";
+import type { AppRole } from "@/lib/session";
 
 /**
  * Shown when a QR is opened by someone who isn't signed in.

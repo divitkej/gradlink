@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft, ScanLine } from "lucide-react";
 import Logo from "@/components/Logo";
-import { ROLE_LABEL, type AppRole } from "@/lib/demo-session";
+import { ROLE_LABEL, type AppRole } from "@/lib/session";
 
 export default function ScanLayout({ viewerRole, children }: { viewerRole: AppRole; children: React.ReactNode }) {
   return (

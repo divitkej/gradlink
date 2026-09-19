@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
-import { useSession, DEMO_EVENT_ID, type AppRole } from "@/lib/demo-session";
+import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
   listAnalytics, listShortlistsForCompany, upsertShortlist,
@@ -84,8 +84,8 @@ export default function EventConsole({ eventId }: { eventId: string }) {
         <LoadingBlock />
       ) : (
         <GsapReveal key={tab} style={{ display: "block" }}>
-          {tab === "overview" && <Overview role={role} me={me} students={students} companies={companies} analytics={analytics} />}
-          {tab === "people" && <People role={role} students={students} companies={companies} me={me} shortlists={shortlists} eventId={eventId} myId={session.profileId} onShortlist={setShortlists} />}
+          {tab === "overview" && <Overview role={role} me={me} students={students} companies={companies} analytics={analytics} eventId={eventId} />}
+          {tab === "people" && <People role={role} students={students} companies={companies} shortlists={shortlists} eventId={eventId} myId={session.profileId} onShortlist={setShortlists} />}
           {tab === "qr" && role !== "event_manager" && (
             <SectionCard title="My event QR" accent="var(--border-strong)">
               <QRCard
@@ -94,7 +94,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
               />
             </SectionCard>
           )}
-          {tab === "checklist" && <Checklist role={role} profileId={session.profileId} />}
+          {tab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
           {tab === "manual" && <ManualSection defaultRole={role} />}
         </GsapReveal>
       )}
@@ -131,7 +131,7 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
   );
 }
 
-function Overview({ role, me, students, companies, analytics }: { role: AppRole; me: StudentRow | CompanyRow | null; students: StudentRow[]; companies: CompanyRow[]; analytics: AnalyticsRow[] }) {
+function Overview({ role, me, students, companies, analytics, eventId }: { role: AppRole; me: StudentRow | CompanyRow | null; students: StudentRow[]; companies: CompanyRow[]; analytics: AnalyticsRow[]; eventId: string }) {
   if (role === "student") {
     const mySkills = ((me as StudentRow)?.skills ?? []).map((s) => s.toLowerCase());
     const ranked = companies
@@ -146,7 +146,7 @@ function Overview({ role, me, students, companies, analytics }: { role: AppRole;
       <SectionCard title="Companies to visit first" hint="Matched to your skills">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {ranked.map(({ c, overlap }) => (
-            <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${DEMO_EVENT_ID}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+            <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <Avatar name={c.company_name ?? c.company ?? "C"} size={38} tone="var(--teal)" />
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
@@ -173,7 +173,7 @@ function Overview({ role, me, students, companies, analytics }: { role: AppRole;
       <SectionCard title="Recommended students" hint="Matched to your hiring needs">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {ranked.map(({ s, overlap }) => (
-            <Link key={s.id} href={`/scan/student/${s.profile_id}?eventId=${DEMO_EVENT_ID}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+            <Link key={s.id} href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <Avatar name={s.full_name} size={38} />
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{s.full_name}</span>
@@ -208,7 +208,7 @@ function Overview({ role, me, students, companies, analytics }: { role: AppRole;
             {analytics.filter((a) => a.engagement_score < 40).map((a) => {
               const s = students.find((x) => x.profile_id === a.student_id);
               return (
-                <Link key={a.id} href={`/scan/student/${a.student_id}?eventId=${DEMO_EVENT_ID}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+                <Link key={a.id} href={`/scan/student/${a.student_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
                   <Avatar name={s?.full_name ?? "Student"} size={34} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s?.full_name ?? "Student"}</span>
@@ -226,9 +226,9 @@ function Overview({ role, me, students, companies, analytics }: { role: AppRole;
 }
 
 function People({
-  role, students, companies, me, shortlists, eventId, myId, onShortlist,
+  role, students, companies, shortlists, eventId, myId, onShortlist,
 }: {
-  role: AppRole; students: StudentRow[]; companies: CompanyRow[]; me: StudentRow | CompanyRow | null;
+  role: AppRole; students: StudentRow[]; companies: CompanyRow[];
   shortlists: ShortlistRow[]; eventId: string; myId: string; onShortlist: (s: ShortlistRow[]) => void;
 }) {
   const [q, setQ] = useState("");

@@ -5,7 +5,7 @@ import { GlassPanel } from "@/components/dashboard/widgets";
 import { LoadingBlock } from "@/components/dashboard/cards";
 import StudentProfileEditor from "@/components/dashboard/StudentProfileEditor";
 import CompanyProfileEditor from "@/components/dashboard/CompanyProfileEditor";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 
 export default function ProfilePage() {
   const { session, ready } = useSession();

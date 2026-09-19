@@ -5,12 +5,14 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { GlassPanel } from "@/components/dashboard/widgets";
 import { Avatar, LoadingBlock } from "@/components/dashboard/cards";
 import { MessageSquare, Send, ArrowLeft } from "lucide-react";
-import { useSession, DEMO_EVENT_ID } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
 import { listMessagesForProfile, getProfileNames, sendMessage, markMessagesRead, type MessageRow } from "@/lib/db";
 import { notifyMessagesRead } from "@/lib/notifications";
 
 export default function MessagesPage() {
   const { session, ready } = useSession();
+  const { eventId } = useActiveEvent();
   const me = session?.profileId ?? "";
 
   const [msgs, setMsgs] = useState<MessageRow[]>([]);
@@ -29,20 +31,21 @@ export default function MessagesPage() {
     return () => window.removeEventListener("resize", f);
   }, []);
 
-  async function load() {
-    if (!me) return;
-    const m = await listMessagesForProfile(me);
-    const ids = m.flatMap((x) => [x.sender_profile_id, x.receiver_profile_id]).filter(Boolean) as string[];
-    setNames(await getProfileNames(ids));
-    setMsgs(m);
-  }
-
   useEffect(() => {
-    if (!ready || !session) return;
+    if (!ready || !me || !eventId) return;
     let cancelled = false;
-    (async () => { setLoading(true); await load(); if (!cancelled) setLoading(false); })();
+    (async () => {
+      setLoading(true);
+      const m = await listMessagesForProfile(me, eventId);
+      const ids = m.flatMap((x) => [x.sender_profile_id, x.receiver_profile_id]).filter(Boolean) as string[];
+      const resolved = await getProfileNames(ids);
+      if (cancelled) return;
+      setNames(resolved);
+      setMsgs(m);
+      setLoading(false);
+    })();
     return () => { cancelled = true; };
-  }, [ready, session]);
+  }, [ready, me, eventId]);
 
   const convs = useMemo(() => {
     const map = new Map<string, MessageRow[]>();
@@ -82,16 +85,16 @@ export default function MessagesPage() {
 
   async function send() {
     const text = reply.trim();
-    if (!text || !active || !me) return;
+    if (!text || !active || !me || !eventId) return;
     setSending(true);
     const temp: MessageRow = {
       id: "temp-" + Math.random().toString(36).slice(2),
       created_at: new Date().toISOString(),
-      event_id: DEMO_EVENT_ID, sender_profile_id: me, receiver_profile_id: active.id, message: text, read_at: null,
+      event_id: eventId, sender_profile_id: me, receiver_profile_id: active.id, message: text, read_at: null,
     };
     setMsgs((p) => [...p, temp]);
     setReply("");
-    await sendMessage({ eventId: DEMO_EVENT_ID, senderProfileId: me, receiverProfileId: active.id, message: text });
+    await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
     setSending(false);
   }
 

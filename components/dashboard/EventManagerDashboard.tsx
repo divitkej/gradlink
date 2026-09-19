@@ -8,14 +8,14 @@ import { Badge } from "@/components/ui/primitives";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
 import OutcomeReportCard from "./OutcomeReportCard";
-import { useSession, DEMO_EVENT_ID } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists,
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow,
 } from "@/lib/db";
 import { scoreTone } from "@/lib/resume";
 
-export default function EventManagerDashboard() {
+export default function EventManagerDashboard({ eventId }: { eventId: string }) {
   const { session, ready } = useSession();
   const [event, setEvent] = useState<EventRow | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
@@ -31,19 +31,18 @@ export default function EventManagerDashboard() {
     (async () => {
       setLoading(true);
       const [ev, st, co, an, sc, sl] = await Promise.all([
-        getEvent(DEMO_EVENT_ID), getRegisteredStudents(), getRegisteredCompanies(),
-        listAnalytics(), getScans({ eventId: DEMO_EVENT_ID }), listShortlists(),
+        getEvent(eventId), getRegisteredStudents(eventId), getRegisteredCompanies(eventId),
+        listAnalytics(eventId), getScans({ eventId }), listShortlists(eventId),
       ]);
       if (cancelled) return;
       setEvent(ev); setStudents(st); setCompanies(co); setAnalytics(an); setScans(sc); setShortlists(sl);
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [ready]);
+  }, [ready, eventId]);
 
   if (loading) return <LoadingBlock label="Loading live event data…" />;
 
-  const checkedIn = analytics.length; // proxy; seeded analytics rows = engaged students
   const avg = analytics.length ? Math.round(analytics.reduce((s, a) => s + a.resume_score, 0) / analytics.length) : 0;
   const ready70 = analytics.filter((a) => a.resume_score >= 70).length;
   const needHelp = analytics.filter((a) => a.engagement_score < 40);
@@ -151,7 +150,7 @@ export default function EventManagerDashboard() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {needHelp.map((a) => (
-              <Link key={a.id} href={`/scan/student/${a.student_id}?eventId=${DEMO_EVENT_ID}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+              <Link key={a.id} href={`/scan/student/${a.student_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
                 <Avatar name={nameOf(a.student_id)} size={34} />
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{nameOf(a.student_id)}</span>
@@ -178,7 +177,7 @@ export default function EventManagerDashboard() {
         </div>
       )}
 
-      {session && <div id="checklist"><Checklist role="event_manager" profileId={session.profileId} /></div>}
+      {session && <div id="checklist"><Checklist role="event_manager" profileId={session.profileId} eventId={eventId} /></div>}
 
       <div id="manual"><ManualSection defaultRole="event_manager" /></div>
 

@@ -18,25 +18,19 @@ export function notifyMessagesRead() {
  * messages surface without a full reload.
  */
 export function useUnreadMessages(profileId: string | null | undefined) {
-  const [count, setCount] = useState(0);
+  const [fetched, setFetched] = useState(0);
 
   const refresh = useCallback(async () => {
-    if (!profileId) {
-      setCount(0);
-      return;
-    }
-    setCount(await getUnreadMessageCount(profileId));
+    if (!profileId) return;
+    setFetched(await getUnreadMessageCount(profileId));
   }, [profileId]);
 
   useEffect(() => {
-    if (!profileId) {
-      setCount(0);
-      return;
-    }
+    if (!profileId) return;
     let cancelled = false;
     const run = async () => {
       const n = await getUnreadMessageCount(profileId);
-      if (!cancelled) setCount(n);
+      if (!cancelled) setFetched(n);
     };
     run();
 
@@ -53,5 +47,6 @@ export function useUnreadMessages(profileId: string | null | undefined) {
     };
   }, [profileId]);
 
-  return { count, refresh };
+  // Signed out, or no profile yet: there is nothing unread by definition.
+  return { count: profileId ? fetched : 0, refresh };
 }

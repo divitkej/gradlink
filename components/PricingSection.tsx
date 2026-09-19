@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
 import { PLANS, startCheckout, type Plan } from "@/lib/billing";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 
 export default function PricingSection() {
   const { session, ready } = useSession();
@@ -19,7 +19,7 @@ export default function PricingSection() {
 
     if (!ready) return;
     if (!session) {
-      window.location.href = "/sign-up/college";
+      window.location.assign("/sign-up/college");
       return;
     }
     if (!isManager) {

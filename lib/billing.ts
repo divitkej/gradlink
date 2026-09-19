@@ -127,7 +127,7 @@ export async function startCheckout(input: {
     });
     const data = (await res.json()) as { url?: string; error?: string };
     if (!res.ok || !data.url) return data.error ?? "Couldn't start checkout. Please try again.";
-    window.location.href = data.url;
+    window.location.assign(data.url);
     return null;
   } catch {
     return "Couldn't reach the payment service. Check your connection and try again.";

@@ -9,15 +9,19 @@ import {
   Search, Bell, Menu, X, BookOpen, Network, LogOut, History,
 } from "lucide-react";
 import Logo from "@/components/Logo";
-import { useSession, DEMO_EVENT_ID, ROLE_LABEL, type AppRole } from "@/lib/demo-session";
+import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
 import { useUnreadMessages } from "@/lib/notifications";
 import { Avatar } from "./cards";
 
 export type DashRole = AppRole;
 
-const EV = `/events/${DEMO_EVENT_ID}`;
+type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
 
-const NAV: Record<AppRole, { label: string; href: string; icon: React.ComponentType<{ size?: number }> }[]> = {
+/** Nav depends on which event is open, so it is built per render. */
+function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
+  const EV = eventId ? `/events/${eventId}` : "/dashboard/events";
+  return {
   student: [
     { label: "Overview", href: "/dashboard/student", icon: LayoutDashboard },
     { label: "Event", href: EV, icon: CalendarDays },
@@ -51,7 +55,8 @@ const NAV: Record<AppRole, { label: string; href: string; icon: React.ComponentT
     { label: "Scan Monitor", href: "/dashboard/event-manager#scans", icon: History },
     { label: "Manual", href: "/dashboard/event-manager#manual", icon: BookOpen },
   ],
-};
+  };
+}
 
 function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -69,6 +74,7 @@ export default function DashboardShell({
   const pathname = usePathname();
   const router = useRouter();
   const { session, ready, signOut } = useSession();
+  const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
   const { count: unread } = useUnreadMessages(session?.profileId);
 
@@ -91,7 +97,7 @@ export default function DashboardShell({
   }
 
   const activeRole: AppRole = session.role;
-  const nav = NAV[activeRole];
+  const nav = buildNav(eventId)[activeRole];
   const displayName = session.name || "Your account";
   const displayOrg = session.org || "";
 

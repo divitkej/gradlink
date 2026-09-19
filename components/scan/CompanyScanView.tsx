@@ -9,7 +9,7 @@ import ScanLayout from "./ScanLayout";
 import ViewerGate from "./ViewerGate";
 import { SectionCard, StatTile, FlagPill, TagRow, Avatar, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
 import { Button } from "@/components/ui/primitives";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, sendMessage, recordScan,
   getStudentByProfile,

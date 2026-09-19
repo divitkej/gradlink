@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, AlertTriangle, Check, ScanLine, Building2, History } from "lucide-react";
+import { Sparkles, AlertTriangle, ScanLine, Building2, History } from "lucide-react";
 import { GlassPanel, PanelTitle, StatCard } from "./widgets";
 import { SectionCard, MeterBar, FlagPill, ScoreRing, LoadingBlock } from "./cards";
 import { Badge } from "@/components/ui/primitives";
@@ -10,7 +10,8 @@ import { Reveal } from "@/components/anim/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
-import { useSession, DEMO_EVENT_ID, DEMO_EVENT_TITLE, DEMO_IDENTITIES } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
 import {
   getStudentByProfile, getScans, getRegisteredCompanies, listShortlistsForStudent,
   getChecklistItems, getChecklistProgress,
@@ -18,9 +19,10 @@ import {
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
 
-export default function StudentDashboard() {
+export default function StudentDashboard({ eventId }: { eventId: string }) {
   const { session } = useSession();
-  const profileId = session?.profileId ?? DEMO_IDENTITIES.student.profileId;
+  const { event } = useActiveEvent();
+  const profileId = session?.profileId ?? "";
   const firstName = session?.name?.split(" ")[0] ?? "there";
 
   const [me, setMe] = useState<StudentRow | null>(null);
@@ -36,10 +38,10 @@ export default function StudentDashboard() {
       setLoading(true);
       const [m, sc, co, sl, items, prog] = await Promise.all([
         getStudentByProfile(profileId),
-        getScans({ scannedProfileId: profileId }),
-        getRegisteredCompanies(),
-        listShortlistsForStudent(profileId),
-        getChecklistItems("student"),
+        getScans({ eventId, scannedProfileId: profileId }),
+        getRegisteredCompanies(eventId),
+        listShortlistsForStudent(profileId, eventId),
+        getChecklistItems("student", eventId),
         getChecklistProgress(profileId),
       ]);
       if (cancelled) return;
@@ -52,11 +54,16 @@ export default function StudentDashboard() {
       setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [profileId]);
+  }, [profileId, eventId]);
 
   if (loading) {
     return <GlassPanel><LoadingBlock label="Loading your profile…" /></GlassPanel>;
   }
+
+  const eventDate = event?.start_date
+    ? new Date(event.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+    : null;
+  const eventLabel = [event?.title ?? "Your event", eventDate].filter(Boolean).join(" · ");
 
   const evalr = evaluateResume(me ?? {});
   const resumeScore = evalr.score;
@@ -86,7 +93,7 @@ export default function StudentDashboard() {
       <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 20 }}>
         <Reveal>
           <GlassPanel style={{ border: "1px solid var(--border-strong)", height: "100%" }}>
-            <Badge tone="cyan" pulse>{DEMO_EVENT_TITLE} · 18 Feb</Badge>
+            <Badge tone="cyan" pulse>{eventLabel}</Badge>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(24px,3vw,32px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px", letterSpacing: "-0.02em" }}>
               Welcome back, {firstName}.
             </h2>
@@ -107,7 +114,7 @@ export default function StudentDashboard() {
           <GlassPanel id="qr" style={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <PanelTitle>My QR</PanelTitle>
             <QRCard
-              payload={`/scan/student/${profileId}?eventId=${DEMO_EVENT_ID}`}
+              payload={`/scan/student/${profileId}?eventId=${eventId}`}
               caption={session?.name ?? "Your profile"}
               sub={session?.org ?? me?.university ?? ""}
               accent="var(--cyan)"
@@ -119,7 +126,7 @@ export default function StudentDashboard() {
 
       {/* Checklist + Resume analysis */}
       <div className="dash-2col" id="checklist" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Checklist role="student" profileId={profileId} />
+        <Checklist role="student" profileId={profileId} eventId={eventId} />
 
         <SectionCard
           title="AI resume analysis"
@@ -170,7 +177,7 @@ export default function StudentDashboard() {
             {matched.map(({ c, overlap }) => (
               <Link
                 key={c.id}
-                href={`/scan/company/${c.profile_id}?eventId=${DEMO_EVENT_ID}`}
+                href={`/scan/company/${c.profile_id}?eventId=${eventId}`}
                 className="dash-company"
                 style={{ textDecoration: "none", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: 16, height: "100%", display: "flex", flexDirection: "column", gap: 10, transition: "all 0.18s" }}
               >

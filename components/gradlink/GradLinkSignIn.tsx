@@ -9,7 +9,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import { signIn, sendReset, getProfileForUser } from "@/lib/auth";
 import { detectIdentityByEmail, ensureProfile } from "@/lib/db";
-import { setSession } from "@/lib/demo-session";
+import { setSession } from "@/lib/session";
 
 function roleHome(role: "student" | "company" | "event_manager") {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -86,7 +86,7 @@ export default function GradLinkSignIn() {
         profileId: profile.profileId,
         name: profile.name || email.split("@")[0],
         org: profile.org,
-        mode: "auth",
+        activeEventId: null,
       });
       setBusy(false);
       router.push(roleHome(profile.role as "student" | "company" | "event_manager"));
@@ -114,7 +114,7 @@ export default function GradLinkSignIn() {
       profileId,
       name: identity.name || email.split("@")[0],
       org: identity.org,
-      mode: "auth",
+      activeEventId: null,
     });
     setBusy(false);
     router.push(roleHome(identity.role));

@@ -6,15 +6,17 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { GlassPanel, PanelTitle, StatCard, Pipeline } from "@/components/dashboard/widgets";
 import { Badge, Button } from "@/components/ui/primitives";
 import { Reveal } from "@/components/anim/primitives";
-import { Download, QrCode, ScanLine, Users } from "lucide-react";
+import { Download, ScanLine, Users } from "lucide-react";
 import QRCard from "@/components/dashboard/QRCard";
 import Checklist from "@/components/dashboard/Checklist";
 import ManualSection from "@/components/dashboard/ManualSection";
-import { Avatar, FlagPill, LoadingBlock } from "@/components/dashboard/cards";
-import { useSession, DEMO_EVENT_ID, DEMO_IDENTITIES } from "@/lib/demo-session";
+import { Avatar, LoadingBlock } from "@/components/dashboard/cards";
+import { useSession } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
+import EventGate from "@/components/events/EventGate";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, getStudentByProfile,
-  type CompanyRow, type ScanRow, type ShortlistRow, type StudentRow,
+  type CompanyRow, type ShortlistRow, type StudentRow,
 } from "@/lib/db";
 import { evaluateResume } from "@/lib/resume";
 
@@ -23,13 +25,14 @@ const filters = ["Degree", "Graduation Year", "Skills", "Readiness", "Resume", "
 const statusTone = (s?: string) =>
   s === "priority" ? "amber" : s === "shortlisted" ? "teal" : s === "maybe" ? "cyan" : s === "rejected" ? "danger" : "muted";
 
-export default function CompanyPage() {
+function CompanyOverview({ eventId }: { eventId: string }) {
   const { session } = useSession();
-  const profileId = session?.profileId ?? DEMO_IDENTITIES.company.profileId;
-  const orgName = session?.org ?? "Careem";
+  const { event } = useActiveEvent();
+  const profileId = session?.profileId ?? "";
+  const orgName = session?.org || "Your company";
+  const eventTitle = event?.title ?? "This event";
 
   const [me, setMe] = useState<CompanyRow | null>(null);
-  const [scans, setScans] = useState<ScanRow[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,8 +43,8 @@ export default function CompanyPage() {
       setLoading(true);
       const [c, sc, sl] = await Promise.all([
         getCompanyByProfile(profileId),
-        getScans({ scannerProfileId: profileId }),
-        listShortlistsForCompany(profileId),
+        getScans({ eventId, scannerProfileId: profileId }),
+        listShortlistsForCompany(profileId, eventId),
       ]);
       const ids = Array.from(new Set([
         ...sc.map((s) => s.scanned_profile_id).filter(Boolean) as string[],
@@ -49,10 +52,10 @@ export default function CompanyPage() {
       ]));
       const rows = (await Promise.all(ids.map((id) => getStudentByProfile(id)))).filter(Boolean) as StudentRow[];
       if (cancelled) return;
-      setMe(c); setScans(sc); setShortlists(sl); setStudents(rows); setLoading(false);
+      setMe(c); setShortlists(sl); setStudents(rows); setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [profileId]);
+  }, [profileId, eventId]);
 
   const slByStudent = new Map(shortlists.map((s) => [s.student_id, s.status]));
   const scannedCount = students.length;
@@ -71,13 +74,13 @@ export default function CompanyPage() {
   const hasPipeline = scannedCount + shortlists.length > 0;
 
   return (
-    <DashboardShell role="company" title="Company Overview">
+    <>
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         <Reveal>
           <GlassPanel style={{ border: "1px solid var(--border-strong)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
               <div>
-                <Badge tone="amber" pulse>Career Fair 2025 · Booth {me?.booth_number ?? "—"}</Badge>
+                <Badge tone="amber" pulse>{eventTitle} · Booth {me?.booth_number ?? "—"}</Badge>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{orgName} Recruiting</h2>
                 <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 460 }}>Scan students at your booth, shortlist your best matches, and follow up — all from here.</p>
               </div>
@@ -99,9 +102,9 @@ export default function CompanyPage() {
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <GlassPanel id="qr">
             <PanelTitle>Company QR</PanelTitle>
-            <QRCard payload={`/scan/company/${profileId}?eventId=${DEMO_EVENT_ID}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--teal)" filename="gradlink-company-qr" />
+            <QRCard payload={`/scan/company/${profileId}?eventId=${eventId}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--teal)" filename="gradlink-company-qr" />
           </GlassPanel>
-          <Checklist role="company" profileId={profileId} />
+          <Checklist role="company" profileId={profileId} eventId={eventId} />
         </div>
 
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20 }}>
@@ -137,7 +140,7 @@ export default function CompanyPage() {
                     </div>
                     <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                       <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{score}</strong></span>
-                      <Link href={`/scan/student/${s.profile_id}?eventId=${DEMO_EVENT_ID}`} style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>View profile →</Link>
+                      <Link href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>View profile →</Link>
                     </div>
                   </div>
                 );
@@ -154,13 +157,13 @@ export default function CompanyPage() {
               <PanelTitle>This event</PanelTitle>
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "12px 14px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Abu Dhabi Career Fair 2025</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{eventTitle}</span>
                   <Badge tone="amber" pulse>Live</Badge>
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>18 Feb 2025 · Booth {me?.booth_number ?? "—"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "—"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
               </div>
               <div style={{ marginTop: 12 }}>
-                <Link href={`/events/${DEMO_EVENT_ID}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>Open event console →</Link>
+                <Link href={`/events/${eventId}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>Open event console →</Link>
               </div>
             </GlassPanel>
           </div>
@@ -173,6 +176,14 @@ export default function CompanyPage() {
         @media (max-width: 900px) { .dash-2col { grid-template-columns: 1fr !important; } }
         @media (max-width: 520px) { .dash-stats { grid-template-columns: repeat(2,1fr) !important; } }
       `}</style>
+    </>
+  );
+}
+
+export default function CompanyPage() {
+  return (
+    <DashboardShell role="company" title="Company Overview">
+      <EventGate>{(eventId) => <CompanyOverview eventId={eventId} />}</EventGate>
     </DashboardShell>
   );
 }

@@ -5,8 +5,8 @@ import { GlassPanel, PanelTitle } from "./widgets";
 import { Badge, Button } from "@/components/ui/primitives";
 import { Avatar, LoadingBlock, FlagPill } from "./cards";
 import { Check, FileText, Save, UploadCloud, Loader2 } from "lucide-react";
-import { getCompanyByProfile, updateCompanyProfile, uploadPublicFile, type CompanyRow } from "@/lib/db";
-import type { GLSession } from "@/lib/demo-session";
+import { getCompanyByProfile, updateCompanyProfile, uploadPublicFile } from "@/lib/db";
+import type { GLSession } from "@/lib/session";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
@@ -20,7 +20,6 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
 }
 
 export default function CompanyProfileEditor({ session }: { session: GLSession }) {
-  const [me, setMe] = useState<CompanyRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -46,7 +45,6 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
       setLoading(true);
       const m = await getCompanyByProfile(session.profileId);
       if (cancelled) return;
-      setMe(m);
       setCompanyName(m?.company_name ?? m?.company ?? session.org ?? "");
       setSector(m?.sector ?? "");
       setIndustry(m?.industry ?? "");

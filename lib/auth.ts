@@ -13,7 +13,6 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
 import { firebaseAuth, firestore, isFirebaseConfigured } from "./firebase";
-import { DEMO_EVENT_ID } from "./demo-session";
 
 export { isFirebaseConfigured };
 
@@ -111,29 +110,10 @@ export async function signUpUser({
       [orgColumn]: organization,
     });
 
-    // Students & companies join the demo event; managers host it.
-    if (appRole === "student" || appRole === "company") {
-      await setDoc(doc(db, "events", DEMO_EVENT_ID, "registrations", profileId), {
-        created_at: now,
-        event_id: DEMO_EVENT_ID,
-        profile_id: profileId,
-        role: appRole,
-        checked_in: false,
-      });
-    }
-    if (appRole === "student") {
-      await setDoc(doc(db, "events", DEMO_EVENT_ID, "analytics", profileId), {
-        event_id: DEMO_EVENT_ID,
-        student_id: profileId,
-        profile_views: 0,
-        company_scans: 0,
-        shortlists: 0,
-        messages_received: 0,
-        resume_score: 0,
-        engagement_score: 0,
-      });
-    }
-  } catch (err) {
+    // A new account belongs to no event yet. Students and employers join one
+    // with the code their college shares; colleges create their own. Signing up
+    // no longer drops everyone into a single shared event.
+  } catch {
     // The auth account exists but its data didn't land. Say so plainly rather
     // than reporting success against a half-created account.
     return {

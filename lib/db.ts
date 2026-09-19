@@ -7,7 +7,6 @@ import {
 } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { firestore, firebaseStorage } from "./firebase";
-import { DEMO_EVENT_ID } from "./demo-session";
 
 /* ============================================================
    GradLink event-platform data access layer (Firestore).
@@ -71,17 +70,6 @@ export interface CompanyRow {
   booth_number: string | null;
   skills_wanted: string[] | null;
   brochure_url: string | null;
-}
-
-export interface EventRow {
-  id: string;
-  title: string;
-  description: string | null;
-  location: string | null;
-  start_date: string | null;
-  end_date: string | null;
-  status: string;
-  created_by: string | null;
 }
 
 export interface ScanRow {
@@ -187,7 +175,6 @@ async function getManyById<T>(db: Firestore, path: string, ids: string[]): Promi
   return results;
 }
 
-const eventsCol = (db: Firestore) => collection(db, "events");
 const regsCol = (db: Firestore, eventId: string) => collection(db, "events", eventId, "registrations");
 const scansCol = (db: Firestore, eventId: string) => collection(db, "events", eventId, "scans");
 const shortlistsCol = (db: Firestore, eventId: string) => collection(db, "events", eventId, "shortlists");
@@ -196,19 +183,6 @@ const analyticsCol = (db: Firestore, eventId: string) => collection(db, "events"
 /** Deterministic composite ids stand in for the old unique constraints. */
 const shortlistId = (companyId: string, studentId: string) => `${companyId}__${studentId}`;
 const progressId = (profileId: string, itemId: string) => `${profileId}__${itemId}`;
-
-/* ---------------- Events ---------------- */
-export async function getEvent(eventId = DEMO_EVENT_ID): Promise<EventRow | null> {
-  const db = firestore();
-  if (!db) return null;
-  try {
-    const snap = await getDoc(doc(eventsCol(db), eventId));
-    return snap.exists() ? row<EventRow>(snap.id, snap.data()) : null;
-  } catch (e) {
-    log("getEvent", e);
-    return null;
-  }
-}
 
 /* ---------------- Students ---------------- */
 export async function getStudentByProfile(profileId: string): Promise<StudentRow | null> {
@@ -235,7 +209,7 @@ export async function updateStudentProfile(profileId: string, fields: Partial<St
   }
 }
 
-export async function getRegisteredStudents(eventId = DEMO_EVENT_ID): Promise<StudentRow[]> {
+export async function getRegisteredStudents(eventId: string): Promise<StudentRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -272,7 +246,7 @@ export async function updateCompanyProfile(profileId: string, fields: Partial<Co
   }
 }
 
-export async function getRegisteredCompanies(eventId = DEMO_EVENT_ID): Promise<CompanyRow[]> {
+export async function getRegisteredCompanies(eventId: string): Promise<CompanyRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -285,7 +259,7 @@ export async function getRegisteredCompanies(eventId = DEMO_EVENT_ID): Promise<C
 }
 
 /* ---------------- Analytics ---------------- */
-export async function getAnalytics(studentId: string, eventId = DEMO_EVENT_ID): Promise<AnalyticsRow | null> {
+export async function getAnalytics(studentId: string, eventId: string): Promise<AnalyticsRow | null> {
   const db = firestore();
   if (!db || !studentId) return null;
   try {
@@ -297,7 +271,7 @@ export async function getAnalytics(studentId: string, eventId = DEMO_EVENT_ID): 
   }
 }
 
-export async function listAnalytics(eventId = DEMO_EVENT_ID): Promise<AnalyticsRow[]> {
+export async function listAnalytics(eventId: string): Promise<AnalyticsRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -311,7 +285,7 @@ export async function listAnalytics(eventId = DEMO_EVENT_ID): Promise<AnalyticsR
 
 /* ---------------- Scans ---------------- */
 export async function recordScan(input: {
-  eventId?: string;
+  eventId: string;
   scannerProfileId: string;
   scannedProfileId: string;
   scannerRole: string;
@@ -321,7 +295,7 @@ export async function recordScan(input: {
 }): Promise<boolean> {
   const db = firestore();
   if (!db) return false;
-  const eventId = input.eventId ?? DEMO_EVENT_ID;
+  const eventId = input.eventId;
   try {
     const ref = doc(scansCol(db, eventId));
     await setDoc(ref, {
@@ -342,13 +316,13 @@ export async function recordScan(input: {
 }
 
 export async function getScans(filter: {
-  eventId?: string;
+  eventId: string;
   scannerProfileId?: string;
   scannedProfileId?: string;
 }): Promise<ScanRow[]> {
   const db = firestore();
   if (!db) return [];
-  const eventId = filter.eventId ?? DEMO_EVENT_ID;
+  const eventId = filter.eventId;
   try {
     const cons: QueryConstraint[] = [];
     if (filter.scannerProfileId) cons.push(where("scanner_profile_id", "==", filter.scannerProfileId));
@@ -364,7 +338,7 @@ export async function getScans(filter: {
 
 /* ---------------- Shortlists ---------------- */
 export async function upsertShortlist(input: {
-  eventId?: string;
+  eventId: string;
   companyId: string;
   studentId: string;
   status: ShortlistRow["status"];
@@ -372,7 +346,7 @@ export async function upsertShortlist(input: {
 }): Promise<boolean> {
   const db = firestore();
   if (!db) return false;
-  const eventId = input.eventId ?? DEMO_EVENT_ID;
+  const eventId = input.eventId;
   try {
     const id = shortlistId(input.companyId, input.studentId);
     const ref = doc(shortlistsCol(db, eventId), id);
@@ -397,7 +371,7 @@ export async function upsertShortlist(input: {
   }
 }
 
-export async function getShortlist(companyId: string, studentId: string, eventId = DEMO_EVENT_ID): Promise<ShortlistRow | null> {
+export async function getShortlist(companyId: string, studentId: string, eventId: string): Promise<ShortlistRow | null> {
   const db = firestore();
   if (!db) return null;
   try {
@@ -409,7 +383,7 @@ export async function getShortlist(companyId: string, studentId: string, eventId
   }
 }
 
-export async function listShortlistsForCompany(companyId: string, eventId = DEMO_EVENT_ID): Promise<ShortlistRow[]> {
+export async function listShortlistsForCompany(companyId: string, eventId: string): Promise<ShortlistRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -423,7 +397,7 @@ export async function listShortlistsForCompany(companyId: string, eventId = DEMO
   }
 }
 
-export async function listShortlistsForStudent(studentId: string, eventId = DEMO_EVENT_ID): Promise<ShortlistRow[]> {
+export async function listShortlistsForStudent(studentId: string, eventId: string): Promise<ShortlistRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -435,7 +409,7 @@ export async function listShortlistsForStudent(studentId: string, eventId = DEMO
   }
 }
 
-export async function listShortlists(eventId = DEMO_EVENT_ID): Promise<ShortlistRow[]> {
+export async function listShortlists(eventId: string): Promise<ShortlistRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -449,7 +423,7 @@ export async function listShortlists(eventId = DEMO_EVENT_ID): Promise<Shortlist
 
 /* ---------------- Messages ---------------- */
 export async function sendMessage(input: {
-  eventId?: string;
+  eventId: string;
   senderProfileId: string;
   receiverProfileId: string;
   message: string;
@@ -460,7 +434,7 @@ export async function sendMessage(input: {
     const ref = doc(collection(db, "messages"));
     await setDoc(ref, {
       created_at: new Date().toISOString(),
-      event_id: input.eventId ?? DEMO_EVENT_ID,
+      event_id: input.eventId,
       sender_profile_id: input.senderProfileId,
       receiver_profile_id: input.receiverProfileId,
       // Firestore can't OR across two fields, so both sides are indexed here.
@@ -475,7 +449,7 @@ export async function sendMessage(input: {
   }
 }
 
-export async function listMessagesForProfile(profileId: string, eventId = DEMO_EVENT_ID): Promise<MessageRow[]> {
+export async function listMessagesForProfile(profileId: string, eventId: string): Promise<MessageRow[]> {
   const db = firestore();
   if (!db || !profileId) return [];
   try {
@@ -545,7 +519,7 @@ export async function markMessagesRead(profileId: string, fromProfileId?: string
 }
 
 /* ---------------- Checklist ---------------- */
-export async function getChecklistItems(role: string, eventId = DEMO_EVENT_ID): Promise<ChecklistItemRow[]> {
+export async function getChecklistItems(role: string, eventId: string): Promise<ChecklistItemRow[]> {
   const db = firestore();
   if (!db) return [];
   try {
@@ -605,7 +579,7 @@ export async function setChecklistProgress(itemId: string, profileId: string, co
 }
 
 /* ---------------- role detection (real sign-in) ---------------- */
-import type { AppRole } from "./demo-session";
+import type { AppRole } from "./session";
 
 const ROLE_TABLE_MAP: { table: string; role: AppRole; orgCol: string }[] = [
   { table: "students", role: "student", orgCol: "university" },
@@ -684,22 +658,8 @@ export async function ensureProfile(input: { email: string; role: AppRole; name:
       { merge: true }
     );
 
-    if (input.role === "student" || input.role === "company") {
-      await setDoc(doc(regsCol(db, DEMO_EVENT_ID), pid), {
-        created_at: new Date().toISOString(),
-        event_id: DEMO_EVENT_ID,
-        profile_id: pid,
-        role: input.role,
-        checked_in: false,
-      });
-    }
-    if (input.role === "student") {
-      await setDoc(doc(analyticsCol(db, DEMO_EVENT_ID), pid), {
-        event_id: DEMO_EVENT_ID, student_id: pid,
-        profile_views: 0, company_scans: 0, shortlists: 0,
-        messages_received: 0, resume_score: 0, engagement_score: 0,
-      });
-    }
+    // No event registration here on purpose: a new account isn't a member of
+    // anything until they join an event with its code (see lib/events.ts).
     return pid;
   } catch (err) {
     log("ensureProfile", err);
@@ -754,6 +714,10 @@ export function normalizeFeedback(fb: AIFeedback | string | null): AIFeedback | 
   }
   return fb;
 }
+
+/* Events moved to lib/events.ts; re-exported so existing imports keep resolving. */
+export type { EventRow } from "./events";
+export { getEvent } from "./events";
 
 /* Re-exported so callers that need a raw handle don't import firebase directly. */
 export { firestore, collectionGroup, deleteField, updateDoc };

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
 
 function roleHome(role: string) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;

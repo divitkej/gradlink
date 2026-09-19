@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GraduationCap, Building2, Briefcase, BookOpen } from "lucide-react";
 import { SectionCard } from "./cards";
-import type { AppRole } from "@/lib/demo-session";
+import type { AppRole } from "@/lib/session";
 
 const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; accent: string; steps: string[] }> = {
   student: {

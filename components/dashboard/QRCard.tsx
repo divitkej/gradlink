@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useHydrated } from "@/lib/use-hydrated";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, Share2, Check, QrCode as QrIcon } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
@@ -24,15 +25,14 @@ export default function QRCard({
   filename?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [url, setUrl] = useState<string>(payload);
   const [copied, setCopied] = useState(false);
+  const hydrated = useHydrated();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const abs = payload.startsWith("http") ? payload : window.location.origin + payload;
-      setUrl(abs);
-    }
-  }, [payload]);
+  // The QR has to encode an absolute URL so it resolves on the scanning phone,
+  // but window.location is only readable after hydration.
+  const url = hydrated && !payload.startsWith("http")
+    ? window.location.origin + payload
+    : payload;
 
   function download() {
     const canvas = ref.current?.querySelector("canvas");

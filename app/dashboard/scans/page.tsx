@@ -6,24 +6,26 @@ import { GlassPanel, PanelTitle } from "@/components/dashboard/widgets";
 import { Badge } from "@/components/ui/primitives";
 import { Avatar, LoadingBlock } from "@/components/dashboard/cards";
 import { History } from "lucide-react";
-import { useSession } from "@/lib/demo-session";
+import { useSession } from "@/lib/session";
+import { useActiveEvent } from "@/lib/use-active-event";
 import { getScans, getProfileNames, type ScanRow } from "@/lib/db";
 
 export default function ScansPage() {
   const { session, ready } = useSession();
+  const { eventId } = useActiveEvent();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [names, setNames] = useState<Record<string, { name: string; role: string; org: string }>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!ready || !session) return;
+    if (!ready || !session || !eventId) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
       // Scans where I'm involved (as scanner or as the one scanned).
       const [inbound, outbound] = await Promise.all([
-        getScans({ scannedProfileId: session.profileId }),
-        getScans({ scannerProfileId: session.profileId }),
+        getScans({ eventId, scannedProfileId: session.profileId }),
+        getScans({ eventId, scannerProfileId: session.profileId }),
       ]);
       const all = [...inbound, ...outbound].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
       const ids = all.flatMap((s) => [s.scanner_profile_id, s.scanned_profile_id]).filter(Boolean) as string[];
@@ -32,7 +34,7 @@ export default function ScansPage() {
       setScans(all); setNames(n); setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [ready, session]);
+  }, [ready, session, eventId]);
 
   return (
     <DashboardShell title="Scan History">

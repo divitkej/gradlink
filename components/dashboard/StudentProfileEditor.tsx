@@ -7,7 +7,7 @@ import { Avatar, ScoreRing, LoadingBlock, FlagPill } from "./cards";
 import { Check, FileText, Link as LinkIcon, Save, UploadCloud, Loader2 } from "lucide-react";
 import { getStudentByProfile, updateStudentProfile, uploadPublicFile, type StudentRow } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
-import type { GLSession } from "@/lib/demo-session";
+import type { GLSession } from "@/lib/session";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
@@ -21,7 +21,6 @@ function Field({ label, value, onChange, placeholder, type = "text" }: { label: 
 }
 
 export default function StudentProfileEditor({ session }: { session: GLSession }) {
-  const [me, setMe] = useState<StudentRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -46,7 +45,6 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       setLoading(true);
       const m = await getStudentByProfile(session.profileId);
       if (cancelled) return;
-      setMe(m);
       setDegree(m?.degree ?? "");
       setYear(m?.graduation_year ? String(m.graduation_year) : "");
       setUniversity(m?.university ?? session.org ?? "");
