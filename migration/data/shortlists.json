@@ -6,7 +6,7 @@
     "company_id": "d29db75e-2cee-441a-83ce-99007464b905",
     "student_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
     "status": "rejected",
-    "notes": "no"
+    "notes": "[notes redacted]"
   },
   {
     "id": "f833c7d5-0c71-4ef8-abea-6529a766d812",
@@ -33,6 +33,6 @@
     "company_id": "9e2fdd7e-9e72-40b2-8b7d-e2293603f4d6",
     "student_id": "e6a9b88b-49c0-4dde-85b9-4098cc3a2e8a",
     "status": "rejected",
-    "notes": "Not Qualified"
+    "notes": "[notes redacted]"
   }
 ]

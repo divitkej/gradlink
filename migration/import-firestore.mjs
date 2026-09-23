@@ -27,8 +27,15 @@ import { getAuth } from "firebase-admin/auth";
 import { getStorage } from "firebase-admin/storage";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DATA = join(HERE, "data");
 const PRIVATE = join(HERE, ".private");
+
+/*
+ * Prefer the real, git-ignored export. The committed copy under data/ has had
+ * names, emails and message bodies pseudonymised (see scrub-export.mjs), so
+ * importing from it would create placeholder accounts rather than real ones.
+ */
+const REAL_DATA = join(PRIVATE, "data");
+const DATA = existsSync(REAL_DATA) ? REAL_DATA : join(HERE, "data");
 
 const DRY = process.argv.includes("--dry-run");
 const DO_STORAGE = process.argv.includes("--storage");
@@ -62,7 +69,17 @@ const app = initializeApp({
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-console.log(`Project: ${serviceAccount.project_id}${DRY ? "  (DRY RUN — nothing will be written)" : ""}\n`);
+console.log(`Project: ${serviceAccount.project_id}${DRY ? "  (DRY RUN — nothing will be written)" : ""}`);
+console.log(`Source:  ${DATA}`);
+if (DATA !== REAL_DATA) {
+  // Importing placeholders would silently create fake accounts, so say so loudly.
+  console.log(
+    "\n  WARNING: this is the SCRUBBED copy. Names, emails and message bodies are\n" +
+      "  placeholders, so the import will not recreate real accounts. Restore your\n" +
+      `  private export to ${REAL_DATA} first if that is not what you want.`
+  );
+}
+console.log("");
 
 /* ---------------- load ---------------- */
 const profiles = table("profiles");

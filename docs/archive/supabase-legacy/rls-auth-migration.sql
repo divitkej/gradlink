@@ -6,7 +6,7 @@
 -- managers) the events they host.
 --
 -- PROVEN: the predicate model was validated against live data on 2026-06-14
--- (company "Smitta" saw 2/3 messages; non-participant "Amsal" saw 0/3).
+-- (the company participant saw 2/3 messages; a non-participant saw 0/3).
 --
 -- ⚠️ DO NOT APPLY BLINDLY. Prerequisites, in order:
 --   1. Supabase Auth → "Confirm email" OFF (so sign-in/up yield a JWT).

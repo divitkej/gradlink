@@ -43,7 +43,20 @@ don't paste it into chat or commit it.
 
 ## Step 3 — Move the data
 
-Your Supabase data is already exported to `migration/data/*.json` (157 rows).
+Two copies of the export exist:
+
+| Path | Contents | In git? |
+|---|---|---|
+| `migration/.private/data/` | the real export — real names, emails, messages | **no**, git-ignored |
+| `migration/data/` | the same 157 rows, pseudonymised by `scrub-export.mjs` | yes |
+
+The import uses the private copy when it's present and falls back to the
+scrubbed one with a loud warning, because importing placeholders would quietly
+create fake accounts.
+
+> **`migration/.private/` is the only copy of your real data, and git is not
+> backing it up.** Keep a copy somewhere else.
+
 Do a dry run first — it writes nothing and reports exactly what it would do:
 
 ```bash
@@ -102,8 +115,8 @@ their profile id.
   sign in*. They now have a real account and can use "Forgot password" to set a
   password for the first time. This is a fix, not a regression.
 
-One college row (`Dr. Huda Al Naqbi`) has no `profile_id` and will be keyed by
-its own id with no auth account. The script logs it when it runs.
+One college row has no `profile_id` and will be keyed by its own id, with no
+auth account. The script names it when it runs.
 
 ## Don't delete Supabase yet
 
@@ -115,4 +128,5 @@ and confirmed your data is there. Once you're happy:
 - Then delete the project — and **rotate the leaked `service_role` key** either
   way, since it was exposed in chat earlier in this project's history.
 
-`migration/data/*.json` is your offline copy regardless.
+Your offline copy of the real data is `migration/.private/data/` — not the
+scrubbed `migration/data/` in this repo. Back it up accordingly.
