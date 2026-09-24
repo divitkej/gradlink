@@ -6,16 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:import": "node migration/import-neon.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@neondatabase/serverless": "^1.1.0",
     "@react-three/fiber": "^9.6.1",
     "clsx": "^2.1.1",
-    "firebase": "^12.16.0",
-    "firebase-admin": "^14.2.0",
     "framer-motion": "^12.40.0",
     "gsap": "^3.15.0",
     "jsqr": "^1.4.0",
@@ -30,6 +35,7 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "1.20.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -37,8 +43,8 @@
     "@types/three": "^0.184.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
-    "firebase-tools": "^15.25.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.139.0"
   }
 }

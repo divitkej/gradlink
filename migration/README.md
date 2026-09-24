@@ -1,132 +1,92 @@
-# Supabase → Firebase migration
+# Moving GradLink's data to Neon
 
-Everything in the app is already rewritten for Firebase. What's left needs a
-Google account, so it has to be done by you. It's about 15 minutes.
+The app code is already on Neon + Cloudflare Workers. What's left needs your
+Neon and Cloudflare accounts, so it has to be done by you.
 
 ## What changed
 
-| Before (Supabase) | After (Firebase) |
+| Before (Supabase → Firebase) | After |
 |---|---|
-| Postgres, 14 tables | Firestore collections + event subcollections |
-| Supabase Auth | Firebase Auth (Email/Password) |
-| Storage bucket `uploads` | Firebase Storage |
-| RLS policies (all `USING (true)` — wide open) | `firestore.rules` / `storage.rules` — sign-in required, owner-only writes |
-| `profiles.id` ≠ auth uid | **auth uid IS the profile id** |
+| Firestore collections / Supabase Postgres | Neon Postgres, `db/schema.sql` (same table + column names as Supabase) |
+| Firebase Auth / Supabase Auth | `auth_credentials` + signed session cookie, handled by the Worker |
+| Firebase Storage / Supabase `uploads` bucket | Workers KV namespace `UPLOADS` |
+| `firestore.rules` / RLS | Owner checks in `lib/server/rpc.ts` |
+| Vercel | Cloudflare Workers (`wrangler.jsonc`) |
 
-That last row is the important one. Because a user's Firebase uid is also their
-profile id, every rule is a direct `request.auth.uid == profileId` comparison —
-no lookups, and no way to read someone else's data by guessing an id.
+Ids are kept exactly as they were, so printed QR codes and shared links still work.
 
-## Step 1 — Create the Firebase project
+## Step 1 — Create the schema
 
-1. <https://console.firebase.google.com> → **Add project** (name it `gradlink`).
-2. **Build → Firestore Database → Create database** → Production mode → region
-   `asia-south1` (Mumbai — closest to your UAE/India users).
-3. **Build → Authentication → Get started → Email/Password → Enable.**
-4. **Build → Storage → Get started.**
-
-## Step 2 — Get the two sets of keys
-
-**Web config** (for the app): Project settings → General → Your apps → Web
-(`</>`) → register app → copy the `firebaseConfig` values into `.env.local`
-using `.env.local.example` as the template.
-
-**Service account** (for the import script): Project settings → Service
-accounts → **Generate new private key** → save the downloaded file as:
-
-```
-migration/.private/service-account.json
+```bash
+cp .dev.vars.example .dev.vars      # paste your Neon DATABASE_URL
+npm run db:migrate
 ```
 
-That folder is git-ignored. The key grants full admin access to your project —
-don't paste it into chat or commit it.
+## Step 2 — Pick the data source
 
-## Step 3 — Move the data
-
-Two copies of the export exist:
+There are up to three copies of GradLink's data:
 
 | Path | Contents | In git? |
 |---|---|---|
-| `migration/.private/data/` | the real export — real names, emails, messages | **no**, git-ignored |
-| `migration/data/` | the same 157 rows, pseudonymised by `scrub-export.mjs` | yes |
+| `migration/.private/data/` | the real June 2026 Supabase export | **no**, git-ignored |
+| `migration/.private/firestore-export/` | live Firebase data, if you run the export below | **no**, git-ignored |
+| `migration/data/` | the Supabase export, pseudonymised by `scrub-export.mjs` | yes |
 
-The import uses the private copy when it's present and falls back to the
-scrubbed one with a loud warning, because importing placeholders would quietly
-create fake accounts.
-
-> **`migration/.private/` is the only copy of your real data, and git is not
-> backing it up.** Keep a copy somewhere else.
-
-Do a dry run first — it writes nothing and reports exactly what it would do:
+**If GradLink has been live on Firebase** (people signed up or events ran after
+the Firebase move), export Firestore first — it is newer than the Supabase copy:
 
 ```bash
-node migration/import-firestore.mjs --dry-run
+npm i --no-save firebase-admin
+node migration/export-firestore.mjs     # needs migration/.private/service-account.json
 ```
 
-Then run it for real, including the résumé/brochure files:
+## Step 3 — Import
+
+Always dry-run first — it writes nothing and reports what it would do:
 
 ```bash
-node migration/import-firestore.mjs --storage
+npm run db:import -- --dry-run
+npm run db:import
 ```
 
-The script is idempotent — safe to re-run if something fails partway.
+Add `--from=migration/.private/firestore-export` to import the Firestore
+export instead. With no flag, the real Supabase export is used if present,
+otherwise the scrubbed copy (with a loud warning — it contains placeholder
+names and emails).
 
-## Step 4 — Deploy the security rules
+The import is idempotent (`on conflict do nothing`), so it's safe to re-run.
+
+**Uploaded files:** if any résumés/brochures are still hosted on Supabase or
+Firebase Storage, copy them into Workers KV (after deploying, with
+`APP_URL` set to the Worker URL in `.dev.vars` and `npx wrangler login` done):
 
 ```bash
-npx firebase login
+npm run db:import -- --files
 ```
-
-```bash
-npx firebase deploy --only firestore:rules,firestore:indexes,storage --project YOUR_PROJECT_ID
-```
-
-Composite indexes take a few minutes to build. Until they finish, the messages
-inbox and scan history will return empty — that's expected, not a bug.
-
-## Step 5 — Point the reset-password page at GradLink
-
-Authentication → Templates → Password reset → pencil icon → **Customise action
-URL** → set it to:
-
-```
-https://gradlink-theta.vercel.app/reset-password
-```
-
-Without this, Firebase uses its own generic reset page instead of your branded one.
-
-## Step 6 — Add the env vars to Vercel
-
-Add all six `NEXT_PUBLIC_FIREBASE_*` values to the Vercel project (Settings →
-Environment Variables), then redeploy. Remove the two `NEXT_PUBLIC_SUPABASE_*`
-vars once you've confirmed the site works.
-
----
 
 ## What happens to existing accounts
 
-18 profiles were exported. Each gets a Firebase Auth account whose uid equals
-their profile id.
+Every imported profile gets a login, **without a password**. Supabase stored
+bcrypt hashes and Firebase stores its own scrypt variant; verifying either on
+every sign-in would exceed the Cloudflare Workers Free plan's CPU limit. So
+existing users set a new password once:
 
-- **9 accounts keep their existing password** — the bcrypt hashes came across
-  intact, so those users notice nothing.
-- **9 accounts have no password.** These are profiles that were created while
-  Supabase auth was failing, so they had no auth user at all and *could never
-  sign in*. They now have a real account and can use "Forgot password" to set a
-  password for the first time. This is a fix, not a regression.
+1. Sign-in tells them their account moved and to tap **Forgot password?**
+2. They get an email with a link to `/reset-password` (needs `RESEND_API_KEY`
+   and `EMAIL_FROM` set as Worker secrets).
 
-One college row has no `profile_id` and will be keyed by its own id, with no
-auth account. The script names it when it runs.
+New passwords use PBKDF2-SHA256 (WebCrypto, native to Workers).
 
-## Don't delete Supabase yet
+## Retire the old services
 
-Keep the Supabase project alive until you've signed in on the live Firebase site
-and confirmed your data is there. Once you're happy:
+Once you've signed in on the Workers site and checked your data:
 
-- Download a final backup (free-tier projects can't download backups after the
-  90-day pause window, so do it while active).
-- Then delete the project — and **rotate the leaked `service_role` key** either
-  way, since it was exposed in chat earlier in this project's history.
+- **Firebase** — keep the project until any Storage files are copied
+  (`--files`), then delete it.
+- **Supabase** — download a final backup if you still can, delete the project,
+  and **rotate the leaked `service_role` key** either way.
+- **Vercel** — remove the project (or its production domain) so there's a single
+  live deployment.
 
-Your offline copy of the real data is `migration/.private/data/` — not the
-scrubbed `migration/data/` in this repo. Back it up accordingly.
+`migration/.private/` is the only copy of the real data and git is not backing
+it up. Keep a copy somewhere else.

@@ -7,8 +7,7 @@ import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react"
 import AuthShell from "./AuthShell";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
-import { signIn, sendReset, getProfileForUser } from "@/lib/auth";
-import { detectIdentityByEmail, ensureProfile } from "@/lib/db";
+import { signIn, sendReset } from "@/lib/auth";
 import { setSession } from "@/lib/session";
 
 function roleHome(role: "student" | "company" | "event_manager") {
@@ -72,52 +71,23 @@ export default function GradLinkSignIn() {
     }
     setBusy(true);
     const res = await signIn(email, password);
-    if (!res.ok || !res.uid) {
+    if (!res.ok || !res.profile) {
       setBusy(false);
       setError(res.error ?? "Incorrect email or password.");
       return;
     }
 
-    // The auth uid is the profile id, so this is normally a single direct read.
-    const profile = await getProfileForUser(res.uid, email);
-    if (profile) {
-      setSession({
-        role: profile.role as "student" | "company" | "event_manager",
-        profileId: profile.profileId,
-        name: profile.name || email.split("@")[0],
-        org: profile.org,
-        activeEventId: null,
-      });
-      setBusy(false);
-      router.push(roleHome(profile.role as "student" | "company" | "event_manager"));
-      return;
-    }
-
-    // Fallback for older accounts whose profile was never linked: find them by
-    // their role document, backfilling a profile if one is genuinely missing.
-    const identity = await detectIdentityByEmail(email);
-    if (!identity) {
-      setBusy(false);
-      setError("We couldn't find a GradLink profile for this account. Please sign up first.");
-      return;
-    }
-    const profileId =
-      identity.profileId ??
-      (await ensureProfile({ email, role: identity.role, name: identity.name, org: identity.org }));
-    if (!profileId) {
-      setBusy(false);
-      setError("Couldn't load your profile. Please try again.");
-      return;
-    }
+    // Sign-in returns the profile directly: the account id IS the profile id.
+    const profile = res.profile;
     setSession({
-      role: identity.role,
-      profileId,
-      name: identity.name || email.split("@")[0],
-      org: identity.org,
+      role: profile.role,
+      profileId: profile.profileId,
+      name: profile.name || email.split("@")[0],
+      org: profile.org,
       activeEventId: null,
     });
     setBusy(false);
-    router.push(roleHome(identity.role));
+    router.push(roleHome(profile.role));
   }
 
   return (

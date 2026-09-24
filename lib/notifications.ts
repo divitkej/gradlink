@@ -11,11 +11,17 @@ export function notifyMessagesRead() {
   window.dispatchEvent(new Event(MSG_READ_EVT));
 }
 
+const POLL_MS = 60_000;
+
 /**
  * Live unread-message count for the given profile.
  * Refreshes on mount, on window focus, when messages are marked read
  * (via `notifyMessagesRead`), and on a light interval so new incoming
  * messages surface without a full reload.
+ *
+ * The interval skips hidden tabs: every poll is a database query, and a
+ * background tab polling around the clock would stop Neon from ever scaling
+ * to zero — burning the Free plan's compute hours for nobody.
  */
 export function useUnreadMessages(profileId: string | null | undefined) {
   const [fetched, setFetched] = useState(0);
@@ -37,7 +43,9 @@ export function useUnreadMessages(profileId: string | null | undefined) {
     const onFocus = () => run();
     window.addEventListener(MSG_READ_EVT, run);
     window.addEventListener("focus", onFocus);
-    const interval = window.setInterval(run, 25000);
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") run();
+    }, POLL_MS);
 
     return () => {
       cancelled = true;

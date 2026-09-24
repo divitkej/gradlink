@@ -1,24 +1,20 @@
 "use client";
 
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  verifyPasswordResetCode,
-  confirmPasswordReset,
-  updatePassword,
-  signOut as fbSignOut,
-  fetchSignInMethodsForEmail,
-  type User,
-} from "firebase/auth";
-import { doc, getDoc, setDoc, collection, query, where, getDocs, limit } from "firebase/firestore";
-import { firebaseAuth, firestore, isFirebaseConfigured } from "./firebase";
+import { api, ApiError } from "./api-client";
+import type { AppRole } from "./session";
 
-export { isFirebaseConfigured };
+/* ============================================================
+   Authentication — email + password, handled by the Worker
+   (/api/auth/* → lib/server/auth-api.ts) against Neon.
+
+   Replaces Firebase Auth. The signed-in state is an HttpOnly session
+   cookie the browser can't read or forge; lib/session.ts keeps a
+   localStorage copy of the profile purely so the UI paints instantly.
+   ============================================================ */
 
 export type Role = "student" | "company" | "college";
 
-/** Maps each role to its Firestore collection and the org-name field. */
+/** Maps each role to its table and the org-name column. */
 export const ROLE_TABLE: Record<Role, { table: string; orgColumn: string }> = {
   student: { table: "students", orgColumn: "university" },
   company: { table: "companies", orgColumn: "company" },
@@ -34,221 +30,97 @@ export interface SignUpInput {
   organization: string;
 }
 
-const NOT_CONFIGURED = "GradLink isn't connected yet — add your Firebase keys to .env.local (see README).";
+export interface SignedInProfile {
+  profileId: string;
+  role: AppRole;
+  name: string;
+  org: string;
+}
 
-/** Turn a Firebase auth error code into something a human can act on. */
-function friendlyAuthError(err: unknown): string {
-  const code = (err as { code?: string })?.code ?? "";
-  switch (code) {
-    case "auth/email-already-in-use":
-      return "An account with this email already exists — please sign in instead.";
-    case "auth/invalid-email":
-      return "That email address doesn't look right.";
-    case "auth/weak-password":
-      return "That password is too weak. Use at least 8 characters.";
-    case "auth/invalid-credential":
-    case "auth/wrong-password":
-    case "auth/user-not-found":
-      return "Incorrect email or password.";
-    case "auth/too-many-requests":
-      return "Too many attempts. Please wait a moment and try again.";
-    case "auth/network-request-failed":
-      return "Network problem — check your connection and try again.";
-    default:
-      return (err as { message?: string })?.message ?? "Something went wrong. Please try again.";
-  }
+/** The server's messages are written for people; network failures aren't. */
+function friendlyError(err: unknown): string {
+  if (err instanceof ApiError) return err.message;
+  return "Network problem — check your connection and try again.";
 }
 
 /**
- * Creates the Firebase Auth user and all of their Firestore documents.
- *
- * The auth uid IS the profile id throughout GradLink — that's what lets the
- * security rules say `request.auth.uid == profileId` without an extra lookup.
+ * Creates the account, its profile and its role row in one transaction, and
+ * signs the user in. The profile id is the account id throughout GradLink.
  */
-export async function signUpUser({
-  role, fullName, email, password, organization,
-}: SignUpInput): Promise<{ ok: boolean; error?: string; profileId?: string }> {
-  const auth = firebaseAuth();
-  const db = firestore();
-  if (!auth || !db) return { ok: false, error: NOT_CONFIGURED };
-
-  const appRole = role === "college" ? "event_manager" : role;
-  const { table, orgColumn } = ROLE_TABLE[role];
-  const emailTrimmed = email.trim();
-  const emailLower = emailTrimmed.toLowerCase();
-
-  let user: User;
+export async function signUpUser(
+  input: SignUpInput
+): Promise<{ ok: boolean; error?: string; profileId?: string }> {
   try {
-    const cred = await createUserWithEmailAndPassword(auth, emailTrimmed, password);
-    user = cred.user;
+    const res = await api<{ profile: SignedInProfile }>("/api/auth/sign-up", input);
+    return { ok: true, profileId: res.profile.profileId };
   } catch (err) {
-    return { ok: false, error: friendlyAuthError(err) };
-  }
-
-  const profileId = user.uid;
-  const now = new Date().toISOString();
-
-  try {
-    await setDoc(doc(db, "profiles", profileId), {
-      created_at: now,
-      auth_uid: profileId,
-      role: appRole,
-      full_name: fullName,
-      email: emailTrimmed,
-      email_lower: emailLower,
-      organization,
-      avatar_url: null,
-    });
-
-    await setDoc(doc(db, table, profileId), {
-      created_at: now,
-      profile_id: profileId,
-      auth_uid: profileId,
-      full_name: fullName,
-      email: emailTrimmed,
-      email_lower: emailLower,
-      [orgColumn]: organization,
-    });
-
-    // A new account belongs to no event yet. Students and employers join one
-    // with the code their college shares; colleges create their own. Signing up
-    // no longer drops everyone into a single shared event.
-  } catch {
-    // The auth account exists but its data didn't land. Say so plainly rather
-    // than reporting success against a half-created account.
-    return {
-      ok: false,
-      error: "Your account was created but we couldn't finish setting up your workspace. Please sign in to retry.",
-    };
-  }
-
-  return { ok: true, profileId };
-}
-
-/** Email + password sign-in. */
-export async function signIn(email: string, password: string): Promise<{ ok: boolean; error?: string; uid?: string }> {
-  const auth = firebaseAuth();
-  if (!auth) return { ok: false, error: NOT_CONFIGURED };
-  try {
-    const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
-    return { ok: true, uid: cred.user.uid };
-  } catch (err) {
-    return { ok: false, error: friendlyAuthError(err) };
+    return { ok: false, error: friendlyError(err) };
   }
 }
 
-/** Send a password-reset email that returns the user to /reset-password. */
+/** Email + password sign-in. Returns the profile, so no second lookup is needed. */
+export async function signIn(
+  email: string,
+  password: string
+): Promise<{ ok: boolean; error?: string; uid?: string; profile?: SignedInProfile }> {
+  try {
+    const res = await api<{ profile: SignedInProfile }>("/api/auth/sign-in", { email: email.trim(), password });
+    return { ok: true, uid: res.profile.profileId, profile: res.profile };
+  } catch (err) {
+    return { ok: false, error: friendlyError(err) };
+  }
+}
+
+/** Email a password-reset link that opens /reset-password. */
 export async function sendReset(email: string): Promise<{ ok: boolean; error?: string }> {
-  const auth = firebaseAuth();
-  if (!auth) return { ok: false, error: NOT_CONFIGURED };
   try {
-    await sendPasswordResetEmail(auth, email.trim(), {
-      url: typeof window !== "undefined" ? `${window.location.origin}/sign-in` : "https://gradlink-theta.vercel.app/sign-in",
-    });
+    await api("/api/auth/reset-request", { email: email.trim() });
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: friendlyAuthError(err) };
+    return { ok: false, error: friendlyError(err) };
   }
 }
 
-/**
- * Validate the `oobCode` from a password-reset email link.
- * Requires the Firebase console's action URL to point at /reset-password.
- */
-export async function verifyResetCode(oobCode: string): Promise<{ ok: boolean; email?: string; error?: string }> {
-  const auth = firebaseAuth();
-  if (!auth) return { ok: false, error: NOT_CONFIGURED };
+/** Validate the `token` from a password-reset email link. */
+export async function verifyResetCode(token: string): Promise<{ ok: boolean; email?: string; error?: string }> {
   try {
-    const email = await verifyPasswordResetCode(auth, oobCode);
-    return { ok: true, email };
-  } catch {
-    return { ok: false, error: "This reset link has expired or has already been used. Request a new one from the sign-in page." };
+    const res = await api<{ email: string }>("/api/auth/reset-verify", { token });
+    return { ok: true, email: res.email };
+  } catch (err) {
+    return { ok: false, error: friendlyError(err) };
   }
 }
 
-/** Complete a password reset using the `oobCode` from the email link. */
-export async function confirmReset(oobCode: string, password: string): Promise<{ ok: boolean; error?: string }> {
-  const auth = firebaseAuth();
-  if (!auth) return { ok: false, error: NOT_CONFIGURED };
+/** Complete a password reset using the `token` from the email link. */
+export async function confirmReset(token: string, password: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    await confirmPasswordReset(auth, oobCode, password);
+    await api("/api/auth/reset-confirm", { token, password });
     return { ok: true };
   } catch (err) {
-    const code = (err as { code?: string })?.code ?? "";
-    if (/expired|invalid/i.test(code)) {
-      return { ok: false, error: "This reset link has expired. Request a new one from the sign-in page." };
-    }
-    return { ok: false, error: friendlyAuthError(err) };
+    return { ok: false, error: friendlyError(err) };
   }
 }
 
 /** Set a new password for the currently signed-in user. */
 export async function setNewPassword(password: string): Promise<{ ok: boolean; error?: string }> {
-  const auth = firebaseAuth();
-  if (!auth?.currentUser) return { ok: false, error: "Your reset link has expired. Please request a new one." };
   try {
-    await updatePassword(auth.currentUser, password);
+    await api("/api/auth/change-password", { password });
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: friendlyAuthError(err) };
+    return { ok: false, error: friendlyError(err) };
   }
 }
 
 export async function signOutUser(): Promise<void> {
-  const auth = firebaseAuth();
-  if (auth) await fbSignOut(auth);
+  await api("/api/auth/sign-out", {}).catch(() => {});
 }
 
-/**
- * Look up a profile document by auth uid, falling back to an email match for
- * accounts whose uid and profile id diverged before the migration.
- */
-export async function getProfileForUser(
-  uid: string,
-  email?: string | null
-): Promise<{ profileId: string; role: string; name: string; org: string } | null> {
-  const db = firestore();
-  if (!db) return null;
+/** The account behind the current session cookie, or null when signed out. */
+export async function getCurrentUser(): Promise<(SignedInProfile & { email: string }) | null> {
   try {
-    const direct = await getDoc(doc(db, "profiles", uid));
-    if (direct.exists()) {
-      const d = direct.data() as Record<string, string | null>;
-      return {
-        profileId: direct.id,
-        role: (d.role as string) ?? "student",
-        name: (d.full_name as string) ?? "",
-        org: (d.organization as string) ?? "",
-      };
-    }
-    if (email) {
-      const snap = await getDocs(
-        query(collection(db, "profiles"), where("email_lower", "==", email.trim().toLowerCase()), limit(1))
-      );
-      if (!snap.empty) {
-        const d = snap.docs[0];
-        const data = d.data() as Record<string, string | null>;
-        return {
-          profileId: d.id,
-          role: (data.role as string) ?? "student",
-          name: (data.full_name as string) ?? "",
-          org: (data.organization as string) ?? "",
-        };
-      }
-    }
+    const res = await api<{ user: (SignedInProfile & { email: string }) | null }>("/api/auth/session");
+    return res.user;
   } catch {
-    /* fall through to null so the caller can show its own error */
-  }
-  return null;
-}
-
-/** Whether an email already has an account (used for friendlier sign-up errors). */
-export async function emailExists(email: string): Promise<boolean> {
-  const auth = firebaseAuth();
-  if (!auth) return false;
-  try {
-    const methods = await fetchSignInMethodsForEmail(auth, email.trim());
-    return methods.length > 0;
-  } catch {
-    return false;
+    return null;
   }
 }

@@ -1,0 +1,48 @@
+// GradLink on Cloudflare Workers — Workers FREE plan only.
+//
+// Everything below is available on the Free plan: static assets, Workers KV,
+// workers.dev hosting and Workers Logs. Nothing here needs Workers Paid, and
+// there are deliberately no cron triggers, Durable Objects, R2 buckets, queues
+// or Images bindings.
+//
+// Secrets are NOT configured here. Set them once with Wrangler:
+//   npx wrangler secret put DATABASE_URL
+//   npx wrangler secret put AUTH_SECRET
+// (see README.md → "Environment variables" for the full list)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gradlink",
+  // Built by `opennextjs-cloudflare build` from the Next.js app.
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-01",
+  // nodejs_compat is required by the Next.js runtime; it also mirrors vars and
+  // secrets onto process.env, which the API routes read.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  // Pages, JS/CSS and prerendered HTML. Static asset requests are free and
+  // don't count against the Free plan's daily Worker request limit.
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // Résumés, brochures and logos (replaces Firebase Storage).
+  // Create once with:  npx wrangler kv namespace create UPLOADS
+  // then paste the printed id here.
+  "kv_namespaces": [
+    {
+      "binding": "UPLOADS",
+      "id": "REPLACE_WITH_UPLOADS_KV_NAMESPACE_ID"
+    }
+  ],
+
+  // Non-secret configuration. APP_URL is optional — when empty, emailed links
+  // use the origin of the request that triggered them.
+  "vars": {
+    "APP_URL": ""
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
