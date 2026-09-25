@@ -1,7 +1,6 @@
 "use client";
 
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "./firebase";
+import { rpc } from "./api-client";
 
 /* ============================================================
    GradLink billing — colleges pay, companies and students are free.
@@ -10,10 +9,10 @@ import { firestore } from "./firebase";
    what a placement office needs after the fair: the outcome report,
    exports, unlimited events and year-over-year comparison.
 
-   Entitlement lives in `subscriptions/{profileId}` (keyed by the event
-   manager's profile id, which is also their auth uid). That document is
-   written ONLY by the Stripe webhook through the Admin SDK — clients can
-   read it but never write it, so a plan cannot be forged from the browser.
+   Entitlement lives in the `subscriptions` table, keyed by the event
+   manager's profile id. That row is written ONLY by the Stripe webhook
+   (app/api/stripe/webhook) — the data API exposes it read-only to its
+   owner, so a plan cannot be forged from the browser.
    ============================================================ */
 
 export type PlanId = "free" | "pro";
@@ -86,12 +85,11 @@ export const FREE_SUBSCRIPTION: SubscriptionRow = { plan: "free", status: "activ
 
 /** Read a college's subscription. Falls back to the free plan on any error. */
 export async function getSubscription(profileId: string): Promise<SubscriptionRow> {
-  const db = firestore();
-  if (!db || !profileId) return FREE_SUBSCRIPTION;
+  if (!profileId) return FREE_SUBSCRIPTION;
   try {
-    const snap = await getDoc(doc(db, "subscriptions", profileId));
-    if (!snap.exists()) return FREE_SUBSCRIPTION;
-    return { ...FREE_SUBSCRIPTION, ...(snap.data() as SubscriptionRow) };
+    const row = await rpc<SubscriptionRow | null>("getSubscription", profileId);
+    if (!row) return FREE_SUBSCRIPTION;
+    return { ...FREE_SUBSCRIPTION, ...row };
   } catch {
     return FREE_SUBSCRIPTION;
   }

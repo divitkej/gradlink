@@ -52,7 +52,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 - [ ] **Opening hero on a low-end phone.** Hand-written WebGL shader background plus canvas particle text. Check frame rate and battery heat.
   `components/landing/OpeningHero.tsx`, `components/ui/shader-background.tsx` · Verify live
 - [ ] **Link preview card.** Paste the URL into LinkedIn and WhatsApp and check the image.
-  `app/opengraph-image.tsx` · Verify live
+  `app/opengraph-image.png` (source: `docs/brand/opengraph-image.tsx`) · Verify live
 - [x] **Scroll progress bar and thread.** Removed with all other scroll-triggered animations ahead of the redesign, so there is nothing left to test.
   Done in `1317868`
 - [ ] **Navbar links on the home page.** Platform, Students, Employers, Colleges, Analytics, Pricing, Login, Get Started.

@@ -21,8 +21,12 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `components/ui/` | Generic building blocks (buttons, cards, meters, sections) |
 | `components/anim/` | Reusable motion helpers |
 | `components/` (root) | App-wide pieces only: `Logo.tsx`, `Providers.tsx`. `PricingSection.tsx` moves to `components/pricing/` when pricing work starts. |
-| `lib/` | Data access (`lib/db.ts`), auth (`lib/auth.ts`), utilities |
+| `lib/` | Client-side data access (`lib/db.ts`), auth (`lib/auth.ts`), utilities |
+| `lib/server/` | Server-only code for the API routes (auth, rpc, SQL, files, mail) |
+| `db/` | Postgres schema (`db/schema.sql`) |
+| `scripts/` | Project scripts run through `npm run` |
 | `docs/checklists/` | Live launch checklists, one file per area |
+| `docs/brand/` | Sources for the share images and icons in `app/` |
 | `docs/archive/` | Historical material, never imported or deployed |
 | `migration/` | One-off data migration scripts and exports |
 

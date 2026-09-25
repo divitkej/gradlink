@@ -18,7 +18,8 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const SITE_URL = "https://gradlink-theta.vercel.app";
+// Set NEXT_PUBLIC_SITE_URL at build time to the Worker's public URL (see .env.example).
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const SHARE_TITLE = "GradLink — Prepare students. Connect employers. Track outcomes.";
 const SHARE_DESC =
   "Career-event intelligence for UAE colleges — from check-in to offer, every student interaction becomes measurable career data.";

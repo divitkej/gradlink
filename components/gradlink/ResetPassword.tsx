@@ -8,8 +8,7 @@ import AuthShell from "./AuthShell";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import PasswordChecklist, { passwordIsStrong } from "./PasswordChecklist";
-import { verifyResetCode, confirmReset, setNewPassword } from "@/lib/auth";
-import { firebaseAuth } from "@/lib/firebase";
+import { verifyResetCode, confirmReset, setNewPassword, getCurrentUser } from "@/lib/auth";
 
 function Field({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (v: string) => void }) {
   return (
@@ -27,7 +26,7 @@ function Field({ id, label, value, onChange }: { id: string; label: string; valu
 export default function ResetPassword() {
   const router = useRouter();
   const params = useSearchParams();
-  const oobCode = params.get("oobCode");
+  const token = params.get("token");
 
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
@@ -39,20 +38,21 @@ export default function ResetPassword() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Firebase sends a one-time `oobCode` in the reset link. Validate it up
-      // front so an expired link says so before the user types a new password.
-      if (oobCode) {
-        const res = await verifyResetCode(oobCode);
+      // The emailed link carries a one-time `token`. Validate it up front so
+      // an expired link says so before the user types a new password.
+      if (token) {
+        const res = await verifyResetCode(token);
         if (cancelled) return;
         if (res.ok) setHasSession(true);
         else setError(res.error ?? null);
         return;
       }
       // No code in the URL — allow an already-signed-in user to change their password.
-      if (firebaseAuth()?.currentUser) setHasSession(true);
+      const user = await getCurrentUser();
+      if (!cancelled && user) setHasSession(true);
     })();
     return () => { cancelled = true; };
-  }, [oobCode]);
+  }, [token]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,7 +60,7 @@ export default function ResetPassword() {
     if (!passwordIsStrong(pw)) { setError("Please meet all the password requirements."); return; }
     if (pw !== pw2) { setError("The two passwords don't match."); return; }
     setBusy(true);
-    const res = oobCode ? await confirmReset(oobCode, pw) : await setNewPassword(pw);
+    const res = token ? await confirmReset(token, pw) : await setNewPassword(pw);
     setBusy(false);
     if (!res.ok) {
       setError(res.error ?? "Couldn't update your password. Please try again.");
