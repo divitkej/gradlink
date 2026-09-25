@@ -156,3 +156,10 @@ only by the Stripe webhook, so a paid plan can't be forged from the browser.
 
 GradLink ran on Supabase until July 2026, then briefly on Firebase. Both are
 archived under `docs/archive/`; neither is used at runtime.
+
+## Contributors
+
+| Contributor | Role |
+|---|---|
+| [@divitkej](https://github.com/divitkej) | Creator and maintainer |
+| [@BharatGupta09](https://github.com/BharatGupta09) | Contributor — Neon + Cloudflare Workers migration |
