@@ -118,6 +118,17 @@ export default function OpeningHero() {
       >
         {/* Wordmark: particles and solid text share wordSize → seamless dissolve */}
         <div style={{ position: "relative", width: "min(640px, 92vw)", height: boxH, marginBottom: 30 }}>
+          {/* Soft dark patch that dims the hero lines behind the wordmark */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: "-24px -48px",
+              zIndex: -1,
+              pointerEvents: "none",
+              background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
+            }}
+          />
           {mounted && !reduce && (
             <motion.div
               initial={{ opacity: 1 }}
