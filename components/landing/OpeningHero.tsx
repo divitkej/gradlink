@@ -175,8 +175,20 @@ export default function OpeningHero() {
             letterSpacing: "0.01em",
             color: "var(--text)",
             lineHeight: 1.55,
+            position: "relative",
           }}
         >
+          {/* Soft dark patch that dims the hero lines behind the tagline */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: "-28px -72px",
+              zIndex: -1,
+              pointerEvents: "none",
+              background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
+            }}
+          />
           <div style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Prepare students. Connect employers.</div>
           <div style={{ marginTop: 4 }}>
             <span style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Track outcomes.</span>
