@@ -116,9 +116,13 @@ npx wrangler secret put EMAIL_FROM            # optional, enables password reset
 ## Deploy
 
 ```bash
-npm run deploy      # opennextjs-cloudflare build && deploy → https://gradlink.<subdomain>.workers.dev
+npm run deploy      # opennextjs-cloudflare build && deploy → https://gradlink.divitkej.workers.dev
 npm run upload      # same build, uploaded as a preview version without going live
 ```
+
+The old Vercel project (`gradlink-theta.vercel.app`) no longer builds the app.
+`vercel.json` makes it skip the build and redirect every path to the Worker
+(temporary 307, so it can be switched to permanent once the move is settled).
 
 Stripe webhook endpoint: `https://<your-worker-url>/api/stripe/webhook`
 (events: `checkout.session.completed`, `customer.subscription.updated`,

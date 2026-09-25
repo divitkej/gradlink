@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo \"GradLink runs on Cloudflare Workers; this Vercel project only redirects\"",
+  "buildCommand": "echo \"skip build\"",
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://gradlink.divitkej.workers.dev/:path*",
+      "permanent": false
+    }
+  ]
+}
