@@ -66,9 +66,9 @@ function CompanyOverview({ eventId }: { eventId: string }) {
 
   const pipeline = [
     { label: "Scanned", count: scannedCount, color: "var(--text-muted)" },
-    { label: "Shortlisted", count: shortlisted, color: "var(--teal)" },
-    { label: "Priority", count: priority, color: "var(--cyan)" },
-    { label: "Maybe", count: maybe, color: "#2BB8E8" },
+    { label: "Shortlisted", count: shortlisted, color: "var(--accent-2)" },
+    { label: "Priority", count: priority, color: "var(--accent)" },
+    { label: "Maybe", count: maybe, color: "#D4D4D4" },
     { label: "Not a fit", count: rejected, color: "var(--amber)" },
   ];
   const hasPipeline = scannedCount + shortlists.length > 0;
@@ -85,7 +85,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
                 <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 460 }}>Scan students at your booth, shortlist your best matches, and follow up — all from here.</p>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none" }}><ScanLine size={16} /> Scan students</Link>
+                <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scan students</Link>
                 <Button variant="secondary" icon={<Download size={15} />}>Export</Button>
               </div>
             </div>
@@ -102,7 +102,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <GlassPanel id="qr">
             <PanelTitle>Company QR</PanelTitle>
-            <QRCard payload={`/scan/company/${profileId}?eventId=${eventId}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--teal)" filename="gradlink-company-qr" />
+            <QRCard payload={`/scan/company/${profileId}?eventId=${eventId}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--accent-2)" filename="gradlink-company-qr" />
           </GlassPanel>
           <Checklist role="company" profileId={profileId} eventId={eventId} />
         </div>
@@ -111,16 +111,16 @@ function CompanyOverview({ eventId }: { eventId: string }) {
           <GlassPanel id="students" style={{ padding: 0, overflow: "hidden" }}>
             <div style={{ padding: "18px 22px 0" }}><PanelTitle hint={`${scannedCount} scanned`}>Scanned students</PanelTitle></div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 22px 14px" }}>
-              {filters.map((f) => <span key={f} style={{ fontSize: 11.5, color: "var(--text-2)", background: "rgba(53,211,255,0.06)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", padding: "4px 10px" }}>{f}</span>)}
+              {filters.map((f) => <span key={f} style={{ fontSize: 11.5, color: "var(--text-2)", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", padding: "4px 10px" }}>{f}</span>)}
             </div>
             {loading ? (
               <LoadingBlock label="Loading candidates…" />
             ) : students.length === 0 ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "26px 24px 34px", textAlign: "center" }}>
-                <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--teal)" }}><Users size={22} /></div>
+                <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-2)" }}><Users size={22} /></div>
                 <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No students scanned yet</div>
                 <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Open the scanner and scan a student&apos;s QR at your booth — they&apos;ll show up here with their portfolio and resume score.</p>
-                <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}><ScanLine size={15} /> Open scanner</Link>
+                <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}><ScanLine size={15} /> Open scanner</Link>
               </div>
             ) : (
               students.map((s) => {
@@ -140,7 +140,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
                     </div>
                     <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                       <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{score}</strong></span>
-                      <Link href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>View profile →</Link>
+                      <Link href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ marginLeft: "auto", fontSize: 12, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>View profile →</Link>
                     </div>
                   </div>
                 );
@@ -163,7 +163,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "—"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
               </div>
               <div style={{ marginTop: 12 }}>
-                <Link href={`/events/${eventId}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>Open event console →</Link>
+                <Link href={`/events/${eventId}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>Open event console →</Link>
               </div>
             </GlassPanel>
           </div>

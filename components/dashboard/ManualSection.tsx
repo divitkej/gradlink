@@ -8,7 +8,7 @@ import type { AppRole } from "@/lib/session";
 const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; accent: string; steps: string[] }> = {
   student: {
     icon: GraduationCap,
-    accent: "var(--cyan)",
+    accent: "var(--accent)",
     steps: [
       "View the companies registered for the event.",
       "Filter companies by sector and role to find your best fits.",
@@ -21,7 +21,7 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
   },
   company: {
     icon: Building2,
-    accent: "var(--teal)",
+    accent: "var(--accent-2)",
     steps: [
       "Scan a student's QR code at your booth.",
       "View their full portfolio — skills, resume, links and bio.",
@@ -75,8 +75,8 @@ export default function ManualSection({ defaultRole = "student" }: { defaultRole
               onClick={() => setActive(t.key)}
               style={{
                 fontSize: 12.5, fontWeight: 600, padding: "7px 14px", borderRadius: "var(--r-full)", cursor: "pointer",
-                color: on ? "#021016" : "var(--text-2)",
-                background: on ? "linear-gradient(100deg, var(--cyan), var(--teal))" : "rgba(255,255,255,0.04)",
+                color: on ? "#0A0A0A" : "var(--text-2)",
+                background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)",
                 border: `1px solid ${on ? "transparent" : "var(--border)"}`,
                 transition: "all 0.18s",
               }}
@@ -93,7 +93,7 @@ export default function ManualSection({ defaultRole = "student" }: { defaultRole
             <span
               style={{
                 width: 24, height: 24, flexShrink: 0, borderRadius: "50%",
-                background: "rgba(53,211,255,0.10)", border: `1px solid ${m.accent}`,
+                background: "rgba(255,255,255,0.10)", border: `1px solid ${m.accent}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 12, fontWeight: 700, color: m.accent, fontFamily: "var(--font-display)",
               }}

@@ -2,17 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Check, ListChecks, Zap } from "lucide-react";
-import { SectionCard, LoadingBlock, MeterBar } from "./cards";
+import { SectionCard, LoadingBlock } from "./cards";
 import {
   getChecklistItems, getChecklistProgress, setChecklistProgress,
   getStudentByProfile, getCompanyByProfile, getScans, listMessagesForProfile, listShortlistsForCompany,
   type ChecklistItemRow,
 } from "@/lib/db";
 import type { AppRole } from "@/lib/session";
+import { Meter } from "@/components/ui/primitives";
 
 const PHASES: { key: ChecklistItemRow["phase"]; label: string; tone: string }[] = [
-  { key: "pre_event", label: "Before the event", tone: "var(--cyan)" },
-  { key: "during_event", label: "During the event", tone: "var(--teal)" },
+  { key: "pre_event", label: "Before the event", tone: "var(--accent)" },
+  { key: "during_event", label: "During the event", tone: "var(--accent-2)" },
   { key: "post_event", label: "After the event", tone: "var(--amber)" },
 ];
 
@@ -167,7 +168,7 @@ export default function Checklist({
       title="Event checklist"
       hint={role === "event_manager" ? `${totalDone}/${items.length} complete` : `${totalDone}/${items.length} · auto-tracked`}
       right={
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: "var(--teal)" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>
           <ListChecks size={14} /> {pct}%
         </span>
       }
@@ -176,7 +177,7 @@ export default function Checklist({
         <LoadingBlock label="Loading your checklist…" />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <MeterBar value={pct} tone="var(--teal)" />
+          <Meter value={pct} tone="var(--accent-2)" />
           {PHASES.map((phase) => {
             const list = grouped[phase.key] ?? [];
             if (!list.length) return null;
@@ -188,7 +189,7 @@ export default function Checklist({
                   onClick={() => setOpenPhase(open ? "" : phase.key)}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", background: "transparent", border: "none", cursor: "pointer", color: "var(--text)" }}
                 >
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: phase.tone, boxShadow: `0 0 8px ${phase.tone}` }} />
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: phase.tone }} />
                   <span style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600 }}>{phase.label}</span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: "auto" }}>{phaseDone}/{list.length}</span>
                   <ChevronDown size={16} style={{ color: "var(--text-muted)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
@@ -205,8 +206,8 @@ export default function Checklist({
                           style={{
                             display: "flex", gap: 12, alignItems: "flex-start", textAlign: "left",
                             padding: "11px 12px", borderRadius: "var(--r-sm)", cursor: isAuto ? "default" : "pointer",
-                            background: checked ? "rgba(0,194,168,0.06)" : "rgba(255,255,255,0.02)",
-                            border: `1px solid ${checked ? "rgba(0,194,168,0.22)" : "var(--border)"}`,
+                            background: checked ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",
+                            border: `1px solid ${checked ? "rgba(255,255,255,0.22)" : "var(--border)"}`,
                             transition: "all 0.15s",
                           }}
                         >
@@ -214,18 +215,18 @@ export default function Checklist({
                             style={{
                               width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
                               display: "flex", alignItems: "center", justifyContent: "center",
-                              background: checked ? "var(--teal)" : "transparent",
-                              border: `1.5px solid ${checked ? "var(--teal)" : "var(--text-muted)"}`,
+                              background: checked ? "var(--accent-2)" : "transparent",
+                              border: `1.5px solid ${checked ? "var(--accent-2)" : "var(--text-muted)"}`,
                               transition: "all 0.15s",
                             }}
                           >
-                            {checked && <Check size={13} color="#021016" strokeWidth={3} />}
+                            {checked && <Check size={13} color="#0A0A0A" strokeWidth={3} />}
                           </span>
                           <span style={{ minWidth: 0, flex: 1 }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
                               <span style={{ fontSize: 13.5, fontWeight: 500, color: checked ? "var(--text-2)" : "var(--text)", textDecoration: checked ? "line-through" : "none" }}>{item.title}</span>
                               {isAuto && (
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 700, color: "var(--teal)", background: "rgba(0,194,168,0.10)", border: "1px solid rgba(0,194,168,0.25)", borderRadius: "var(--r-full)", padding: "1px 7px" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 700, color: "var(--accent-2)", background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "var(--r-full)", padding: "1px 7px" }}>
                                   <Zap size={9} /> Auto
                                 </span>
                               )}

@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, ScanLine, Sparkles } from "lucide-react";
-import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock, MeterBar } from "./cards";
-import { Badge } from "@/components/ui/primitives";
+import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock } from "./cards";
+import { Badge, Meter } from "@/components/ui/primitives";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
 import OutcomeReportCard from "./OutcomeReportCard";
@@ -65,7 +65,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity, and placement outcomes — connected to your event database.</p>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-            <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
+            <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
           </div>
         </div>
         <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 20 }}>
@@ -77,9 +77,9 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
       </SectionCard>
 
       {scans.length === 0 && (
-        <SectionCard accent="rgba(53,211,255,0.25)" style={{ background: "rgba(53,211,255,0.05)" }}>
+        <SectionCard accent="rgba(255,255,255,0.25)" style={{ background: "rgba(255,255,255,0.05)" }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-            <div style={{ width: 44, height: 44, flexShrink: 0, borderRadius: "var(--r-md)", background: "rgba(53,211,255,0.10)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)" }}>
+            <div style={{ width: 44, height: 44, flexShrink: 0, borderRadius: "var(--r-md)", background: "rgba(255,255,255,0.10)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}>
               <Sparkles size={20} />
             </div>
             <div>
@@ -100,7 +100,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <StatTile label="Resume-ready" value={ready70} accent />
             <StatTile label="Need help" value={needHelp.length} tone="var(--amber)" />
           </div>
-          <div style={{ marginTop: 14 }}><MeterBar value={avg} tone={scoreTone(avg)} /></div>
+          <div style={{ marginTop: 14 }}><Meter value={avg} tone={scoreTone(avg)} /></div>
         </SectionCard>
 
         <SectionCard title="Live scan monitor" hint={`${scans.length} scans`}>
@@ -134,8 +134,8 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
                 <tr key={c.id}>
                   <td style={{ padding: "11px 12px", fontSize: 13, fontWeight: 600, color: "var(--text)", borderTop: "1px solid var(--border)" }}>{c.company_name ?? c.company}</td>
                   <td style={{ padding: "11px 12px", fontSize: 13, color: "var(--text-2)", textAlign: "right", borderTop: "1px solid var(--border)" }}>{c.booth_number}</td>
-                  <td style={{ padding: "11px 12px", fontSize: 13, color: "var(--cyan)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{sc}</td>
-                  <td style={{ padding: "11px 12px", fontSize: 13, color: "var(--teal)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{shl}</td>
+                  <td style={{ padding: "11px 12px", fontSize: 13, color: "var(--accent)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{sc}</td>
+                  <td style={{ padding: "11px 12px", fontSize: 13, color: "var(--accent-2)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{shl}</td>
                 </tr>
               ))}
             </tbody>

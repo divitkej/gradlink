@@ -2,12 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import ShaderBackground from "./ui/shader-background";
-import { useMounted } from "./anim/primitives";
+import ShaderBackground from "../ui/shader-background";
+import { useMounted } from "../anim/primitives";
 import HeroBackground from "./HeroBackground";
-import ParticleText from "./anim/ParticleText";
+import ParticleText from "../anim/ParticleText";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Soft dark patch that dims the hero lines behind a piece of text. */
+function DimPatch({ inset }: { inset: string }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset,
+        zIndex: -1,
+        pointerEvents: "none",
+        background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
+      }}
+    />
+  );
+}
 
 export default function OpeningHero() {
   const reduce = useReducedMotion();
@@ -67,7 +83,7 @@ export default function OpeningHero() {
         justifyContent: "center",
       }}
     >
-      {/* Hero background stack — bottom-masked to dissolve into the global bg. */}
+      {/* Hero background stack · bottom-masked to dissolve into the global bg. */}
       <div
         aria-hidden
         style={{
@@ -100,7 +116,7 @@ export default function OpeningHero() {
           zIndex: 1,
           pointerEvents: "none",
           background:
-            "radial-gradient(ellipse 85% 75% at 50% 46%, transparent 40%, rgba(3,8,15,0.5) 78%, rgba(3,8,15,0.35) 100%)",
+            "radial-gradient(ellipse 85% 75% at 50% 46%, transparent 40%, rgba(0,0,0,0.5) 78%, rgba(0,0,0,0.35) 100%)",
         }}
       />
 
@@ -118,6 +134,7 @@ export default function OpeningHero() {
       >
         {/* Wordmark: particles and solid text share wordSize → seamless dissolve */}
         <div style={{ position: "relative", width: "min(640px, 92vw)", height: boxH, marginBottom: 30 }}>
+          <DimPatch inset="-24px -48px" />
           {mounted && !reduce && (
             <motion.div
               initial={{ opacity: 1 }}
@@ -129,7 +146,7 @@ export default function OpeningHero() {
                 text="GradLink"
                 fontSize={wordSize}
                 height={boxH}
-                color="#35D3FF"
+                color="#FFFFFF"
                 lerp={0.05}
                 frames={300}
               />
@@ -163,7 +180,7 @@ export default function OpeningHero() {
           </motion.div>
         </div>
 
-        {/* Tagline — two lines, appears after the wordmark solidifies */}
+        {/* Tagline · two lines, appears after the wordmark solidifies */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: phase === "solid" ? 1 : 0, y: phase === "solid" ? 0 : 12 }}
@@ -171,15 +188,18 @@ export default function OpeningHero() {
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(16px, 2.3vw, 23px)",
-            fontWeight: 500,
+            fontWeight: 700,
             letterSpacing: "0.01em",
-            color: "var(--text)",
+            color: "#FFFFFF",
+            textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)",
             lineHeight: 1.55,
+            position: "relative",
           }}
         >
+          <DimPatch inset="-28px -72px" />
           <div>Prepare students. Connect employers.</div>
           <div style={{ marginTop: 4 }}>
-            <span className="text-gradient">Track outcomes.</span>
+            <span>Track outcomes.</span>
           </div>
         </motion.div>
       </div>

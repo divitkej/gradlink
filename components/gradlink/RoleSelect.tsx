@@ -10,18 +10,18 @@ const roles = [
     icon: GraduationCap,
     title: "I'm a student",
     line: "Show up ready. Leave with offers.",
-    accent: "var(--cyan)",
-    soft: "rgba(53,211,255,0.10)",
-    bd: "rgba(53,211,255,0.30)",
+    accent: "var(--accent)",
+    soft: "rgba(255,255,255,0.10)",
+    bd: "rgba(255,255,255,0.30)",
   },
   {
     href: "/sign-up/company",
     icon: Building2,
     title: "I'm a company",
     line: "Scan once. Shortlist smarter.",
-    accent: "var(--teal)",
-    soft: "rgba(0,194,168,0.10)",
-    bd: "rgba(0,194,168,0.30)",
+    accent: "var(--accent-2)",
+    soft: "rgba(255,255,255,0.10)",
+    bd: "rgba(255,255,255,0.30)",
   },
   {
     href: "/sign-up/college",
@@ -54,7 +54,7 @@ export default function RoleSelect() {
         Join GradLink
       </h1>
       <p style={{ fontSize: 15, color: "var(--text-muted)", textAlign: "center", marginBottom: 36 }}>
-        Tell us who you are — we&apos;ll tailor the rest.
+        Tell us who you are and we&apos;ll tailor the rest.
       </p>
 
       <div className="role-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
@@ -109,13 +109,13 @@ export default function RoleSelect() {
 
       <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 28 }}>
         Already have an account?{" "}
-        <Link href="/sign-in" className="gl-link" style={{ color: "var(--cyan)", fontWeight: 600, textDecoration: "none" }}>
+        <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Sign in
         </Link>
       </p>
 
       <style>{`
-        .role-card:hover { transform: translateY(-4px); border-color: var(--border-strong) !important; box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(53,211,255,0.12); }
+        .role-card:hover { transform: translateY(-4px); border-color: var(--border-strong) !important; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
         .gl-link:hover { text-decoration: underline; }
         @media (max-width: 860px) { .role-grid { grid-template-columns: 1fr !important; } }
       `}</style>

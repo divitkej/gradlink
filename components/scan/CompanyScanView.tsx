@@ -127,7 +127,7 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
       )}
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-          <Check size={15} color="var(--teal)" /> {toast}
+          <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
     </ScanLayout>
@@ -139,7 +139,7 @@ function CompanyHeader({ company }: { company: CompanyRow }) {
   return (
     <SectionCard accent="var(--border-strong)">
       <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-        <Avatar name={name} size={60} tone="var(--teal)" />
+        <Avatar name={name} size={60} tone="var(--accent-2)" />
         <div style={{ flex: 1, minWidth: 200 }}>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--text)" }}>{name}</h1>
           <p style={{ fontSize: 13.5, color: "var(--text-muted)", marginTop: 2 }}>{[company.sector, company.industry].filter(Boolean).join(" · ")}</p>
@@ -164,7 +164,7 @@ function StudentView({
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {company.hiring_roles.map((r) => (
               <div key={r} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-                <Briefcase size={15} color="var(--teal)" />
+                <Briefcase size={15} color="var(--accent-2)" />
                 <span style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 500 }}>{r}</span>
               </div>
             ))}
@@ -194,7 +194,7 @@ function StudentView({
         <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
           {["Have your QR ready to share", "Prepare a 30-second intro", `Skim ${company.hiring_roles?.length ? "the open roles above" : "their website"}`, "Note one question to ask the recruiter"].map((t) => (
             <li key={t} style={{ display: "flex", gap: 9, alignItems: "center", fontSize: 13, color: "var(--text-2)" }}>
-              <Check size={14} color="var(--cyan)" /> {t}
+              <Check size={14} color="var(--accent)" /> {t}
             </li>
           ))}
         </ul>
@@ -208,7 +208,7 @@ function StudentView({
             </a>
           )}
           {company.brochure_url && (
-            <a href={company.brochure_url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12.5, fontWeight: 600, color: "var(--teal)", background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.25)", borderRadius: "var(--r-sm)", padding: "8px 13px", textDecoration: "none" }}>
+            <a href={company.brochure_url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12.5, fontWeight: 600, color: "var(--accent-2)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "var(--r-sm)", padding: "8px 13px", textDecoration: "none" }}>
               <FileText size={14} /> View brochure
             </a>
           )}
@@ -224,7 +224,7 @@ function StudentView({
 function Toggle({ on, onClick, icon, label }: { on: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
     <button onClick={onClick}
-      style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: "9px 15px", borderRadius: "var(--r-md)", color: on ? "#021016" : "var(--teal)", background: on ? "var(--teal)" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "var(--teal)" : "var(--border)"}`, transition: "all 0.15s" }}>
+      style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: "9px 15px", borderRadius: "var(--r-md)", color: on ? "#0A0A0A" : "var(--accent-2)", background: on ? "var(--accent-2)" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "var(--accent-2)" : "var(--border)"}`, transition: "all 0.15s" }}>
       {icon} {label}
     </button>
   );
@@ -246,7 +246,7 @@ function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company
           <StatTile label="Shortlisted" value={shortlisted} accent />
           <StatTile label="Maybe" value={maybes} />
           <StatTile label="Booth" value={company.booth_number ?? "—"} />
-          <StatTile label="Follow-up" value={followUp} tone={shortlisted > 0 ? "var(--teal)" : "var(--amber)"} />
+          <StatTile label="Follow-up" value={followUp} tone={shortlisted > 0 ? "var(--accent-2)" : "var(--amber)"} />
         </div>
         <style>{`@media (max-width:560px){.mgr-stats{grid-template-columns:repeat(2,1fr) !important}}`}</style>
       </SectionCard>
@@ -257,16 +257,16 @@ function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company
 
       <SectionCard title="Booth engagement">
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <Line icon={<Users size={15} color="var(--cyan)" />} label="Students who scanned this booth" value={studentScans} />
-          <Line icon={<Star size={15} color="var(--teal)" />} label="Candidates shortlisted" value={shortlisted} />
+          <Line icon={<Users size={15} color="var(--accent)" />} label="Students who scanned this booth" value={studentScans} />
+          <Line icon={<Star size={15} color="var(--accent-2)" />} label="Candidates shortlisted" value={shortlisted} />
           <Line icon={<MessageSquare size={15} color="var(--amber)" />} label="Maybe / under review" value={maybes} />
           <Line icon={<Building2 size={15} color="var(--text-2)" />} label="Hiring roles posted" value={company.hiring_roles?.length ?? 0} />
         </div>
       </SectionCard>
 
-      <SectionCard title="Manager note" accent="rgba(0,194,168,0.22)" style={{ background: "rgba(0,194,168,0.05)" }}>
+      <SectionCard title="Manager note" accent="rgba(255,255,255,0.22)" style={{ background: "rgba(255,255,255,0.05)" }}>
         <p style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55 }}>
-          <Sparkles size={15} color="var(--teal)" />
+          <Sparkles size={15} color="var(--accent-2)" />
           {studentScans === 0 ? "Low booth traffic — consider promoting this employer to students." : "Healthy engagement. Encourage post-event follow-ups with shortlisted students."}
         </p>
       </SectionCard>

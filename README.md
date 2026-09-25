@@ -41,6 +41,10 @@ no always-on database compute.
 - Styling is inline `style={{}}` objects + CSS variables in `app/globals.css`.
   Tailwind is installed but unused in components — keep it that way.
 
+## Repo layout
+
+Folder and branch rules are in `AGENTS.md` under "Repository organization". Launch checklists live in `docs/checklists/` (index: `docs/README.md`).
+
 ## Local development
 
 ```bash

@@ -2,16 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import AnimatedTextCycle from "./anim/AnimatedTextCycle";
-import Magnetic from "./anim/Magnetic";
+import AnimatedTextCycle from "../anim/AnimatedTextCycle";
+import Magnetic from "../anim/Magnetic";
 import HeroDashboard from "./HeroDashboard";
-import { Button, Badge } from "./ui/primitives";
-
-gsap.registerPlugin(ScrollTrigger);
+import { Button, Badge } from "../ui/primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -25,18 +19,6 @@ const fadeUp = {
 };
 
 export default function HeroSection() {
-  const heroDashRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    if (!heroDashRef.current) return;
-    gsap.to(heroDashRef.current, {
-      yPercent: -14,
-      ease: "none",
-      scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: 1 },
-    });
-  });
-
   return (
     <section
       id="hero"
@@ -148,48 +130,11 @@ export default function HeroSection() {
             </Magnetic>
           </motion.div>
 
-          {/* Trust stats */}
-          <motion.div
-            custom={6}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            style={{
-              marginTop: 40,
-              paddingTop: 28,
-              borderTop: "1px solid var(--border)",
-              display: "flex",
-              gap: 28,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { n: "12+", l: "UAE Colleges" },
-              { n: "18K+", l: "Students" },
-              { n: "200+", l: "Employers" },
-            ].map((s) => (
-              <div key={s.l}>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)" }}>
-                  {s.n}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{s.l}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
-        {/* Right dashboard with shader glow behind */}
+        {/* Right dashboard */}
         <div style={{ position: "relative", display: "flex", justifyContent: "flex-end" }} className="hero-dash-wrap">
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: "-12% -8%",
-              background: "radial-gradient(circle at 60% 40%, rgba(53,211,255,0.18), transparent 60%)",
-              filter: "blur(20px)",
-            }}
-          />
-          <div ref={heroDashRef} style={{ willChange: "transform" }}>
+          <div style={{ position: "relative" }}>
             <HeroDashboard />
           </div>
         </div>

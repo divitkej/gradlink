@@ -1,7 +1,7 @@
 import GradLinkSignIn from "@/components/gradlink/GradLinkSignIn";
 
 export const metadata = {
-  title: "Sign in — GradLink",
+  title: "Sign in · GradLink",
   description: "Sign in to your GradLink career intelligence dashboard.",
 };
 

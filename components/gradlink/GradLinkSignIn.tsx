@@ -97,7 +97,7 @@ export default function GradLinkSignIn() {
           width: "100%", maxWidth: 420,
           background: "var(--glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
           border: "1px solid var(--border-strong)", borderRadius: "var(--r-xl)",
-          boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(53,211,255,0.08), 0 0 70px rgba(0,194,168,0.12)",
+          boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)",
           padding: "clamp(26px, 4vw, 38px)",
         }}
       >
@@ -120,7 +120,7 @@ export default function GradLinkSignIn() {
           </div>
 
           {resetMsg && (
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "var(--teal)", background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.25)", borderRadius: "var(--r-sm)", padding: "10px 12px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "var(--accent-2)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "var(--r-sm)", padding: "10px 12px" }}>
               <CheckCircle2 size={15} style={{ flexShrink: 0, marginTop: 1 }} />
               <span>{resetMsg}</span>
             </div>
@@ -145,13 +145,13 @@ export default function GradLinkSignIn() {
 
         <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 16 }}>
           New to GradLink?{" "}
-          <Link href="/sign-up" className="gl-link" style={{ color: "var(--cyan)", fontWeight: 600, textDecoration: "none" }}>Create an account</Link>
+          <Link href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Create an account</Link>
         </p>
 
         <style>{`
           .gl-input::placeholder { color: var(--text-muted); opacity: 0.7; }
-          .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(53,211,255,0.12) !important; }
-          .gl-link:hover { color: var(--cyan) !important; text-decoration: underline; }
+          .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12) !important; }
+          .gl-link:hover { color: var(--accent) !important; text-decoration: underline; }
         `}</style>
       </div>
     </AuthShell>

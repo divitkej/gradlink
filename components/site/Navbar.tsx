@@ -2,22 +2,40 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useLenis } from "lenis/react";
 import { Menu, X } from "lucide-react";
-import Logo from "./Logo";
-import { Button } from "./ui/primitives";
+import Logo from "../Logo";
+import { Button } from "../ui/primitives";
 
+// In the order the sections appear on the home page. Each link points to a
+// different section, and the "/" prefix makes them work from other pages too.
 const links = [
-  { label: "Platform", href: "#product" },
-  { label: "Students", href: "#readiness" },
-  { label: "Employers", href: "#employers" },
-  { label: "Colleges", href: "#analytics" },
-  { label: "Analytics", href: "#analytics" },
+  { label: "How it works", href: "/#journey" },
+  { label: "Platform", href: "/#product" },
+  { label: "Students", href: "/#readiness" },
+  { label: "Live events", href: "/#live" },
+  { label: "Colleges", href: "/#analytics" },
+  { label: "Employers", href: "/#employers" },
   { label: "Pricing", href: "/pricing" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const lenis = useLenis();
+
+  // On the home page the logo is a "back to top": a same-route <Link> would
+  // leave the scroll position where it is.
+  const onLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") return;
+    e.preventDefault();
+    window.history.replaceState(null, "", "/");
+    if (lenis) lenis.scrollTo(0);
+    else window.scrollTo({ top: 0 });
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -38,7 +56,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           zIndex: 100,
-          background: scrolled ? "rgba(5,11,20,0.72)" : "rgba(5,11,20,0.35)",
+          background: scrolled ? "rgba(10,10,10,0.72)" : "rgba(10,10,10,0.35)",
           backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
           borderBottom: `1px solid ${scrolled ? "var(--border)" : "transparent"}`,
@@ -58,13 +76,13 @@ export default function Navbar() {
           }}
           aria-label="Main"
         >
-          <a href="#top" style={{ textDecoration: "none" }} aria-label="GradLink home">
+          <Link href="/" onClick={onLogoClick} style={{ textDecoration: "none" }} aria-label="GradLink home">
             <Logo size={22} />
-          </a>
+          </Link>
 
           <ul
             className="nav-links"
-            style={{ display: "flex", alignItems: "center", gap: 4, listStyle: "none" }}
+            style={{ display: "flex", alignItems: "center", gap: 2, listStyle: "none" }}
           >
             {links.map((l) => (
               <li key={l.label}>
@@ -76,9 +94,10 @@ export default function Navbar() {
                     fontWeight: 500,
                     color: "var(--text-2)",
                     textDecoration: "none",
-                    padding: "8px 14px",
+                    padding: "8px 12px",
                     borderRadius: "var(--r-sm)",
                     position: "relative",
+                    whiteSpace: "nowrap",
                     transition: "color 0.18s ease",
                   }}
                 >
@@ -141,7 +160,7 @@ export default function Navbar() {
                 position: "fixed",
                 inset: 0,
                 zIndex: 110,
-                background: "rgba(2,8,15,0.6)",
+                background: "rgba(0,0,0,0.6)",
                 backdropFilter: "blur(4px)",
               }}
             />
@@ -219,16 +238,15 @@ export default function Navbar() {
         .nav-link::after {
           content: "";
           position: absolute;
-          left: 14px; right: 14px; bottom: 4px;
+          left: 12px; right: 12px; bottom: 4px;
           height: 1.5px;
-          background: linear-gradient(90deg, var(--cyan), var(--teal));
+          background: linear-gradient(90deg, var(--accent), var(--accent-2));
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.25s ease;
-          box-shadow: 0 0 8px var(--cyan);
         }
         .nav-link:hover::after { transform: scaleX(1); }
-        @media (max-width: 920px) {
+        @media (max-width: 1080px) {
           .nav-links, .nav-cta { display: none !important; }
           .nav-burger { display: flex !important; }
         }

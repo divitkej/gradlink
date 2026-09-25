@@ -21,20 +21,20 @@ const ROLE_CONFIG: Record<Role, {
   emailPlaceholder: string; emailNote: string; subtitle: string; label: string;
 }> = {
   student: {
-    badge: "Student account", icon: GraduationCap, accent: "var(--cyan)",
-    orgLabel: "University name", orgPlaceholder: "Abu Dhabi University", orgIcon: GraduationCap,
+    badge: "Student account", icon: GraduationCap, accent: "var(--accent)",
+    orgLabel: "University name", orgPlaceholder: "Your university", orgIcon: GraduationCap,
     emailPlaceholder: "you@university.ac.ae", emailNote: "Please use your university email address.",
     subtitle: "Get fair-ready and tracked from check-in to offer.", label: "student",
   },
   company: {
-    badge: "Company account", icon: Building2, accent: "var(--teal)",
-    orgLabel: "Company name", orgPlaceholder: "Careem", orgIcon: Building2,
+    badge: "Company account", icon: Building2, accent: "var(--accent-2)",
+    orgLabel: "Company name", orgPlaceholder: "Your company", orgIcon: Building2,
     emailPlaceholder: "you@company.com", emailNote: "Please use your company email address.",
     subtitle: "Scan once, shortlist smarter, follow up faster.", label: "company",
   },
   college: {
     badge: "College / Event host", icon: Briefcase, accent: "var(--amber)",
-    orgLabel: "Institution / Organization name", orgPlaceholder: "Abu Dhabi University Career Center", orgIcon: Building2,
+    orgLabel: "Institution / Organization name", orgPlaceholder: "Your career centre or organisation", orgIcon: Building2,
     emailPlaceholder: "you@institution.ac.ae", emailNote: "Please use your official institution email address.",
     subtitle: "Run events, track engagement, and prove outcomes.", label: "college / event host",
   },
@@ -117,7 +117,7 @@ export default function SignUpForm({ role }: { role: Role }) {
     return (
       <Card>
         <div style={{ textAlign: "center" }}>
-          <CheckCircle2 size={48} color="var(--teal)" style={{ margin: "0 auto 16px" }} />
+          <CheckCircle2 size={48} color="var(--accent-2)" style={{ margin: "0 auto 16px" }} />
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
             You&apos;re in!
           </h1>
@@ -134,7 +134,7 @@ export default function SignUpForm({ role }: { role: Role }) {
     <Card>
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}><Logo size={24} /></div>
 
-      <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: "var(--r-full)", border: "1px solid var(--border-strong)", background: "rgba(53,211,255,0.08)", margin: "0 auto 14px", color: c.accent, fontSize: 12, fontWeight: 600 }}>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: "var(--r-full)", border: "1px solid var(--border-strong)", background: "rgba(255,255,255,0.08)", margin: "0 auto 14px", color: c.accent, fontSize: 12, fontWeight: 600 }}>
         <BadgeIcon size={14} />
         {c.badge}
       </div>
@@ -174,12 +174,12 @@ export default function SignUpForm({ role }: { role: Role }) {
 
       <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 18 }}>
         Already have an account?{" "}
-        <Link href="/sign-in" className="gl-link" style={{ color: "var(--cyan)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
+        <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
       </p>
 
       <style>{`
         .gl-input::placeholder { color: var(--text-muted); opacity: 0.7; }
-        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(53,211,255,0.12) !important; }
+        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12) !important; }
         .gl-link:hover { text-decoration: underline; }
       `}</style>
     </Card>
@@ -193,7 +193,7 @@ function Card({ children }: { children: React.ReactNode }) {
         width: "100%", maxWidth: 440,
         background: "var(--glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
         border: "1px solid var(--border-strong)", borderRadius: "var(--r-xl)",
-        boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(53,211,255,0.08), 0 0 70px rgba(0,194,168,0.12)",
+        boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)",
         padding: "clamp(26px, 4vw, 38px)", display: "flex", flexDirection: "column",
       }}
     >

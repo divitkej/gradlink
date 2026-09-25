@@ -90,7 +90,7 @@ export default function OutcomeReportCard({
       ) : pro ? (
         <>
           <p style={{ display: "inline-flex", gap: 8, alignItems: "flex-start", fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6 }}>
-            <Sparkles size={15} color="var(--teal)" style={{ flexShrink: 0, marginTop: 2 }} />
+            <Sparkles size={15} color="var(--accent-2)" style={{ flexShrink: 0, marginTop: 2 }} />
             <span>
               {report.resumeReady} of {report.studentsRegistered} students are resume-ready, {report.totalScans} scans
               recorded across {report.employers} employers, and {report.shortlists} shortlists created.
@@ -110,8 +110,8 @@ export default function OutcomeReportCard({
                   {report.employerTable.slice(0, 5).map((e) => (
                     <tr key={e.name}>
                       <td style={{ padding: "9px 10px", fontSize: 13, fontWeight: 600, color: "var(--text)", borderTop: "1px solid var(--border)" }}>{e.name}</td>
-                      <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--cyan)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.studentScans}</td>
-                      <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--teal)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.shortlisted}</td>
+                      <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.studentScans}</td>
+                      <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent-2)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.shortlisted}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -145,14 +145,14 @@ export default function OutcomeReportCard({
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 8, height: 42, padding: "0 18px",
                     borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14,
-                    color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))",
+                    color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))",
                     border: "none", cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1,
                   }}
                 >
                   {busy ? <Loader2 size={15} className="gl-spin" /> : <TrendingUp size={15} />}
                   {busy ? "Opening checkout…" : "Upgrade to Placement Pro"}
                 </button>
-                <Link href="/pricing" style={{ fontSize: 13, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>
+                <Link href="/pricing" style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>
                   See what&apos;s included →
                 </Link>
               </div>

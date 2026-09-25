@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CountUp } from "./anim/primitives";
-import { Badge } from "./ui/primitives";
+import { Badge } from "../ui/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -10,8 +10,8 @@ function Stat({ label, value, suffix = "", accent = false }: { label: string; va
   return (
     <div
       style={{
-        background: accent ? "rgba(0,194,168,0.08)" : "rgba(255,255,255,0.03)",
-        border: `1px solid ${accent ? "rgba(0,194,168,0.22)" : "var(--border)"}`,
+        background: accent ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
+        border: `1px solid ${accent ? "rgba(255,255,255,0.22)" : "var(--border)"}`,
         borderRadius: "var(--r-md)",
         padding: "10px 12px",
       }}
@@ -21,11 +21,11 @@ function Stat({ label, value, suffix = "", accent = false }: { label: string; va
           fontFamily: "var(--font-display)",
           fontSize: 19,
           fontWeight: 700,
-          color: accent ? "var(--teal)" : "var(--text)",
+          color: accent ? "var(--accent-2)" : "var(--text)",
           letterSpacing: "-0.02em",
         }}
       >
-        <CountUp to={value} suffix={suffix} />
+        {value}{suffix}
       </div>
       <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
     </div>
@@ -64,15 +64,15 @@ function Panel({ title, children, badge }: { title: string; children: React.Reac
 export default function HeroDashboard() {
   const schedule = [
     { t: "09:00", l: "Resume Workshop", live: true },
-    { t: "10:30", l: "PwC Booth Opens", live: false },
-    { t: "11:00", l: "Mock Interview — Careem", live: false },
+    { t: "10:30", l: "Consulting firm booth opens", live: false },
+    { t: "11:00", l: "Mock interview · Fintech firm", live: false },
     { t: "14:00", l: "Startup Networking", live: false },
   ];
-  const journey = ["Resume Workshop", "PwC Booth", "Mock Interview", "Follow-up Sent"];
+  const journey = ["Resume Workshop", "Consulting booth", "Mock Interview", "Follow-up Sent"];
   const readiness = [
-    { l: "Communication", v: 54, c: "var(--danger)" },
-    { l: "Technology", v: 82, c: "var(--teal)" },
-    { l: "Professionalism", v: 58, c: "var(--amber)" },
+    { l: "Communication", v: 54, c: "var(--text-muted)" },
+    { l: "Technology", v: 82, c: "var(--accent-2)" },
+    { l: "Professionalism", v: 58, c: "var(--text-2)" },
   ];
   const pipeline = [
     { l: "Scanned", v: 180 },
@@ -95,20 +95,20 @@ export default function HeroDashboard() {
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--r-xl)",
         padding: 18,
-        boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(53,211,255,0.1)",
+        boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.1)",
       }}
     >
       {/* Top bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
-            GradLink — Career Fair 2025
+            Campus Career Fair
           </div>
           <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>
-            Abu Dhabi University · 18 Feb 2025
+            Sample University
           </div>
         </div>
-        <Badge tone="amber" pulse>Event Active</Badge>
+        <SampleDataLabel />
       </div>
 
       {/* Stats */}
@@ -132,7 +132,7 @@ export default function HeroDashboard() {
                   {s.l}
                 </span>
                 {s.live && (
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--teal)", boxShadow: "0 0 6px var(--teal)" }} className="pulse-dot" />
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent-2)" }} className="pulse-dot" />
                 )}
               </div>
             ))}
@@ -147,7 +147,7 @@ export default function HeroDashboard() {
                 position: "relative",
                 width: 56,
                 height: 56,
-                background: "#02101a",
+                background: "#0A0A0A",
                 borderRadius: 8,
                 padding: 5,
                 display: "grid",
@@ -162,7 +162,7 @@ export default function HeroDashboard() {
                   key={i}
                   style={{
                     background: [0, 1, 6, 7, 4, 5, 10, 11, 24, 25, 30, 31, 14, 21, 28, 35, 18, 13].includes(i)
-                      ? "var(--cyan)"
+                      ? "var(--accent)"
                       : "transparent",
                     borderRadius: 1,
                   }}
@@ -176,7 +176,7 @@ export default function HeroDashboard() {
                   right: 0,
                   top: 0,
                   height: 14,
-                  background: "linear-gradient(180deg, transparent, rgba(53,211,255,0.55), transparent)",
+                  background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.55), transparent)",
                 }}
               />
             </div>
@@ -192,9 +192,9 @@ export default function HeroDashboard() {
         {/* Matched companies */}
         <Panel title="Matched Companies">
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {["Careem", "PwC UAE", "G42"].map((c) => (
+            {["Fintech firm", "Consulting firm", "AI startup"].map((c) => (
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--teal)", boxShadow: "0 0 6px var(--teal)" }} />
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent-2)" }} />
                 <span style={{ fontSize: 12, color: "var(--text)", fontWeight: 500 }}>{c}</span>
               </div>
             ))}
@@ -229,15 +229,15 @@ export default function HeroDashboard() {
                   fontSize: 10.5,
                   fontWeight: 500,
                   color: "var(--text)",
-                  background: "rgba(53,211,255,0.08)",
-                  border: "1px solid rgba(53,211,255,0.2)",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.2)",
                   borderRadius: "var(--r-full)",
                   padding: "3px 9px",
                 }}
               >
                 {j}
               </span>
-              {i < journey.length - 1 && <span style={{ color: "var(--teal)", fontSize: 11 }}>→</span>}
+              {i < journey.length - 1 && <span style={{ color: "var(--accent-2)", fontSize: 11 }}>→</span>}
             </span>
           ))}
         </div>
@@ -247,8 +247,8 @@ export default function HeroDashboard() {
       <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
         {pipeline.map((p) => (
           <div key={p.l} style={{ textAlign: "center", padding: "8px 4px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cyan)" }}>
-              <CountUp to={p.v} />
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--accent)" }}>
+              {p.v}
             </div>
             <div style={{ fontSize: 9.5, color: "var(--text-muted)", marginTop: 1 }}>{p.l}</div>
           </div>

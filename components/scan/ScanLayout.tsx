@@ -11,7 +11,7 @@ export default function ScanLayout({ viewerRole, children }: { viewerRole: AppRo
       <header
         style={{
           position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "center", gap: 12,
-          padding: "14px 18px", background: "rgba(5,11,20,0.7)", backdropFilter: "blur(16px)",
+          padding: "14px 18px", background: "rgba(10,10,10,0.7)", backdropFilter: "blur(16px)",
           borderBottom: "1px solid var(--border)",
         }}
       >
@@ -19,7 +19,7 @@ export default function ScanLayout({ viewerRole, children }: { viewerRole: AppRo
           <ArrowLeft size={16} /> Scanner
         </Link>
         <div style={{ flex: 1, display: "flex", justifyContent: "center" }}><Logo size={20} /></div>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "var(--cyan)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "4px 10px" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "4px 10px" }}>
           <ScanLine size={12} /> {ROLE_LABEL[viewerRole]}
         </span>
       </header>

@@ -54,27 +54,9 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
               background: isActive
                 ? "linear-gradient(160deg, var(--surface-elev), var(--surface))"
                 : "var(--glass)",
-              boxShadow: isActive ? "0 0 40px rgba(53,211,255,0.14)" : "none",
-              transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+              transition: "border-color 0.3s ease",
             }}
           >
-            {/* Accent wash on active */}
-            <AnimatePresence>
-              {isActive && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "radial-gradient(120% 80% at 100% 0%, rgba(0,194,168,0.16), transparent 60%)",
-                  }}
-                />
-              )}
-            </AnimatePresence>
 
             {/* Collapsed spine: vertical label + value */}
             {!isActive && (
@@ -94,7 +76,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                     fontFamily: "var(--font-display)",
                     fontSize: 22,
                     fontWeight: 700,
-                    color: "var(--cyan)",
+                    color: "var(--accent)",
                   }}
                 >
                   {p.value}
@@ -150,7 +132,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                         fontWeight: 600,
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
-                        color: "var(--cyan)",
+                        color: "var(--accent)",
                         marginTop: 8,
                       }}
                     >
@@ -186,7 +168,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                             fontFamily: "var(--font-display)",
                             fontSize: 16,
                             fontWeight: 700,
-                            color: "var(--teal)",
+                            color: "var(--accent-2)",
                             marginTop: 2,
                           }}
                         >

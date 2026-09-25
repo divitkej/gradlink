@@ -49,8 +49,8 @@ function JoinCode({ code }: { code: string }) {
       style={{
         display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px",
         borderRadius: "var(--r-full)", cursor: "pointer",
-        background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.28)",
-        color: "var(--teal)", fontFamily: "var(--font-display)", fontWeight: 700,
+        background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.28)",
+        color: "var(--accent-2)", fontFamily: "var(--font-display)", fontWeight: 700,
         fontSize: 13, letterSpacing: "0.14em",
       }}
     >
@@ -65,7 +65,7 @@ function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean
   return (
     <div
       style={{
-        background: active ? "rgba(53,211,255,0.06)" : "rgba(255,255,255,0.03)",
+        background: active ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
         border: `1px solid ${active ? "var(--border-strong)" : "var(--border)"}`,
         borderRadius: "var(--r-lg)",
         padding: "18px 20px",
@@ -81,7 +81,7 @@ function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean
               {EVENT_STATUS_LABEL[event.status] ?? event.status}
             </Badge>
             {active && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--cyan)" }}>Currently open</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--accent)" }}>Currently open</span>
             )}
           </div>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: 17, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
@@ -111,7 +111,7 @@ function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean
           style={{
             display: "inline-flex", alignItems: "center", gap: 7, height: 38, padding: "0 16px",
             borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 13.5,
-            color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none",
+            color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none",
           }}
         >
           Open console <ArrowRight size={14} />
@@ -160,8 +160,8 @@ export default function EventsPage() {
               display: "inline-flex", alignItems: "center", gap: 8, height: 42, padding: "0 18px",
               borderRadius: "var(--r-md)", cursor: "pointer",
               fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14,
-              color: showForm ? "var(--text-2)" : "#021016",
-              background: showForm ? "rgba(255,255,255,0.04)" : "linear-gradient(100deg, var(--cyan), var(--teal))",
+              color: showForm ? "var(--text-2)" : "#0A0A0A",
+              background: showForm ? "rgba(255,255,255,0.04)" : "linear-gradient(100deg, var(--accent), var(--accent-2))",
               border: showForm ? "1px solid var(--border)" : "none",
             }}
           >

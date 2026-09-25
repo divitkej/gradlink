@@ -100,8 +100,8 @@ export function evaluateResume(student: Partial<StudentRow>): ResumeEvaluation {
 }
 
 export function scoreTone(score: number): string {
-  if (score >= 80) return "var(--teal)";
-  if (score >= 60) return "var(--cyan)";
+  if (score >= 80) return "var(--accent)";
+  if (score >= 60) return "var(--accent-2)";
   if (score >= 40) return "var(--amber)";
   return "var(--danger)";
 }

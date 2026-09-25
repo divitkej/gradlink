@@ -1,11 +1,8 @@
 "use client";
 
-import ScrollHeading from "./anim/ScrollHeading";
-
 /**
- * A quiet full-bleed band whose headline letters scatter and converge as you
- * scroll into it — a deliberate breathing moment that links the sections
- * around it. Minimal by design.
+ * A quiet full-bleed band: a deliberate breathing moment that links the
+ * sections around it. Minimal by design.
  */
 export default function StatementBand({
   text,
@@ -37,8 +34,7 @@ export default function StatementBand({
             {eyebrow}
           </div>
         )}
-        <ScrollHeading
-          text={text}
+        <h2
           style={{
             fontSize: "clamp(28px, 5vw, 60px)",
             fontWeight: 700,
@@ -46,7 +42,9 @@ export default function StatementBand({
             letterSpacing: "-0.02em",
             color: "var(--text)",
           }}
-        />
+        >
+          {text}
+        </h2>
       </div>
     </section>
   );

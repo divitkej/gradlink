@@ -125,7 +125,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
         <PanelTitle hint={resumeUrl ? "Attached" : "Required for your AI score"}>Your résumé</PanelTitle>
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", border: "none" }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", border: "none" }}>
             {uploading ? <Loader2 size={16} className="gl-spin" /> : <UploadCloud size={16} />}
             {uploading ? "Uploading…" : resumeUrl ? "Replace résumé" : "Attach résumé (PDF)"}
           </button>
@@ -170,10 +170,10 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
           <PanelTitle hint="AI-evaluated">Resume analysis</PanelTitle>
           <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5, marginBottom: 14 }}>{evalr.summary}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--teal)" }}>Strengths</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>Strengths</div>
             {evalr.strengths.map((s) => (
               <div key={s} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                <Check size={13} color="var(--teal)" style={{ flexShrink: 0, marginTop: 2 }} />
+                <Check size={13} color="var(--accent-2)" style={{ flexShrink: 0, marginTop: 2 }} />
                 <span style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.45 }}>{s}</span>
               </div>
             ))}
@@ -190,7 +190,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
 
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-          <Check size={15} color="var(--teal)" /> {toast}
+          <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
       <style>{`@media (max-width: 900px) { .dash-2col { grid-template-columns: 1fr !important; } }`}</style>

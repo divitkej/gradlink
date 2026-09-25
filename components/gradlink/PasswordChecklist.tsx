@@ -45,13 +45,13 @@ export default function PasswordChecklist({ value }: { value: string }) {
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
-                background: ok ? "var(--teal)" : "rgba(255,255,255,0.06)",
+                background: ok ? "var(--accent-2)" : "rgba(255,255,255,0.06)",
                 border: ok ? "none" : "1px solid var(--border)",
                 transition: "all 0.18s",
               }}
             >
               {ok ? (
-                <Check size={11} color="#021016" strokeWidth={3} />
+                <Check size={11} color="#0A0A0A" strokeWidth={3} />
               ) : (
                 <X size={10} color="var(--text-muted)" strokeWidth={2.5} />
               )}

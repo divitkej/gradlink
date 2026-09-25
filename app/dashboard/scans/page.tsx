@@ -44,7 +44,7 @@ export default function ScansPage() {
           <LoadingBlock label="Loading scans…" />
         ) : scans.length === 0 ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "34px 24px 42px", textAlign: "center" }}>
-            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)" }}><History size={22} /></div>
+            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}><History size={22} /></div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No scans yet</div>
             <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Every QR scan you make — or that someone makes of you — will be logged here.</p>
           </div>
@@ -56,7 +56,7 @@ export default function ScansPage() {
             return (
               <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 22px", borderTop: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", gap: 11, alignItems: "center" }}>
-                  <Avatar name={other?.name ?? "GradLink"} size={32} tone={other?.role === "company" ? "var(--teal)" : "var(--cyan)"} />
+                  <Avatar name={other?.name ?? "GradLink"} size={32} tone={other?.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                   <div>
                     <div style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 500 }}>{mineScanner ? `You scanned ${other?.name ?? "a profile"}` : `${other?.name ?? "Someone"} scanned you`}</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.scan_context ?? "scan"}{s.notes ? ` · ${s.notes}` : ""}</div>

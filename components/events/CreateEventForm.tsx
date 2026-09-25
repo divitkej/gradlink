@@ -133,8 +133,8 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
           alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 8,
           height: 46, padding: "0 22px", borderRadius: "var(--r-md)",
           fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14.5,
-          border: "none", color: "#021016",
-          background: "linear-gradient(100deg, var(--cyan), var(--teal))",
+          border: "none", color: "#0A0A0A",
+          background: "linear-gradient(100deg, var(--accent), var(--accent-2))",
           cursor: busy || !title.trim() ? "default" : "pointer",
           opacity: busy || !title.trim() ? 0.6 : 1,
         }}

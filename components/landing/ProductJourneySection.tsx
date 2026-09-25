@@ -1,9 +1,9 @@
 "use client";
 
 import { ClipboardCheck, Radio, MessageSquareReply, TrendingUp } from "lucide-react";
-import { Section } from "./ui/Section";
-import { SpotlightCard } from "./ui/primitives";
-import { SectionHeading, Stagger, StaggerItem } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import MatteCard from "./MatteCard";
+import { SectionHeading } from "../anim/primitives";
 
 const steps = [
   {
@@ -53,18 +53,18 @@ export default function ProductJourneySection() {
             left: "12.5%",
             right: "12.5%",
             height: 2,
-            background: "linear-gradient(90deg, transparent, var(--cyan), var(--teal), transparent)",
+            background: "linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent)",
             opacity: 0.5,
           }}
         />
-        <Stagger
+        <div
           className="journey-grid"
           style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, position: "relative" }}
         >
           {steps.map((s) => {
             const Icon = s.icon;
             return (
-              <StaggerItem key={s.n}>
+              <div key={s.n}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                   {/* Node */}
                   <div
@@ -78,11 +78,11 @@ export default function ProductJourneySection() {
                       alignItems: "center",
                       justifyContent: "center",
                       marginBottom: 22,
-                      boxShadow: "0 0 0 6px rgba(53,211,255,0.05), 0 0 30px rgba(53,211,255,0.15)",
+                      boxShadow: "0 0 0 6px rgba(255,255,255,0.05)",
                       position: "relative",
                     }}
                   >
-                    <Icon size={26} color="var(--cyan)" strokeWidth={1.5} />
+                    <Icon size={26} color="var(--accent)" strokeWidth={1.5} />
                     <span
                       style={{
                         position: "absolute",
@@ -91,7 +91,7 @@ export default function ProductJourneySection() {
                         fontFamily: "var(--font-display)",
                         fontSize: 11,
                         fontWeight: 700,
-                        color: "var(--teal)",
+                        color: "var(--accent-2)",
                         background: "var(--bg)",
                         border: "1px solid var(--border)",
                         borderRadius: "var(--r-full)",
@@ -101,15 +101,15 @@ export default function ProductJourneySection() {
                       {s.n}
                     </span>
                   </div>
-                  <SpotlightCard style={{ padding: 22, width: "100%" }}>
+                  <MatteCard style={{ padding: 22, width: "100%" }}>
                     <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{s.phase}</h3>
                     <p style={{ fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>{s.body}</p>
-                  </SpotlightCard>
+                  </MatteCard>
                 </div>
-              </StaggerItem>
+              </div>
             );
           })}
-        </Stagger>
+        </div>
       </div>
 
       <style>{`

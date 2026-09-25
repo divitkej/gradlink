@@ -72,12 +72,12 @@ export default function ResetPassword() {
 
   return (
     <AuthShell backHref="/sign-in" backLabel="Back to sign in">
-      <div style={{ width: "100%", maxWidth: 420, background: "var(--glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-xl)", boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(53,211,255,0.08), 0 0 70px rgba(0,194,168,0.12)", padding: "clamp(26px, 4vw, 38px)" }}>
+      <div style={{ width: "100%", maxWidth: 420, background: "var(--glass)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-xl)", boxShadow: "0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)", padding: "clamp(26px, 4vw, 38px)" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}><Logo size={26} /></div>
 
         {done ? (
           <div style={{ textAlign: "center" }}>
-            <CheckCircle2 size={48} color="var(--teal)" style={{ margin: "0 auto 16px" }} />
+            <CheckCircle2 size={48} color="var(--accent-2)" style={{ margin: "0 auto 16px" }} />
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Password updated</h1>
             <p style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 22, lineHeight: 1.6 }}>You can now sign in with your new password. Taking you there…</p>
             <Button href="/sign-in" variant="primary" icon={<ArrowRight size={16} />}>Go to sign in</Button>
@@ -112,14 +112,14 @@ export default function ResetPassword() {
             </form>
 
             <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 18 }}>
-              Remembered it? <Link href="/sign-in" className="gl-link" style={{ color: "var(--cyan)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
+              Remembered it? <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
             </p>
           </>
         )}
 
         <style>{`
           .gl-input::placeholder { color: var(--text-muted); opacity: 0.7; }
-          .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(53,211,255,0.12) !important; }
+          .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12) !important; }
           .gl-link:hover { text-decoration: underline; }
         `}</style>
       </div>

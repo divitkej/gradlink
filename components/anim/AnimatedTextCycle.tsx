@@ -11,7 +11,7 @@ export default function AnimatedTextCycle({
   phrases,
   interval = 2200,
   className,
-  color = "var(--cyan)",
+  color = "var(--accent)",
 }: {
   phrases: string[];
   interval?: number;

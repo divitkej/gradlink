@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ResetPassword from "@/components/gradlink/ResetPassword";
 
-export const metadata = { title: "Reset password — GradLink" };
+export const metadata = { title: "Reset password · GradLink" };
 
 export default function ResetPasswordPage() {
   // ResetPassword reads the `oobCode` query param via useSearchParams, which

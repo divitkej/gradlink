@@ -11,7 +11,7 @@ import { useReducedMotion } from "framer-motion";
 export default function ParticleText({
   text,
   fontSize = 72,
-  color = "#35D3FF",
+  color = "#FFFFFF",
   height = 120,
   lerp = 0.08,
   frames = 160,
