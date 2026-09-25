@@ -177,7 +177,7 @@ export default function OpeningHero() {
             lineHeight: 1.55,
           }}
         >
-          <div>Prepare students. Connect employers.</div>
+          <div style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Prepare students. Connect employers.</div>
           <div style={{ marginTop: 4 }}>
             <span style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Track outcomes.</span>
           </div>
