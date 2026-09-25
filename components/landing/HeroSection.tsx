@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import AnimatedTextCycle from "./anim/AnimatedTextCycle";
-import Magnetic from "./anim/Magnetic";
+import AnimatedTextCycle from "../anim/AnimatedTextCycle";
+import Magnetic from "../anim/Magnetic";
 import HeroDashboard from "./HeroDashboard";
-import { Button, Badge } from "./ui/primitives";
+import { Button, Badge } from "../ui/primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

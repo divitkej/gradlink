@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import ShaderBackground from "./ui/shader-background";
-import { useMounted } from "./anim/primitives";
+import ShaderBackground from "../ui/shader-background";
+import { useMounted } from "../anim/primitives";
 import HeroBackground from "./HeroBackground";
-import ParticleText from "./anim/ParticleText";
+import ParticleText from "../anim/ParticleText";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { CalendarX, EyeOff, FileX2 } from "lucide-react";
-import { Section } from "./ui/Section";
-import { SpotlightCard } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import { SpotlightCard } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
 
 const problems = [
   {

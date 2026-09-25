@@ -1,9 +1,9 @@
 "use client";
 
 import { Check, Clock, Sparkles } from "lucide-react";
-import { Section } from "./ui/Section";
-import { GlassCard, Meter } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import { GlassCard, Meter } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
 
 const competencies = [
   { l: "Communication", v: 54, c: "var(--danger)" },

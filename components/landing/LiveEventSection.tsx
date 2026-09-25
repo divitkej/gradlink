@@ -1,9 +1,9 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Section } from "./ui/Section";
-import { GlassCard, Badge } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import { GlassCard, Badge } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
 
 const passport = [
   { l: "Resume Workshop", t: "09:15", done: true },

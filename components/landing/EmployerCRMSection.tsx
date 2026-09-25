@@ -1,8 +1,8 @@
 "use client";
 
-import { Section } from "./ui/Section";
-import { GlassCard, Badge, Meter } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import { GlassCard, Badge, Meter } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
 
 const filters = ["Degree", "Graduation Year", "GPA", "Skills", "Readiness Score", "Resume Score", "Event Activity", "Stage"];
 

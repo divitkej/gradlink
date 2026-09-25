@@ -3,8 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import Logo from "./Logo";
-import { Button } from "./ui/primitives";
+import Logo from "../Logo";
+import { Button } from "../ui/primitives";
 
 const links = [
   { label: "Platform", href: "#product" },

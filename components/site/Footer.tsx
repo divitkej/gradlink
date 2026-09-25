@@ -1,4 +1,4 @@
-import Logo from "./Logo";
+import Logo from "../Logo";
 
 const columns = {
   Platform: ["Career Profiles", "Events Hub", "Readiness Hub", "Employer CRM", "Analytics"],

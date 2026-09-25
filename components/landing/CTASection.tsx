@@ -1,12 +1,12 @@
 "use client";
 
 import { ArrowRight, Check } from "lucide-react";
-import { Section } from "./ui/Section";
-import { Button } from "./ui/primitives";
-import AnimatedTextCycle from "./anim/AnimatedTextCycle";
-import ParticleText from "./anim/ParticleText";
-import ShaderGlow from "./anim/ShaderGlow";
-import BackgroundPaths from "./anim/BackgroundPaths";
+import { Section } from "../ui/Section";
+import { Button } from "../ui/primitives";
+import AnimatedTextCycle from "../anim/AnimatedTextCycle";
+import ParticleText from "../anim/ParticleText";
+import ShaderGlow from "../anim/ShaderGlow";
+import BackgroundPaths from "../anim/BackgroundPaths";
 
 const chips = ["Setup in 48 hours", "No contract lock-in", "Dedicated onboarding", "UAE data residency"];
 

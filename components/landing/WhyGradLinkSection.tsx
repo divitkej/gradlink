@@ -1,9 +1,9 @@
 "use client";
 
 import { Layers, QrCode, GraduationCap, BarChart3, Send, CalendarRange } from "lucide-react";
-import { Section } from "./ui/Section";
-import { SpotlightCard } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
+import { Section } from "../ui/Section";
+import { SpotlightCard } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
 
 const reasons = [
   { icon: Layers, title: "Built for the full event lifecycle", body: "Before, during, after, and between events — not just registration." },

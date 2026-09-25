@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserCircle, Gauge, Radio, Database, Check } from "lucide-react";
-import { Section } from "./ui/Section";
-import { SectionHeading } from "./anim/primitives";
-import { Badge } from "./ui/primitives";
+import { Section } from "../ui/Section";
+import { SectionHeading } from "../anim/primitives";
+import { Badge } from "../ui/primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

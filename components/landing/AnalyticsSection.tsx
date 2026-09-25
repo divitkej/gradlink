@@ -1,9 +1,9 @@
 "use client";
 
-import { Section } from "./ui/Section";
-import { GlassCard, Meter } from "./ui/primitives";
-import { SectionHeading } from "./anim/primitives";
-import HoverExpandStats, { type StatPanel } from "./anim/HoverExpandStats";
+import { Section } from "../ui/Section";
+import { GlassCard, Meter } from "../ui/primitives";
+import { SectionHeading } from "../anim/primitives";
+import HoverExpandStats, { type StatPanel } from "../anim/HoverExpandStats";
 
 const outcomePanels: StatPanel[] = [
   {
