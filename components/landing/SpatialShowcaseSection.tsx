@@ -6,6 +6,7 @@ import { UserCircle, Gauge, Radio, Database, Check } from "lucide-react";
 import { Section } from "../ui/Section";
 import { SectionHeading } from "../anim/primitives";
 import { Badge } from "../ui/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -121,7 +122,7 @@ function MiniLive() {
         <div style={{ marginLeft: "auto" }}><Badge tone="muted" pulse>Live</Badge></div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {[["09:00", "Resume Workshop", true], ["10:30", "PwC Booth", true], ["11:00", "Mock Interview", false]].map(([t, l, done]) => (
+        {[["09:00", "Resume Workshop", true], ["10:30", "Consulting booth", true], ["11:00", "Mock Interview", false]].map(([t, l, done]) => (
           <div key={t as string} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
             <span style={{ color: "var(--text-muted)", minWidth: 34 }}>{t}</span>
             <span style={{ flex: 1, color: done ? "var(--text)" : "var(--text-2)" }}>{l}</span>
@@ -248,11 +249,12 @@ export default function SpatialShowcaseSection() {
                 boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginBottom: 20 }}>
                 <div style={{ width: 40, height: 40, borderRadius: "var(--r-md)", background: "linear-gradient(135deg, var(--accent), var(--accent-2))", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Icon size={20} color="#0A0A0A" strokeWidth={1.7} />
                 </div>
                 <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)" }}>{m.name}</h3>
+                <div style={{ marginLeft: "auto" }}><SampleDataLabel /></div>
               </div>
 
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 9, marginBottom: 24 }}>
@@ -273,7 +275,7 @@ export default function SpatialShowcaseSection() {
       </div>
 
       <style>{`
-        @media (max-width: 920px) { .showcase-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 920px) { .showcase-grid { grid-template-columns: minmax(0, 1fr) !important; } }
       `}</style>
     </Section>
   );

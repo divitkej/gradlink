@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductFrame } from "./ProductFrame";
-import { Badge } from "../ui/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 function Stat({ label, value, suffix = "", accent = false }: { label: string; value: number; suffix?: string; accent?: boolean }) {
   return (
@@ -57,10 +57,10 @@ export default function ProductReveal() {
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10 }}>
           <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--text)" }}>GradLink — Career Fair 2025</div>
-            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Abu Dhabi University · 18 Feb 2025</div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--text)" }}>Campus Career Fair</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Sample University</div>
           </div>
-          <Badge tone="muted" pulse>Live Now</Badge>
+          <SampleDataLabel />
         </div>
 
         <div className="reveal-stats" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
@@ -75,7 +75,7 @@ export default function ProductReveal() {
         <div className="reveal-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1.1fr", gap: 12 }}>
           <Panel title="Live Schedule">
             <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-              {[["09:00", "Resume Workshop", true], ["10:30", "PwC Booth Opens", false], ["11:00", "Mock Interview — Careem", false], ["14:00", "Startup Networking", false]].map(([t, l, live]) => (
+              {[["09:00", "Resume Workshop", true], ["10:30", "Consulting firm booth opens", false], ["11:00", "Mock interview · Fintech firm", false], ["14:00", "Startup Networking", false]].map(([t, l, live]) => (
                 <div key={t as string} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5 }}>
                   <span style={{ color: "var(--text-muted)", minWidth: 36 }}>{t}</span>
                   <span style={{ flex: 1, color: live ? "var(--text)" : "var(--text-2)", fontWeight: live ? 600 : 400 }}>{l}</span>
@@ -99,7 +99,7 @@ export default function ProductReveal() {
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-              {["Workshop", "PwC Booth", "Mock", "Follow-up"].map((j, i) => (
+              {["Workshop", "Consulting booth", "Mock", "Follow-up"].map((j, i) => (
                 <span key={j} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                   <span style={{ fontSize: 10.5, color: "var(--text)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "var(--r-full)", padding: "3px 8px" }}>{j}</span>
                   {i < 3 && <span style={{ color: "var(--accent-2)", fontSize: 11 }}>→</span>}

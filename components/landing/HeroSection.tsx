@@ -130,34 +130,6 @@ export default function HeroSection() {
             </Magnetic>
           </motion.div>
 
-          {/* Trust stats */}
-          <motion.div
-            custom={6}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            style={{
-              marginTop: 40,
-              paddingTop: 28,
-              borderTop: "1px solid var(--border)",
-              display: "flex",
-              gap: 28,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { n: "12+", l: "UAE Colleges" },
-              { n: "18K+", l: "Students" },
-              { n: "200+", l: "Employers" },
-            ].map((s) => (
-              <div key={s.l}>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)" }}>
-                  {s.n}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{s.l}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         {/* Right dashboard */}

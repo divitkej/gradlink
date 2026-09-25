@@ -139,7 +139,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
       <GlassPanel>
         <PanelTitle hint="Edits update your booth QR & checklist">Edit your booth profile</PanelTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }} className="cp-grid">
-          <Field label="Company name" value={companyName} onChange={setCompanyName} placeholder="Careem" />
+          <Field label="Company name" value={companyName} onChange={setCompanyName} placeholder="Your company" />
           <Field label="Booth number" value={booth} onChange={setBooth} placeholder="B12" />
           <Field label="Sector" value={sector} onChange={setSector} placeholder="Technology" />
           <Field label="Industry" value={industry} onChange={setIndustry} placeholder="Ride-hailing & Delivery" />

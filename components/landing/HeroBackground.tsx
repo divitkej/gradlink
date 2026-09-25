@@ -1,5 +1,5 @@
 /**
- * HeroBackground — the opening screen's atmosphere, and the one place on the
+ * HeroBackground · the opening screen's atmosphere, and the one place on the
  * site that glows:
  *  - near-black monochrome base
  *  - one soft grey-white glow behind the wordmark (slow pulse)

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Badge } from "../ui/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -63,11 +64,11 @@ function Panel({ title, children, badge }: { title: string; children: React.Reac
 export default function HeroDashboard() {
   const schedule = [
     { t: "09:00", l: "Resume Workshop", live: true },
-    { t: "10:30", l: "PwC Booth Opens", live: false },
-    { t: "11:00", l: "Mock Interview — Careem", live: false },
+    { t: "10:30", l: "Consulting firm booth opens", live: false },
+    { t: "11:00", l: "Mock interview · Fintech firm", live: false },
     { t: "14:00", l: "Startup Networking", live: false },
   ];
-  const journey = ["Resume Workshop", "PwC Booth", "Mock Interview", "Follow-up Sent"];
+  const journey = ["Resume Workshop", "Consulting booth", "Mock Interview", "Follow-up Sent"];
   const readiness = [
     { l: "Communication", v: 54, c: "var(--text-muted)" },
     { l: "Technology", v: 82, c: "var(--accent-2)" },
@@ -101,13 +102,13 @@ export default function HeroDashboard() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
-            GradLink — Career Fair 2025
+            Campus Career Fair
           </div>
           <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>
-            Abu Dhabi University · 18 Feb 2025
+            Sample University
           </div>
         </div>
-        <Badge tone="muted" pulse>Event Active</Badge>
+        <SampleDataLabel />
       </div>
 
       {/* Stats */}
@@ -191,7 +192,7 @@ export default function HeroDashboard() {
         {/* Matched companies */}
         <Panel title="Matched Companies">
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {["Careem", "PwC UAE", "G42"].map((c) => (
+            {["Fintech firm", "Consulting firm", "AI startup"].map((c) => (
               <div key={c} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--accent-2)", boxShadow: "none" }} />
                 <span style={{ fontSize: 12, color: "var(--text)", fontWeight: 500 }}>{c}</span>

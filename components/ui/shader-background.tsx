@@ -179,10 +179,12 @@ export default function ShaderBackground({ className }: { className?: string }) 
       },
     };
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Phones render at 1x: a full-screen fragment shader at 2-3x pixel density
+    // is the main cost on low-end devices. Desktop keeps up to 2x.
     const resizeCanvas = () => {
       const w = canvas.clientWidth || window.innerWidth;
       const h = canvas.clientHeight || window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1 : 2);
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -196,6 +198,8 @@ export default function ShaderBackground({ className }: { className?: string }) 
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     let rafId = 0;
+    let observer: IntersectionObserver | undefined;
+    let stopWatching: (() => void) | undefined;
     const startTime = Date.now();
 
     const draw = (time: number) => {
@@ -214,15 +218,35 @@ export default function ShaderBackground({ className }: { className?: string }) 
       // Respect reduced motion: render a single static frame, no loop.
       draw(8.0);
     } else {
+      // Only animate while the canvas is on screen and the tab is visible,
+      // so the shader stops using the GPU once the visitor scrolls past it.
+      let onScreen = true;
       const render = () => {
         draw((Date.now() - startTime) / 1000);
         rafId = requestAnimationFrame(render);
       };
-      rafId = requestAnimationFrame(render);
+      const sync = () => {
+        const shouldRun = onScreen && document.visibilityState === "visible";
+        if (shouldRun && !rafId) rafId = requestAnimationFrame(render);
+        if (!shouldRun && rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+      };
+      observer = new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        sync();
+      });
+      observer.observe(canvas);
+      document.addEventListener("visibilitychange", sync);
+      stopWatching = () => document.removeEventListener("visibilitychange", sync);
+      sync();
     }
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
+      observer?.disconnect();
+      stopWatching?.();
       if (rafId) cancelAnimationFrame(rafId);
       // NOTE: do NOT call WEBGL_lose_context.loseContext() here. React Strict
       // Mode (dev) remounts the effect on the SAME canvas, and getContext()

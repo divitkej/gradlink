@@ -22,19 +22,19 @@ const ROLE_CONFIG: Record<Role, {
 }> = {
   student: {
     badge: "Student account", icon: GraduationCap, accent: "var(--accent)",
-    orgLabel: "University name", orgPlaceholder: "Abu Dhabi University", orgIcon: GraduationCap,
+    orgLabel: "University name", orgPlaceholder: "Your university", orgIcon: GraduationCap,
     emailPlaceholder: "you@university.ac.ae", emailNote: "Please use your university email address.",
     subtitle: "Get fair-ready and tracked from check-in to offer.", label: "student",
   },
   company: {
     badge: "Company account", icon: Building2, accent: "var(--accent-2)",
-    orgLabel: "Company name", orgPlaceholder: "Careem", orgIcon: Building2,
+    orgLabel: "Company name", orgPlaceholder: "Your company", orgIcon: Building2,
     emailPlaceholder: "you@company.com", emailNote: "Please use your company email address.",
     subtitle: "Scan once, shortlist smarter, follow up faster.", label: "company",
   },
   college: {
     badge: "College / Event host", icon: Briefcase, accent: "var(--amber)",
-    orgLabel: "Institution / Organization name", orgPlaceholder: "Abu Dhabi University Career Center", orgIcon: Building2,
+    orgLabel: "Institution / Organization name", orgPlaceholder: "Your career centre or organisation", orgIcon: Building2,
     emailPlaceholder: "you@institution.ac.ae", emailNote: "Please use your official institution email address.",
     subtitle: "Run events, track engagement, and prove outcomes.", label: "college / event host",
   },

@@ -58,23 +58,6 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
               transition: "border-color 0.3s ease, box-shadow 0.3s ease",
             }}
           >
-            {/* Accent wash on active */}
-            <AnimatePresence>
-              {isActive && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "radial-gradient(120% 80% at 100% 0%, rgba(255,255,255,0.16), transparent 60%)",
-                  }}
-                />
-              )}
-            </AnimatePresence>
 
             {/* Collapsed spine: vertical label + value */}
             {!isActive && (

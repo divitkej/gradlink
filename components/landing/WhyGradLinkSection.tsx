@@ -6,7 +6,7 @@ import { MatteCard } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
 
 const reasons = [
-  { icon: Layers, title: "Built for the full event lifecycle", body: "Before, during, after, and between events — not just registration." },
+  { icon: Layers, title: "Built for the full event lifecycle", body: "Before, during, after, and between events · not just registration." },
   { icon: QrCode, title: "Turns QR scans into outcomes", body: "Every scan can become a follow-up, shortlist, interview, or offer." },
   { icon: GraduationCap, title: "Prepares students before recruiters arrive", body: "Readiness scores, resume checks, mock interviews, and personalized event plans." },
   { icon: BarChart3, title: "Gives colleges real analytics", body: "Track engagement, company activity, interviews, offers, and placement impact." },

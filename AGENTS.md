@@ -45,6 +45,6 @@ Rules:
 
 ## Checklists
 
-- `docs/checklists/<area>.md` tracks what is left before launch. Fixing an item ticks it in the same commit, with the commit hash.
+- `docs/checklists/<area>.md` tracks what is left before launch. Fixing an item ticks it in the same commit, naming that commit by its title (a hash is not known until after committing).
 - Keep file paths in checklists current when files move.
 - No em dashes in docs or visible copy.

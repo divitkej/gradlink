@@ -3,6 +3,7 @@
 import { Section } from "../ui/Section";
 import { GlassCard, Badge, Meter } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const filters = ["Degree", "Graduation Year", "GPA", "Skills", "Readiness Score", "Resume Score", "Event Activity", "Stage"];
 
@@ -37,8 +38,11 @@ export default function EmployerCRMSection() {
           {/* Pipeline */}
           <div>
             <GlassCard padding={26}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 18 }}>
-                Careem — Candidate Pipeline
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+                  Fintech firm · Candidate pipeline
+                </span>
+                <SampleDataLabel />
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {pipeline.map((p) => (
@@ -71,7 +75,7 @@ export default function EmployerCRMSection() {
             <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Scanned Candidates</div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>42 students · Careem</div>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>42 students · Fintech firm</div>
               </div>
               <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)", padding: "6px 12px", cursor: "pointer" }}>Export CSV</span>
             </div>

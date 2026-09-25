@@ -2,16 +2,20 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Logo from "../Logo";
 import { Button } from "../ui/primitives";
 
+// In the order the sections appear on the home page. Each link points to a
+// different section, and the "/" prefix makes them work from other pages too.
 const links = [
-  { label: "Platform", href: "#product" },
-  { label: "Students", href: "#readiness" },
-  { label: "Employers", href: "#employers" },
-  { label: "Colleges", href: "#analytics" },
-  { label: "Analytics", href: "#analytics" },
+  { label: "How it works", href: "/#journey" },
+  { label: "Platform", href: "/#product" },
+  { label: "Students", href: "/#readiness" },
+  { label: "Live events", href: "/#live" },
+  { label: "Colleges", href: "/#analytics" },
+  { label: "Employers", href: "/#employers" },
   { label: "Pricing", href: "/pricing" },
 ];
 
@@ -58,13 +62,13 @@ export default function Navbar() {
           }}
           aria-label="Main"
         >
-          <a href="#top" style={{ textDecoration: "none" }} aria-label="GradLink home">
+          <Link href="/" style={{ textDecoration: "none" }} aria-label="GradLink home">
             <Logo size={22} />
-          </a>
+          </Link>
 
           <ul
             className="nav-links"
-            style={{ display: "flex", alignItems: "center", gap: 4, listStyle: "none" }}
+            style={{ display: "flex", alignItems: "center", gap: 2, listStyle: "none" }}
           >
             {links.map((l) => (
               <li key={l.label}>
@@ -76,9 +80,10 @@ export default function Navbar() {
                     fontWeight: 500,
                     color: "var(--text-2)",
                     textDecoration: "none",
-                    padding: "8px 14px",
+                    padding: "8px 12px",
                     borderRadius: "var(--r-sm)",
                     position: "relative",
+                    whiteSpace: "nowrap",
                     transition: "color 0.18s ease",
                   }}
                 >
@@ -219,7 +224,7 @@ export default function Navbar() {
         .nav-link::after {
           content: "";
           position: absolute;
-          left: 14px; right: 14px; bottom: 4px;
+          left: 12px; right: 12px; bottom: 4px;
           height: 1.5px;
           background: linear-gradient(90deg, var(--accent), var(--accent-2));
           transform: scaleX(0);
@@ -228,7 +233,7 @@ export default function Navbar() {
           box-shadow: none;
         }
         .nav-link:hover::after { transform: scaleX(1); }
-        @media (max-width: 920px) {
+        @media (max-width: 1080px) {
           .nav-links, .nav-cta { display: none !important; }
           .nav-burger { display: flex !important; }
         }

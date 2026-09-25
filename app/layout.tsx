@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 import Providers from "@/components/Providers";
 import GradLinkBackground from "@/components/gradlink/gradlink-background";
 
@@ -18,15 +19,13 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-// Set NEXT_PUBLIC_SITE_URL at build time to the Worker's public URL (see .env.example).
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const SHARE_TITLE = "GradLink — Prepare students. Connect employers. Track outcomes.";
+const SHARE_TITLE = "GradLink · Prepare students. Connect employers. Track outcomes.";
 const SHARE_DESC =
   "Career-event intelligence for UAE colleges — from check-in to offer, every student interaction becomes measurable career data.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "GradLink — Career event intelligence for UAE colleges",
+  title: "GradLink · Career event intelligence for UAE colleges",
   description: SHARE_DESC,
   applicationName: "GradLink",
   openGraph: {

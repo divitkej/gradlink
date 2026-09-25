@@ -4,12 +4,13 @@ import { Check } from "lucide-react";
 import { Section } from "../ui/Section";
 import { GlassCard, Badge } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const passport = [
   { l: "Resume Workshop", t: "09:15", done: true },
-  { l: "Mock Interview — Careem", t: "10:00", done: true },
-  { l: "Careem Booth", t: "10:45", done: true },
-  { l: "PwC Booth", t: "11:30", done: true },
+  { l: "Mock interview · Fintech firm", t: "10:00", done: true },
+  { l: "Fintech firm Booth", t: "10:45", done: true },
+  { l: "Consulting booth", t: "11:30", done: true },
   { l: "Follow-up Sent", t: "12:10", done: true },
   { l: "Startup Networking", t: "14:00", done: false },
 ];
@@ -23,10 +24,10 @@ const leaderboard = [
 ];
 
 const scans = [
-  { s: "Sara Al Rashidi", c: "Careem", t: "10:45", status: "Shortlisted" },
-  { s: "M. Al Mansoori", c: "PwC UAE", t: "11:02", status: "Scanned" },
-  { s: "Fatima Khalid", c: "G42", t: "11:18", status: "Shortlisted" },
-  { s: "Ahmed Nasser", c: "Careem", t: "11:34", status: "Scanned" },
+  { s: "Sara Al Rashidi", c: "Fintech firm", t: "10:45", status: "Shortlisted" },
+  { s: "M. Al Mansoori", c: "Consulting firm", t: "11:02", status: "Scanned" },
+  { s: "Fatima Khalid", c: "AI startup", t: "11:18", status: "Shortlisted" },
+  { s: "Ahmed Nasser", c: "Fintech firm", t: "11:34", status: "Scanned" },
 ];
 
 export default function LiveEventSection() {
@@ -46,7 +47,7 @@ export default function LiveEventSection() {
               <span style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>
                 Sara&apos;s Digital Passport
               </span>
-              <Badge tone="muted" pulse>Live</Badge>
+              <SampleDataLabel />
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               {passport.map((p, i) => (
@@ -65,7 +66,7 @@ export default function LiveEventSection() {
               ))}
             </div>
             <p style={{ marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--border)", fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>
-              A student attends a resume workshop, completes a mock interview, checks into Careem, visits PwC, and sends a
+              A student attends a resume workshop, completes a mock interview, checks into Fintech firm, visits Consulting firm, and sends a
               follow-up. <strong style={{ color: "var(--text)" }}>GradLink turns each action into a signal.</strong>
             </p>
           </GlassCard>

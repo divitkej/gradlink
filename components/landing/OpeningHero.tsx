@@ -67,7 +67,7 @@ export default function OpeningHero() {
         justifyContent: "center",
       }}
     >
-      {/* Hero background stack — bottom-masked to dissolve into the global bg. */}
+      {/* Hero background stack · bottom-masked to dissolve into the global bg. */}
       <div
         aria-hidden
         style={{
@@ -174,7 +174,7 @@ export default function OpeningHero() {
           </motion.div>
         </div>
 
-        {/* Tagline — two lines, appears after the wordmark solidifies */}
+        {/* Tagline · two lines, appears after the wordmark solidifies */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: phase === "solid" ? 1 : 0, y: phase === "solid" ? 0 : 12 }}

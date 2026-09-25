@@ -4,6 +4,7 @@ import { Check, Clock, Sparkles } from "lucide-react";
 import { Section } from "../ui/Section";
 import { GlassCard, Meter } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
+import SampleDataLabel from "./SampleDataLabel";
 
 const competencies = [
   { l: "Communication", v: 54, c: "var(--text-muted)" },
@@ -69,12 +70,13 @@ export default function ReadinessSection() {
         {/* Student card */}
         <div>
           <GlassCard padding={28} style={{ border: "1px solid var(--border-strong)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 20, borderBottom: "1px solid var(--border)", marginBottom: 22 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14, paddingBottom: 20, borderBottom: "1px solid var(--border)", marginBottom: 22 }}>
               <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontWeight: 700, fontFamily: "var(--font-display)", fontSize: 17 }}>SA</div>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)" }}>Sara Al Rashidi</div>
-                <div style={{ fontSize: 12.5, color: "var(--text-muted)" }}>Business Administration · Year 3 · Abu Dhabi University</div>
+                <div style={{ fontSize: 12.5, color: "var(--text-muted)" }}>Business Administration · Year 3 · Sample University</div>
               </div>
+              <div style={{ marginLeft: "auto", alignSelf: "flex-start" }}><SampleDataLabel /></div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, padding: "18px 12px", background: "rgba(255,255,255,0.02)", borderRadius: "var(--r-md)", marginBottom: 22 }}>
@@ -111,7 +113,7 @@ export default function ReadinessSection() {
       </div>
 
       <style>{`
-        @media (max-width: 900px) { .readiness-grid { grid-template-columns: 1fr !important; gap: 40px !important; } }
+        @media (max-width: 900px) { .readiness-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 40px !important; } }
       `}</style>
     </Section>
   );
