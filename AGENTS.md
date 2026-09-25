@@ -29,6 +29,7 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `docs/brand/` | Sources for the share images and icons in `app/` |
 | `docs/archive/` | Historical material, never imported or deployed |
 | `migration/` | One-off data migration scripts and exports |
+| `vercel.json` | Redirect-only config for the retired Vercel project; the app deploys to Cloudflare |
 
 Rules:
 - A component used by one area goes in that area's folder. Move it to `components/ui/` only once a second area uses it.
