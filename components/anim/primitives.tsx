@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useReducedMotion, type Variants } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -42,58 +42,6 @@ export function Reveal({
     >
       {children}
     </MotionTag>
-  );
-}
-
-/* ---------- Stagger container + item ---------- */
-export const staggerContainer: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-};
-
-export const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
-
-export function Stagger({
-  children,
-  className,
-  style,
-  amount = 0.2,
-}: {
-  children: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  amount?: number;
-}) {
-  return (
-    <motion.div
-      className={className}
-      style={style}
-      variants={staggerContainer}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function StaggerItem({
-  children,
-  className,
-  style,
-}: {
-  children: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <motion.div variants={staggerItem} className={className} style={style}>
-      {children}
-    </motion.div>
   );
 }
 
@@ -214,7 +162,6 @@ export function SectionHeading({
         marginRight: align === "center" ? "auto" : 0,
       }}
     >
-      <Reveal>
         <span
           style={{
             display: "inline-flex",
@@ -243,8 +190,6 @@ export function SectionHeading({
           />
           {badge}
         </span>
-      </Reveal>
-      <Reveal delay={0.08}>
         <h2
           style={{
             fontSize: "clamp(28px, 3.6vw, 44px)",
@@ -256,9 +201,7 @@ export function SectionHeading({
         >
           {title}
         </h2>
-      </Reveal>
       {subtitle && (
-        <Reveal delay={0.16}>
           <p
             style={{
               fontSize: 17,
@@ -271,7 +214,6 @@ export function SectionHeading({
           >
             {subtitle}
           </p>
-        </Reveal>
       )}
     </div>
   );

@@ -1,8 +1,8 @@
 "use client";
 
 import { Section } from "./ui/Section";
-import { GlassCard, Badge } from "./ui/primitives";
-import { SectionHeading, AnimatedBar, Reveal } from "./anim/primitives";
+import { GlassCard, Badge, Meter } from "./ui/primitives";
+import { SectionHeading } from "./anim/primitives";
 
 const filters = ["Degree", "Graduation Year", "GPA", "Skills", "Readiness Score", "Resume Score", "Event Activity", "Stage"];
 
@@ -35,25 +35,25 @@ export default function EmployerCRMSection() {
       <div className="crm-grid" style={{ display: "grid", gridTemplateColumns: "4fr 5fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Pipeline */}
-          <Reveal>
+          <div>
             <GlassCard padding={26}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 18 }}>
                 Careem — Candidate Pipeline
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {pipeline.map((p, i) => (
+                {pipeline.map((p) => (
                   <div key={p.l} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <span style={{ fontSize: 12.5, color: "var(--text-2)", width: 80 }}>{p.l}</span>
-                    <div style={{ flex: 1 }}><AnimatedBar value={p.pct} color={p.c} delay={i * 0.08} /></div>
+                    <div style={{ flex: 1 }}><Meter value={p.pct} color={p.c} /></div>
                     <span style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: p.c, width: 28, textAlign: "right" }}>{p.v}</span>
                   </div>
                 ))}
               </div>
             </GlassCard>
-          </Reveal>
+          </div>
 
           {/* Filters */}
-          <Reveal delay={0.1}>
+          <div>
             <GlassCard padding={22}>
               <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 12 }}>Filter candidates by:</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -62,11 +62,11 @@ export default function EmployerCRMSection() {
                 ))}
               </div>
             </GlassCard>
-          </Reveal>
+          </div>
         </div>
 
         {/* Candidate list */}
-        <Reveal delay={0.12}>
+        <div>
           <GlassCard padding={0} style={{ overflow: "hidden", border: "1px solid var(--border-strong)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
@@ -101,7 +101,7 @@ export default function EmployerCRMSection() {
               </div>
             ))}
           </GlassCard>
-        </Reveal>
+        </div>
       </div>
 
       <style>{`

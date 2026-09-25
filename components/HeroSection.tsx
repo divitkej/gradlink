@@ -2,16 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 import AnimatedTextCycle from "./anim/AnimatedTextCycle";
 import Magnetic from "./anim/Magnetic";
 import HeroDashboard from "./HeroDashboard";
 import { Button, Badge } from "./ui/primitives";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -25,18 +19,6 @@ const fadeUp = {
 };
 
 export default function HeroSection() {
-  const heroDashRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    if (!heroDashRef.current) return;
-    gsap.to(heroDashRef.current, {
-      yPercent: -14,
-      ease: "none",
-      scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: 1 },
-    });
-  });
-
   return (
     <section
       id="hero"
@@ -189,7 +171,7 @@ export default function HeroSection() {
               filter: "blur(20px)",
             }}
           />
-          <div ref={heroDashRef} style={{ willChange: "transform" }}>
+          <div style={{ position: "relative" }}>
             <HeroDashboard />
           </div>
         </div>

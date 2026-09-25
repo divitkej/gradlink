@@ -3,7 +3,7 @@
 import { CalendarX, EyeOff, FileX2 } from "lucide-react";
 import { Section } from "./ui/Section";
 import { SpotlightCard } from "./ui/primitives";
-import { SectionHeading, Stagger, StaggerItem } from "./anim/primitives";
+import { SectionHeading } from "./anim/primitives";
 
 const problems = [
   {
@@ -41,7 +41,7 @@ export default function ProblemSection() {
         subtitle="Colleges know who attended. They rarely know who prepared, who met recruiters, who followed up, who got shortlisted, and who converted into interviews or offers."
       />
 
-      <Stagger
+      <div
         className="problem-grid"
         style={{
           display: "grid",
@@ -53,7 +53,7 @@ export default function ProblemSection() {
         {problems.map((p) => {
           const Icon = p.icon;
           return (
-            <StaggerItem key={p.title}>
+            <div key={p.title}>
               <SpotlightCard style={{ padding: 28, height: "100%" }}>
                 <div
                   style={{
@@ -89,10 +89,10 @@ export default function ProblemSection() {
                   {p.tag}
                 </span>
               </SpotlightCard>
-            </StaggerItem>
+            </div>
           );
         })}
-      </Stagger>
+      </div>
 
       <style>{`
         @media (max-width: 900px) { .problem-grid { grid-template-columns: 1fr !important; } }

@@ -2,7 +2,6 @@
 
 import { MotionConfig } from "framer-motion";
 import SmoothScroll from "./anim/SmoothScroll";
-import ScrollSync from "./anim/ScrollSync";
 
 /**
  * - MotionConfig reducedMotion="user": Framer respects prefers-reduced-motion
@@ -14,7 +13,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
       <SmoothScroll>
-        <ScrollSync />
         {children}
       </SmoothScroll>
     </MotionConfig>

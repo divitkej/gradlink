@@ -72,13 +72,10 @@ function Ring({ v, label }: { v: number; label: string }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
       <svg width={68} height={68} style={{ transform: "rotate(-90deg)" }}>
         <circle cx={34} cy={34} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={6} />
-        <motion.circle
+        <circle
           cx={34} cy={34} r={r} fill="none" stroke="var(--cyan)" strokeWidth={6} strokeLinecap="round"
           strokeDasharray={c}
-          initial={{ strokeDashoffset: c }}
-          whileInView={{ strokeDashoffset: c - (v / 100) * c }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.1, ease: EASE }}
+          strokeDashoffset={c - (v / 100) * c}
           style={{ filter: "drop-shadow(0 0 6px var(--cyan))" }}
         />
         <text x={34} y={34} transform="rotate(90 34 34)" textAnchor="middle" dominantBaseline="middle" style={{ fill: "var(--text)", fontSize: 13, fontWeight: 700 }}>{v}%</text>

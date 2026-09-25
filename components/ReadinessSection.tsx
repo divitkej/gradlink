@@ -1,12 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Check, Clock, Sparkles } from "lucide-react";
 import { Section } from "./ui/Section";
-import { GlassCard } from "./ui/primitives";
-import { SectionHeading, AnimatedBar, Reveal } from "./anim/primitives";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
+import { GlassCard, Meter } from "./ui/primitives";
+import { SectionHeading } from "./anim/primitives";
 
 const competencies = [
   { l: "Communication", v: 54, c: "var(--danger)" },
@@ -32,13 +29,10 @@ function Ring({ v, label }: { v: number; label: string }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       <svg width={80} height={80} style={{ transform: "rotate(-90deg)" }}>
         <circle cx={40} cy={40} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={7} />
-        <motion.circle
+        <circle
           cx={40} cy={40} r={r} fill="none" stroke="var(--cyan)" strokeWidth={7} strokeLinecap="round"
           strokeDasharray={c}
-          initial={{ strokeDashoffset: c }}
-          whileInView={{ strokeDashoffset: c - (v / 100) * c }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: EASE }}
+          strokeDashoffset={c - (v / 100) * c}
           style={{ filter: "drop-shadow(0 0 8px var(--cyan))" }}
         />
         <text x={40} y={40} transform="rotate(90 40 40)" textAnchor="middle" dominantBaseline="middle" style={{ fill: "var(--text)", fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)" }}>{v}%</text>
@@ -58,23 +52,23 @@ export default function ReadinessSection() {
             title="Know who is ready before recruiters arrive."
             subtitle="GradLink helps career centers identify which students need support before they walk into the fair."
           />
-          <Reveal delay={0.2}>
+          <div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 40 }}>
-              {competencies.map((c, i) => (
+              {competencies.map((c) => (
                 <div key={c.l}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                     <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>{c.l}</span>
                     <span style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 600 }}>{c.v}%</span>
                   </div>
-                  <AnimatedBar value={c.v} color={c.c} delay={i * 0.08} />
+                  <Meter value={c.v} color={c.c} />
                 </div>
               ))}
             </div>
-          </Reveal>
+          </div>
         </div>
 
         {/* Student card */}
-        <Reveal delay={0.15}>
+        <div>
           <GlassCard padding={28} style={{ border: "1px solid var(--border-strong)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 20, borderBottom: "1px solid var(--border)", marginBottom: 22 }}>
               <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(53,211,255,0.12)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)", fontWeight: 700, fontFamily: "var(--font-display)", fontSize: 17 }}>SA</div>
@@ -114,7 +108,7 @@ export default function ReadinessSection() {
               </span>
             </div>
           </GlassCard>
-        </Reveal>
+        </div>
       </div>
 
       <style>{`

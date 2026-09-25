@@ -175,6 +175,39 @@ export function SpotlightCard({
   );
 }
 
+/* ---------- Meter (static progress bar) ---------- */
+export function Meter({
+  value,
+  color = "var(--cyan)",
+  track = "rgba(255,255,255,0.08)",
+  height = 8,
+}: {
+  value: number;
+  color?: string;
+  track?: string;
+  height?: number;
+}) {
+  return (
+    <div
+      style={{ height, background: track, borderRadius: "var(--r-full)", overflow: "hidden" }}
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: `${value}%`,
+          background: color,
+          borderRadius: "var(--r-full)",
+          boxShadow: `0 0 12px ${color}`,
+        }}
+      />
+    </div>
+  );
+}
+
 /* ---------- Badge ---------- */
 export function Badge({
   children,

@@ -11,16 +11,12 @@ import AnalyticsSection from "@/components/AnalyticsSection";
 import EmployerCRMSection from "@/components/EmployerCRMSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
-import ScrollThread from "@/components/anim/ScrollThread";
-import ScrollProgress from "@/components/anim/ScrollProgress";
 import StatementBand from "@/components/StatementBand";
 import ProductReveal from "@/components/gradlink/ProductReveal";
 
 export default function Home() {
   return (
     <>
-      <ScrollProgress />
-      <ScrollThread />
       <Navbar />
       <main>
         <OpeningHero />

@@ -1,8 +1,8 @@
 "use client";
 
 import { Section } from "./ui/Section";
-import { GlassCard } from "./ui/primitives";
-import { SectionHeading, AnimatedBar, CountUp, Reveal } from "./anim/primitives";
+import { GlassCard, Meter } from "./ui/primitives";
+import { SectionHeading } from "./anim/primitives";
 import HoverExpandStats, { type StatPanel } from "./anim/HoverExpandStats";
 
 const outcomePanels: StatPanel[] = [
@@ -100,21 +100,21 @@ export default function AnalyticsSection() {
 
       <div className="analytics-grid" style={{ display: "grid", gridTemplateColumns: "5fr 4fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         {/* Funnel */}
-        <Reveal>
+        <div>
           <GlassCard padding={28}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 22 }}>
               Career Fair 2025 — Outcome Funnel
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {funnel.map((f, i) => (
+              {funnel.map((f) => (
                 <div key={f.l}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                     <span style={{ fontSize: 13, color: "var(--text-2)" }}>{f.l}</span>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>
-                      <CountUp to={f.v} />
+                      {f.v}
                     </span>
                   </div>
-                  <AnimatedBar value={f.pct} color={f.c} delay={i * 0.07} />
+                  <Meter value={f.pct} color={f.c} />
                 </div>
               ))}
             </div>
@@ -132,11 +132,11 @@ export default function AnalyticsSection() {
               ))}
             </div>
           </GlassCard>
-        </Reveal>
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Company table */}
-          <Reveal delay={0.1}>
+          <div>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Company Engagement</div>
@@ -164,10 +164,10 @@ export default function AnalyticsSection() {
                 </table>
               </div>
             </GlassCard>
-          </Reveal>
+          </div>
 
           {/* Activity chart */}
-          <Reveal delay={0.18}>
+          <div>
             <GlassCard padding={20}>
               <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)", marginBottom: 18 }}>Student Activity Breakdown</div>
               <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 96 }}>
@@ -192,12 +192,12 @@ export default function AnalyticsSection() {
                 ))}
               </div>
             </GlassCard>
-          </Reveal>
+          </div>
         </div>
       </div>
 
       {/* Interactive outcomes — hover any metric for the breakdown */}
-      <Reveal delay={0.1}>
+      <div>
         <div
           style={{
             display: "flex",
@@ -216,7 +216,7 @@ export default function AnalyticsSection() {
           </span>
         </div>
         <HoverExpandStats panels={outcomePanels} />
-      </Reveal>
+      </div>
 
       <style>{`
         @keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }

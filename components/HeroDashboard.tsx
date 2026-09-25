@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CountUp } from "./anim/primitives";
 import { Badge } from "./ui/primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -25,7 +24,7 @@ function Stat({ label, value, suffix = "", accent = false }: { label: string; va
           letterSpacing: "-0.02em",
         }}
       >
-        <CountUp to={value} suffix={suffix} />
+        {value}{suffix}
       </div>
       <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
     </div>
@@ -248,7 +247,7 @@ export default function HeroDashboard() {
         {pipeline.map((p) => (
           <div key={p.l} style={{ textAlign: "center", padding: "8px 4px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
             <div style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 700, color: "var(--cyan)" }}>
-              <CountUp to={p.v} />
+              {p.v}
             </div>
             <div style={{ fontSize: 9.5, color: "var(--text-muted)", marginTop: 1 }}>{p.l}</div>
           </div>

@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 import { Section } from "./ui/Section";
 import { GlassCard, Badge } from "./ui/primitives";
-import { SectionHeading, Reveal } from "./anim/primitives";
+import { SectionHeading } from "./anim/primitives";
 
 const passport = [
   { l: "Resume Workshop", t: "09:15", done: true },
@@ -40,7 +40,7 @@ export default function LiveEventSection() {
 
       <div className="live-grid" style={{ display: "grid", gridTemplateColumns: "5fr 4fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         {/* Passport journey */}
-        <Reveal>
+        <div>
           <GlassCard padding={28}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
               <span style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>
@@ -69,11 +69,11 @@ export default function LiveEventSection() {
               follow-up. <strong style={{ color: "var(--text)" }}>GradLink turns each action into a signal.</strong>
             </p>
           </GlassCard>
-        </Reveal>
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Leaderboard */}
-          <Reveal delay={0.1}>
+          <div>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Engagement Leaderboard</span>
@@ -87,10 +87,10 @@ export default function LiveEventSection() {
                 </div>
               ))}
             </GlassCard>
-          </Reveal>
+          </div>
 
           {/* Scan feed */}
-          <Reveal delay={0.18}>
+          <div>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Recent Recruiter Scans</span>
@@ -105,7 +105,7 @@ export default function LiveEventSection() {
                 </div>
               ))}
             </GlassCard>
-          </Reveal>
+          </div>
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 "use client";
 
-import { ContainerScroll } from "./ContainerScroll";
-import { CountUp } from "../anim/primitives";
+import { ProductFrame } from "./ProductFrame";
 import { Badge } from "../ui/primitives";
 
 function Stat({ label, value, suffix = "", accent = false }: { label: string; value: number; suffix?: string; accent?: boolean }) {
@@ -15,7 +14,7 @@ function Stat({ label, value, suffix = "", accent = false }: { label: string; va
       }}
     >
       <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: accent ? "var(--teal)" : "var(--text)", letterSpacing: "-0.02em" }}>
-        <CountUp to={value} suffix={suffix} />
+        {value}{suffix}
       </div>
       <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
     </div>
@@ -41,7 +40,7 @@ const funnel = [
 
 export default function ProductReveal() {
   return (
-    <ContainerScroll
+    <ProductFrame
       titleComponent={
         <>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px, 3.6vw, 44px)", fontWeight: 700, lineHeight: 1.12, color: "var(--text)", letterSpacing: "-0.02em", marginBottom: 14 }}>
@@ -132,6 +131,6 @@ export default function ProductReveal() {
           .reveal-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-    </ContainerScroll>
+    </ProductFrame>
   );
 }

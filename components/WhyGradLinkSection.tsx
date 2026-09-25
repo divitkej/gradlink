@@ -3,7 +3,7 @@
 import { Layers, QrCode, GraduationCap, BarChart3, Send, CalendarRange } from "lucide-react";
 import { Section } from "./ui/Section";
 import { SpotlightCard } from "./ui/primitives";
-import { SectionHeading, Stagger, StaggerItem } from "./anim/primitives";
+import { SectionHeading } from "./anim/primitives";
 
 const reasons = [
   { icon: Layers, title: "Built for the full event lifecycle", body: "Before, during, after, and between events — not just registration." },
@@ -23,14 +23,14 @@ export default function WhyGradLinkSection() {
         subtitle="Because a career fair should produce more than attendance numbers. It should produce preparation, engagement, follow-ups, and measurable outcomes."
       />
 
-      <Stagger
+      <div
         className="why-grid"
         style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 56 }}
       >
         {reasons.map((r) => {
           const Icon = r.icon;
           return (
-            <StaggerItem key={r.title}>
+            <div key={r.title}>
               <SpotlightCard style={{ padding: 26, height: "100%" }}>
                 <div
                   style={{
@@ -52,10 +52,10 @@ export default function WhyGradLinkSection() {
                 </h3>
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)" }}>{r.body}</p>
               </SpotlightCard>
-            </StaggerItem>
+            </div>
           );
         })}
-      </Stagger>
+      </div>
 
       <style>{`
         @media (max-width: 980px) { .why-grid { grid-template-columns: 1fr 1fr !important; } }
