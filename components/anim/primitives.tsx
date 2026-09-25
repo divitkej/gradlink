@@ -132,7 +132,6 @@ export function AnimatedBar({
           height: "100%",
           background: color,
           borderRadius: "var(--r-full)",
-          boxShadow: `none`,
         }}
       />
     </div>
@@ -185,7 +184,6 @@ export function SectionHeading({
               height: 6,
               borderRadius: "50%",
               background: accent,
-              boxShadow: `none`,
             }}
           />
           {badge}

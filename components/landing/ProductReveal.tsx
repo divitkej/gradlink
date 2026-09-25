@@ -79,7 +79,7 @@ export default function ProductReveal() {
                 <div key={t as string} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5 }}>
                   <span style={{ color: "var(--text-muted)", minWidth: 36 }}>{t}</span>
                   <span style={{ flex: 1, color: live ? "var(--text)" : "var(--text-2)", fontWeight: live ? 600 : 400 }}>{l}</span>
-                  {live && <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent-2)", boxShadow: "none" }} />}
+                  {live && <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent-2)" }} />}
                 </div>
               ))}
             </div>
@@ -116,7 +116,7 @@ export default function ProductReveal() {
                     <span style={{ color: "var(--text-2)" }}>{f.l}</span>
                   </div>
                   <div style={{ height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${f.v}%`, background: f.c, borderRadius: 3, boxShadow: `none` }} />
+                    <div style={{ height: "100%", width: `${f.v}%`, background: f.c, borderRadius: 3 }} />
                   </div>
                 </div>
               ))}

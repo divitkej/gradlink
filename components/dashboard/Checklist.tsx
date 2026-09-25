@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, Check, ListChecks, Zap } from "lucide-react";
-import { SectionCard, LoadingBlock, MeterBar } from "./cards";
+import { SectionCard, LoadingBlock } from "./cards";
 import {
   getChecklistItems, getChecklistProgress, setChecklistProgress,
   getStudentByProfile, getCompanyByProfile, getScans, listMessagesForProfile, listShortlistsForCompany,
   type ChecklistItemRow,
 } from "@/lib/db";
 import type { AppRole } from "@/lib/session";
+import { Meter } from "@/components/ui/primitives";
 
 const PHASES: { key: ChecklistItemRow["phase"]; label: string; tone: string }[] = [
   { key: "pre_event", label: "Before the event", tone: "var(--accent)" },
@@ -176,7 +177,7 @@ export default function Checklist({
         <LoadingBlock label="Loading your checklist…" />
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <MeterBar value={pct} tone="var(--accent-2)" />
+          <Meter value={pct} tone="var(--accent-2)" />
           {PHASES.map((phase) => {
             const list = grouped[phase.key] ?? [];
             if (!list.length) return null;
@@ -188,7 +189,7 @@ export default function Checklist({
                   onClick={() => setOpenPhase(open ? "" : phase.key)}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", background: "transparent", border: "none", cursor: "pointer", color: "var(--text)" }}
                 >
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: phase.tone, boxShadow: `none` }} />
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: phase.tone }} />
                   <span style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 600 }}>{phase.label}</span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: "auto" }}>{phaseDone}/{list.length}</span>
                   <ChevronDown size={16} style={{ color: "var(--text-muted)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />

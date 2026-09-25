@@ -2,7 +2,7 @@
 
 import { ClipboardCheck, Radio, MessageSquareReply, TrendingUp } from "lucide-react";
 import { Section } from "../ui/Section";
-import { MatteCard } from "../ui/primitives";
+import MatteCard from "./MatteCard";
 import { SectionHeading } from "../anim/primitives";
 
 const steps = [

@@ -128,21 +128,13 @@ export function ScoreRing({ score, size = 96, tone = "var(--accent)", label }: {
           strokeLinecap="round"
           strokeDasharray={circ}
           strokeDashoffset={circ * (1 - pct)}
-          style={{ transition: "stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1)", filter: `drop-shadow(0 0 6px ${tone})` }}
+          style={{ transition: "stroke-dashoffset 1s cubic-bezier(0.22,1,0.36,1)" }}
         />
       </svg>
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontFamily: "var(--font-display)", fontSize: size * 0.28, fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{Math.round(score)}</span>
         {label && <span style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{label}</span>}
       </div>
-    </div>
-  );
-}
-
-export function MeterBar({ value, tone = "var(--accent)" }: { value: number; tone?: string }) {
-  return (
-    <div style={{ height: 7, borderRadius: 6, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
-      <div style={{ height: "100%", width: `${Math.max(0, Math.min(100, value))}%`, background: tone, borderRadius: 6, transition: "width 0.9s cubic-bezier(0.22,1,0.36,1)" }} />
     </div>
   );
 }

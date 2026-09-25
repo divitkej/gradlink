@@ -7,7 +7,8 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Signed-in areas, API routes and one-off links are not for search results.
-      disallow: ["/dashboard/", "/api/", "/scan/", "/events/", "/reset-password"],
+      // No trailing slash, so each rule also covers the bare route (e.g. /dashboard).
+      disallow: ["/dashboard", "/api", "/scan", "/events", "/reset-password"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

@@ -9,6 +9,22 @@ import ParticleText from "../anim/ParticleText";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** Soft dark patch that dims the hero lines behind a piece of text. */
+function DimPatch({ inset }: { inset: string }) {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset,
+        zIndex: -1,
+        pointerEvents: "none",
+        background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
+      }}
+    />
+  );
+}
+
 export default function OpeningHero() {
   const reduce = useReducedMotion();
   const mounted = useMounted();
@@ -118,17 +134,7 @@ export default function OpeningHero() {
       >
         {/* Wordmark: particles and solid text share wordSize → seamless dissolve */}
         <div style={{ position: "relative", width: "min(640px, 92vw)", height: boxH, marginBottom: 30 }}>
-          {/* Soft dark patch that dims the hero lines behind the wordmark */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: "-24px -48px",
-              zIndex: -1,
-              pointerEvents: "none",
-              background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
-            }}
-          />
+          <DimPatch inset="-24px -48px" />
           {mounted && !reduce && (
             <motion.div
               initial={{ opacity: 1 }}
@@ -182,27 +188,18 @@ export default function OpeningHero() {
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "clamp(16px, 2.3vw, 23px)",
-            fontWeight: 500,
+            fontWeight: 700,
             letterSpacing: "0.01em",
-            color: "var(--text)",
+            color: "#FFFFFF",
+            textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)",
             lineHeight: 1.55,
             position: "relative",
           }}
         >
-          {/* Soft dark patch that dims the hero lines behind the tagline */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: "-28px -72px",
-              zIndex: -1,
-              pointerEvents: "none",
-              background: "radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, transparent 75%)",
-            }}
-          />
-          <div style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Prepare students. Connect employers.</div>
+          <DimPatch inset="-28px -72px" />
+          <div>Prepare students. Connect employers.</div>
           <div style={{ marginTop: 4 }}>
-            <span style={{ color: "#FFFFFF", fontWeight: 700, textShadow: "0 1px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)" }}>Track outcomes.</span>
+            <span>Track outcomes.</span>
           </div>
         </motion.div>
       </div>

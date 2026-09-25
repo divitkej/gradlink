@@ -54,8 +54,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
               background: isActive
                 ? "linear-gradient(160deg, var(--surface-elev), var(--surface))"
                 : "var(--glass)",
-              boxShadow: isActive ? "none" : "none",
-              transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+              transition: "border-color 0.3s ease",
             }}
           >
 

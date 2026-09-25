@@ -53,7 +53,7 @@ export default function LiveEventSection() {
               {passport.map((p, i) => (
                 <div key={p.l} style={{ display: "flex", gap: 16 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: p.done ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--surface-elev)", border: p.done ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: p.done ? "none" : "none" }}>
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: p.done ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--surface-elev)", border: p.done ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {p.done ? <Check size={13} color="#0A0A0A" strokeWidth={3} /> : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-muted)" }} />}
                     </div>
                     {i < passport.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 26, background: p.done ? "linear-gradient(var(--accent-2), var(--border))" : "var(--border)" }} />}

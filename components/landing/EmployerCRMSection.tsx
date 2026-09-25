@@ -48,7 +48,7 @@ export default function EmployerCRMSection() {
                 {pipeline.map((p) => (
                   <div key={p.l} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <span style={{ fontSize: 12.5, color: "var(--text-2)", width: 80 }}>{p.l}</span>
-                    <div style={{ flex: 1 }}><Meter value={p.pct} color={p.c} /></div>
+                    <div style={{ flex: 1 }}><Meter value={p.pct} tone={p.c} /></div>
                     <span style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: p.c, width: 28, textAlign: "right" }}>{p.v}</span>
                   </div>
                 ))}

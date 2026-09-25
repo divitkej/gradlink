@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Activity, ScanLine, Sparkles } from "lucide-react";
-import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock, MeterBar } from "./cards";
-import { Badge } from "@/components/ui/primitives";
+import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock } from "./cards";
+import { Badge, Meter } from "@/components/ui/primitives";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
 import OutcomeReportCard from "./OutcomeReportCard";
@@ -100,7 +100,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <StatTile label="Resume-ready" value={ready70} accent />
             <StatTile label="Need help" value={needHelp.length} tone="var(--amber)" />
           </div>
-          <div style={{ marginTop: 14 }}><MeterBar value={avg} tone={scoreTone(avg)} /></div>
+          <div style={{ marginTop: 14 }}><Meter value={avg} tone={scoreTone(avg)} /></div>
         </SectionCard>
 
         <SectionCard title="Live scan monitor" hint={`${scans.length} scans`}>

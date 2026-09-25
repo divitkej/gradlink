@@ -118,7 +118,7 @@ export default function AnalyticsSection() {
                       {f.v}
                     </span>
                   </div>
-                  <Meter value={f.pct} color={f.c} />
+                  <Meter value={f.pct} tone={f.c} />
                 </div>
               ))}
             </div>
@@ -185,7 +185,6 @@ export default function AnalyticsSection() {
                           height: `${b.h}%`,
                           background: "linear-gradient(180deg, var(--accent), var(--accent-2))",
                           borderRadius: "4px 4px 0 0",
-                          boxShadow: "none",
                           animation: `growBar 0.9s ${i * 0.08}s ease both`,
                           transformOrigin: "bottom",
                         }}

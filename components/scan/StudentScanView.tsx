@@ -7,8 +7,8 @@ import {
 } from "lucide-react";
 import ScanLayout from "./ScanLayout";
 import ViewerGate from "./ViewerGate";
-import { SectionCard, StatTile, FlagPill, ScoreRing, MeterBar, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
-import { Button } from "@/components/ui/primitives";
+import { SectionCard, StatTile, FlagPill, ScoreRing, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
+import { Button, Meter } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import {
   getStudentByProfile, getAnalytics, getScans, getShortlist, upsertShortlist, sendMessage,
@@ -160,7 +160,7 @@ function ResumeScore({ student }: { student: StudentRow }) {
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)", marginBottom: 4 }}>
                   <span>{b.label}</span><span>{Math.round(b.earned)}/{b.max}</span>
                 </div>
-                <MeterBar value={(b.earned / b.max) * 100} tone={tone} />
+                <Meter value={(b.earned / b.max) * 100} tone={tone} />
               </div>
             ))}
           </div>
@@ -326,7 +326,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
           <StatTile label="Resume score" value={resumeScore} tone={scoreTone(resumeScore)} />
           <StatTile label="Engagement" value={engagement} suffix="/100" tone={engagement >= 75 ? "var(--accent-2)" : engagement >= 40 ? "var(--accent)" : "var(--amber)"} />
         </div>
-        <div style={{ marginTop: 14 }}><MeterBar value={engagement} tone="var(--accent-2)" /></div>
+        <div style={{ marginTop: 14 }}><Meter value={engagement} tone="var(--accent-2)" /></div>
         <style>{`@media (max-width:560px){.mgr-stats{grid-template-columns:repeat(2,1fr) !important}}`}</style>
       </SectionCard>
 
@@ -365,7 +365,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
             {scanHistory.map((s, i) => (
               <div key={s.id} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--accent)", marginTop: 5, boxShadow: "none" }} />
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--accent)", marginTop: 5 }} />
                   {i < scanHistory.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 22, background: "var(--border)" }} />}
                 </div>
                 <div style={{ paddingBottom: 14 }}>

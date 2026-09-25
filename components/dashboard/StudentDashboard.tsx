@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sparkles, AlertTriangle, ScanLine, Building2, History } from "lucide-react";
 import { GlassPanel, PanelTitle, StatCard } from "./widgets";
-import { SectionCard, MeterBar, FlagPill, ScoreRing, LoadingBlock } from "./cards";
-import { Badge } from "@/components/ui/primitives";
+import { SectionCard, FlagPill, ScoreRing, LoadingBlock } from "./cards";
+import { Badge, Meter } from "@/components/ui/primitives";
 import { Reveal } from "@/components/anim/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
@@ -142,7 +142,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--text-muted)", marginBottom: 3 }}>
                       <span>{b.label}</span><span>{Math.round(b.earned)}/{b.max}</span>
                     </div>
-                    <MeterBar value={(b.earned / b.max) * 100} tone={tone} />
+                    <Meter value={(b.earned / b.max) * 100} tone={tone} />
                   </div>
                 ))}
               </div>

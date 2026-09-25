@@ -54,7 +54,7 @@ export default function RoleSelect() {
         Join GradLink
       </h1>
       <p style={{ fontSize: 15, color: "var(--text-muted)", textAlign: "center", marginBottom: 36 }}>
-        Tell us who you are — we&apos;ll tailor the rest.
+        Tell us who you are and we&apos;ll tailor the rest.
       </p>
 
       <div className="role-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>

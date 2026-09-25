@@ -60,7 +60,7 @@ export default function ReadinessSection() {
                     <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>{c.l}</span>
                     <span style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 600 }}>{c.v}%</span>
                   </div>
-                  <Meter value={c.v} color={c.c} />
+                  <Meter value={c.v} tone={c.c} />
                 </div>
               ))}
             </div>

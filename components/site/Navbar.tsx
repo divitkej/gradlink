@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useLenis } from "lenis/react";
 import { Menu, X } from "lucide-react";
 import Logo from "../Logo";
 import { Button } from "../ui/primitives";
@@ -22,6 +24,18 @@ const links = [
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const lenis = useLenis();
+
+  // On the home page the logo is a "back to top": a same-route <Link> would
+  // leave the scroll position where it is.
+  const onLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") return;
+    e.preventDefault();
+    window.history.replaceState(null, "", "/");
+    if (lenis) lenis.scrollTo(0);
+    else window.scrollTo({ top: 0 });
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -62,7 +76,7 @@ export default function Navbar() {
           }}
           aria-label="Main"
         >
-          <Link href="/" style={{ textDecoration: "none" }} aria-label="GradLink home">
+          <Link href="/" onClick={onLogoClick} style={{ textDecoration: "none" }} aria-label="GradLink home">
             <Logo size={22} />
           </Link>
 
@@ -230,7 +244,6 @@ export default function Navbar() {
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.25s ease;
-          box-shadow: none;
         }
         .nav-link:hover::after { transform: scaleX(1); }
         @media (max-width: 1080px) {

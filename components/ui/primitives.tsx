@@ -112,61 +112,32 @@ export function GlassCard({
   );
 }
 
-/* ---------- MatteCard (flat surface, border firms up on hover) ---------- */
-export function MatteCard({
-  children,
-  className,
-  style,
-}: {
-  children: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <div
-      className={`matte-card${className ? ` ${className}` : ""}`}
-      style={{
-        position: "relative",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--r-lg)",
-        overflow: "hidden",
-        transition: "border-color 0.2s ease",
-        ...style,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 /* ---------- Meter (static progress bar) ---------- */
 export function Meter({
   value,
-  color = "var(--accent)",
-  track = "rgba(255,255,255,0.08)",
+  tone = "var(--accent)",
   height = 8,
 }: {
   value: number;
-  color?: string;
-  track?: string;
+  tone?: string;
   height?: number;
 }) {
+  const pct = Math.max(0, Math.min(100, value));
   return (
     <div
-      style={{ height, background: track, borderRadius: "var(--r-full)", overflow: "hidden" }}
+      style={{ height, background: "rgba(255,255,255,0.08)", borderRadius: "var(--r-full)", overflow: "hidden" }}
       role="progressbar"
-      aria-valuenow={value}
+      aria-valuenow={Math.round(pct)}
       aria-valuemin={0}
       aria-valuemax={100}
     >
       <div
         style={{
           height: "100%",
-          width: `${value}%`,
-          background: color,
+          width: `${pct}%`,
+          background: tone,
           borderRadius: "var(--r-full)",
-          boxShadow: `none`,
+          transition: "width 0.9s cubic-bezier(0.22,1,0.36,1)",
         }}
       />
     </div>
@@ -214,7 +185,6 @@ export function Badge({
             height: 6,
             borderRadius: "50%",
             background: t.fg,
-            boxShadow: `none`,
           }}
         />
       )}

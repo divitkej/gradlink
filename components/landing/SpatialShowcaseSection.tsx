@@ -201,7 +201,6 @@ export default function SpatialShowcaseSection() {
                   gap: 14,
                   alignItems: "flex-start",
                   transition: "all 0.25s ease",
-                  boxShadow: isActive ? "none" : "none",
                 }}
               >
                 <div

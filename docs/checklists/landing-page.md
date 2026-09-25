@@ -51,16 +51,20 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 ## Test pass
 
 - [x] **Smooth scroll lands anchor links correctly.** Automated check with Lenis active: all 6 section links land with the section at the top, from `/` and from `/pricing`, desktop and mobile.
-  `components/anim/SmoothScroll.tsx` · Done
+  `components/anim/SmoothScroll.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [ ] **Opening hero on a low-end phone.** WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU (software rendering), so its frame rate is not meaningful: still check on a real low-end Android for frame rate and heat.
   `components/landing/OpeningHero.tsx`, `components/ui/shader-background.tsx` · Verify on device
 - [ ] **Link preview card.** Share image regenerated with the new logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`); `og:image` and `twitter:image` tags present. After deploying with `NEXT_PUBLIC_SITE_URL` set, paste the URL into LinkedIn and WhatsApp.
   `app/opengraph-image.png` · Verify live
 - [x] **Scroll progress bar and thread.** Removed with all other scroll-triggered animations ahead of the redesign, so there is nothing left to test.
   Done in `1317868`
-- [x] **Navbar links on the home page.** Automated check: all 7 tabs, Login and Get Started go to the right place.
-  `components/site/Navbar.tsx` · Done
+- [x] **Navbar links on the home page.** Automated check: all 7 tabs, Login and Get Started go to the right place. The logo scrolls back to the top when you are already on `/` (fixed in "Fix code review findings on the landing branch").
+  `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Mobile menu at 375px.** Automated check: opens, closes with X, tapping a link closes it and lands on the section, no horizontal scroll anywhere on the page (fixed a 56px overflow from the sample-data labels).
-  `components/site/Navbar.tsx` · Done
+  `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Hero and CTA buttons.** Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#product`.
-  `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done
+  `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
+
+## Outside this checklist
+
+- Signed-in dashboards, scan views and event forms still use em dashes in about 20 places of visible copy (toasts, empty states, helper text). They belong in a dashboard checklist when that work starts.

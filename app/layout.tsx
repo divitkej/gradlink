@@ -21,7 +21,7 @@ const dmSans = DM_Sans({
 
 const SHARE_TITLE = "GradLink · Prepare students. Connect employers. Track outcomes.";
 const SHARE_DESC =
-  "Career-event intelligence for UAE colleges — from check-in to offer, every student interaction becomes measurable career data.";
+  "Career-event intelligence for UAE colleges. From check-in to offer, every student interaction becomes measurable career data.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
