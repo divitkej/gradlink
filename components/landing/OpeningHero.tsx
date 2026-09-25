@@ -100,7 +100,7 @@ export default function OpeningHero() {
           zIndex: 1,
           pointerEvents: "none",
           background:
-            "radial-gradient(ellipse 85% 75% at 50% 46%, transparent 40%, rgba(3,8,15,0.5) 78%, rgba(3,8,15,0.35) 100%)",
+            "radial-gradient(ellipse 85% 75% at 50% 46%, transparent 40%, rgba(0,0,0,0.5) 78%, rgba(0,0,0,0.35) 100%)",
         }}
       />
 
@@ -129,7 +129,7 @@ export default function OpeningHero() {
                 text="GradLink"
                 fontSize={wordSize}
                 height={boxH}
-                color="#35D3FF"
+                color="#FFFFFF"
                 lerp={0.05}
                 frames={300}
               />

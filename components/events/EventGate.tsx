@@ -32,7 +32,7 @@ export default function EventGate({
     <SectionCard
       title="Create your first event"
       accent="var(--border-strong)"
-      right={<CalendarPlus size={18} color="var(--cyan)" />}
+      right={<CalendarPlus size={18} color="var(--accent)" />}
     >
       <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 18, maxWidth: 620 }}>
         An event is a career fair, placement drive or employer day. Once it exists you&apos;ll get a
@@ -45,7 +45,7 @@ export default function EventGate({
     <SectionCard
       title="Join your event"
       accent="var(--border-strong)"
-      right={<Ticket size={18} color="var(--cyan)" />}
+      right={<Ticket size={18} color="var(--accent)" />}
     >
       <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 18, maxWidth: 620 }}>
         Your college shares a short code for each career fair. Enter it here to register — your QR,

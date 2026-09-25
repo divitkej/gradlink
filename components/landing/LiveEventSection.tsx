@@ -46,16 +46,16 @@ export default function LiveEventSection() {
               <span style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>
                 Sara&apos;s Digital Passport
               </span>
-              <Badge tone="amber" pulse>Live</Badge>
+              <Badge tone="muted" pulse>Live</Badge>
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               {passport.map((p, i) => (
                 <div key={p.l} style={{ display: "flex", gap: 16 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: p.done ? "linear-gradient(135deg, var(--cyan), var(--teal))" : "var(--surface-elev)", border: p.done ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: p.done ? "0 0 12px rgba(0,194,168,0.4)" : "none" }}>
-                      {p.done ? <Check size={13} color="#021016" strokeWidth={3} /> : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-muted)" }} />}
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: p.done ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--surface-elev)", border: p.done ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: p.done ? "none" : "none" }}>
+                      {p.done ? <Check size={13} color="#0A0A0A" strokeWidth={3} /> : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-muted)" }} />}
                     </div>
-                    {i < passport.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 26, background: p.done ? "linear-gradient(var(--teal), var(--border))" : "var(--border)" }} />}
+                    {i < passport.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 26, background: p.done ? "linear-gradient(var(--accent-2), var(--border))" : "var(--border)" }} />}
                   </div>
                   <div style={{ paddingBottom: i < passport.length - 1 ? 18 : 0 }}>
                     <div style={{ fontSize: 14, fontWeight: p.done ? 600 : 400, color: p.done ? "var(--text)" : "var(--text-2)" }}>{p.l}</div>
@@ -80,10 +80,10 @@ export default function LiveEventSection() {
                 <Badge tone="teal" pulse>Live</Badge>
               </div>
               {leaderboard.map((s) => (
-                <div key={s.r} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", borderBottom: "1px solid var(--border)", background: s.r === 1 ? "rgba(0,194,168,0.06)" : "transparent" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: s.r === 1 ? "var(--teal)" : "var(--text-muted)", width: 16 }}>{s.r}</span>
+                <div key={s.r} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", borderBottom: "1px solid var(--border)", background: s.r === 1 ? "rgba(255,255,255,0.06)" : "transparent" }}>
+                  <span style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-muted)", width: 16 }}>{s.r}</span>
                   <span style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{s.n}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: s.r === 1 ? "var(--teal)" : "var(--text-2)" }}>{s.s}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-2)" }}>{s.s}</span>
                 </div>
               ))}
             </GlassCard>

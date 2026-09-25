@@ -6,12 +6,12 @@ import { GlassCard, Meter } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
 
 const competencies = [
-  { l: "Communication", v: 54, c: "var(--danger)" },
-  { l: "Technology", v: 82, c: "var(--teal)" },
-  { l: "Professionalism", v: 58, c: "var(--amber)" },
-  { l: "Teamwork", v: 76, c: "var(--cyan)" },
-  { l: "Critical Thinking", v: 63, c: "var(--cyan)" },
-  { l: "Leadership", v: 45, c: "var(--danger)" },
+  { l: "Communication", v: 54, c: "var(--text-muted)" },
+  { l: "Technology", v: 82, c: "var(--accent-2)" },
+  { l: "Professionalism", v: 58, c: "var(--text-2)" },
+  { l: "Teamwork", v: 76, c: "var(--accent)" },
+  { l: "Critical Thinking", v: 63, c: "var(--accent)" },
+  { l: "Leadership", v: 45, c: "var(--text-muted)" },
 ];
 
 const actions = [
@@ -30,10 +30,9 @@ function Ring({ v, label }: { v: number; label: string }) {
       <svg width={80} height={80} style={{ transform: "rotate(-90deg)" }}>
         <circle cx={40} cy={40} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={7} />
         <circle
-          cx={40} cy={40} r={r} fill="none" stroke="var(--cyan)" strokeWidth={7} strokeLinecap="round"
+          cx={40} cy={40} r={r} fill="none" stroke="var(--accent)" strokeWidth={7} strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c - (v / 100) * c}
-          style={{ filter: "drop-shadow(0 0 8px var(--cyan))" }}
         />
         <text x={40} y={40} transform="rotate(90 40 40)" textAnchor="middle" dominantBaseline="middle" style={{ fill: "var(--text)", fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)" }}>{v}%</text>
       </svg>
@@ -71,7 +70,7 @@ export default function ReadinessSection() {
         <div>
           <GlassCard padding={28} style={{ border: "1px solid var(--border-strong)", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, paddingBottom: 20, borderBottom: "1px solid var(--border)", marginBottom: 22 }}>
-              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(53,211,255,0.12)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)", fontWeight: 700, fontFamily: "var(--font-display)", fontSize: 17 }}>SA</div>
+              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontWeight: 700, fontFamily: "var(--font-display)", fontSize: 17 }}>SA</div>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)" }}>Sara Al Rashidi</div>
                 <div style={{ fontSize: 12.5, color: "var(--text-muted)" }}>Business Administration · Year 3 · Abu Dhabi University</div>
@@ -88,7 +87,7 @@ export default function ReadinessSection() {
               {actions.map((a) => {
                 const done = a.s === "Complete";
                 const pending = a.s === "Pending";
-                const color = done ? "var(--teal)" : pending ? "var(--amber)" : "var(--cyan)";
+                const color = done ? "var(--accent-2)" : pending ? "var(--text-2)" : "var(--accent)";
                 return (
                   <div key={a.l} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
                     <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>{a.l}</span>
@@ -101,10 +100,10 @@ export default function ReadinessSection() {
               })}
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.22)", borderRadius: "var(--r-md)" }}>
-              <Sparkles size={17} color="var(--teal)" />
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.22)", borderRadius: "var(--r-md)" }}>
+              <Sparkles size={17} color="var(--accent-2)" />
               <span style={{ fontSize: 13, color: "var(--text-2)" }}>
-                Complete 3 more items to unlock <strong style={{ color: "var(--teal)" }}>Fair-Ready</strong> badge
+                Complete 3 more items to unlock <strong style={{ color: "var(--accent-2)" }}>Fair-Ready</strong> badge
               </span>
             </div>
           </GlassCard>

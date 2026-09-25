@@ -98,7 +98,7 @@ export function CountUp({
 /* ---------- Animated progress bar (fills in view) ---------- */
 export function AnimatedBar({
   value,
-  color = "var(--cyan)",
+  color = "var(--accent)",
   track = "rgba(255,255,255,0.08)",
   height = 8,
   delay = 0,
@@ -132,7 +132,7 @@ export function AnimatedBar({
           height: "100%",
           background: color,
           borderRadius: "var(--r-full)",
-          boxShadow: `0 0 12px ${color}`,
+          boxShadow: `none`,
         }}
       />
     </div>
@@ -145,7 +145,7 @@ export function SectionHeading({
   title,
   subtitle,
   align = "left",
-  accent = "var(--cyan)",
+  accent = "var(--accent)",
 }: {
   badge: string;
   title: ReactNode;
@@ -172,7 +172,7 @@ export function SectionHeading({
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: accent,
-            background: "rgba(53,211,255,0.08)",
+            background: "rgba(255,255,255,0.08)",
             border: "1px solid var(--border-strong)",
             borderRadius: "var(--r-full)",
             padding: "5px 14px",
@@ -185,7 +185,7 @@ export function SectionHeading({
               height: 6,
               borderRadius: "50%",
               background: accent,
-              boxShadow: `0 0 8px ${accent}`,
+              boxShadow: `none`,
             }}
           />
           {badge}

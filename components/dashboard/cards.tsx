@@ -61,12 +61,12 @@ export function StatTile({
   accent?: boolean;
   tone?: string;
 }) {
-  const color = tone ?? (accent ? "var(--teal)" : "var(--text)");
+  const color = tone ?? (accent ? "var(--accent-2)" : "var(--text)");
   return (
     <div
       style={{
-        background: accent ? "rgba(0,194,168,0.07)" : "rgba(255,255,255,0.03)",
-        border: `1px solid ${accent ? "rgba(0,194,168,0.22)" : "var(--border)"}`,
+        background: accent ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.03)",
+        border: `1px solid ${accent ? "rgba(255,255,255,0.22)" : "var(--border)"}`,
         borderRadius: "var(--r-md)",
         padding: "14px 16px",
       }}
@@ -82,8 +82,8 @@ export function StatTile({
 
 export function FlagPill({ label, tone = "cyan", icon }: { label: string; tone?: "cyan" | "teal" | "amber" | "danger" | "muted"; icon?: ReactNode }) {
   const map: Record<string, { fg: string; bg: string; bd: string }> = {
-    cyan: { fg: "var(--cyan)", bg: "rgba(53,211,255,0.10)", bd: "rgba(53,211,255,0.28)" },
-    teal: { fg: "var(--teal)", bg: "rgba(0,194,168,0.10)", bd: "rgba(0,194,168,0.28)" },
+    cyan: { fg: "var(--accent)", bg: "rgba(255,255,255,0.10)", bd: "rgba(255,255,255,0.28)" },
+    teal: { fg: "var(--accent-2)", bg: "rgba(255,255,255,0.10)", bd: "rgba(255,255,255,0.28)" },
     amber: { fg: "var(--amber)", bg: "rgba(247,201,72,0.10)", bd: "rgba(247,201,72,0.30)" },
     danger: { fg: "var(--danger)", bg: "rgba(255,107,107,0.10)", bd: "rgba(255,107,107,0.28)" },
     muted: { fg: "var(--text-2)", bg: "rgba(255,255,255,0.05)", bd: "var(--border)" },
@@ -110,7 +110,7 @@ export function FlagPill({ label, tone = "cyan", icon }: { label: string; tone?:
   );
 }
 
-export function ScoreRing({ score, size = 96, tone = "var(--cyan)", label }: { score: number; size?: number; tone?: string; label?: string }) {
+export function ScoreRing({ score, size = 96, tone = "var(--accent)", label }: { score: number; size?: number; tone?: string; label?: string }) {
   const r = size / 2 - 7;
   const circ = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, score)) / 100;
@@ -139,7 +139,7 @@ export function ScoreRing({ score, size = 96, tone = "var(--cyan)", label }: { s
   );
 }
 
-export function MeterBar({ value, tone = "var(--cyan)" }: { value: number; tone?: string }) {
+export function MeterBar({ value, tone = "var(--accent)" }: { value: number; tone?: string }) {
   return (
     <div style={{ height: 7, borderRadius: 6, background: "rgba(255,255,255,0.07)", overflow: "hidden" }}>
       <div style={{ height: "100%", width: `${Math.max(0, Math.min(100, value))}%`, background: tone, borderRadius: 6, transition: "width 0.9s cubic-bezier(0.22,1,0.36,1)" }} />
@@ -147,7 +147,7 @@ export function MeterBar({ value, tone = "var(--cyan)" }: { value: number; tone?
   );
 }
 
-export function Avatar({ name, size = 44, tone = "var(--cyan)" }: { name: string; size?: number; tone?: string }) {
+export function Avatar({ name, size = 44, tone = "var(--accent)" }: { name: string; size?: number; tone?: string }) {
   const initials = name.split(" ").map((x) => x[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
   return (
     <div
@@ -155,7 +155,7 @@ export function Avatar({ name, size = 44, tone = "var(--cyan)" }: { name: string
         width: size,
         height: size,
         borderRadius: "50%",
-        background: "rgba(53,211,255,0.12)",
+        background: "rgba(255,255,255,0.12)",
         border: "1px solid var(--border-strong)",
         display: "flex",
         alignItems: "center",
@@ -173,7 +173,7 @@ export function Avatar({ name, size = 44, tone = "var(--cyan)" }: { name: string
 }
 
 export function TagRow({ items, tone = "cyan" }: { items: string[]; tone?: "cyan" | "teal" | "amber" }) {
-  const colors: Record<string, string> = { cyan: "rgba(53,211,255,0.06)", teal: "rgba(0,194,168,0.06)", amber: "rgba(247,201,72,0.06)" };
+  const colors: Record<string, string> = { cyan: "rgba(255,255,255,0.06)", teal: "rgba(255,255,255,0.06)", amber: "rgba(247,201,72,0.06)" };
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
       {items.map((s) => (

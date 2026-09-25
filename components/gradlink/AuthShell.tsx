@@ -33,8 +33,8 @@ export default function AuthShell({
         <CanvasRevealEffect
           animationSpeed={3}
           colors={[
-            [0, 194, 168],
-            [53, 211, 255],
+            [255, 255, 255],
+            [160, 160, 160],
           ]}
           dotSize={4}
           containerClassName=""
@@ -48,7 +48,7 @@ export default function AuthShell({
           inset: 0,
           pointerEvents: "none",
           background:
-            "radial-gradient(ellipse 50% 45% at 50% 46%, rgba(0,194,168,0.12), transparent 60%), radial-gradient(ellipse 90% 80% at 50% 50%, transparent 45%, rgba(3,8,15,0.6) 100%)",
+            "radial-gradient(ellipse 50% 45% at 50% 46%, rgba(255,255,255,0.12), transparent 60%), radial-gradient(ellipse 90% 80% at 50% 50%, transparent 45%, rgba(0,0,0,0.6) 100%)",
         }}
       />
 

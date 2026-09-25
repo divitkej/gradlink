@@ -99,8 +99,8 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
             </h2>
             <p style={{ fontSize: 15, color: "var(--text-2)", marginBottom: 22 }}>
               {profileComplete >= 80
-                ? <>Your event profile is <strong style={{ color: "var(--teal)" }}>{profileComplete}% complete.</strong> You&apos;re fair-ready.</>
-                : <>Your event profile is <strong style={{ color: "var(--cyan)" }}>{profileComplete}% complete.</strong> Finish it to stand out.</>}
+                ? <>Your event profile is <strong style={{ color: "var(--accent-2)" }}>{profileComplete}% complete.</strong> You&apos;re fair-ready.</>
+                : <>Your event profile is <strong style={{ color: "var(--accent)" }}>{profileComplete}% complete.</strong> Finish it to stand out.</>}
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
               <StatCard label="Readiness" value={readiness} suffix="%" delay={0.05} />
@@ -117,7 +117,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
               payload={`/scan/student/${profileId}?eventId=${eventId}`}
               caption={session?.name ?? "Your profile"}
               sub={session?.org ?? me?.university ?? ""}
-              accent="var(--cyan)"
+              accent="var(--accent)"
               filename="gradlink-student-qr"
             />
           </GlassPanel>
@@ -184,14 +184,14 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontFamily: "var(--font-display)", fontSize: 14.5, fontWeight: 700, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                   {overlap > 0
-                    ? <span style={{ fontSize: 12, fontWeight: 700, color: "var(--teal)" }}>{overlap}★</span>
+                    ? <span style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>{overlap}★</span>
                     : null}
                 </div>
                 <p style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.5, flex: 1 }}>{c.sector} · Booth {c.booth_number}</p>
                 <span style={{ fontSize: 11.5, color: "var(--text-2)" }}>{(c.hiring_roles ?? []).length} open roles</span>
                 {overlap > 0
                   ? <FlagPill label={`${overlap} skill match`} tone="teal" />
-                  : <span style={{ fontSize: 12, fontWeight: 600, color: "var(--cyan)" }}>Explore →</span>}
+                  : <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)" }}>Explore →</span>}
               </Link>
             ))}
           </div>
@@ -205,14 +205,14 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
         </div>
         {scans.length === 0 ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "30px 24px 36px", textAlign: "center" }}>
-            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}>
               <ScanLine size={22} />
             </div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No scans yet</div>
             <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>
               Show your QR at company booths — when a recruiter scans you, they&apos;ll appear here.
             </p>
-            <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+            <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <ScanLine size={15} /> Open my QR
             </Link>
           </div>
@@ -220,7 +220,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
           scans.map((s) => (
             <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 22px", borderTop: "1px solid var(--border)" }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-                {s.scanner_role === "company" ? <Building2 size={15} color="var(--teal)" /> : <History size={15} color="var(--cyan)" />}
+                {s.scanner_role === "company" ? <Building2 size={15} color="var(--accent-2)" /> : <History size={15} color="var(--accent)" />}
                 <span style={{ fontSize: 13, color: "var(--text-2)" }}>
                   {s.scanner_role === "company" ? "A company scanned your profile" : "Event check-in"}
                   {s.notes ? ` · "${s.notes}"` : ""}

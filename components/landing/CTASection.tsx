@@ -5,8 +5,6 @@ import { Section } from "../ui/Section";
 import { Button } from "../ui/primitives";
 import AnimatedTextCycle from "../anim/AnimatedTextCycle";
 import ParticleText from "../anim/ParticleText";
-import ShaderGlow from "../anim/ShaderGlow";
-import BackgroundPaths from "../anim/BackgroundPaths";
 
 const chips = ["Setup in 48 hours", "No contract lock-in", "Dedicated onboarding", "UAE data residency"];
 
@@ -24,14 +22,12 @@ export default function CTASection() {
           textAlign: "center",
         }}
       >
-        <BackgroundPaths opacity={0.35} />
-        <ShaderGlow intensity={0.7} />
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: 720, margin: "0 auto" }}>
           {/* Particle headline */}
           <div>
             <div style={{ marginBottom: 8 }}>
-              <ParticleText text="GradLink" fontSize={64} height={96} color="#35D3FF" />
+              <ParticleText text="GradLink" fontSize={64} height={96} color="#FFFFFF" />
             </div>
           </div>
 
@@ -65,7 +61,7 @@ export default function CTASection() {
             <div style={{ marginTop: 44, paddingTop: 32, borderTop: "1px solid var(--border)", display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap" }}>
               {chips.map((c) => (
                 <span key={c} style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "var(--text-2)" }}>
-                  <Check size={15} color="var(--teal)" strokeWidth={2.4} />
+                  <Check size={15} color="var(--accent-2)" strokeWidth={2.4} />
                   {c}
                 </span>
               ))}

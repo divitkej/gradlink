@@ -37,7 +37,7 @@ export default function PricingSection() {
   return (
     <section style={{ position: "relative", zIndex: 1, padding: "clamp(90px, 12vh, 140px) 24px 100px", maxWidth: 1100, margin: "0 auto" }}>
       <div style={{ textAlign: "center", marginBottom: 52 }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: "var(--r-full)", border: "1px solid var(--border-strong)", background: "rgba(53,211,255,0.08)", color: "var(--cyan)", fontSize: 12, fontWeight: 600, marginBottom: 18 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 12px", borderRadius: "var(--r-full)", border: "1px solid var(--border-strong)", background: "rgba(255,255,255,0.08)", color: "var(--accent)", fontSize: 12, fontWeight: 600, marginBottom: 18 }}>
           Pricing
         </div>
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(30px, 5vw, 48px)", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)", marginBottom: 14, lineHeight: 1.1 }}>
@@ -69,12 +69,12 @@ export default function PricingSection() {
               borderRadius: "var(--r-xl)",
               padding: "clamp(24px, 3.5vw, 34px)",
               boxShadow: plan.highlight
-                ? "0 30px 90px rgba(0,0,0,0.5), 0 0 0 1px rgba(53,211,255,0.10), 0 0 70px rgba(0,194,168,0.14)"
+                ? "0 30px 90px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.10)"
                 : "0 20px 60px rgba(0,0,0,0.35)",
             }}
           >
             {plan.highlight && (
-              <div style={{ position: "absolute", top: -11, left: "clamp(24px, 3.5vw, 34px)", display: "inline-flex", alignItems: "center", padding: "3px 11px", borderRadius: "var(--r-full)", fontSize: 11, fontWeight: 700, letterSpacing: "0.03em", color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))" }}>
+              <div style={{ position: "absolute", top: -11, left: "clamp(24px, 3.5vw, 34px)", display: "inline-flex", alignItems: "center", padding: "3px 11px", borderRadius: "var(--r-full)", fontSize: 11, fontWeight: 700, letterSpacing: "0.03em", color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))" }}>
                 Most popular
               </div>
             )}
@@ -95,8 +95,8 @@ export default function PricingSection() {
                 height: 46, borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14.5,
                 marginBottom: 24, cursor: busy === plan.id ? "default" : "pointer",
                 border: plan.highlight ? "none" : "1px solid var(--border)",
-                color: plan.highlight ? "#021016" : "var(--text)",
-                background: plan.highlight ? "linear-gradient(100deg, var(--cyan), var(--teal))" : "rgba(255,255,255,0.04)",
+                color: plan.highlight ? "#0A0A0A" : "var(--text)",
+                background: plan.highlight ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)",
                 opacity: busy === plan.id ? 0.7 : 1,
               }}
             >
@@ -108,7 +108,7 @@ export default function PricingSection() {
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 11 }}>
               {plan.features.map((f) => (
                 <li key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.5 }}>
-                  <Check size={15} color="var(--teal)" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <Check size={15} color="var(--accent-2)" style={{ flexShrink: 0, marginTop: 2 }} />
                   <span>{f}</span>
                 </li>
               ))}
@@ -125,7 +125,7 @@ export default function PricingSection() {
 
       <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--text-muted)", marginTop: 36, lineHeight: 1.6 }}>
         Students and employers never pay to use GradLink.{" "}
-        <Link href="/sign-up" className="gl-link" style={{ color: "var(--cyan)", fontWeight: 600, textDecoration: "none" }}>
+        <Link href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Create a free account
         </Link>
         .

@@ -28,11 +28,11 @@ export function ProductFrame({
           style={{
             borderRadius: "var(--r-xl)",
             border: "1px solid var(--border-strong)",
-            background: "linear-gradient(160deg, rgba(16,42,69,0.82), rgba(11,30,51,0.72))",
+            background: "linear-gradient(160deg, rgba(30,30,30,0.82), rgba(22,22,22,0.72))",
             backdropFilter: "blur(18px)",
             WebkitBackdropFilter: "blur(18px)",
             boxShadow:
-              "0 40px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(53,211,255,0.12), 0 0 80px rgba(0,194,168,0.16)",
+              "0 40px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.12)",
             padding: "clamp(16px, 2.4vw, 28px)",
           }}
         >

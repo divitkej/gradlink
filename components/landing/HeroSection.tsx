@@ -160,17 +160,8 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Right dashboard with shader glow behind */}
+        {/* Right dashboard */}
         <div style={{ position: "relative", display: "flex", justifyContent: "flex-end" }} className="hero-dash-wrap">
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: "-12% -8%",
-              background: "radial-gradient(circle at 60% 40%, rgba(53,211,255,0.18), transparent 60%)",
-              filter: "blur(20px)",
-            }}
-          />
           <div style={{ position: "relative" }}>
             <HeroDashboard />
           </div>

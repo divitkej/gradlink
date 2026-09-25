@@ -120,7 +120,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
       )}
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-          <Check size={15} color="var(--teal)" /> {toast}
+          <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
     </ScanLayout>
@@ -168,8 +168,8 @@ function ResumeScore({ student }: { student: StudentRow }) {
       </div>
       <div className="rs-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 16 }}>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--teal)", marginBottom: 8 }}>Strengths</div>
-          {evalr.strengths.map((s) => <Row key={s} icon={<Check size={13} color="var(--teal)" />} text={s} />)}
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)", marginBottom: 8 }}>Strengths</div>
+          {evalr.strengths.map((s) => <Row key={s} icon={<Check size={13} color="var(--accent-2)" />} text={s} />)}
         </div>
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--amber)", marginBottom: 8 }}>Improvements</div>
@@ -208,7 +208,7 @@ function CompanyView({
   onStatus: (s: ShortlistRow["status"]) => void; onSaveNote: () => void; onSend: () => void;
 }) {
   const actions: { key: ShortlistRow["status"]; label: string; icon: React.ReactNode; tone: string }[] = [
-    { key: "shortlisted", label: "Shortlist", icon: <Star size={15} />, tone: "var(--teal)" },
+    { key: "shortlisted", label: "Shortlist", icon: <Star size={15} />, tone: "var(--accent-2)" },
     { key: "maybe", label: "Maybe", icon: <HelpCircle size={15} />, tone: "var(--amber)" },
     { key: "rejected", label: "Not a fit", icon: <ThumbsDown size={15} />, tone: "var(--danger)" },
   ];
@@ -226,7 +226,7 @@ function CompanyView({
             const on = status === a.key;
             return (
               <button key={a.key} onClick={() => onStatus(a.key)}
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: "9px 15px", borderRadius: "var(--r-md)", color: on ? "#021016" : a.tone, background: on ? a.tone : "rgba(255,255,255,0.04)", border: `1px solid ${on ? a.tone : "var(--border)"}`, transition: "all 0.15s" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: "9px 15px", borderRadius: "var(--r-md)", color: on ? "#0A0A0A" : a.tone, background: on ? a.tone : "rgba(255,255,255,0.04)", border: `1px solid ${on ? a.tone : "var(--border)"}`, transition: "all 0.15s" }}>
                 {a.icon} {a.label}
               </button>
             );
@@ -324,9 +324,9 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
           <StatTile label="Shortlists" value={shortlists} accent />
           <StatTile label="Messages" value={a?.messages_received ?? 0} />
           <StatTile label="Resume score" value={resumeScore} tone={scoreTone(resumeScore)} />
-          <StatTile label="Engagement" value={engagement} suffix="/100" tone={engagement >= 75 ? "var(--teal)" : engagement >= 40 ? "var(--cyan)" : "var(--amber)"} />
+          <StatTile label="Engagement" value={engagement} suffix="/100" tone={engagement >= 75 ? "var(--accent-2)" : engagement >= 40 ? "var(--accent)" : "var(--amber)"} />
         </div>
-        <div style={{ marginTop: 14 }}><MeterBar value={engagement} tone="var(--teal)" /></div>
+        <div style={{ marginTop: 14 }}><MeterBar value={engagement} tone="var(--accent-2)" /></div>
         <style>{`@media (max-width:560px){.mgr-stats{grid-template-columns:repeat(2,1fr) !important}}`}</style>
       </SectionCard>
 
@@ -340,7 +340,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
             {recs.map(({ c, overlap }) => (
               <div key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 9 }}>
-                  <Building2 size={15} color="var(--teal)" />
+                  <Building2 size={15} color="var(--accent-2)" />
                   <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>· Booth {c.booth_number}</span>
                 </span>
@@ -365,7 +365,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
             {scanHistory.map((s, i) => (
               <div key={s.id} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--cyan)", marginTop: 5, boxShadow: "0 0 8px var(--cyan)" }} />
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--accent)", marginTop: 5, boxShadow: "none" }} />
                   {i < scanHistory.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 22, background: "var(--border)" }} />}
                 </div>
                 <div style={{ paddingBottom: 14 }}>

@@ -117,7 +117,7 @@ export default function DashboardShell({
               display: "flex", alignItems: "center", gap: 11, padding: "9px 12px",
               borderRadius: "var(--r-md)", fontSize: 13.5, fontWeight: 500, textDecoration: "none",
               color: on ? "var(--text)" : "var(--text-2)",
-              background: on ? "rgba(53,211,255,0.10)" : "transparent",
+              background: on ? "rgba(255,255,255,0.10)" : "transparent",
               border: `1px solid ${on ? "var(--border-strong)" : "transparent"}`,
               transition: "all 0.15s",
             }}
@@ -185,7 +185,7 @@ export default function DashboardShell({
           style={{
             position: "sticky", top: 0, zIndex: 30, height: 64,
             display: "flex", alignItems: "center", gap: 14, padding: "0 20px",
-            background: "rgba(5,11,20,0.6)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)",
+            background: "rgba(10,10,10,0.6)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)",
           }}
         >
           <button className="dash-burger" onClick={() => setOpen(true)} aria-label="Open menu"
@@ -193,7 +193,7 @@ export default function DashboardShell({
             <Menu size={18} />
           </button>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--text)" }}>{title}</h1>
-          <span className="dash-rolechip" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "var(--cyan)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "3px 10px" }}>
+          <span className="dash-rolechip" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "3px 10px" }}>
             {ROLE_LABEL[activeRole]}
           </span>
           <div style={{ flex: 1 }} />
@@ -223,7 +223,7 @@ export default function DashboardShell({
 
       {open && (
         <>
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(2,8,15,0.6)", backdropFilter: "blur(4px)" }} />
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} />
           <aside style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(82vw, 300px)", zIndex: 60, background: "var(--bg-2)", borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column" }}>
             <div style={{ padding: "18px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Logo size={20} />
@@ -237,7 +237,7 @@ export default function DashboardShell({
 
       <style>{`
         .dash-nav:hover { color: var(--text) !important; background: rgba(255,255,255,0.04); }
-        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(53,211,255,0.12); }
+        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
         @media (max-width: 920px) {
           .dash-sidebar { display: none !important; }
           .dash-main { margin-left: 0 !important; }

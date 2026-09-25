@@ -73,7 +73,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
           const Icon = t.icon; const on = tab === t.key;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "#021016" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--cyan), var(--teal))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
               <Icon size={15} /> {t.label}
             </button>
           );
@@ -90,7 +90,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
             <SectionCard title="My event QR" accent="var(--border-strong)">
               <QRCard
                 payload={role === "student" ? `/scan/student/${session.profileId}?eventId=${eventId}` : `/scan/company/${session.profileId}?eventId=${eventId}`}
-                caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--teal)" : "var(--cyan)"} filename={`gradlink-${role}-qr`}
+                caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${role}-qr`}
               />
             </SectionCard>
           )}
@@ -117,7 +117,7 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
             {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
           </div>
         </div>
-        <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none", alignSelf: "flex-start" }}>
+        <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none", alignSelf: "flex-start" }}>
           <ScanLine size={16} /> Open scanner
         </Link>
       </div>
@@ -147,7 +147,7 @@ function Overview({ role, me, students, companies, analytics, eventId }: { role:
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {ranked.map(({ c, overlap }) => (
             <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
-              <Avatar name={c.company_name ?? c.company ?? "C"} size={38} tone="var(--teal)" />
+              <Avatar name={c.company_name ?? c.company ?? "C"} size={38} tone="var(--accent-2)" />
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                 <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>Booth {c.booth_number} · {c.sector}</span>
@@ -249,12 +249,12 @@ function People({
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14 }}>
           {filtered.map((c) => (
             <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)" }}>
-              <Avatar name={c.company_name ?? c.company ?? "C"} size={40} tone="var(--teal)" />
+              <Avatar name={c.company_name ?? c.company ?? "C"} size={40} tone="var(--accent-2)" />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {c.booth_number} · {c.sector} · {(c.hiring_roles ?? []).length} roles</div>
               </div>
-              <Link href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "var(--cyan)", textDecoration: "none", padding: "7px 12px", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)", background: "rgba(53,211,255,0.06)" }}>View</Link>
+              <Link href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: "var(--accent)", textDecoration: "none", padding: "7px 12px", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)", background: "rgba(255,255,255,0.06)" }}>View</Link>
             </div>
           ))}
         </div>
@@ -293,9 +293,9 @@ function People({
                 {s.skills?.length ? <div style={{ marginTop: 10 }}><TagRow items={s.skills.slice(0, 6)} /></div> : null}
                 <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap", alignItems: "center" }}>
                   <SlBtn on={status === "priority"} onClick={() => mark(s.profile_id!, "priority")} icon={<Star size={13} />} label="Priority" tone="var(--amber)" />
-                  <SlBtn on={status === "shortlisted"} onClick={() => mark(s.profile_id!, "shortlisted")} icon={<Bookmark size={13} />} label="Shortlist" tone="var(--teal)" />
-                  <SlBtn on={status === "maybe"} onClick={() => mark(s.profile_id!, "maybe")} icon={<HelpCircle size={13} />} label="Maybe" tone="var(--cyan)" />
-                  <Link href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 600, color: "var(--cyan)", textDecoration: "none" }}>View profile →</Link>
+                  <SlBtn on={status === "shortlisted"} onClick={() => mark(s.profile_id!, "shortlisted")} icon={<Bookmark size={13} />} label="Shortlist" tone="var(--accent-2)" />
+                  <SlBtn on={status === "maybe"} onClick={() => mark(s.profile_id!, "maybe")} icon={<HelpCircle size={13} />} label="Maybe" tone="var(--accent)" />
+                  <Link href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ marginLeft: "auto", fontSize: 12.5, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>View profile →</Link>
                 </div>
               </div>
             );
@@ -323,7 +323,7 @@ function People({
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {companies.map((c) => (
             <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
-              <Avatar name={c.company_name ?? c.company ?? "C"} size={34} tone="var(--teal)" />
+              <Avatar name={c.company_name ?? c.company ?? "C"} size={34} tone="var(--accent-2)" />
               <span style={{ flex: 1, minWidth: 0 }}><span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span><span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>Booth {c.booth_number} · {c.sector}</span></span>
             </Link>
           ))}
@@ -346,7 +346,7 @@ function FilterBar({ q, setQ, placeholder, chips, active, setActive, chipLabel }
           const on = active === c;
           return (
             <button key={c} onClick={() => setActive(c)}
-              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "var(--cyan)" : "var(--text-2)", background: on ? "rgba(53,211,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
+              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "var(--accent)" : "var(--text-2)", background: on ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
               {chipLabel ? chipLabel(c) : c === "all" ? "All" : c}
             </button>
           );
@@ -359,7 +359,7 @@ function FilterBar({ q, setQ, placeholder, chips, active, setActive, chipLabel }
 function SlBtn({ on, onClick, icon, label, tone }: { on: boolean; onClick: () => void; icon: React.ReactNode; label: string; tone: string }) {
   return (
     <button onClick={onClick}
-      style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "6px 11px", borderRadius: "var(--r-sm)", color: on ? "#021016" : tone, background: on ? tone : "rgba(255,255,255,0.04)", border: `1px solid ${on ? tone : "var(--border)"}`, transition: "all 0.15s" }}>
+      style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, cursor: "pointer", padding: "6px 11px", borderRadius: "var(--r-sm)", color: on ? "#0A0A0A" : tone, background: on ? tone : "rgba(255,255,255,0.04)", border: `1px solid ${on ? tone : "var(--border)"}`, transition: "all 0.15s" }}>
       {icon} {label}
     </button>
   );

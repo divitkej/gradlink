@@ -38,7 +38,7 @@ export default function Navbar() {
           left: 0,
           right: 0,
           zIndex: 100,
-          background: scrolled ? "rgba(5,11,20,0.72)" : "rgba(5,11,20,0.35)",
+          background: scrolled ? "rgba(10,10,10,0.72)" : "rgba(10,10,10,0.35)",
           backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
           borderBottom: `1px solid ${scrolled ? "var(--border)" : "transparent"}`,
@@ -141,7 +141,7 @@ export default function Navbar() {
                 position: "fixed",
                 inset: 0,
                 zIndex: 110,
-                background: "rgba(2,8,15,0.6)",
+                background: "rgba(0,0,0,0.6)",
                 backdropFilter: "blur(4px)",
               }}
             />
@@ -221,11 +221,11 @@ export default function Navbar() {
           position: absolute;
           left: 14px; right: 14px; bottom: 4px;
           height: 1.5px;
-          background: linear-gradient(90deg, var(--cyan), var(--teal));
+          background: linear-gradient(90deg, var(--accent), var(--accent-2));
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.25s ease;
-          box-shadow: 0 0 8px var(--cyan);
+          box-shadow: none;
         }
         .nav-link:hover::after { transform: scaleX(1); }
         @media (max-width: 920px) {

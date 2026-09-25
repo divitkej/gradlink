@@ -54,7 +54,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
               background: isActive
                 ? "linear-gradient(160deg, var(--surface-elev), var(--surface))"
                 : "var(--glass)",
-              boxShadow: isActive ? "0 0 40px rgba(53,211,255,0.14)" : "none",
+              boxShadow: isActive ? "none" : "none",
               transition: "border-color 0.3s ease, box-shadow 0.3s ease",
             }}
           >
@@ -70,7 +70,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                     position: "absolute",
                     inset: 0,
                     background:
-                      "radial-gradient(120% 80% at 100% 0%, rgba(0,194,168,0.16), transparent 60%)",
+                      "radial-gradient(120% 80% at 100% 0%, rgba(255,255,255,0.16), transparent 60%)",
                   }}
                 />
               )}
@@ -94,7 +94,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                     fontFamily: "var(--font-display)",
                     fontSize: 22,
                     fontWeight: 700,
-                    color: "var(--cyan)",
+                    color: "var(--accent)",
                   }}
                 >
                   {p.value}
@@ -150,7 +150,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                         fontWeight: 600,
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
-                        color: "var(--cyan)",
+                        color: "var(--accent)",
                         marginTop: 8,
                       }}
                     >
@@ -186,7 +186,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
                             fontFamily: "var(--font-display)",
                             fontSize: 16,
                             fontWeight: 700,
-                            color: "var(--teal)",
+                            color: "var(--accent-2)",
                             marginTop: 2,
                           }}
                         >

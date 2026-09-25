@@ -130,7 +130,7 @@ export default function Scanner() {
           <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55, marginBottom: 20 }}>
             Scanning records who met whom at a specific event, so you need to be in one before the scanner opens.
           </p>
-          <Link href="/dashboard/events" style={{ display: "inline-flex", alignItems: "center", gap: 7, height: 44, padding: "0 20px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none" }}>
+          <Link href="/dashboard/events" style={{ display: "inline-flex", alignItems: "center", gap: 7, height: 44, padding: "0 20px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}>
             Go to events
           </Link>
         </div>
@@ -147,17 +147,17 @@ export default function Scanner() {
   const peopleTitle = viewer === "student" ? "Companies to scan" : viewer === "company" ? "Students to scan" : "Scan anyone";
   const people: { id: string; name: string; sub: string; route: string; tone?: string }[] =
     viewer === "student"
-      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Booth ${c.booth_number ?? "—"} · ${c.sector ?? ""}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--teal)" }))
+      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Booth ${c.booth_number ?? "—"} · ${c.sector ?? ""}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" }))
       : viewer === "company"
       ? students.map((s) => ({ id: s.id, name: s.full_name, sub: [s.degree, s.university].filter(Boolean).join(" · "), route: `/scan/student/${s.profile_id}?eventId=${eventId}` }))
       : [
           ...students.map((s) => ({ id: s.id, name: s.full_name, sub: `Student · ${s.university ?? ""}`, route: `/scan/student/${s.profile_id}?eventId=${eventId}` })),
-          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Company · Booth ${c.booth_number ?? "—"}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--teal)" })),
+          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Company · Booth ${c.booth_number ?? "—"}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" })),
         ];
 
   return (
     <div style={{ position: "relative", zIndex: 1, minHeight: "100svh", display: "flex", flexDirection: "column" }}>
-      <header style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: "rgba(5,11,20,0.7)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)" }}>
+      <header style={{ position: "sticky", top: 0, zIndex: 10, display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: "rgba(10,10,10,0.7)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)" }}>
         <Link href={roleHome(viewer)} aria-label="Back to dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: "var(--text-2)", textDecoration: "none", fontSize: 13.5 }}>
           <LayoutDashboard size={16} /> Dashboard
         </Link>
@@ -168,7 +168,7 @@ export default function Scanner() {
       <main style={{ flex: 1, width: "100%", maxWidth: 680, margin: "0 auto", padding: "22px 18px 60px", display: "flex", flexDirection: "column", gap: 18 }}>
         {myPayload && (
           <SectionCard title="My event QR" accent="var(--border-strong)">
-            <QRCard payload={myPayload} caption={session.name} sub={`${ROLE_LABEL[viewer]} · ${session.org}`} accent={viewer === "company" ? "var(--teal)" : "var(--cyan)"} filename={`gradlink-${viewer}-qr`} />
+            <QRCard payload={myPayload} caption={session.name} sub={`${ROLE_LABEL[viewer]} · ${session.org}`} accent={viewer === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${viewer}-qr`} />
           </SectionCard>
         )}
 
@@ -176,7 +176,7 @@ export default function Scanner() {
           {camOn ? (
             <div style={{ position: "relative", borderRadius: "var(--r-md)", overflow: "hidden", border: "1px solid var(--border-strong)", aspectRatio: "4/3", background: "#000" }}>
               <video ref={videoRef} playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <div style={{ position: "absolute", inset: "18% 22%", border: "2px solid var(--cyan)", borderRadius: 14, boxShadow: "0 0 0 9999px rgba(2,8,15,0.45)" }} />
+              <div style={{ position: "absolute", inset: "18% 22%", border: "2px solid var(--accent)", borderRadius: 14, boxShadow: "0 0 0 9999px rgba(0,0,0,0.45)" }} />
             </div>
           ) : (
             <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55 }}>
@@ -202,7 +202,7 @@ export default function Scanner() {
               {people.map((p) => (
                 <button key={p.id} onClick={() => go(p.route)}
                   style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", cursor: "pointer", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textAlign: "left", transition: "border-color 0.15s" }}>
-                  <Avatar name={p.name} size={38} tone={p.tone ?? "var(--cyan)"} />
+                  <Avatar name={p.name} size={38} tone={p.tone ?? "var(--accent)"} />
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{p.name}</span>
                     <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.sub}</span>

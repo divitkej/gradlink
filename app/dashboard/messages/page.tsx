@@ -108,7 +108,7 @@ export default function MessagesPage() {
       ) : convs.length === 0 ? (
         <GlassPanel>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "36px 24px 44px", textAlign: "center" }}>
-            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--cyan)" }}><MessageSquare size={22} /></div>
+            <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}><MessageSquare size={22} /></div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No conversations yet</div>
             <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 380, lineHeight: 1.55 }}>Scan someone at the event and tap “Message” to start a conversation — it’ll show up here.</p>
           </div>
@@ -125,8 +125,8 @@ export default function MessagesPage() {
                   const mine = c.last.sender_profile_id === me;
                   return (
                     <button key={c.id} onClick={() => setActiveId(c.id)}
-                      style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "12px 16px", cursor: "pointer", textAlign: "left", background: on ? "rgba(53,211,255,0.08)" : "transparent", border: "none", borderBottom: "1px solid var(--border)", borderLeft: `2px solid ${on ? "var(--cyan)" : "transparent"}` }}>
-                      <Avatar name={c.name} size={38} tone={c.role === "company" ? "var(--teal)" : "var(--cyan)"} />
+                      style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "12px 16px", cursor: "pointer", textAlign: "left", background: on ? "rgba(255,255,255,0.08)" : "transparent", border: "none", borderBottom: "1px solid var(--border)", borderLeft: `2px solid ${on ? "var(--accent)" : "transparent"}` }}>
+                      <Avatar name={c.name} size={38} tone={c.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                       <span style={{ flex: 1, minWidth: 0 }}>
                         <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</span>
                         <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mine ? "You: " : ""}{c.last.message}</span>
@@ -146,7 +146,7 @@ export default function MessagesPage() {
                   {mobile && (
                     <button onClick={() => setActiveId(null)} aria-label="Back" style={{ background: "none", border: "none", color: "var(--text-2)", cursor: "pointer", display: "flex" }}><ArrowLeft size={18} /></button>
                   )}
-                  <Avatar name={active.name} size={34} tone={active.role === "company" ? "var(--teal)" : "var(--cyan)"} />
+                  <Avatar name={active.name} size={34} tone={active.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{active.name}</div>
                     <div style={{ fontSize: 11.5, color: "var(--text-muted)", textTransform: "capitalize" }}>{(active.role ?? "").replace("_", " ")}</div>
@@ -158,7 +158,7 @@ export default function MessagesPage() {
                     const mine = m.sender_profile_id === me;
                     return (
                       <div key={m.id} style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start" }}>
-                        <div style={{ maxWidth: "76%", padding: "10px 14px", borderRadius: mine ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: mine ? "linear-gradient(100deg, rgba(53,211,255,0.22), rgba(0,194,168,0.22))" : "rgba(255,255,255,0.05)", border: `1px solid ${mine ? "rgba(53,211,255,0.3)" : "var(--border)"}` }}>
+                        <div style={{ maxWidth: "76%", padding: "10px 14px", borderRadius: mine ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: mine ? "linear-gradient(100deg, rgba(255,255,255,0.22), rgba(255,255,255,0.22))" : "rgba(255,255,255,0.05)", border: `1px solid ${mine ? "rgba(255,255,255,0.3)" : "var(--border)"}` }}>
                           <div style={{ fontSize: 13.5, color: "var(--text)", lineHeight: 1.5 }}>{m.message}</div>
                           <div style={{ fontSize: 10.5, color: "var(--text-muted)", marginTop: 4, textAlign: "right" }}>{new Date(m.created_at).toLocaleString(undefined, { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" })}</div>
                         </div>
@@ -173,7 +173,7 @@ export default function MessagesPage() {
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                     style={{ flex: 1, resize: "none", maxHeight: 120, padding: "11px 14px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none", fontFamily: "var(--font-body)" }} />
                   <button onClick={send} disabled={sending || !reply.trim()} aria-label="Send"
-                    style={{ flexShrink: 0, width: 44, height: 44, borderRadius: "var(--r-md)", border: "none", cursor: reply.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: "#021016", background: reply.trim() ? "linear-gradient(100deg, var(--cyan), var(--teal))" : "rgba(255,255,255,0.08)" }}>
+                    style={{ flexShrink: 0, width: 44, height: 44, borderRadius: "var(--r-md)", border: "none", cursor: reply.trim() ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", color: "#0A0A0A", background: reply.trim() ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.08)" }}>
                     <Send size={17} />
                   </button>
                 </div>

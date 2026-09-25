@@ -1,8 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
-import { useRef, type ReactNode } from "react";
-import { useMounted } from "../anim/primitives";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 /* ---------- Button ---------- */
 export function Button({
@@ -35,16 +34,15 @@ export function Button({
     borderRadius: "var(--r-md)",
     cursor: "pointer",
     textDecoration: "none",
-    transition: "transform 0.18s ease, box-shadow 0.25s ease, background 0.2s ease",
+    transition: "transform 0.18s ease, background 0.2s ease",
     border: "1px solid transparent",
     whiteSpace: "nowrap",
   };
 
   const variants: Record<string, React.CSSProperties> = {
     primary: {
-      color: "#021016",
-      background: "linear-gradient(100deg, var(--cyan), var(--teal))",
-      boxShadow: "0 0 0 1px rgba(53,211,255,0.4), 0 8px 30px rgba(0,194,168,0.32)",
+      color: "#0A0A0A",
+      background: "var(--accent)",
     },
     secondary: {
       color: "var(--text)",
@@ -58,12 +56,9 @@ export function Button({
     },
   };
 
-  const hoverGlow =
-    variant === "primary"
-      ? "0 0 0 1px rgba(53,211,255,0.6), 0 12px 44px rgba(0,194,168,0.5)"
-      : variant === "secondary"
-      ? "0 0 0 1px var(--border-strong), 0 10px 32px rgba(53,211,255,0.18)"
-      : "none";
+  // Matte hover: a flat tone shift, no glow.
+  const hoverBg =
+    variant === "primary" ? "#FFFFFF" : variant === "secondary" ? "var(--surface-elev)" : "transparent";
 
   const style = { ...base, ...variants[variant] };
   const Comp = href ? motion.a : motion.button;
@@ -75,7 +70,7 @@ export function Button({
       aria-label={ariaLabel}
       className={className}
       style={style}
-      whileHover={{ y: -2, boxShadow: hoverGlow }}
+      whileHover={{ y: -1, background: hoverBg }}
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 22 }}
     >
@@ -117,8 +112,8 @@ export function GlassCard({
   );
 }
 
-/* ---------- SpotlightCard (cursor-aware glow + lift) ---------- */
-export function SpotlightCard({
+/* ---------- MatteCard (flat surface, border firms up on hover) ---------- */
+export function MatteCard({
   children,
   className,
   style,
@@ -127,58 +122,28 @@ export function SpotlightCard({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  const mounted = useMounted();
-  const animate = mounted && !reduce;
-
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduce || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    ref.current.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    ref.current.style.setProperty("--my", `${e.clientY - r.top}px`);
-  };
-
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      className={className}
+    <div
+      className={`matte-card${className ? ` ${className}` : ""}`}
       style={{
         position: "relative",
-        background: "var(--glass)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: "var(--r-lg)",
         overflow: "hidden",
-        transition: "border-color 0.25s ease",
+        transition: "border-color 0.2s ease",
         ...style,
       }}
-      whileHover={animate ? { y: -4, borderColor: "var(--border-strong)" } : {}}
-      transition={{ type: "spring", stiffness: 300, damping: 24 }}
     >
-      {animate && (
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            background:
-              "radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(53,211,255,0.10), transparent 60%)",
-          }}
-        />
-      )}
-      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
-    </motion.div>
+      {children}
+    </div>
   );
 }
 
 /* ---------- Meter (static progress bar) ---------- */
 export function Meter({
   value,
-  color = "var(--cyan)",
+  color = "var(--accent)",
   track = "rgba(255,255,255,0.08)",
   height = 8,
 }: {
@@ -201,7 +166,7 @@ export function Meter({
           width: `${value}%`,
           background: color,
           borderRadius: "var(--r-full)",
-          boxShadow: `0 0 12px ${color}`,
+          boxShadow: `none`,
         }}
       />
     </div>
@@ -219,8 +184,8 @@ export function Badge({
   pulse?: boolean;
 }) {
   const tones: Record<string, { fg: string; bg: string; bd: string }> = {
-    cyan: { fg: "var(--cyan)", bg: "rgba(53,211,255,0.10)", bd: "rgba(53,211,255,0.28)" },
-    teal: { fg: "var(--teal)", bg: "rgba(0,194,168,0.10)", bd: "rgba(0,194,168,0.28)" },
+    cyan: { fg: "var(--accent)", bg: "rgba(255,255,255,0.10)", bd: "rgba(255,255,255,0.28)" },
+    teal: { fg: "var(--accent-2)", bg: "rgba(255,255,255,0.10)", bd: "rgba(255,255,255,0.28)" },
     amber: { fg: "var(--amber)", bg: "rgba(247,201,72,0.10)", bd: "rgba(247,201,72,0.30)" },
     muted: { fg: "var(--text-2)", bg: "rgba(255,255,255,0.05)", bd: "var(--border)" },
   };
@@ -249,7 +214,7 @@ export function Badge({
             height: 6,
             borderRadius: "50%",
             background: t.fg,
-            boxShadow: `0 0 8px ${t.fg}`,
+            boxShadow: `none`,
           }}
         />
       )}

@@ -103,7 +103,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
     <GsapReveal style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <GlassPanel style={{ border: "1px solid var(--border-strong)" }}>
         <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
-          <Avatar name={companyName || "C"} size={64} tone="var(--teal)" />
+          <Avatar name={companyName || "C"} size={64} tone="var(--accent-2)" />
           <div style={{ flex: 1, minWidth: 200 }}>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--text)" }}>{companyName || "Your company"}</h2>
             <p style={{ fontSize: 13.5, color: "var(--text-muted)" }}>{[sector, industry, booth ? `Booth ${booth}` : null].filter(Boolean).join(" · ") || "Complete your booth profile below"}</p>
@@ -121,7 +121,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
         <PanelTitle hint={brochureUrl ? "Attached" : "Optional — students can view it"}>Company brochure</PanelTitle>
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", border: "none" }}>
+            style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", border: "none" }}>
             {uploading ? <Loader2 size={16} className="gl-spin" /> : <UploadCloud size={16} />}
             {uploading ? "Uploading…" : brochureUrl ? "Replace brochure" : "Attach brochure (PDF)"}
           </button>
@@ -168,7 +168,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
 
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-          <Check size={15} color="var(--teal)" /> {toast}
+          <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
       <style>{`@media (max-width: 640px) { .cp-grid { grid-template-columns: 1fr !important; } }`}</style>

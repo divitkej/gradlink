@@ -18,7 +18,7 @@ export default function ViewerGate({ hint }: { onPick?: (r: AppRole) => void; hi
         {hint ?? "GradLink shows this profile based on your account. Sign in to continue, then scan again."}
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", width: "100%", maxWidth: 360 }}>
-        <Link href="/sign-in" style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#021016", background: "linear-gradient(100deg, var(--cyan), var(--teal))", textDecoration: "none" }}>
+        <Link href="/sign-in" style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}>
           <LogIn size={17} /> Sign in
         </Link>
         <Link href="/sign-up" style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "var(--text)", background: "var(--glass)", border: "1px solid var(--border)", textDecoration: "none" }}>

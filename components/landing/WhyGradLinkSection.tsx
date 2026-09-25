@@ -2,7 +2,7 @@
 
 import { Layers, QrCode, GraduationCap, BarChart3, Send, CalendarRange } from "lucide-react";
 import { Section } from "../ui/Section";
-import { SpotlightCard } from "../ui/primitives";
+import { MatteCard } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
 
 const reasons = [
@@ -31,13 +31,13 @@ export default function WhyGradLinkSection() {
           const Icon = r.icon;
           return (
             <div key={r.title}>
-              <SpotlightCard style={{ padding: 26, height: "100%" }}>
+              <MatteCard style={{ padding: 26, height: "100%" }}>
                 <div
                   style={{
                     width: 44,
                     height: 44,
                     borderRadius: "var(--r-md)",
-                    background: "linear-gradient(135deg, rgba(53,211,255,0.14), rgba(0,194,168,0.10))",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))",
                     border: "1px solid var(--border-strong)",
                     display: "flex",
                     alignItems: "center",
@@ -45,13 +45,13 @@ export default function WhyGradLinkSection() {
                     marginBottom: 18,
                   }}
                 >
-                  <Icon size={21} color="var(--cyan)" strokeWidth={1.6} />
+                  <Icon size={21} color="var(--accent)" strokeWidth={1.6} />
                 </div>
                 <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", marginBottom: 9, lineHeight: 1.3 }}>
                   {r.title}
                 </h3>
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)" }}>{r.body}</p>
-              </SpotlightCard>
+              </MatteCard>
             </div>
           );
         })}

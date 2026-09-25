@@ -63,13 +63,13 @@ const outcomePanels: StatPanel[] = [
 ];
 
 const funnel = [
-  { l: "Registered", v: 500, pct: 100, c: "var(--cyan)" },
-  { l: "Resume Prep", v: 312, pct: 62, c: "var(--cyan)" },
-  { l: "Attended Fair", v: 284, pct: 57, c: "#2BB8E8" },
-  { l: "Recruiter Scans", v: 180, pct: 36, c: "var(--teal)" },
-  { l: "Shortlisted", v: 74, pct: 15, c: "var(--teal)" },
-  { l: "Interview Invites", v: 26, pct: 5, c: "var(--amber)" },
-  { l: "Confirmed Offers", v: 14, pct: 3, c: "var(--amber)" },
+  { l: "Registered", v: 500, pct: 100, c: "var(--accent)" },
+  { l: "Resume Prep", v: 312, pct: 62, c: "var(--accent)" },
+  { l: "Attended Fair", v: 284, pct: 57, c: "#D4D4D4" },
+  { l: "Recruiter Scans", v: 180, pct: 36, c: "var(--accent-2)" },
+  { l: "Shortlisted", v: 74, pct: 15, c: "var(--accent-2)" },
+  { l: "Interview Invites", v: 26, pct: 5, c: "var(--text-2)" },
+  { l: "Confirmed Offers", v: 14, pct: 3, c: "var(--text-2)" },
 ];
 
 const companies = [
@@ -121,9 +121,9 @@ export default function AnalyticsSection() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 24 }}>
               {[
-                { l: "Event ROI Score", v: "8.4", suf: "/10", c: "var(--teal)" },
-                { l: "Avg Readiness", v: "72", suf: "%", c: "var(--cyan)" },
-                { l: "Placement Rate", v: "4.6", suf: "%", c: "var(--amber)" },
+                { l: "Event ROI Score", v: "8.4", suf: "/10", c: "var(--accent-2)" },
+                { l: "Avg Readiness", v: "72", suf: "%", c: "var(--accent)" },
+                { l: "Placement Rate", v: "4.6", suf: "%", c: "var(--text-2)" },
               ].map((s) => (
                 <div key={s.l} style={{ textAlign: "center", padding: "14px 8px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)" }}>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: s.c }}>{s.v}<span style={{ fontSize: 13 }}>{s.suf}</span></div>
@@ -156,7 +156,7 @@ export default function AnalyticsSection() {
                       <tr key={row.c}>
                         <td style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{row.c}</td>
                         <td style={{ padding: "10px 16px", fontSize: 13, color: "var(--text-2)", textAlign: "right" }}>{row.scans}</td>
-                        <td style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "var(--teal)", textAlign: "right" }}>{row.short}</td>
+                        <td style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: "var(--accent-2)", textAlign: "right" }}>{row.short}</td>
                         <td style={{ padding: "10px 16px", fontSize: 13, color: "var(--text-2)", textAlign: "right" }}>{row.intv}</td>
                       </tr>
                     ))}
@@ -179,9 +179,9 @@ export default function AnalyticsSection() {
                         style={{
                           width: "100%",
                           height: `${b.h}%`,
-                          background: "linear-gradient(180deg, var(--cyan), var(--teal))",
+                          background: "linear-gradient(180deg, var(--accent), var(--accent-2))",
                           borderRadius: "4px 4px 0 0",
-                          boxShadow: "0 0 12px rgba(53,211,255,0.25)",
+                          boxShadow: "none",
                           animation: `growBar 0.9s ${i * 0.08}s ease both`,
                           transformOrigin: "bottom",
                         }}

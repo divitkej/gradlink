@@ -15,7 +15,7 @@ export default function QRCard({
   payload,
   caption,
   sub,
-  accent = "var(--cyan)",
+  accent = "var(--accent)",
   filename = "gradlink-qr",
 }: {
   payload: string;
@@ -67,12 +67,12 @@ export default function QRCard({
             borderRadius: 14,
             padding: 12,
             border: "1px solid var(--border-strong)",
-            boxShadow: `0 0 0 1px rgba(53,211,255,0.12), 0 14px 40px rgba(0,0,0,0.4)`,
+            boxShadow: `0 0 0 1px rgba(255,255,255,0.12), 0 14px 40px rgba(0,0,0,0.4)`,
             flexShrink: 0,
             position: "relative",
           }}
         >
-          <QRCodeCanvas value={url} size={132} level="M" marginSize={1} bgColor="#ffffff" fgColor="#041019" />
+          <QRCodeCanvas value={url} size={132} level="M" marginSize={1} bgColor="#ffffff" fgColor="#080808" />
         </div>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: accent, marginBottom: 6 }}>

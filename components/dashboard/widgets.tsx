@@ -38,13 +38,13 @@ export function StatCard({
     <Reveal delay={delay}>
       <div
         style={{
-          background: accent ? "rgba(0,194,168,0.07)" : "var(--glass)",
-          border: `1px solid ${accent ? "rgba(0,194,168,0.22)" : "var(--border)"}`,
+          background: accent ? "rgba(255,255,255,0.07)" : "var(--glass)",
+          border: `1px solid ${accent ? "rgba(255,255,255,0.22)" : "var(--border)"}`,
           borderRadius: "var(--r-md)",
           padding: "16px 18px",
         }}
       >
-        <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 700, letterSpacing: "-0.02em", color: accent ? "var(--teal)" : "var(--text)" }}>
+        <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 700, letterSpacing: "-0.02em", color: accent ? "var(--accent-2)" : "var(--text)" }}>
           <CountUp to={value} suffix={suffix} />
         </div>
         <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 3 }}>{label}</div>
@@ -53,7 +53,7 @@ export function StatCard({
   );
 }
 
-export function CompetencyBar({ label, value, color = "var(--cyan)", delay = 0 }: { label: string; value: number; color?: string; delay?: number }) {
+export function CompetencyBar({ label, value, color = "var(--accent)", delay = 0 }: { label: string; value: number; color?: string; delay?: number }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
@@ -83,7 +83,7 @@ export function Pipeline({ stages }: { stages: { label: string; count: number; c
 export function EmptyState({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
   return (
     <GlassPanel style={{ textAlign: "center", padding: "56px 28px" }}>
-      <div style={{ display: "inline-flex", width: 56, height: 56, borderRadius: "var(--r-lg)", background: "rgba(53,211,255,0.08)", border: "1px solid var(--border-strong)", alignItems: "center", justifyContent: "center", color: "var(--cyan)", marginBottom: 18 }}>
+      <div style={{ display: "inline-flex", width: 56, height: 56, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", alignItems: "center", justifyContent: "center", color: "var(--accent)", marginBottom: 18 }}>
         {icon}
       </div>
       <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>{title}</h2>
