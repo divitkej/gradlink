@@ -1,11 +1,12 @@
 import Stripe from "stripe";
-import { adminDb } from "@/lib/firebase-admin";
+import { db } from "@/lib/server/sql";
+import { serverEnv } from "@/lib/server/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Stripe webhook — the ONLY writer of `subscriptions/*`.
+ * Stripe webhook — the ONLY writer of the `subscriptions` table.
  *
  * The signature check is what makes this trustworthy: without it anyone could
  * POST here and grant themselves a paid plan. Never skip it, and never derive
@@ -17,8 +18,9 @@ export const dynamic = "force-dynamic";
  *                   customer.subscription.deleted
  */
 export async function POST(request: Request) {
-  const secret = process.env.STRIPE_SECRET_KEY;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const env = serverEnv();
+  const secret = env.STRIPE_SECRET_KEY;
+  const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
   if (!secret || !webhookSecret) {
     return Response.json({ error: "Webhook not configured." }, { status: 503 });
   }
@@ -38,16 +40,17 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  const db = adminDb();
-  if (!db) return Response.json({ error: "Server not configured." }, { status: 503 });
-
   const iso = (unixSeconds: number | null | undefined) =>
     typeof unixSeconds === "number" ? new Date(unixSeconds * 1000).toISOString() : null;
 
-  async function writeSubscription(profileId: string, data: Record<string, unknown>) {
-    await db!.doc(`subscriptions/${profileId}`).set(
-      { ...data, updated_at: new Date().toISOString() },
-      { merge: true }
+  /** Upsert only the fields given, like the old Firestore `set(..., { merge: true })`. */
+  async function writeSubscription(profileId: string, data: Record<string, string | null>) {
+    const cols = Object.keys(data);
+    await db().query(
+      `insert into subscriptions (profile_id, ${cols.join(", ")}, updated_at)
+       values ($1, ${cols.map((_, i) => `$${i + 2}`).join(", ")}, now())
+       on conflict (profile_id) do update set ${cols.map((c) => `${c} = excluded.${c}`).join(", ")}, updated_at = now()`,
+      [profileId, ...cols.map((c) => data[c])],
     );
   }
 

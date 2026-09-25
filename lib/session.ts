@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { signOut as fbSignOut } from "firebase/auth";
-import { firebaseAuth } from "./firebase";
+import { signOutUser } from "./auth";
 import { useHydrated } from "./use-hydrated";
 
 /** App-level role vocabulary used across the platform. */
@@ -16,8 +15,9 @@ export const ROLE_LABEL: Record<AppRole, string> = {
 
 /**
  * The signed-in user, mirrored into localStorage so the UI can paint
- * immediately instead of waiting on a Firestore read. Firebase Auth remains
- * the source of truth for access — this is a cache, not a credential.
+ * immediately instead of waiting on a network round trip. The HttpOnly session
+ * cookie checked by the Worker is the source of truth for access — this is a
+ * cache, not a credential.
  */
 export interface GLSession {
   role: AppRole;
@@ -113,10 +113,9 @@ export function useSession() {
 
   const signOut = useCallback(() => {
     clearSession();
-    // Drop the Firebase session too, or the user stays authenticated to
-    // Firestore and the security rules keep granting them access.
-    const auth = firebaseAuth();
-    if (auth) fbSignOut(auth).catch(() => {});
+    // Clear the server session cookie too, or the browser stays authenticated
+    // to the API even though the UI looks signed out.
+    signOutUser();
   }, []);
 
   return { session, ready, setSession: update, selectEvent, signOut };

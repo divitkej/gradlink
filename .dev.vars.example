@@ -1,0 +1,28 @@
+# Local server configuration for GradLink (Cloudflare Workers + Neon).
+#
+#   cp .dev.vars.example .dev.vars
+#
+# .dev.vars is git-ignored. It's read by `npm run dev` (via
+# initOpenNextCloudflareForDev), `npm run preview`, and the db:* scripts.
+# In production the same names are set as Worker secrets:
+#   npx wrangler secret put <NAME>
+
+# Neon → your project → Connect → "Pooled connection" string.
+DATABASE_URL=<NEON_DATABASE_URL>
+
+# Signs session cookies. At least 32 random characters, e.g. from:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+AUTH_SECRET=<AUTH_SECRET>
+
+# Optional. Public origin used in password-reset links; defaults to the request origin.
+APP_URL=http://localhost:3000
+
+# Optional locally (reset links are printed to the console instead).
+# Required in production for "Forgot password" — Resend free tier, https://resend.com
+RESEND_API_KEY=<RESEND_API_KEY>
+EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
+
+# Optional — only needed to test the Placement Pro upgrade.
+STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
+STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
+STRIPE_PRICE_PRO=<STRIPE_PRICE_ID>
