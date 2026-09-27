@@ -26,7 +26,7 @@ const sections: LegalSection[] = [
       <>
         <p>We only collect what you give us or what GradLink needs to work:</p>
         <ul>
-          <li><strong>Account details:</strong> your name, email address, account type (student, company or college) and organisation. Your password is stored only as a one-way hash; we cannot read it.</li>
+          <li><strong>Account details:</strong> your name, email address, account type (student, company or college) and organisation, and whether you have confirmed your email address. Your password is stored only as a one-way hash; we cannot read it.</li>
           <li><strong>Student profile:</strong> university, degree, graduation year, skills, bio, links to LinkedIn, GitHub and a portfolio, your résumé file and a résumé score.</li>
           <li><strong>Company profile:</strong> company name, sector, website, description, roles you are hiring for, skills wanted, booth number, logo and brochure.</li>
           <li><strong>Event activity:</strong> events you create or join, check-ins, QR scans between students and companies with any notes added, shortlist decisions and notes, and per-event counts such as profile views and scans received.</li>
@@ -46,7 +46,7 @@ const sections: LegalSection[] = [
           <li>To run your account and the features you use: profiles, events, scanning, shortlists, messages and reports.</li>
           <li>To calculate your résumé score. It is worked out automatically from fixed rules about how complete your profile is. It is guidance only and does not decide anything about you by itself.</li>
           <li>To keep GradLink secure, for example locking an account after repeated wrong passwords.</li>
-          <li>To send emails you ask for, such as password reset links.</li>
+          <li>To send account emails: the link to confirm your email address when you sign up, and password reset links you ask for.</li>
           <li>To take payment for Placement Pro and keep records the law requires.</li>
           <li>To answer you when you contact us.</li>
         </ul>
@@ -82,7 +82,7 @@ const sections: LegalSection[] = [
           <li><strong>Neon</strong> stores the GradLink database, in Singapore.</li>
           <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
-          <li><strong>Resend</strong> sends password reset emails, once that feature is switched on.</li>
+          <li><strong>Google (Gmail)</strong> sends account emails such as confirmation and password reset links.</li>
         </ul>
         <p>Each one only handles your data to provide its service to us. We may also share data if the law requires it, or with a buyer if GradLink is ever sold, in which case this policy continues to apply.</p>
       </>
@@ -92,7 +92,7 @@ const sections: LegalSection[] = [
     heading: "Data stored outside the UAE",
     body: (
       <p>
-        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare and Stripe operate.
+        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare, Stripe and Google operate.
         We use these providers because they apply strong security and data protection commitments to the data they hold.
       </p>
     ),
@@ -102,7 +102,7 @@ const sections: LegalSection[] = [
     body: (
       <ul>
         <li>Account and profile data: for as long as your account is open. When you ask us to delete your account, we delete it within 30 days.</li>
-        <li>Password reset links: they expire after 60 minutes.</li>
+        <li>Email confirmation links: they expire after 24 hours. Password reset links: after 60 minutes.</li>
         <li>Sign-in cookie: up to 30 days, or until you sign out.</li>
         <li>Billing records: as long as UAE law requires us to keep them.</li>
         <li>Request logs: for as long as Cloudflare’s standard log retention.</li>

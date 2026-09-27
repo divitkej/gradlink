@@ -3,7 +3,8 @@ import { ConfigError } from "./session";
 
 /** An error whose message is safe to show the user. */
 export class HttpError extends Error {
-  constructor(public status: number, message: string) {
+  /** `code` lets the browser react to a specific case, e.g. "unverified". */
+  constructor(public status: number, message: string, public code?: string) {
     super(message);
   }
 }
@@ -28,7 +29,7 @@ export function assertSameOrigin(request: Request, { requireJson = true } = {}) 
 
 /** Uniform error → Response mapping for every route handler. */
 export function handleError(scope: string, err: unknown): Response {
-  if (err instanceof HttpError) return json({ error: err.message }, { status: err.status });
+  if (err instanceof HttpError) return json({ error: err.message, ...(err.code && { code: err.code }) }, { status: err.status });
   if (err instanceof NotConfiguredError || err instanceof ConfigError) {
     console.error(`[${scope}] not configured:`, err.message);
     return json({ error: "GradLink isn't connected yet. The server is missing its configuration." }, { status: 503 });

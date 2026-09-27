@@ -65,6 +65,20 @@ create table if not exists password_reset_tokens (
 );
 create index if not exists password_reset_tokens_profile_idx on password_reset_tokens (profile_id);
 
+-- Email confirmation. Sign-in is refused until email_verified_at is set,
+-- whenever the server can send email (lib/server/auth-api.ts). Tokens are
+-- stored hashed, like reset tokens.
+alter table auth_credentials add column if not exists email_verified_at timestamptz;
+
+create table if not exists email_verification_tokens (
+  token_hash  text primary key,
+  profile_id  text not null references profiles (id) on delete cascade,
+  created_at  timestamptz not null default now(),
+  expires_at  timestamptz not null,
+  used_at     timestamptz
+);
+create index if not exists email_verification_tokens_profile_idx on email_verification_tokens (profile_id);
+
 -- ------------------------------------------------------------- role rows --
 create table if not exists students (
   id               text primary key default gen_random_uuid()::text,

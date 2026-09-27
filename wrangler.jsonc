@@ -38,7 +38,11 @@
   // Non-secret configuration. APP_URL is optional — when empty, emailed links
   // use the origin of the request that triggered them.
   "vars": {
-    "APP_URL": ""
+    "APP_URL": "",
+    // Account email (confirm your email, password reset) is sent from this
+    // Gmail over SMTP. Sending starts once its app password is set:
+    //   npx wrangler secret put SMTP_PASS
+    "SMTP_USER": "divitkej@gmail.com"
   },
 
   "observability": {

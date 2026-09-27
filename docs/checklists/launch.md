@@ -27,8 +27,8 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
 
 - [ ] **Custom domain.** Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it.
   Owner action, then `wrangler.jsonc`
-- [ ] **Password reset email.** Neon side is ready. Needs the domain verified in Resend, then `RESEND_API_KEY` and `EMAIL_FROM` set as Worker secrets. Until then "Forgot password" says it is not set up.
-  `lib/server/mail.ts` · Blocked on the domain
+- [ ] **Account email: confirm email and password reset.** Built without a domain: the Worker sends through `divitkej@gmail.com` over SMTP (`lib/server/smtp.ts`, about 500 emails a day). Sign-up now emails a confirm link and sign-in is refused until it is opened (`/verify-email`); a completed password reset also confirms the email. Tested end to end on the Workers runtime against a local mail server, including resend, single-use and superseded links, and a Gmail-style login refusal. Left: create a Gmail app password and set it with `npx wrangler secret put SMTP_PASS` (or in the dashboard as a secret). Until then accounts are confirmed on creation and "Forgot password" says it is not set up. Then send one real reset to confirm Gmail accepts it.
+  `lib/server/auth-api.ts`, `lib/server/mail.ts`, `components/gradlink/VerifyEmail.tsx` · Done in "Send account email through Gmail and require email confirmation", waiting on the app password
 
 ## Legal and claims
 
