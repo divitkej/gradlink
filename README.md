@@ -156,9 +156,13 @@ Components should not call `fetch('/api/…')` directly.
 ## Access rules
 
 Enforced in the Worker (`lib/server/rpc.ts`), not the browser: every operation
-needs a signed-in account; writes are owner-only; messages are readable only by
-their two participants; `subscriptions` is readable by its owner and writable
-only by the Stripe webhook, so a paid plan can't be forged from the browser.
+needs a signed-in account; writes are owner-only and checked against the
+account's role; event data (attendees, scans, shortlists, analytics) is visible
+only to people registered for that event, and whole-event views only to its
+staff; shortlist notes stay with the company that wrote them; messages are
+readable only by their two participants; `subscriptions` is readable by its
+owner and writable only by the Stripe webhook, so a paid plan can't be forged
+from the browser. Open items are tracked in `docs/checklists/security.md`.
 
 ## History
 
