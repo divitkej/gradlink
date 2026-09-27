@@ -28,7 +28,7 @@ const RECENT_LOGIN_MS = 15 * 60 * 1000;
 const MSG = {
   badLogin: "Incorrect email or password.",
   locked: "Too many attempts. Please wait a moment and try again.",
-  exists: "An account with this email already exists — please sign in instead.",
+  exists: "An account with this email already exists. Please sign in instead.",
   badEmail: "That email address doesn't look right.",
   weak: "That password is too weak. Use at least 8 characters.",
   noPassword:

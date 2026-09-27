@@ -31,7 +31,7 @@ export function handleError(scope: string, err: unknown): Response {
   if (err instanceof HttpError) return json({ error: err.message }, { status: err.status });
   if (err instanceof NotConfiguredError || err instanceof ConfigError) {
     console.error(`[${scope}] not configured:`, err.message);
-    return json({ error: "GradLink isn't connected yet — the server is missing its configuration." }, { status: 503 });
+    return json({ error: "GradLink isn't connected yet. The server is missing its configuration." }, { status: 503 });
   }
   console.error(`[${scope}]`, err);
   return json({ error: "Something went wrong. Please try again." }, { status: 500 });

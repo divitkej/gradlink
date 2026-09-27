@@ -40,7 +40,7 @@ export interface SignedInProfile {
 /** The server's messages are written for people; network failures aren't. */
 function friendlyError(err: unknown): string {
   if (err instanceof ApiError) return err.message;
-  return "Network problem — check your connection and try again.";
+  return "Network problem. Check your connection and try again.";
 }
 
 /**
