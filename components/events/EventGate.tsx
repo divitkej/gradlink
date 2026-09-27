@@ -5,7 +5,7 @@ import { SectionCard, LoadingBlock } from "@/components/dashboard/cards";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import JoinEventForm from "./JoinEventForm";
-import CreateEventForm from "./CreateEventForm";
+import EventForm from "./EventForm";
 
 /**
  * Wraps any view that only makes sense inside an event.
@@ -39,7 +39,7 @@ export default function EventGate({
         join code to share — students and employers use it to register, and everything they do at
         the event reports back here.
       </p>
-      <CreateEventForm />
+      <EventForm />
     </SectionCard>
   ) : (
     <SectionCard

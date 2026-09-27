@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2,
   MessageSquare, BarChart3, Users, Briefcase, ScanLine,
-  Search, Bell, Menu, X, BookOpen, Network, LogOut, History,
+  Search, Bell, Menu, X, BookOpen, Network, LogOut, History, CalendarRange,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
@@ -18,10 +18,16 @@ export type DashRole = AppRole;
 
 type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
 
-/** Nav depends on which event is open, so it is built per render. */
+const ALL_EVENTS = "/dashboard/events";
+
+/**
+ * Nav depends on which event is open, so it is built per render.
+ * "All events" is always there, so people can switch events or add another.
+ * With no event open, "Event" would point at the same page, so it is dropped.
+ */
 function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
-  const EV = eventId ? `/events/${eventId}` : "/dashboard/events";
-  return {
+  const EV = eventId ? `/events/${eventId}` : ALL_EVENTS;
+  const nav: Record<AppRole, NavItem[]> = {
   student: [
     { label: "Overview", href: "/dashboard/student", icon: LayoutDashboard },
     { label: "Event", href: EV, icon: CalendarDays },
@@ -56,6 +62,14 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Manual", href: "/dashboard/event-manager#manual", icon: BookOpen },
   ],
   };
+  const all: NavItem = { label: "All events", href: ALL_EVENTS, icon: CalendarRange };
+  for (const role of Object.keys(nav) as AppRole[]) {
+    const items = nav[role].filter((i) => eventId || i.label !== "Event");
+    const after = items.findIndex((i) => i.label === (eventId ? "Event" : "Overview"));
+    items.splice(after + 1, 0, all);
+    nav[role] = items;
+  }
+  return nav;
 }
 
 function roleHome(role: AppRole) {

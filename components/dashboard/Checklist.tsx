@@ -26,7 +26,7 @@ function autoRule(title: string, sig: StudentSignals): boolean | null {
   const t = title.toLowerCase();
   if (t.includes("complete your profile")) return sig.profileComplete;
   if (t.includes("upload your resume")) return sig.hasResume;
-  if (t.includes("ai resume score")) return sig.hasResume;
+  if (t.includes("resume score")) return sig.hasResume;
   if (t.includes("portfolio")) return sig.hasLinks;
   if (t.includes("save target")) return sig.savedCount > 0;
   if (t.includes("show your qr")) return sig.scannedByCompany > 0;
@@ -101,10 +101,13 @@ export default function Checklist({
   role,
   profileId,
   eventId,
+  onProgress,
 }: {
   role: AppRole;
   profileId: string;
   eventId: string;
+  /** Called with the completion percentage once loaded and after every change. */
+  onProgress?: (pct: number) => void;
 }) {
   const [items, setItems] = useState<ChecklistItemRow[]>([]);
   const [done, setDone] = useState<Record<string, boolean>>({});
@@ -162,6 +165,10 @@ export default function Checklist({
 
   const totalDone = items.filter((i) => done[i.id]).length;
   const pct = items.length ? Math.round((totalDone / items.length) * 100) : 0;
+
+  useEffect(() => {
+    if (!loading) onProgress?.(pct);
+  }, [loading, pct, onProgress]);
 
   return (
     <SectionCard

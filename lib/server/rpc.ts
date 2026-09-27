@@ -1,6 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
+import { seedChecklistQuery } from "./checklist-defaults";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -219,11 +220,29 @@ export const ops: Record<string, Op> = {
   },
 
   /* Checklist */
-  async getChecklistItems(_u, [role, eventId]) {
-    return db()`
+  async getChecklistItems(u, [role, eventId]) {
+    const sql = db();
+    const id = s(eventId);
+    const read = () => sql`
       select id, event_id, role, title, description, phase, order_index from checklist_items
-      where event_id = ${s(eventId)} and role = ${s(role)} order by order_index asc
+      where event_id = ${id} and role = ${s(role)} order by order_index asc
     `;
+    const rows = await read();
+    if (rows.length) return rows;
+
+    // Events created before createEvent seeded a checklist have none at all.
+    // Backfill the defaults the first time a member of the event opens one.
+    // The advisory lock stops two tabs loading at once from seeding twice.
+    const [existing, member] = await Promise.all([
+      sql`select 1 from checklist_items where event_id = ${id} limit 1`,
+      sql`select 1 from event_registrations where event_id = ${id} and profile_id = ${u.id}`,
+    ]);
+    if (existing.length || !member.length) return rows;
+    await sql.transaction([
+      sql`select 1 from pg_advisory_xact_lock(hashtext(${"checklist:" + id}))`,
+      seedChecklistQuery(sql, id),
+    ]);
+    return read();
   },
   async getChecklistProgress(u, [profileId]) {
     isMe(u, profileId);
@@ -299,6 +318,8 @@ export const ops: Record<string, Op> = {
           // their event list the same way a joined event does.
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
               values (${id}, ${u.id}, 'event_manager', true)`,
+          // Every role's checklist starts from the default list.
+          seedChecklistQuery(sql, id),
         ]);
         return { ok: true, event: rows[0] };
       } catch (err) {
@@ -319,6 +340,7 @@ export const ops: Record<string, Op> = {
     };
     const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined);
     if (!entries.length) return true;
+    if (f.title !== undefined && !s(f.title).trim()) throw new HttpError(400, "Give your event a name.");
     const sets = entries.map(([k], idx) => `${k} = $${idx + 3}`);
     const rows = await db().query(
       `update events set ${sets.join(", ")} where id = $1 and created_by = $2 returning id`,

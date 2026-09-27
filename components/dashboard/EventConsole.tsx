@@ -4,13 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
-  Star, HelpCircle, Bookmark, ScanLine, Search,
+  Star, HelpCircle, Bookmark, ScanLine, Search, Pencil,
 } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from "./cards";
 import { Badge } from "@/components/ui/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
+import EventForm from "@/components/events/EventForm";
+import { EVENT_STATUS_LABEL } from "@/lib/events";
 import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
@@ -66,7 +68,10 @@ export default function EventConsole({ eventId }: { eventId: string }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      <EventHeader event={event} role={role} studentCount={students.length} companyCount={companies.length} />
+      <EventHeader
+        event={event} role={role} studentCount={students.length} companyCount={companies.length}
+        canEdit={!!event && event.created_by === session.profileId} onSaved={setEvent}
+      />
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {tabs.filter((t) => !t.hide).map((t) => {
@@ -102,13 +107,32 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   );
 }
 
-function EventHeader({ event, role, studentCount, companyCount }: { event: EventRow | null; role: AppRole; studentCount: number; companyCount: number }) {
+function EventHeader({
+  event, role, studentCount, companyCount, canEdit, onSaved,
+}: {
+  event: EventRow | null; role: AppRole; studentCount: number; companyCount: number;
+  canEdit: boolean; onSaved: (event: EventRow) => void;
+}) {
+  const [editing, setEditing] = useState(false);
   const status = event?.status ?? "live";
+
+  if (editing && event) {
+    return (
+      <SectionCard title="Edit event" accent="var(--border-strong)">
+        <EventForm
+          event={event}
+          onSaved={(next) => { onSaved(next); setEditing(false); }}
+          onCancel={() => setEditing(false)}
+        />
+      </SectionCard>
+    );
+  }
+
   return (
     <SectionCard accent="var(--border-strong)">
       <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
         <div>
-          <Badge tone={status === "live" ? "amber" : "cyan"} pulse={status === "live"}>{status === "live" ? "Live now" : status}</Badge>
+          <Badge tone={status === "live" ? "amber" : status === "ended" ? "muted" : "cyan"} pulse={status === "live"}>{EVENT_STATUS_LABEL[status] ?? status}</Badge>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "12px 0 6px" }}>
             {event?.title ?? "Event"}
           </h1>
@@ -117,9 +141,19 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
             {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
           </div>
         </div>
-        <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none", alignSelf: "flex-start" }}>
-          <ScanLine size={16} /> Open scanner
-        </Link>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignSelf: "flex-start" }}>
+          {canEdit && (
+            <button
+              onClick={() => setEditing(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--text-2)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)" }}
+            >
+              <Pencil size={15} /> Edit event
+            </button>
+          )}
+          <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}>
+            <ScanLine size={16} /> Open scanner
+          </Link>
+        </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 18 }} className="ec-stats">
         <StatTile label="Companies" value={companyCount} />
@@ -202,7 +236,7 @@ function Overview({ role, me, students, companies, analytics, eventId }: { role:
       </SectionCard>
       <SectionCard title="Students needing attention" hint="Low engagement">
         {analytics.filter((a) => a.engagement_score < 40).length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Everyone is engaged 🎉</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No students need attention right now.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {analytics.filter((a) => a.engagement_score < 40).map((a) => {
