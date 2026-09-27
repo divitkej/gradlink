@@ -74,7 +74,8 @@ async function registeredRole(eventId: string, profileId: string): Promise<strin
 function forViewer(u: AuthUser, event: Row | undefined): Row | null {
   if (!event) return null;
   if (event.created_by === u.id) return event;
-  const { join_code: _code, ...rest } = event;
+  const rest = { ...event };
+  delete rest.join_code;
   return rest;
 }
 
