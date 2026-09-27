@@ -28,7 +28,13 @@ export interface ServerEnv {
   EMAIL_FROM?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
+  /** Stripe Price ids, created by `npm run stripe:setup`. See lib/pricing.ts. */
   STRIPE_PRICE_PRO?: string;
+  STRIPE_PRICE_PRO_FOUNDING?: string;
+  STRIPE_PRICE_PRO_2Y?: string;
+  STRIPE_PRICE_PRO_3Y?: string;
+  STRIPE_PRICE_EXTRA_CAMPUS?: string;
+  STRIPE_PRICE_EVENT_PASS?: string;
   /** Workers KV namespace holding résumés, brochures and logos. */
   UPLOADS?: KVLike;
 }

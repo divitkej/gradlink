@@ -11,6 +11,7 @@
 -- unchanged. What's new compared with Supabase:
 --   * events.join_code / host_org       — the multi-event model
 --   * subscriptions                     — Stripe entitlement (was Firestore-only)
+--   * event_passes                      — one-off Event Pass purchases
 --   * auth_credentials / password_reset_tokens — replaces Supabase/Firebase Auth
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
@@ -243,6 +244,30 @@ create table if not exists subscriptions (
   current_period_end      timestamptz,
   updated_at              timestamptz not null default now()
 );
+-- Added with the multi-plan pricing. `term` is the billing term of the paid
+-- plan, `campuses` how many campuses it covers, and `founding` whether it was
+-- bought at the founding price (lib/pricing.ts caps how many campuses get it).
+alter table subscriptions add column if not exists term text
+  check (term in ('annual', 'two_year', 'three_year'));
+alter table subscriptions add column if not exists campuses integer not null default 1;
+alter table subscriptions add column if not exists founding boolean not null default false;
+
+-- One row per Event Pass bought (a one-off Stripe payment). A pass is spent
+-- when the college creates an event without Placement Pro: `event_id` is set
+-- then, and that event keeps the paid features for good. `credited_at` is set
+-- when the pass price was taken off a Placement Pro checkout. Written only by
+-- the Stripe webhook and by createEvent in lib/server/rpc.ts.
+create table if not exists event_passes (
+  id                 text primary key default gen_random_uuid()::text,
+  created_at         timestamptz not null default now(),
+  profile_id         text not null references profiles (id) on delete cascade,
+  stripe_session_id  text not null unique,
+  amount_minor       integer not null,
+  currency           text not null,
+  event_id           text unique references events (id) on delete set null,
+  credited_at        timestamptz
+);
+create index if not exists event_passes_profile_idx on event_passes (profile_id, created_at desc);
 
 -- Present in the Supabase schema for one-off purchases; empty in the export
 -- and not read by the app yet. Server-written only, like subscriptions.

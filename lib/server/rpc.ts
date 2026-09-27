@@ -1,6 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
+import { ACTIVE_SUB_SQL, billingState, eventAccess } from "./billing";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -13,7 +14,7 @@ import type { AuthUser } from "./session";
      * every op requires a signed-in user;
      * reads are open to any signed-in user, EXCEPT messages
        (participants only), checklist progress, event membership
-       lists and subscriptions (owner only);
+       lists and billing (owner only);
      * writes are owner-only, checked against the session's profile
        id — never against an id the browser claims.
    ============================================================ */
@@ -273,7 +274,14 @@ export const ops: Record<string, Op> = {
     const rows = await db()`select * from events where join_code = ${c}`;
     return rows[0] ?? null;
   },
-  /** Any college can create an event; it is always owned by the caller. */
+  /**
+   * Any college can create an event; it is always owned by the caller.
+   *
+   * The first event is the free trial. After that an event needs Placement
+   * Pro or an unused Event Pass, which this spends. The check and the insert
+   * run in one transaction behind a per-college advisory lock, so two
+   * requests racing can't both take the trial or both spend one pass.
+   */
   async createEvent(u, [input]) {
     const i = (input ?? {}) as Row;
     const title = s(i.title).trim().slice(0, 200);
@@ -289,18 +297,44 @@ export const ops: Record<string, Op> = {
       // Collisions at 31^6 are vanishingly rare; lengthen rather than loop forever.
       const joinCode = randomCode(attempt < 4 ? 6 : 8);
       try {
-        const [rows] = await sql.transaction([
-          sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, join_code)
-              values (${id}, ${title}, ${s(i.description).trim() || null}, ${s(i.location).trim() || null},
-                      ${s(i.startDate) || null}, ${s(i.endDate) || null}, ${status}, ${u.id},
-                      ${textOrNull(i.hostOrg, 300)}, ${joinCode})
-              returning *`,
+        const results = await sql.transaction([
+          sql.query(`select pg_advisory_xact_lock(hashtext('create-event:' || $1))`, [u.id]),
+          sql.query(
+            `insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, join_code)
+             select $2, $3, $4, $5, $6, $7, $8, $1, $9, $10
+             where not exists (select 1 from events where created_by = $1)
+                or ${ACTIVE_SUB_SQL}
+                or exists (select 1 from event_passes where profile_id = $1 and event_id is null)
+             returning *`,
+            [u.id, id, title, s(i.description).trim() || null, s(i.location).trim() || null,
+              s(i.startDate) || null, s(i.endDate) || null, status, textOrNull(i.hostOrg, 300), joinCode],
+          ),
+          // Spend a pass only when the event needed one: not the trial, no subscription.
+          sql.query(
+            `update event_passes set event_id = $2
+             where id = (select id from event_passes where profile_id = $1 and event_id is null order by created_at, id limit 1)
+               and exists (select 1 from events where id = $2)
+               and (select count(*) from events where created_by = $1) > 1
+               and not ${ACTIVE_SUB_SQL}`,
+            [u.id, id],
+          ),
           // The organiser is registered into their own event so it appears in
           // their event list the same way a joined event does.
-          sql`insert into event_registrations (event_id, profile_id, role, checked_in)
-              values (${id}, ${u.id}, 'event_manager', true)`,
+          sql.query(
+            `insert into event_registrations (event_id, profile_id, role, checked_in)
+             select $2, $1, 'event_manager', true where exists (select 1 from events where id = $2)`,
+            [u.id, id],
+          ),
         ]);
-        return { ok: true, event: rows[0] };
+        const event = (results[1] as Row[])[0];
+        if (!event) {
+          return {
+            ok: false,
+            code: "upgrade_required",
+            error: "Your free trial covers one event. Buy an Event Pass or subscribe to Placement Pro to create another.",
+          };
+        }
+        return { ok: true, event };
       } catch (err) {
         if ((err as { code?: string }).code === "23505") continue; // join_code clash — retry
         console.error("[rpc] createEvent", err);
@@ -351,13 +385,14 @@ export const ops: Record<string, Op> = {
     return { ok: true, event };
   },
 
-  /* Billing — read-only, owner only. Only the Stripe webhook writes it. */
-  async getSubscription(u, [profileId]) {
-    isMe(u, profileId);
-    const rows = await db()`
-      select plan, status, stripe_customer_id, stripe_subscription_id, current_period_end, updated_at
-      from subscriptions where profile_id = ${u.id}
-    `;
-    return rows[0] ?? null;
+  /* Billing: read-only, owner only. Only the Stripe webhook and createEvent write it. */
+  /** Trial, pass and credit state for the caller's own college account. */
+  async getBillingState(u) {
+    if (u.role !== "event_manager") throw forbidden();
+    return billingState(u.id);
+  },
+  /** Whether one of the caller's own events has the paid features, and why. */
+  async getEventAccess(u, [eventId]) {
+    return eventAccess(u.id, s(eventId));
   },
 };

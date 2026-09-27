@@ -6,7 +6,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Stripe webhook — the ONLY writer of the `subscriptions` table.
+ * Stripe webhook — the ONLY writer of the `subscriptions` table, and the
+ * only place an Event Pass is created.
  *
  * The signature check is what makes this trustworthy: without it anyone could
  * POST here and grant themselves a paid plan. Never skip it, and never derive
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
  *
  * Point Stripe at:  https://<your-domain>/api/stripe/webhook
  * Events:           checkout.session.completed,
+ *                   checkout.session.async_payment_succeeded,
  *                   customer.subscription.updated,
  *                   customer.subscription.deleted
  */
@@ -54,15 +56,44 @@ export async function POST(request: Request) {
     );
   }
 
+  /**
+   * Term, campus count and founding flag, from the metadata the checkout
+   * route set. Older subscriptions carry none of it and keep their values.
+   */
+  function planDetails(meta: Stripe.Metadata | null | undefined): Record<string, string> {
+    const out: Record<string, string> = {};
+    if (!meta) return out;
+    if (meta.term === "annual" || meta.term === "two_year" || meta.term === "three_year") out.term = meta.term;
+    const campuses = Number(meta.campuses);
+    if (Number.isInteger(campuses) && campuses >= 1) out.campuses = String(campuses);
+    if (meta.founding === "1" || meta.founding === "0") out.founding = meta.founding === "1" ? "true" : "false";
+    return out;
+  }
+
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object;
         const profileId = session.client_reference_id ?? session.metadata?.profileId;
         if (!profileId) {
           console.warn("[stripe/webhook] completed session with no profileId", session.id);
           break;
         }
+
+        // A one-off Event Pass. Only recorded once the money has arrived;
+        // delayed payment methods arrive later as async_payment_succeeded.
+        if (session.mode === "payment") {
+          if (session.metadata?.kind !== "event_pass" || session.payment_status !== "paid") break;
+          await db()`
+            insert into event_passes (profile_id, stripe_session_id, amount_minor, currency)
+            values (${profileId}, ${session.id}, ${session.amount_total ?? 0}, ${session.currency ?? ""})
+            on conflict (stripe_session_id) do nothing
+          `;
+          break;
+        }
+        if (event.type !== "checkout.session.completed") break;
+
         // Re-read the subscription so the stored period end is authoritative
         // rather than inferred from the checkout session.
         let periodEnd: string | null = null;
@@ -77,7 +108,17 @@ export async function POST(request: Request) {
           stripe_customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
           stripe_subscription_id: subId ?? null,
           current_period_end: periodEnd,
+          ...planDetails(session.metadata),
         });
+
+        // Event Passes whose price came off this checkout can't be credited again.
+        const credited = (session.metadata?.creditedPasses ?? "").split(",").filter(Boolean);
+        if (credited.length) {
+          await db()`
+            update event_passes set credited_at = now()
+            where profile_id = ${profileId} and id = any(${credited}::text[]) and credited_at is null
+          `;
+        }
         break;
       }
 
@@ -91,6 +132,7 @@ export async function POST(request: Request) {
           status: sub.status === "trialing" ? "active" : (sub.status as string),
           stripe_subscription_id: sub.id,
           current_period_end: iso(sub.items.data[0]?.current_period_end),
+          ...planDetails(sub.metadata),
         });
         break;
       }

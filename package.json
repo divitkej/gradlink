@@ -12,6 +12,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:import": "node migration/import-neon.mjs",
+    "stripe:setup": "node scripts/stripe-setup.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint"

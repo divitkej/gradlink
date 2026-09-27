@@ -78,7 +78,8 @@ into the build.
 | `RESEND_API_KEY` | for "Forgot password" | Resend API key (free tier) |
 | `EMAIL_FROM` | for "Forgot password" | e.g. `GradLink <no-reply@yourdomain>` (a Resend-verified domain) |
 | `APP_URL` | no | Public origin for emailed links; defaults to the request origin. Set in `wrangler.jsonc` `vars` |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | for payments | Stripe keys |
+| `STRIPE_PRICE_PRO`, `STRIPE_PRICE_PRO_FOUNDING`, `STRIPE_PRICE_PRO_2Y`, `STRIPE_PRICE_PRO_3Y`, `STRIPE_PRICE_EXTRA_CAMPUS`, `STRIPE_PRICE_EVENT_PASS` | for payments | Stripe Price ids for each plan. `npm run stripe:setup` creates them from `lib/pricing.ts` and prints the commands that store them |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
 
 Generate an `AUTH_SECRET`:
@@ -121,8 +122,15 @@ npm run upload      # same build, uploaded as a preview version without going li
 ```
 
 Stripe webhook endpoint: `https://<your-worker-url>/api/stripe/webhook`
-(events: `checkout.session.completed`, `customer.subscription.updated`,
-`customer.subscription.deleted`).
+(events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+`customer.subscription.updated`, `customer.subscription.deleted`).
+
+## Pricing
+
+Plans and their rules (trial window, Event Pass credit, founding cap) are in
+`lib/pricing.ts`; who gets paid features is decided in `lib/server/billing.ts`.
+Stripe charges the Price ids in the `STRIPE_PRICE_*` secrets, so after changing
+an amount in `lib/pricing.ts` run `npm run stripe:setup` and store the new ids.
 
 Free-plan notes: the Worker bundle is ~2.3 MiB gzipped against the 3 MiB
 limit — check the `Total Upload … gzip` line when adding dependencies. Share

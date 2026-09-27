@@ -38,7 +38,6 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 | CSV export for companies | Employer CRM "Export CSV" | Only the college outcome report exports CSV |
 | Applications | Journey step 03 | |
 | Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
-| Year-over-year comparison | Pricing (Placement Pro) | |
 
 ## Removed from the footer until they exist
 
@@ -55,7 +54,10 @@ These are service promises, not features. Confirm each is true before launch or 
 | Claim | Where |
 |---|---|
 | "Setup in 48 hours" | CTA section |
-| "No contract lock-in" | CTA section |
+| "No contract lock-in" | CTA section. Placement Pro is billed yearly and the two and three year plans are paid upfront, so check this still reads true |
 | "Dedicated onboarding" | CTA section |
 | "UAE data residency" | CTA section. The app runs on Neon and Cloudflare; confirm the data region before keeping this |
 | "GradLink Technologies LLC" | Footer copyright. Confirm the registered company name |
+| "Priority support" | Pricing (Placement Pro) |
+| "Guided setup for your first event" | Pricing (two-year and three-year plans) |
+| "Early access to new features" | Pricing (three-year plan) |

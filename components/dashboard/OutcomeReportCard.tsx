@@ -6,46 +6,47 @@ import { Download, Lock, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import { SectionCard } from "./cards";
 import { Badge, Button } from "@/components/ui/primitives";
 import { buildReport, downloadReportCsv, type OutcomeReport } from "@/lib/report";
-import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib/billing";
+import { getEventAccess, startCheckout, PRO_FEATURES_BLURB, type EventAccess } from "@/lib/billing";
 import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow } from "@/lib/db";
 
 /**
- * The post-event outcome report — GradLink's paid feature.
+ * The post-event outcome report, GradLink's paid feature.
  *
- * Free colleges see the headline numbers (enough to know the report is worth
- * having) but the full tables and the export are behind Placement Pro.
+ * Everyone sees the headline numbers (enough to know the report is worth
+ * having). The full tables and the export need the event to have the paid
+ * features: Placement Pro, an Event Pass spent on it, or the trial window
+ * of the college's first event (lib/server/billing.ts decides).
  */
 export default function OutcomeReportCard({
-  event, students, companies, scans, shortlists, profileId, email, organization,
+  event, students, companies, scans, shortlists,
 }: {
   event: EventRow | null;
   students: StudentRow[];
   companies: CompanyRow[];
   scans: ScanRow[];
   shortlists: ShortlistRow[];
-  profileId: string;
-  email?: string;
-  organization?: string;
 }) {
-  const [pro, setPro] = useState<boolean | null>(null);
+  const [access, setAccess] = useState<EventAccess | null>(null);
   const [busy, setBusy] = useState(false);
+  const eventId = event?.id ?? "";
+  const pro = access ? access.full : null;
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const sub = await getSubscription(profileId);
-      if (!cancelled) setPro(isPro(sub));
+      const a = await getEventAccess(eventId);
+      if (!cancelled) setAccess(a);
     })();
     return () => { cancelled = true; };
-  }, [profileId]);
+  }, [eventId]);
 
   const report: OutcomeReport = buildReport({ event, students, companies, scans, shortlists });
 
   async function upgrade() {
     setError(null);
     setBusy(true);
-    const err = await startCheckout({ profileId, email: email ?? "", organization: organization ?? "" });
+    const err = await startCheckout("annual");
     if (err) {
       setError(err);
       setBusy(false);
@@ -89,12 +90,22 @@ export default function OutcomeReportCard({
         </p>
       ) : pro ? (
         <>
+          {access?.reason === "trial" && access.trialEndsAt && (
+            <p style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 12, padding: "10px 12px", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
+              This is your free trial event. The full report and export stay open until{" "}
+              {new Date(access.trialEndsAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.{" "}
+              <Link href="/pricing" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Keep them with Placement Pro</Link>.
+            </p>
+          )}
+          {access?.reason === "pass" && (
+            <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 12 }}>Unlocked for good with an Event Pass.</p>
+          )}
           <p style={{ display: "inline-flex", gap: 8, alignItems: "flex-start", fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6 }}>
             <Sparkles size={15} color="var(--accent-2)" style={{ flexShrink: 0, marginTop: 2 }} />
             <span>
               {report.resumeReady} of {report.studentsRegistered} students are resume-ready, {report.totalScans} scans
               recorded across {report.employers} employers, and {report.shortlists} shortlists created.
-              Export the full breakdown — every student, every employer, every outcome.
+              Export the full breakdown: every student, every employer, every outcome.
             </span>
           </p>
 
@@ -129,9 +140,15 @@ export default function OutcomeReportCard({
               <div style={{ fontFamily: "var(--font-display)", fontSize: 15.5, fontWeight: 700, color: "var(--text)", marginBottom: 5 }}>
                 Unlock the full report
               </div>
+              {access?.trialEndsAt && (
+                <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 8 }}>
+                  Your free trial of this report ended on{" "}
+                  {new Date(access.trialEndsAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.
+                </p>
+              )}
               <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 14, maxWidth: 560 }}>
                 {PRO_FEATURES_BLURB} Placement Pro adds the per-student and per-employer breakdown,
-                CSV exports, unlimited events and year-over-year comparison.
+                CSV exports and unlimited events.
               </p>
 
               {error && (

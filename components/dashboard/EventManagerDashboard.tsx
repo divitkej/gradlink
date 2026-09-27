@@ -171,8 +171,6 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             companies={companies}
             scans={scans}
             shortlists={shortlists}
-            profileId={session.profileId}
-            organization={session.org}
           />
         </div>
       )}

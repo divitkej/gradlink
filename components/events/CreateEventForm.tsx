@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react";
 import { createEvent, type EventStatus } from "@/lib/events";
 import { useSession } from "@/lib/session";
@@ -44,10 +45,12 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
   const [status, setStatus] = useState<EventStatus>("upcoming");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsPlan, setNeedsPlan] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setNeedsPlan(false);
     if (!session) return;
     if (endDate && startDate && endDate < startDate) {
       setError("The end date can't be before the start date.");
@@ -64,6 +67,7 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
 
     if (!res.ok || !res.event) {
       setError(res.error ?? "Couldn't create the event.");
+      setNeedsPlan(res.code === "upgrade_required");
       return;
     }
     selectEvent(res.event.id);
@@ -122,7 +126,15 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
       {error && (
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "var(--danger)" }}>
           <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-          <span>{error}</span>
+          <span>
+            {error}
+            {needsPlan && (
+              <>
+                {" "}
+                <Link href="/pricing" style={{ color: "var(--accent)", fontWeight: 600 }}>See plans</Link>
+              </>
+            )}
+          </span>
         </div>
       )}
 

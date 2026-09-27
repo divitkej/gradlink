@@ -114,14 +114,20 @@ export interface CreateEventInput {
   hostOrg?: string;
 }
 
+export interface CreateEventResult {
+  ok: boolean;
+  event?: EventRow;
+  error?: string;
+  /** "upgrade_required" when the free trial event is used and there's no plan or pass. */
+  code?: "upgrade_required";
+}
+
 /** Create an event owned by the calling college. */
-export async function createEvent(
-  input: CreateEventInput
-): Promise<{ ok: boolean; event?: EventRow; error?: string }> {
+export async function createEvent(input: CreateEventInput): Promise<CreateEventResult> {
   if (!input.title.trim()) return { ok: false, error: "Give your event a name." };
   if (!input.createdBy) return { ok: false, error: "We couldn't tell which account is creating this event." };
   try {
-    return await rpc<{ ok: boolean; event?: EventRow; error?: string }>("createEvent", input);
+    return await rpc<CreateEventResult>("createEvent", input);
   } catch (e) {
     log("createEvent", e);
     return { ok: false, error: "Couldn't create the event. Please try again." };
