@@ -18,7 +18,7 @@ GradLink no longer runs on Firestore. Authorization moved from `firestore.rules`
 | Verify live | Code looks right, must be confirmed on the deployed site |
 | Done | Fixed, commit noted |
 
-## Progress: 9 / 10 done, 1 needs the owner
+## Progress: 11 / 12 done, 1 needs the owner
 
 ## Phase 1: Core loop
 
@@ -42,3 +42,7 @@ GradLink no longer runs on Firestore. Authorization moved from `firestore.rules`
   `lib/server/rpc.ts` · Verify live · Done in "Fix Phase 1 core loop: event nav, checklist seeding, event editing"
 - [ ] **Live rules match the repo.** Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under old rules. Owner action: in the Firebase console, delete the Firestore data and Storage files (the export is in `migration/data/`), or deploy deny-all rules, or delete the project.
   `docs/archive/firebase-legacy/firestore.rules` · Verify live · Needs the owner
+- [x] **Anyone signed in could read any event's people.** Registered students (with emails), employers, scans, shortlists, analytics and event details were readable by every signed-in account. Now: students and employers only see events they joined; students see the employer list but not other students; employers see the students in their events; only the organiser sees every scan, shortlist and analytics row; employers' shortlist notes are hidden from students; join codes are only returned to the organiser; scans, shortlists and messages can only be made between people in the same event, and scan roles come from the registrations. Harness check: 38 access checks across members, other events and other colleges.
+  `lib/server/rpc.ts`, `components/dashboard/EventConsole.tsx` · Security · Done in "Scope event data to members and compute analytics live"
+- [x] **Student analytics never change.** The counters in `student_event_analytics` were created at zero and never updated, and the resume score there was always 0. Profile views, company scans, shortlists, messages received, resume score and engagement are now worked out from scans, shortlists, messages and the student profile each time they are read. Harness check: counts and engagement match the activity recorded, an inactive student stays at zero.
+  `lib/server/rpc.ts`, `db/schema.sql` · Broken · Done in "Scope event data to members and compute analytics live"

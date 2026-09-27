@@ -16,7 +16,7 @@ import { EVENT_STATUS_LABEL } from "@/lib/events";
 import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
-  listAnalytics, listShortlistsForCompany, upsertShortlist,
+  listAnalytics, listShortlistsForCompany, upsertShortlist, getEventCounts,
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ShortlistRow,
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
@@ -35,6 +35,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   const [analytics, setAnalytics] = useState<AnalyticsRow[]>([]);
   const [me, setMe] = useState<StudentRow | CompanyRow | null>(null);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
+  const [counts, setCounts] = useState({ students: 0, companies: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,9 +43,15 @@ export default function EventConsole({ eventId }: { eventId: string }) {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [ev, st, co] = await Promise.all([getEvent(eventId), getRegisteredStudents(eventId), getRegisteredCompanies(eventId)]);
+      // Students can't see who else registered, only how many.
+      const [ev, st, co, n] = await Promise.all([
+        getEvent(eventId),
+        role === "student" ? Promise.resolve([]) : getRegisteredStudents(eventId),
+        getRegisteredCompanies(eventId),
+        getEventCounts(eventId),
+      ]);
       if (cancelled) return;
-      setEvent(ev); setStudents(st); setCompanies(co);
+      setEvent(ev); setStudents(st); setCompanies(co); setCounts(n);
       if (role === "event_manager") setAnalytics(await listAnalytics(eventId));
       if (role === "student") setMe(await getStudentByProfile(session.profileId));
       if (role === "company") {
@@ -69,7 +76,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
       <EventHeader
-        event={event} role={role} studentCount={students.length} companyCount={companies.length}
+        event={event} role={role} studentCount={counts.students} companyCount={counts.companies}
         canEdit={!!event && event.created_by === session.profileId} onSaved={setEvent}
       />
 
