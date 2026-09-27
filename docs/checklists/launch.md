@@ -27,8 +27,8 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
 
 - [ ] **Custom domain.** Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it.
   Owner action, then `wrangler.jsonc`
-- [ ] **Account email: confirm email and password reset.** Built without a domain: the Worker sends through `divitkej@gmail.com` over SMTP (`lib/server/smtp.ts`, about 500 emails a day). Sign-up now emails a confirm link and sign-in is refused until it is opened (`/verify-email`); a completed password reset also confirms the email. Tested end to end on the Workers runtime against a local mail server, including resend, single-use and superseded links, and a Gmail-style login refusal. Left: create a Gmail app password and set it with `npx wrangler secret put SMTP_PASS` (or in the dashboard as a secret). Until then accounts are confirmed on creation and "Forgot password" says it is not set up. Then send one real reset to confirm Gmail accepts it.
-  `lib/server/auth-api.ts`, `lib/server/mail.ts`, `components/gradlink/VerifyEmail.tsx` · Done in "Send account email through Gmail and require email confirmation", waiting on the app password
+- [ ] **Account email: confirm email and password reset.** Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link. Sending through `divitkej@gmail.com` is paused by decision, so no sender is configured: accounts are confirmed on creation and "Forgot password" says it is not set up. To turn it on, pick a sender (a dedicated Gmail with an app password as `SMTP_USER` + `SMTP_PASS`, or Resend once the domain exists), then add it to the Privacy Policy's list of services.
+  Done in "Send account email through Gmail and require email confirmation" · Paused in "Pause account email from the personal Gmail"
 
 ## Legal and claims
 

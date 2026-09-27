@@ -46,7 +46,7 @@ const sections: LegalSection[] = [
           <li>To run your account and the features you use: profiles, events, scanning, shortlists, messages and reports.</li>
           <li>To calculate your résumé score. It is worked out automatically from fixed rules about how complete your profile is. It is guidance only and does not decide anything about you by itself.</li>
           <li>To keep GradLink secure, for example locking an account after repeated wrong passwords.</li>
-          <li>To send account emails: the link to confirm your email address when you sign up, and password reset links you ask for.</li>
+          <li>To send account emails, such as a link to confirm your email address or reset your password, once email sending is switched on. We will name the service that sends them in this policy before it starts.</li>
           <li>To take payment for Placement Pro and keep records the law requires.</li>
           <li>To answer you when you contact us.</li>
         </ul>
@@ -82,8 +82,7 @@ const sections: LegalSection[] = [
           <li><strong>Neon</strong> stores the GradLink database, in Singapore.</li>
           <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
-          <li><strong>Google (Gmail)</strong> sends account emails such as confirmation and password reset links.</li>
-        </ul>
+                  </ul>
         <p>Each one only handles your data to provide its service to us. We may also share data if the law requires it, or with a buyer if GradLink is ever sold, in which case this policy continues to apply.</p>
       </>
     ),
@@ -92,7 +91,7 @@ const sections: LegalSection[] = [
     heading: "Data stored outside the UAE",
     body: (
       <p>
-        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare, Stripe and Google operate.
+        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare and Stripe operate.
         We use these providers because they apply strong security and data protection commitments to the data they hold.
       </p>
     ),

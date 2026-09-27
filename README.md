@@ -79,7 +79,7 @@ into the build.
 |---|---|---|
 | `DATABASE_URL` | yes | Neon **pooled** connection string (Neon console → Connect) |
 | `AUTH_SECRET` | yes | ≥32 random characters; signs session cookies |
-| `SMTP_USER` | for account email | Gmail address that sends mail. Set in `wrangler.jsonc` `vars` |
+| `SMTP_USER` | for account email | Mailbox that sends mail (e.g. a Gmail). Not set yet: account email is paused |
 | `SMTP_PASS` | for account email | That Gmail's 16-character app password (Google Account, Security, 2-Step Verification, App passwords). Secret |
 | `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
 | `RESEND_API_KEY` | no | Alternative to SMTP once GradLink has a verified domain |
