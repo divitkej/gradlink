@@ -58,4 +58,7 @@ These are service promises, not features. Confirm each is true before launch or 
 | "No contract lock-in" | CTA section |
 | "Dedicated onboarding" | CTA section |
 | "UAE data residency" | CTA section. The app runs on Neon and Cloudflare; confirm the data region before keeping this |
-| "GradLink Technologies LLC" | Footer copyright. Confirm the registered company name |
+
+## Resolved claims
+
+- [x] **"GradLink Technologies LLC" in the footer.** The company is not registered yet, so the footer now reads "© GradLink". Put the registered name back once it exists. Done in "Drop the unregistered company name from the footer"

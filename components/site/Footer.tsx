@@ -52,7 +52,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: 24 }}>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>© {new Date().getFullYear()} GradLink Technologies LLC. All rights reserved. UAE.</span>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>© {new Date().getFullYear()} GradLink. All rights reserved.</span>
         </div>
       </div>
 
