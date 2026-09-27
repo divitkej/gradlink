@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword, randomToken, sha256 } from "./crypto";
 import { currentUser, sessionCookie, clearedSessionCookie } from "./session";
 import { HttpError, json } from "./http";
 import { emailEnabled, sendEmail } from "./mail";
+import { LIMITS, assertUnderLimit, recordHit, takeHit } from "./rate-limit";
 import type { AppRole } from "../session";
 
 /* ============================================================
@@ -63,6 +64,7 @@ function withCookie(body: unknown, cookie: string, status = 200): Response {
 
 /* ---------------- sign up ---------------- */
 async function signUp(request: Request, body: Body): Promise<Response> {
+  await takeHit(request, LIMITS.signUp);
   const role = body.role as SignUpRole;
   const fullName = str(body.fullName, 200);
   const email = str(body.email, 320);
@@ -111,6 +113,7 @@ async function signIn(request: Request, body: Body): Promise<Response> {
   const emailLower = str(body.email, 320).toLowerCase();
   const password = typeof body.password === "string" ? body.password : "";
   if (!emailLower || !password) throw new HttpError(400, "Enter your email and password.");
+  await assertUnderLimit(request, LIMITS.signInFailures);
 
   const sql = db();
   const rows = await sql`
@@ -122,13 +125,18 @@ async function signIn(request: Request, body: Body): Promise<Response> {
   const r = rows[0];
   if (!r) {
     await burnHashTime(password);
+    await recordHit(request, LIMITS.signInFailures);
     throw new HttpError(401, MSG.badLogin);
   }
   if (r.locked_until && new Date(r.locked_until as string).getTime() > Date.now()) throw new HttpError(429, MSG.locked);
-  if (!r.password_hash) throw new HttpError(401, MSG.noPassword);
+  if (!r.password_hash) {
+    await recordHit(request, LIMITS.signInFailures);
+    throw new HttpError(401, MSG.noPassword);
+  }
 
   const ok = await verifyPassword(password, r.password_hash as string);
   if (!ok) {
+    await recordHit(request, LIMITS.signInFailures);
     await sql`
       update auth_credentials set
         failed_attempts = case when failed_attempts + 1 >= ${MAX_FAILED_ATTEMPTS} then 0 else failed_attempts + 1 end,
@@ -166,6 +174,7 @@ function signOut(request: Request): Response {
 async function requestReset(request: Request, body: Body): Promise<Response> {
   const emailLower = str(body.email, 320).toLowerCase();
   if (!validEmail(emailLower)) throw new HttpError(400, MSG.badEmail);
+  await takeHit(request, LIMITS.resetRequest);
   // Checked before the account lookup, so the answer never depends on whether the email exists.
   if (!emailEnabled()) throw new HttpError(503, "Password reset email isn't set up yet. Please contact your GradLink administrator.");
 
@@ -198,9 +207,10 @@ async function requestReset(request: Request, body: Body): Promise<Response> {
   return json({ ok: true });
 }
 
-async function verifyReset(body: Body): Promise<Response> {
+async function verifyReset(request: Request, body: Body): Promise<Response> {
   const token = str(body.token, 200);
   if (!token) throw new HttpError(400, MSG.expired);
+  await takeHit(request, LIMITS.resetToken);
   const rows = await db()`
     select p.email from password_reset_tokens t join profiles p on p.id = t.profile_id
     where t.token_hash = ${await sha256(token)} and t.used_at is null and t.expires_at > now()
@@ -209,9 +219,10 @@ async function verifyReset(body: Body): Promise<Response> {
   return json({ ok: true, email: rows[0].email });
 }
 
-async function confirmReset(body: Body): Promise<Response> {
+async function confirmReset(request: Request, body: Body): Promise<Response> {
   const token = str(body.token, 200);
   if (!validPassword(body.password)) throw new HttpError(400, MSG.weak);
+  await takeHit(request, LIMITS.resetToken);
   const sql = db();
 
   // Consume the token atomically first, so a link can't be used twice in parallel.
@@ -262,8 +273,8 @@ export async function handleAuth(action: string, request: Request): Promise<Resp
     case "sign-in": return signIn(request, body);
     case "sign-out": return signOut(request);
     case "reset-request": return requestReset(request, body);
-    case "reset-verify": return verifyReset(body);
-    case "reset-confirm": return confirmReset(body);
+    case "reset-verify": return verifyReset(request, body);
+    case "reset-confirm": return confirmReset(request, body);
     case "change-password": return changePassword(request, body);
     default: throw new HttpError(404, "Not found.");
   }

@@ -16,6 +16,7 @@ Update this file in the same commit as the fix.
 - [x] **No security headers.** Added Content-Security-Policy, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy (camera for the scanner only) and COOP. Removed `X-Powered-By`. `next.config.ts` · Done in "Lock down the data API, uploads and response headers"
 - [x] **Third-party script loaded at runtime.** The unused `components/ui/shader-lines.tsx` pulled three.js from a CDN; deleted. · Done in "Lock down the data API, uploads and response headers"
 - [x] **Checkout trusted request data.** Now same-origin only, uses the account's own email, and returns to `APP_URL` instead of the request's Origin header. `app/api/checkout/route.ts` · Done in "Lock down the data API, uploads and response headers"
+- [x] **No per-IP limit on the auth endpoints.** Per IP: 30 wrong passwords per 15 minutes (correct sign-ins never count), 50 sign-ups per hour, 10 reset emails per hour, 30 reset-link checks per 15 minutes. Limits are generous because a whole campus can share one Wi-Fi address. Counters live in Postgres with hashed IPs, because WAF rules cannot attach to a workers.dev address. `lib/server/rate-limit.ts` · Done in "Rate-limit sign-in, sign-up and password reset per IP"
 - [x] **Sign-in timing revealed which emails have accounts.** Unknown emails now take the same hashing time. `lib/server/auth-api.ts` · Done in "Lock down the data API, uploads and response headers"
 
 ## Already sound (checked, no change needed)
@@ -31,7 +32,8 @@ Update this file in the same commit as the fix.
 ## Needs doing outside the code (before launch)
 
 - [ ] **Set `APP_URL`** in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.
-- [ ] **Rate-limit the auth endpoints.** Add a Cloudflare WAF rate limiting rule (one rule is free) on `/api/auth/*`, for example 20 requests per minute per IP. Sign-up and password guessing have no per-IP limit today.
+- [ ] **Run `npm run db:migrate`** against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.
+- [ ] **Optional, after the custom domain is connected:** add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.
 - [ ] **Least-privilege database role.** In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.
 - [ ] **Backups.** Confirm Neon's restore window covers at least 7 days.
 - [ ] **Secrets.** Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.

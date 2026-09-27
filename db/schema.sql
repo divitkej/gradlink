@@ -65,6 +65,18 @@ create table if not exists password_reset_tokens (
 );
 create index if not exists password_reset_tokens_profile_idx on password_reset_tokens (profile_id);
 
+-- Per-IP counters for the auth endpoints (lib/server/rate-limit.ts). One row
+-- per bucket, hashed IP and fixed time window; rows older than a day are
+-- swept by the app, since the Workers Free plan has no cron.
+create table if not exists rate_limits (
+  bucket        text not null,
+  ip_hash       text not null,
+  window_start  timestamptz not null,
+  hits          integer not null default 0,
+  primary key (bucket, ip_hash, window_start)
+);
+create index if not exists rate_limits_window_idx on rate_limits (window_start);
+
 -- ------------------------------------------------------------- role rows --
 create table if not exists students (
   id               text primary key default gen_random_uuid()::text,
