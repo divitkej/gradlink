@@ -12,8 +12,8 @@ import type { CheckoutPlan } from "./pricing";
      * Event Pass: one more event with the paid features, paid once.
        Passes bought in the last 60 days come off Placement Pro.
      * Placement Pro: unlimited events, the full outcome report and
-       CSV exports. Yearly (founding price for the first campuses),
-       two-year or three-year, or yearly across several campuses.
+       CSV exports. Yearly, two-year or three-year, with a founding
+       price for the first colleges on every term.
 
    Entitlement lives in the `subscriptions` and `event_passes` tables,
    written ONLY by the Stripe webhook (app/api/stripe/webhook). The data
@@ -78,12 +78,12 @@ export async function getFoundingOpen(): Promise<boolean> {
 }
 
 /** Kick off Stripe Checkout. Returns an error string, or redirects the browser. */
-export async function startCheckout(plan: CheckoutPlan, campuses = 1): Promise<string | null> {
+export async function startCheckout(plan: CheckoutPlan): Promise<string | null> {
   try {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan, campuses }),
+      body: JSON.stringify({ plan }),
     });
     const data = (await res.json()) as { url?: string; error?: string };
     if (!res.ok || !data.url) return data.error ?? "Couldn't start checkout. Please try again.";

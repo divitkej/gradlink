@@ -34,15 +34,15 @@ const PLANS = [
   { env: "STRIPE_PRICE_PRO", product: "pro", lookup: "gradlink_pro_annual", nickname: "Placement Pro, yearly", amount: aed.annualList, years: 1 },
   { env: "STRIPE_PRICE_PRO_FOUNDING", product: "pro", lookup: "gradlink_pro_annual_founding", nickname: "Placement Pro, yearly, founding price", amount: aed.annualFounding, years: 1 },
   { env: "STRIPE_PRICE_PRO_2Y", product: "pro", lookup: "gradlink_pro_two_year", nickname: "Placement Pro, two years", amount: aed.twoYear, years: 2 },
+  { env: "STRIPE_PRICE_PRO_2Y_FOUNDING", product: "pro", lookup: "gradlink_pro_two_year_founding", nickname: "Placement Pro, two years, founding price", amount: aed.twoYearFounding, years: 2 },
   { env: "STRIPE_PRICE_PRO_3Y", product: "pro", lookup: "gradlink_pro_three_year", nickname: "Placement Pro, three years", amount: aed.threeYear, years: 3 },
-  { env: "STRIPE_PRICE_EXTRA_CAMPUS", product: "campus", lookup: "gradlink_extra_campus", nickname: "Extra campus, yearly", amount: aed.extraCampus, years: 1 },
+  { env: "STRIPE_PRICE_PRO_3Y_FOUNDING", product: "pro", lookup: "gradlink_pro_three_year_founding", nickname: "Placement Pro, three years, founding price", amount: aed.threeYearFounding, years: 3 },
   { env: "STRIPE_PRICE_EVENT_PASS", product: "pass", lookup: "gradlink_event_pass", nickname: "Event Pass", amount: aed.eventPass, years: 0 },
 ];
 for (const p of PLANS) if (!Number.isInteger(p.amount)) throw new Error(`No amount for ${p.lookup} in lib/pricing.ts`);
 
 const PRODUCTS = {
   pro: { name: "GradLink Placement Pro", description: "Unlimited events, the full outcome report and CSV exports." },
-  campus: { name: "GradLink extra campus", description: "Placement Pro for one more campus." },
   pass: { name: "GradLink Event Pass", description: "One event with the full outcome report and CSV export." },
 };
 

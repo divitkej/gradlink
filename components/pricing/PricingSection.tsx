@@ -5,12 +5,12 @@ import Link from "next/link";
 import PlanCard from "./PlanCard";
 import { PRO_FEATURES, getBillingState, getFoundingOpen, startCheckout, type BillingState } from "@/lib/billing";
 import {
-  FOUNDING_CAMPUS_LIMIT, MAX_CAMPUSES, PASS_CREDIT_DAYS, PRICES_AED, TRIAL_REPORT_DAYS, formatAed,
+  FOUNDING_LIMIT, PASS_CREDIT_DAYS, PRICES_AED, TRIAL_REPORT_DAYS, formatAed,
   type CheckoutPlan,
 } from "@/lib/pricing";
 import { useSession } from "@/lib/session";
 
-type Action = "trial" | CheckoutPlan | "multi_campus";
+type Action = "trial" | CheckoutPlan;
 
 export default function PricingSection() {
   const { session, ready } = useSession();
@@ -18,7 +18,6 @@ export default function PricingSection() {
   const [error, setError] = useState<string | null>(null);
   const [founding, setFounding] = useState(false);
   const [billing, setBilling] = useState<BillingState | null>(null);
-  const [campuses, setCampuses] = useState(2);
 
   const isManager = session?.role === "event_manager";
 
@@ -36,6 +35,8 @@ export default function PricingSection() {
   }, [ready, isManager]);
 
   const annual = founding ? PRICES_AED.annualFounding : PRICES_AED.annualList;
+  const twoYear = founding ? PRICES_AED.twoYearFounding : PRICES_AED.twoYear;
+  const threeYear = founding ? PRICES_AED.threeYearFounding : PRICES_AED.threeYear;
   const subscribed = billing?.subscribed ?? false;
   const creditAed = billing ? Math.floor(billing.passCreditMinor / 100) : 0;
 
@@ -55,7 +56,7 @@ export default function PricingSection() {
       return;
     }
     setBusy(action);
-    const err = action === "multi_campus" ? await startCheckout("annual", campuses) : await startCheckout(action);
+    const err = await startCheckout(action);
     if (err) {
       setError(err);
       setBusy(null);
@@ -129,7 +130,7 @@ export default function PricingSection() {
           listPrice={founding ? formatAed(PRICES_AED.annualList) : undefined}
           cadence="per campus / year"
           note={creditNote ?? (founding
-            ? `Founding price for the first ${FOUNDING_CAMPUS_LIMIT} campuses. It stays at ${formatAed(PRICES_AED.annualFounding)} for as long as you renew.`
+            ? `Founding price for the first ${FOUNDING_LIMIT} colleges, on every plan below too. It stays at ${formatAed(PRICES_AED.annualFounding)} for as long as you renew.`
             : undefined)}
           features={PRO_FEATURES}
           cta={subscribed ? "You have Placement Pro" : "Subscribe yearly"}
@@ -146,17 +147,18 @@ export default function PricingSection() {
           Commit for longer, pay less
         </h2>
         <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 540, margin: "0 auto", lineHeight: 1.6 }}>
-          Pay upfront to lock your price, or cover every campus on one subscription.
+          Pay upfront and lock your price. Always cheaper than paying year by year{founding ? ", founding price included" : ""}.
         </p>
       </div>
 
-      <div className="pricing-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, alignItems: "stretch" }}>
+      <div className="pricing-grid pricing-grid-2" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, alignItems: "stretch", maxWidth: 760, margin: "0 auto" }}>
         <PlanCard
           name="Two years"
           tagline="Placement Pro for two years, paid once."
-          price={formatAed(PRICES_AED.twoYear)}
+          price={formatAed(twoYear)}
+          listPrice={founding ? formatAed(PRICES_AED.twoYear) : undefined}
           cadence="every 2 years"
-          note={`${formatAed(PRICES_AED.annualList * 2 - PRICES_AED.twoYear)} less than two years at the list price.`}
+          note={`${formatAed(annual * 2 - twoYear)} less than paying yearly.`}
           features={["Everything in Placement Pro", "Price locked for two years", "Guided setup for your first event"]}
           cta={subscribed ? "You have Placement Pro" : "Pay for two years"}
           disabled={subscribed}
@@ -166,9 +168,10 @@ export default function PricingSection() {
         <PlanCard
           name="Three years"
           tagline="Placement Pro for three years, paid once."
-          price={formatAed(PRICES_AED.threeYear)}
+          price={formatAed(threeYear)}
+          listPrice={founding ? formatAed(PRICES_AED.threeYear) : undefined}
           cadence="every 3 years"
-          note={`${formatAed(PRICES_AED.annualList * 3 - PRICES_AED.threeYear)} less than three years at the list price.`}
+          note={`${formatAed(annual * 3 - threeYear)} less than paying yearly.`}
           features={[
             "Everything in Placement Pro",
             "Price locked for three years",
@@ -180,36 +183,6 @@ export default function PricingSection() {
           busy={busy === "three_year"}
           onCta={() => onCta("three_year")}
         />
-        <PlanCard
-          name="Multi-campus"
-          tagline="Placement Pro for a university with more than one campus."
-          price={formatAed(PRICES_AED.extraCampus)}
-          cadence="per extra campus / year"
-          note={`${formatAed(annual + PRICES_AED.extraCampus * (campuses - 1))} a year for ${campuses} campuses.`}
-          features={[
-            "Everything in Placement Pro",
-            `Each campus after the first costs ${formatAed(PRICES_AED.extraCampus)}, not ${formatAed(PRICES_AED.annualList)}`,
-            "One subscription and one invoice",
-            "Billed yearly",
-          ]}
-          cta={subscribed ? "You have Placement Pro" : `Subscribe for ${campuses} campuses`}
-          disabled={subscribed}
-          busy={busy === "multi_campus"}
-          onCta={() => onCta("multi_campus")}
-        >
-          <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, fontSize: 13, color: "var(--text-2)", marginBottom: 14 }}>
-            Campuses
-            <select
-              value={campuses}
-              onChange={(e) => setCampuses(Number(e.target.value))}
-              style={{ height: 38, padding: "0 10px", fontSize: 14, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", colorScheme: "dark" }}
-            >
-              {Array.from({ length: MAX_CAMPUSES - 1 }, (_, i) => i + 2).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </label>
-        </PlanCard>
       </div>
 
       <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--text-muted)", marginTop: 40, lineHeight: 1.6 }}>
@@ -225,7 +198,8 @@ export default function PricingSection() {
         @keyframes gl-spin { to { transform: rotate(360deg); } }
         @media (prefers-reduced-motion: reduce) { .gl-spin { animation: none; } }
         .gl-link:hover { text-decoration: underline; }
-        @media (max-width: 960px) { .pricing-grid { grid-template-columns: 1fr !important; max-width: 520px; margin: 0 auto; } }
+        @media (max-width: 960px) { .pricing-grid:not(.pricing-grid-2) { grid-template-columns: 1fr !important; max-width: 520px; margin: 0 auto; } }
+        @media (max-width: 700px) { .pricing-grid-2 { grid-template-columns: 1fr !important; max-width: 520px !important; } }
       `}</style>
     </section>
   );

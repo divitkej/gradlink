@@ -3,21 +3,21 @@ import { db } from "@/lib/server/sql";
 import { serverEnv } from "@/lib/server/env";
 import { currentUser } from "@/lib/server/session";
 import { ACTIVE_SUB_SQL, creditablePasses, foundingOpen } from "@/lib/server/billing";
-import { MAX_CAMPUSES, isCheckoutPlan, type CheckoutPlan } from "@/lib/pricing";
+import { isCheckoutPlan, type CheckoutPlan } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
  * Creates a Stripe Checkout Session for a college buying an Event Pass or
- * Placement Pro (annual, two-year or three-year, annual with extra campuses).
+ * Placement Pro (annual, two-year or three-year).
  *
  * The buyer is always the signed-in college, never an id from the request.
  * Their profile id rides along in `client_reference_id` and metadata, so the
  * webhook knows which account to credit when payment succeeds.
  *
  * Pricing rules applied here:
- *   * annual uses the founding price while founding campuses remain;
+ *   * every term uses its founding price while founding spots remain;
  *   * Event Passes bought in the last 60 days come off the first Placement
  *     Pro payment as a one-time Stripe coupon.
  */
@@ -28,20 +28,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "Payments aren't configured yet." }, { status: 503 });
   }
 
-  let body: { plan?: unknown; campuses?: unknown };
+  let body: { plan?: unknown };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid request." }, { status: 400 });
   }
   const plan: CheckoutPlan = isCheckoutPlan(body.plan) ? body.plan : "annual";
-  const campuses = typeof body.campuses === "number" && Number.isInteger(body.campuses) ? body.campuses : 1;
-  if (campuses < 1 || campuses > MAX_CAMPUSES) {
-    return Response.json({ error: `Checkout covers 1 to ${MAX_CAMPUSES} campuses.` }, { status: 400 });
-  }
-  if (campuses > 1 && plan !== "annual") {
-    return Response.json({ error: "Multi-campus plans are billed yearly." }, { status: 400 });
-  }
 
   // Only an event manager may buy a college plan, and only for their own account.
   let user: Awaited<ReturnType<typeof currentUser>>;
@@ -87,27 +80,22 @@ export async function POST(request: Request) {
       return Response.json({ url: session.url });
     }
 
-    const founding = plan === "annual" && (await foundingOpen());
-    const mainPrice =
+    const founding = await foundingOpen();
+    const priceId =
       plan === "annual" ? (founding ? env.STRIPE_PRICE_PRO_FOUNDING : env.STRIPE_PRICE_PRO)
-      : plan === "two_year" ? env.STRIPE_PRICE_PRO_2Y
-      : env.STRIPE_PRICE_PRO_3Y;
-    const campusPrice = env.STRIPE_PRICE_EXTRA_CAMPUS;
-    if (!mainPrice || (campuses > 1 && !campusPrice)) {
+      : plan === "two_year" ? (founding ? env.STRIPE_PRICE_PRO_2Y_FOUNDING : env.STRIPE_PRICE_PRO_2Y)
+      : (founding ? env.STRIPE_PRICE_PRO_3Y_FOUNDING : env.STRIPE_PRICE_PRO_3Y);
+    if (!priceId) {
       return Response.json({ error: "This plan isn't configured yet." }, { status: 503 });
     }
-
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [{ price: mainPrice, quantity: 1 }];
-    if (campuses > 1) lineItems.push({ price: campusPrice, quantity: campuses - 1 });
 
     // Event Pass credit, capped at the first payment so it never goes negative.
     let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
     const credit = await creditablePasses(profileId);
     if (credit.amountMinor > 0) {
-      const prices = await Promise.all(lineItems.map((li) => stripe.prices.retrieve(li.price as string)));
-      const currency = prices[0].currency;
-      const firstPayment = prices.reduce((sum, p, idx) => sum + (p.unit_amount ?? 0) * (lineItems[idx].quantity ?? 1), 0);
-      const amountOff = Math.min(credit.amountMinor, firstPayment);
+      const price = await stripe.prices.retrieve(priceId);
+      const currency = price.currency;
+      const amountOff = Math.min(credit.amountMinor, price.unit_amount ?? 0);
       if (credit.currency === currency && amountOff > 0) {
         const coupon = await stripe.coupons.create({
           amount_off: amountOff,
@@ -124,12 +112,11 @@ export async function POST(request: Request) {
     const meta = {
       profileId,
       term: plan,
-      campuses: String(campuses),
       founding: founding ? "1" : "0",
     };
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: lineItems,
+      line_items: [{ price: priceId, quantity: 1 }],
       client_reference_id: profileId,
       customer_email: user.email || undefined,
       subscription_data: { metadata: { ...meta, organization: user.org ?? "" } },

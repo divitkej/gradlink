@@ -1,6 +1,6 @@
 import { db } from "./sql";
 import {
-  FOUNDING_CAMPUS_LIMIT, PASS_CREDIT_DAYS, TRIAL_MAX_EVENT_DAYS, TRIAL_REPORT_DAYS,
+  FOUNDING_LIMIT, PASS_CREDIT_DAYS, TRIAL_MAX_EVENT_DAYS, TRIAL_REPORT_DAYS,
 } from "../pricing";
 
 /* ============================================================
@@ -108,8 +108,8 @@ export async function billingState(profileId: string): Promise<BillingState> {
   };
 }
 
-/** Whether the founding price is still open, counted in campuses. */
+/** Whether the founding price is still open, counted in colleges. */
 export async function foundingOpen(): Promise<boolean> {
-  const rows = await db()`select coalesce(sum(campuses), 0)::int as used from subscriptions where founding`;
-  return Number(rows[0]?.used ?? 0) < FOUNDING_CAMPUS_LIMIT;
+  const rows = await db()`select count(*)::int as used from subscriptions where founding`;
+  return Number(rows[0]?.used ?? 0) < FOUNDING_LIMIT;
 }

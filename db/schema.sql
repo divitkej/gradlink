@@ -245,11 +245,10 @@ create table if not exists subscriptions (
   updated_at              timestamptz not null default now()
 );
 -- Added with the multi-plan pricing. `term` is the billing term of the paid
--- plan, `campuses` how many campuses it covers, and `founding` whether it was
--- bought at the founding price (lib/pricing.ts caps how many campuses get it).
+-- plan and `founding` whether it was bought at the founding price
+-- (lib/pricing.ts caps how many colleges get it).
 alter table subscriptions add column if not exists term text
   check (term in ('annual', 'two_year', 'three_year'));
-alter table subscriptions add column if not exists campuses integer not null default 1;
 alter table subscriptions add column if not exists founding boolean not null default false;
 
 -- One row per Event Pass bought (a one-off Stripe payment). A pass is spent

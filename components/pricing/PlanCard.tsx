@@ -3,7 +3,7 @@ import { Check, Loader2, ArrowRight } from "lucide-react";
 
 /** One plan on the pricing page. Pure layout: the caller decides what the button does. */
 export default function PlanCard({
-  name, tagline, price, listPrice, cadence, note, features, cta, onCta, busy, disabled, highlight, badge, children,
+  name, tagline, price, listPrice, cadence, note, features, cta, onCta, busy, disabled, highlight, badge,
 }: {
   name: string;
   tagline: string;
@@ -20,8 +20,6 @@ export default function PlanCard({
   disabled?: boolean;
   highlight?: boolean;
   badge?: string;
-  /** Extra controls between the price and the button, such as a campus picker. */
-  children?: ReactNode;
 }) {
   const inactive = busy || disabled;
   return (
@@ -58,8 +56,6 @@ export default function PlanCard({
         <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{cadence}</span>
       </div>
       {note && <p style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.55, marginBottom: 20 }}>{note}</p>}
-
-      {children}
 
       <button
         onClick={onCta}

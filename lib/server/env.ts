@@ -32,8 +32,9 @@ export interface ServerEnv {
   STRIPE_PRICE_PRO?: string;
   STRIPE_PRICE_PRO_FOUNDING?: string;
   STRIPE_PRICE_PRO_2Y?: string;
+  STRIPE_PRICE_PRO_2Y_FOUNDING?: string;
   STRIPE_PRICE_PRO_3Y?: string;
-  STRIPE_PRICE_EXTRA_CAMPUS?: string;
+  STRIPE_PRICE_PRO_3Y_FOUNDING?: string;
   STRIPE_PRICE_EVENT_PASS?: string;
   /** Workers KV namespace holding résumés, brochures and logos. */
   UPLOADS?: KVLike;

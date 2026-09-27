@@ -79,7 +79,7 @@ into the build.
 | `EMAIL_FROM` | for "Forgot password" | e.g. `GradLink <no-reply@yourdomain>` (a Resend-verified domain) |
 | `APP_URL` | no | Public origin for emailed links; defaults to the request origin. Set in `wrangler.jsonc` `vars` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | for payments | Stripe keys |
-| `STRIPE_PRICE_PRO`, `STRIPE_PRICE_PRO_FOUNDING`, `STRIPE_PRICE_PRO_2Y`, `STRIPE_PRICE_PRO_3Y`, `STRIPE_PRICE_EXTRA_CAMPUS`, `STRIPE_PRICE_EVENT_PASS` | for payments | Stripe Price ids for each plan. `npm run stripe:setup` creates them from `lib/pricing.ts` and prints the commands that store them |
+| `STRIPE_PRICE_PRO`, `STRIPE_PRICE_PRO_FOUNDING`, `STRIPE_PRICE_PRO_2Y`, `STRIPE_PRICE_PRO_2Y_FOUNDING`, `STRIPE_PRICE_PRO_3Y`, `STRIPE_PRICE_PRO_3Y_FOUNDING`, `STRIPE_PRICE_EVENT_PASS` | for payments | Stripe Price ids for each plan. `npm run stripe:setup` creates them from `lib/pricing.ts` and prints the commands that store them |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
 
 Generate an `AUTH_SECRET`:

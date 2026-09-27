@@ -57,15 +57,13 @@ export async function POST(request: Request) {
   }
 
   /**
-   * Term, campus count and founding flag, from the metadata the checkout
+   * Term and founding flag, from the metadata the checkout
    * route set. Older subscriptions carry none of it and keep their values.
    */
   function planDetails(meta: Stripe.Metadata | null | undefined): Record<string, string> {
     const out: Record<string, string> = {};
     if (!meta) return out;
     if (meta.term === "annual" || meta.term === "two_year" || meta.term === "three_year") out.term = meta.term;
-    const campuses = Number(meta.campuses);
-    if (Number.isInteger(campuses) && campuses >= 1) out.campuses = String(campuses);
     if (meta.founding === "1" || meta.founding === "0") out.founding = meta.founding === "1" ? "true" : "false";
     return out;
   }
