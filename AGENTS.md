@@ -18,6 +18,7 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `components/gradlink/` | Auth and sign-up flow, plus the global background |
 | `components/dashboard/` | Signed-in dashboard UI |
 | `components/events/`, `components/scan/` | Event and QR scan flows |
+| `components/legal/` | Privacy Policy and Terms pages and their shared layout |
 | `components/ui/` | Generic building blocks (buttons, cards, meters, sections) |
 | `components/anim/` | Reusable motion helpers |
 | `components/` (root) | App-wide pieces only: `Logo.tsx`, `Providers.tsx`. `PricingSection.tsx` moves to `components/pricing/` when pricing work starts. |

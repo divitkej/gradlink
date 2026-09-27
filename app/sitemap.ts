@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/sign-up/company", priority: 0.5 },
     { path: "/sign-up/college", priority: 0.5 },
     { path: "/sign-in", priority: 0.3 },
+    { path: "/privacy", priority: 0.2 },
+    { path: "/terms", priority: 0.2 },
   ];
   return pages.map((p) => ({
     url: `${SITE_URL}${p.path}`,

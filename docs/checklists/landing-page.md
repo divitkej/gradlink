@@ -32,7 +32,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 - [x] **Social links go nowhere.** Removed until the accounts exist.
   `components/site/Footer.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
-- [x] **20 footer column links go nowhere.** Footer rebuilt with 11 links, all to real pages or sections (automated check: pages return 200, section ids exist). Links for unbuilt pages are listed in `features-to-build.md`. Privacy, Terms and Contact removed until those pages exist (see launch blockers).
+- [x] **20 footer column links go nowhere.** Footer rebuilt with 11 links, all to real pages or sections (automated check: pages return 200, section ids exist). Links for unbuilt pages are listed in `features-to-build.md`. Contact removed until it has a page. Privacy and Terms are back in the footer bottom bar, done in "Add Privacy Policy and Terms pages" (see `launch.md`).
   `components/site/Footer.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Invented results in the outcome funnel.** Funnel, stats and "What a college sees after one fair" are labelled "Product preview · sample data"; "Career Fair 2025" and dates replaced with "Sample event".
   `components/landing/AnalyticsSection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
@@ -45,7 +45,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Phase 4: SEO
 
-- [x] **Add robots.txt and sitemap.** `app/robots.ts` (blocks dashboards, API, scan, events, reset) and `app/sitemap.ts` (7 public pages). Both use `NEXT_PUBLIC_SITE_URL`, so set it to the real domain at build time.
+- [x] **Add robots.txt and sitemap.** `app/robots.ts` (blocks dashboards, API, scan, events, reset) and `app/sitemap.ts` (9 public pages, Privacy and Terms added in "Add Privacy Policy and Terms pages"). Both use `NEXT_PUBLIC_SITE_URL`, so set it to the real domain at build time.
   `app/robots.ts`, `app/sitemap.ts`, `lib/site.ts` · Done in "Fix landing links, sample-data labels and SEO basics"
 
 ## Test pass

@@ -4,7 +4,7 @@ Scope: hosting, database, email, domain and the legal pages needed before GradLi
 
 Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Neon Free, region `aws-ap-southeast-1`).
 
-## Progress: 7 / 13 done
+## Progress: 10 / 13 done
 
 ## Hosting and database
 
@@ -30,12 +30,12 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
 
 ## Legal and claims
 
-- [ ] **Privacy Policy page.** Must cover the data in `db/schema.sql`, who sees student profiles, Stripe, Neon and Cloudflare as processors, the 30-day sign-in cookie and how to request deletion (UAE Federal Decree-Law 45 of 2021). Needs the operator's name, a contact email on the domain and the city.
-  `app/privacy/page.tsx` (to create) · Waiting on the domain
-- [ ] **Terms and Conditions page.** Needs the same three details.
-  `app/terms/page.tsx` (to create) · Waiting on the domain
-- [ ] **"UAE data residency" claim is false.** Data sits in Singapore and Neon has no UAE region. Reword or remove.
-  `components/landing/CTASection.tsx` · Waiting on a decision
+- [x] **Privacy Policy page.** Written from what the app stores and who can read it (`db/schema.sql`, `lib/server/rpc.ts`, `lib/server/files.ts`), under the UAE Personal Data Protection Law. Operator Divit Kejriwal, Dubai. Linked from the footer and sitemap. When the domain is live, change `OPERATOR.email` in `lib/site.ts` to an address on it.
+  `app/privacy/page.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in "Add Privacy Policy and Terms pages"
+- [x] **Terms and Conditions page.** Covers accounts, acceptable use, employer use of student data, Placement Pro billing (AED 3,600 per campus per year, cancel by email, no refunds except as stated), liability cap and Dubai law. Not reviewed by a lawyer: get a one-off review before taking the first payment.
+  `app/terms/page.tsx`, `components/legal/TermsOfService.tsx` · Done in "Add Privacy Policy and Terms pages"
+- [x] **"UAE data residency" claim removed.** Data sits in Singapore and Neon has no UAE region. The chip now reads "Free for students and employers", which matches the pricing page.
+  `components/landing/CTASection.tsx` · Done in "Add Privacy Policy and Terms pages"
 - [x] **Unregistered company name removed.** Footer now reads "© GradLink".
   `components/site/Footer.tsx` · Done in "Drop the unregistered company name from the footer"
 - [x] **Favicon.** `app/icon.svg` and `app/apple-icon.png` served live.
