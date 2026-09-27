@@ -77,7 +77,7 @@ into the build.
 | `AUTH_SECRET` | yes | ≥32 random characters; signs session cookies |
 | `RESEND_API_KEY` | for "Forgot password" | Resend API key (free tier) |
 | `EMAIL_FROM` | for "Forgot password" | e.g. `GradLink <no-reply@yourdomain>` (a Resend-verified domain) |
-| `APP_URL` | no | Public origin for emailed links; defaults to the request origin. Set in `wrangler.jsonc` `vars` |
+| `APP_URL` | yes, before launch | Public origin (your custom domain, for example `https://your-domain.example`) used in password-reset links, upload URLs and the Stripe return URL. Falls back to the request origin when empty. Set in `wrangler.jsonc` `vars` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
 

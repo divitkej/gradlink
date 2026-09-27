@@ -46,6 +46,17 @@ function validPassword(pw: unknown): pw is string {
   return typeof pw === "string" && pw.length >= 8 && pw.length <= 256;
 }
 
+/**
+ * A throwaway hash checked when the email has no account (or no password), so
+ * a failed sign-in costs the same time either way and response timing can't be
+ * used to find out which emails have GradLink accounts.
+ */
+let dummyHash: Promise<string> | null = null;
+async function burnHashTime(password: string) {
+  dummyHash ??= hashPassword(randomToken());
+  await verifyPassword(password, await dummyHash);
+}
+
 function withCookie(body: unknown, cookie: string, status = 200): Response {
   return json(body, { status, headers: { "Set-Cookie": cookie } });
 }
@@ -109,7 +120,10 @@ async function signIn(request: Request, body: Body): Promise<Response> {
     where c.email_lower = ${emailLower}
   `;
   const r = rows[0];
-  if (!r) throw new HttpError(401, MSG.badLogin);
+  if (!r) {
+    await burnHashTime(password);
+    throw new HttpError(401, MSG.badLogin);
+  }
   if (r.locked_until && new Date(r.locked_until as string).getTime() > Date.now()) throw new HttpError(429, MSG.locked);
   if (!r.password_hash) throw new HttpError(401, MSG.noPassword);
 

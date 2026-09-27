@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { db } from "@/lib/server/sql";
 import { serverEnv } from "@/lib/server/env";
 import { currentUser } from "@/lib/server/session";
+import { HttpError, assertSameOrigin } from "@/lib/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,14 +26,16 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { profileId?: string; email?: string; organization?: string };
+  let body: { profileId?: string; organization?: string };
   try {
+    assertSameOrigin(request);
     body = await request.json();
-  } catch {
+  } catch (err) {
+    if (err instanceof HttpError) return Response.json({ error: err.message }, { status: err.status });
     return Response.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { profileId, email, organization } = body;
+  const { profileId, organization } = body;
   if (!profileId) return Response.json({ error: "Missing profile." }, { status: 400 });
 
   // Only an event manager may buy a college plan, and only for their own
@@ -54,7 +57,8 @@ export async function POST(request: Request) {
     return Response.json({ error: "Only a college account can subscribe to Placement Pro." }, { status: 403 });
   }
 
-  const origin = request.headers.get("origin") ?? new URL(request.url).origin;
+  // Stripe sends the buyer back to our own origin, never to one the request names.
+  const origin = serverEnv().APP_URL?.replace(/\/$/, "") || new URL(request.url).origin;
   const stripe = new Stripe(secret);
 
   try {
@@ -62,9 +66,9 @@ export async function POST(request: Request) {
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       client_reference_id: profileId,
-      customer_email: email || profile.email || undefined,
+      customer_email: profile.email || undefined,
       subscription_data: {
-        metadata: { profileId, organization: organization ?? profile.organization ?? "" },
+        metadata: { profileId, organization: (organization ?? profile.organization ?? "").slice(0, 300) },
       },
       metadata: { profileId },
       success_url: `${origin}/dashboard/event-manager?upgraded=1`,
