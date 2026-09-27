@@ -19,7 +19,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Automated check" below means a Playwright run against a production build (`next build` + `next start`) at 1440px and 375px.
 
-## Progress: 13 / 16 done, 1 tracked, 2 need a real device or the live site
+## Progress: 14 / 17 done, 1 tracked, 2 need a real device or the live site
 
 ## Phase 2: Navigation fixes
 
@@ -40,6 +40,8 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `components/landing/*`, `components/gradlink/SignUpForm.tsx`, `components/dashboard/CompanyProfileEditor.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Mockups show unlabelled sample data.** Every mock screen carries a "Product preview · sample data" label (`components/landing/SampleDataLabel.tsx`). Invented hero stats (12+ colleges, 18K+ students, 200+ employers) removed.
   `HeroDashboard.tsx`, `ProductReveal.tsx`, `ReadinessSection.tsx`, `LiveEventSection.tsx`, `SpatialShowcaseSection.tsx`, `EmployerCRMSection.tsx`, `AnalyticsSection.tsx`, `HeroSection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
+- [x] **Employer CRM mockup buttons do nothing.** "Shortlist", "Add Note", "Send Follow-up", "Invite to Interview", "Export CSV" and the filter chips looked clickable (pointer cursor, hover glow) but are part of a sample-data picture. The action buttons are now one line of plain text ("Recruiter can: shortlist · add a note · ..."), the filter chips are square instead of pill-shaped, "Export CSV" is replaced by a "Product preview · sample data" label on the candidate list itself (on phones the pipeline card's label is a screen away), and the real features stay listed in `features-to-build.md`.
+  `components/landing/EmployerCRMSection.tsx` · Done in "Stop the Employer CRM mockup looking clickable"
 - [ ] **Promises features that are not built.** Kept on the page by decision. Every unbuilt feature, and where it appears, is listed in `docs/checklists/features-to-build.md`.
   `components/landing/*` · Tracked
 

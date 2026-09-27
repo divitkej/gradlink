@@ -22,7 +22,7 @@ const candidates = [
   { n: "Ahmed Nasser", d: "Finance · Year 4", r: 71, res: 75, s: "Scanned", tone: "muted" as const },
 ];
 
-const actions = ["Shortlist", "Add Note", "Send Follow-up", "Invite to Interview"];
+const actions = ["shortlist", "add a note", "send a follow-up", "invite to interview"];
 
 export default function EmployerCRMSection() {
   return (
@@ -62,7 +62,7 @@ export default function EmployerCRMSection() {
               <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 12 }}>Filter candidates by:</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {filters.map((f) => (
-                  <span key={f} style={{ fontSize: 12, color: "var(--text-2)", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", padding: "5px 12px", cursor: "pointer", transition: "all 0.18s" }} className="filter-chip">{f}</span>
+                  <span key={f} style={{ fontSize: 12, color: "var(--text-2)", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "5px 12px" }}>{f}</span>
                 ))}
               </div>
             </GlassCard>
@@ -72,15 +72,15 @@ export default function EmployerCRMSection() {
         {/* Candidate list */}
         <div>
           <GlassCard padding={0} style={{ overflow: "hidden", border: "1px solid var(--border-strong)" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Scanned Candidates</div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>42 students · Fintech firm</div>
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)", padding: "6px 12px", cursor: "pointer" }}>Export CSV</span>
+              <SampleDataLabel />
             </div>
             {candidates.map((c, i) => (
-              <div key={c.n} className="cand-row" style={{ padding: "16px 20px", borderBottom: i < candidates.length - 1 ? "1px solid var(--border)" : "none", transition: "background 0.18s" }}>
+              <div key={c.n} style={{ padding: "16px 20px", borderBottom: i < candidates.length - 1 ? "1px solid var(--border)" : "none" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                   <div style={{ display: "flex", gap: 11, alignItems: "center" }}>
                     <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.10)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-display)" }}>
@@ -97,10 +97,8 @@ export default function EmployerCRMSection() {
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Readiness <strong style={{ color: "var(--text)" }}>{c.r}%</strong></span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{c.res}%</strong></span>
                 </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {actions.map((a) => (
-                    <button key={a} className="cand-action" style={{ fontSize: 11, fontWeight: 600, color: a === "Shortlist" ? "var(--accent-2)" : "var(--text-2)", background: a === "Shortlist" ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)", border: `1px solid ${a === "Shortlist" ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--r-sm)", padding: "6px 11px", cursor: "pointer", transition: "all 0.18s" }}>{a}</button>
-                  ))}
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
+                  Recruiter can: {actions.join(" · ")}
                 </div>
               </div>
             ))}
@@ -109,9 +107,6 @@ export default function EmployerCRMSection() {
       </div>
 
       <style>{`
-        .filter-chip:hover { color: var(--accent) !important; border-color: var(--border-strong) !important; }
-        .cand-row:hover { background: rgba(255,255,255,0.02); }
-        .cand-action:hover { border-color: var(--border-strong) !important; color: var(--text) !important; }
         @media (max-width: 900px) { .crm-grid { grid-template-columns: 1fr !important; gap: 24px !important; } }
       `}</style>
     </Section>

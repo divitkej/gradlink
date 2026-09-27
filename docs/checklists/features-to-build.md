@@ -35,7 +35,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 | Candidate filters (degree, graduation year, GPA, skills, readiness, résumé score, activity, stage) | Employer CRM filter chips | Check which filters the company dashboard supports; GPA is not stored |
 | Candidate stages "Contacted", "Interview", "Offer" | Employer CRM pipeline, Platform tab CRM mini | Real stages are shortlisted, priority, maybe, not a fit |
 | Bulk messages | Why GradLink card "Helps employers follow up faster" | Only one-to-one messages |
-| CSV export for companies | Employer CRM "Export CSV" | Only the college outcome report exports CSV |
+| CSV export for companies | Not shown any more (the mockup's "Export CSV" was removed) | Only the college outcome report exports CSV |
 | Applications | Journey step 03 | |
 | Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
 | Year-over-year comparison | Pricing (Placement Pro) | |
