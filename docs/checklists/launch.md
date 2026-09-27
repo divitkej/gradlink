@@ -4,7 +4,7 @@ Scope: hosting, database, email, domain and the legal pages needed before GradLi
 
 Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Neon Free, region `aws-ap-southeast-1`).
 
-## Progress: 10 / 13 done
+## Progress: 10 / 14 done
 
 ## Hosting and database
 
@@ -18,12 +18,14 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`
 - [x] **Vercel removed from the repo.** Starter SVGs in `public/` and the `.vercel` ignore entry deleted.
   Done in "Remove leftover Vercel starter files and ignore entry"
+- [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
+  Owner action
 - [ ] **Old Vercel site still live.** `https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it).
   Owner action
 
 ## Domain and email
 
-- [ ] **Custom domain.** Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and rebuild with `NEXT_PUBLIC_SITE_URL` set to it.
+- [ ] **Custom domain.** Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it.
   Owner action, then `wrangler.jsonc`
 - [ ] **Password reset email.** Neon side is ready. Needs the domain verified in Resend, then `RESEND_API_KEY` and `EMAIL_FROM` set as Worker secrets. Until then "Forgot password" says it is not set up.
   `lib/server/mail.ts` · Blocked on the domain
