@@ -10,8 +10,8 @@ const sections: LegalSection[] = [
     heading: "Who you are agreeing with",
     body: (
       <p>
-        GradLink is run by <strong>{OPERATOR.name}</strong>, an individual based in {OPERATOR.location} (&quot;we&quot; or
-        &quot;us&quot;). GradLink is not yet a registered company. By creating an account or using GradLink, you agree to these
+        GradLink is run by <strong>{OPERATOR.name}</strong>, an individual based in {OPERATOR.location} (“we” or
+        “us”). GradLink is not yet a registered company. By creating an account or using GradLink, you agree to these
         terms and to our <a href="/privacy">Privacy Policy</a>. If you use GradLink for an organisation, you confirm you are
         allowed to accept these terms for it.
       </p>
@@ -27,7 +27,7 @@ const sections: LegalSection[] = [
           <li><strong>Companies</strong> join events, scan and shortlist students and message them.</li>
           <li><strong>Colleges</strong> create and run events and see their outcomes.</li>
         </ul>
-        <p>You must be 18 or older, or have a parent or guardian&apos;s permission, to use GradLink.</p>
+        <p>You must be 18 or older, or have a parent or guardian’s permission, to use GradLink.</p>
       </>
     ),
   },
@@ -48,7 +48,7 @@ const sections: LegalSection[] = [
       <p>
         You own what you add to GradLink, such as your profile, résumé, notes and messages. You give us permission to store,
         display and process it only as needed to run GradLink, including showing it to other users as described in the
-        Privacy Policy. You confirm you have the right to share it and that it does not break anyone else&apos;s rights or the law.
+        Privacy Policy. You confirm you have the right to share it and that it does not break anyone else’s rights or the law.
       </p>
     ),
   },
@@ -61,7 +61,7 @@ const sections: LegalSection[] = [
           <li>give false information, pretend to be someone else, or post fake job opportunities,</li>
           <li>harass, threaten or discriminate against anyone, or send spam,</li>
           <li>upload anything unlawful, offensive, or containing viruses or harmful code,</li>
-          <li>copy, scrape or collect other users&apos; data by automated means,</li>
+          <li>copy, scrape or collect other users’ data by automated means,</li>
           <li>try to get around security, access accounts or data that are not yours, or overload the service,</li>
           <li>use GradLink in a way that breaks UAE law or the law where you are.</li>
         </ul>
@@ -110,9 +110,9 @@ const sections: LegalSection[] = [
     heading: "Availability and changes",
     body: (
       <p>
-        We work to keep GradLink running, but it is provided &quot;as is&quot; and may sometimes be unavailable, for example during
+        We work to keep GradLink running, but it is provided “as is” and may sometimes be unavailable, for example during
         maintenance or problems with our hosting providers. We may improve, change or remove features. If we plan to shut
-        GradLink down, we will give you at least 30 days&apos; notice so you can ask for a copy of your data.
+        GradLink down, we will give you at least 30 days’ notice so you can ask for a copy of your data.
       </p>
     ),
   },

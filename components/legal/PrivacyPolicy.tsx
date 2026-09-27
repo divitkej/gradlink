@@ -14,7 +14,7 @@ const sections: LegalSection[] = [
       <>
         <p>
           GradLink is run by <strong>{OPERATOR.name}</strong>, an individual based in {OPERATOR.location}. GradLink is not yet a
-          registered company. Until it is, {OPERATOR.name} is responsible for your personal data under this policy (the &quot;controller&quot;).
+          registered company. Until it is, {OPERATOR.name} is responsible for your personal data under this policy (the “controller”).
         </p>
         <p>For anything about your data, email {mail}.</p>
       </>
@@ -64,7 +64,7 @@ const sections: LegalSection[] = [
         <p>GradLink exists to connect students with employers and colleges, so most of what you add is shared with other people who use it:</p>
         <ul>
           <li>
-            <strong>Visible to other signed-in GradLink users:</strong> profiles (including a student&apos;s résumé and links), company
+            <strong>Visible to other signed-in GradLink users:</strong> profiles (including a student’s résumé and links), company
             profiles, events and who is registered for them, scans, shortlist statuses and the notes attached to them.
           </li>
           <li><strong>Visible only to the people involved:</strong> messages (the sender and the recipient).</li>
@@ -105,7 +105,7 @@ const sections: LegalSection[] = [
         <li>Password reset links: they expire after 60 minutes.</li>
         <li>Sign-in cookie: up to 30 days, or until you sign out.</li>
         <li>Billing records: as long as UAE law requires us to keep them.</li>
-        <li>Request logs: for as long as Cloudflare&apos;s standard log retention.</li>
+        <li>Request logs: for as long as Cloudflare’s standard log retention.</li>
       </ul>
     ),
   },
@@ -143,7 +143,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         GradLink sets one cookie, which keeps you signed in. It is needed for the site to work, so there is no cookie banner.
-        We also save your checklist ticks in your browser&apos;s local storage so they load quickly. We do not use advertising or
+        We also save your checklist ticks in your browser’s local storage so they load quickly. We do not use advertising or
         analytics cookies.
       </p>
     ),
@@ -153,7 +153,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         GradLink is built for university students, employers and colleges. If you are under 18, you need a parent or
-        guardian&apos;s permission to use it. If you believe someone under 18 has given us data without that permission, email {mail} and we will delete it.
+        guardian’s permission to use it. If you believe someone under 18 has given us data without that permission, email {mail} and we will delete it.
       </p>
     ),
   },
