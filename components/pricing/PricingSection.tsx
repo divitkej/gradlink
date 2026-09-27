@@ -186,7 +186,7 @@ export default function PricingSection() {
       </div>
 
       <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--text-muted)", marginTop: 40, lineHeight: 1.6 }}>
-        Prices are in UAE dirhams. Students and employers never pay to use GradLink.{" "}
+        Prices are in UAE dirhams, with no VAT added. Students and employers never pay to use GradLink.{" "}
         <Link href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Create a free account
         </Link>

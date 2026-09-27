@@ -37,7 +37,6 @@ A multi-campus plan (AED 3,600 per extra campus) was built and then cut until th
 - [ ] **Store the Stripe keys as Worker secrets.** `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` (`npx wrangler secret put <NAME>`).
 - [ ] **Point the Stripe webhook at the Worker.** `https://<domain>/api/stripe/webhook` with `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.updated`, `customer.subscription.deleted`.
 - [ ] **Run one test purchase of each plan in Stripe test mode.** Check the `subscriptions` or `event_passes` row, then that the report unlocks and a second event can be created.
-- [ ] **Confirm VAT.** Prices are shown without VAT. If GradLink is VAT-registered in the UAE, say whether prices include the 5%, and turn on Stripe Tax or add it to the Prices.
 - [ ] **Confirm the service promises.** Priority support, guided setup for the first event (two and three years), early access to new features (three years). See "Claims to confirm" in `features-to-build.md`.
 
 - [x] **Multi-year cost more than founding yearly.** Two founding years were AED 7,200 against AED 8,200 for the two-year plan. Multi-year now gets the founding price too (AED 6,120 and AED 8,640), and the list prices are AED 8,160 and AED 11,500, so a longer term is always cheaper.
@@ -45,7 +44,11 @@ A multi-campus plan (AED 3,600 per extra campus) was built and then cut until th
 - [x] **Multi-campus plan cut.** It had no per-campus accounts behind it, so extra campuses bought nothing in the app.
   `components/pricing/PricingSection.tsx`, `app/api/checkout/route.ts` · Done in "Cut multi-campus plan and make multi-year cheaper than paying yearly"
 
+- [x] **VAT.** GradLink is not VAT-registered, so no VAT is charged and the page says "with no VAT added".
+  `components/pricing/PricingSection.tsx` · Done in "State that prices carry no VAT"
+
 ## Known limits
 
 - The founding cap is checked when checkout starts. Two colleges paying at the same moment for the last spot can both get it, so the cap can overshoot by a college or two.
 - An Event Pass is spent on the next event created, not on an event that already exists. A college whose subscription lapses can't use a pass to reopen an older event's report.
+- VAT registration becomes mandatory once taxable sales pass AED 375,000 in 12 months (voluntary from AED 187,500). After registering, add 5% VAT in Stripe (Stripe Tax or tax rates on the Prices), show a TRN on invoices, and update the pricing page line.
