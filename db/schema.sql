@@ -235,6 +235,9 @@ create table if not exists checklist_items (
   order_index  integer not null default 0
 );
 create index if not exists checklist_items_event_role_idx on checklist_items (event_id, role, order_index);
+-- Lets the default checklist (lib/server/checklist-template.ts) be added to an
+-- event safely more than once: repeats are ignored.
+create unique index if not exists checklist_items_event_item_uniq on checklist_items (event_id, role, phase, title);
 
 create table if not exists checklist_progress (
   id                 text primary key default gen_random_uuid()::text,

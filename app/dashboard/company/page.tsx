@@ -80,9 +80,9 @@ function CompanyOverview({ eventId }: { eventId: string }) {
           <GlassPanel style={{ border: "1px solid var(--border-strong)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
               <div>
-                <Badge tone="amber" pulse>{eventTitle} · Booth {me?.booth_number ?? "—"}</Badge>
+                <Badge tone="amber" pulse>{eventTitle} · Booth {me?.booth_number ?? "not set"}</Badge>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{orgName} Recruiting</h2>
-                <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 460 }}>Scan students at your booth, shortlist your best matches, and follow up — all from here.</p>
+                <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 460 }}>Scan students at your booth, shortlist your best matches, and follow up, all from here.</p>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                 <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scan students</Link>
@@ -119,7 +119,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "26px 24px 34px", textAlign: "center" }}>
                 <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-2)" }}><Users size={22} /></div>
                 <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No students scanned yet</div>
-                <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Open the scanner and scan a student&apos;s QR at your booth — they&apos;ll show up here with their portfolio and resume score.</p>
+                <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Open the scanner and scan a student&apos;s QR at your booth. They&apos;ll show up here with their portfolio and resume score.</p>
                 <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}><ScanLine size={15} /> Open scanner</Link>
               </div>
             ) : (
@@ -160,7 +160,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
                   <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{eventTitle}</span>
                   <Badge tone="amber" pulse>Live</Badge>
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "—"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "not set"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
               </div>
               <div style={{ marginTop: 12 }}>
                 <Link href={`/events/${eventId}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>Open event console →</Link>

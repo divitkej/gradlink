@@ -4,6 +4,7 @@
 |---|---|
 | `checklists/` | Live launch checklists, one file per area. Tick items in the same commit as the fix. |
 | `checklists/landing-page.md` | Landing page (`/`) and shared marketing chrome |
+| `checklists/dashboard.md` | Signed-in pages, event and scan flows, and the 404 page |
 | `checklists/launch.md` | Hosting, database, domain, email and legal pages before public launch |
 | `checklists/features-to-build.md` | Features the site shows that the app does not have yet, plus claims to confirm |
 | `brand/` | Sources for the share images and icons. See `brand/README.md`. |

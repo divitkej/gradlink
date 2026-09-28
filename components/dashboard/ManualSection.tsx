@@ -24,8 +24,8 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     accent: "var(--accent-2)",
     steps: [
       "Scan a student's QR code at your booth.",
-      "View their full portfolio — skills, resume, links and bio.",
-      "Check their AI resume score and feedback at a glance.",
+      "View their full portfolio: skills, resume, links and bio.",
+      "Check their resume score and feedback at a glance.",
       "Shortlist, reject, or mark a candidate as a maybe.",
       "Add private notes while the conversation is fresh.",
       "Message strong candidates directly from their profile.",

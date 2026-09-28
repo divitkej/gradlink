@@ -81,7 +81,7 @@ export default function QRCard({
           <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-display)" }}>{caption}</div>
           {sub && <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 2 }}>{sub}</div>}
           <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 10, lineHeight: 1.5, maxWidth: 240 }}>
-            Show this at the booth — a scan opens your live profile instantly.
+            Show this at the booth. A scan opens your live profile instantly.
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
+import { CHECKLIST_TEMPLATE } from "./checklist-template";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -22,6 +23,19 @@ type Args = unknown[];
 type Op = (user: AuthUser, args: Args) => Promise<unknown>;
 
 const forbidden = () => new HttpError(403, "You don't have permission to do that.");
+
+/** Adds the default checklist to an event. Safe to repeat: existing items are kept. */
+async function addDefaultChecklist(eventId: string): Promise<void> {
+  await db()`
+    insert into checklist_items (event_id, role, phase, order_index, title, description)
+    select ${eventId}, x.role, x.phase, x.order_index, x.title, x.description
+    from json_to_recordset(${JSON.stringify(CHECKLIST_TEMPLATE)}::json)
+      as x(role text, phase text, order_index int, title text, description text)
+    where exists (select 1 from events where id = ${eventId})
+      and not exists (select 1 from checklist_items where event_id = ${eventId})
+    on conflict do nothing
+  `;
+}
 
 function isMe(user: AuthUser, id: unknown) {
   if (id !== user.id) throw forbidden();
@@ -137,12 +151,17 @@ export const ops: Record<string, Op> = {
   async recordScan(u, [input]) {
     const i = (input ?? {}) as Row;
     isMe(u, i.scannerProfileId);
-    await db()`
+    // A scan belongs to an event. Without one (a hand-typed link, or before
+    // joining) there is nothing to record, so it is skipped rather than failing.
+    const rows = await db()`
       insert into scans (event_id, scanner_profile_id, scanned_profile_id, scanner_role, scanned_role, scan_context, notes)
-      values (${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${textOrNull(i.scannerRole, 50)},
-              ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)})
+      select ${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${textOrNull(i.scannerRole, 50)},
+             ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
+      where exists (select 1 from events where id = ${s(i.eventId)})
+        and exists (select 1 from profiles where id = ${s(i.scannedProfileId)})
+      returning id
     `;
-    return true;
+    return rows.length > 0;
   },
   async getScans(_u, [filter]) {
     const f = (filter ?? {}) as Row;
@@ -220,6 +239,8 @@ export const ops: Record<string, Op> = {
 
   /* Checklist */
   async getChecklistItems(_u, [role, eventId]) {
+    // Events created before the default checklist existed get it on first view.
+    if (s(eventId)) await addDefaultChecklist(s(eventId));
     return db()`
       select id, event_id, role, title, description, phase, order_index from checklist_items
       where event_id = ${s(eventId)} and role = ${s(role)} order by order_index asc
@@ -300,6 +321,9 @@ export const ops: Record<string, Op> = {
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
               values (${id}, ${u.id}, 'event_manager', true)`,
         ]);
+        // A failure here must not report the event as failed: the checklist is
+        // also added the first time anyone opens it.
+        await addDefaultChecklist(id).catch((err) => console.error("[rpc] default checklist", err));
         return { ok: true, event: rows[0] };
       } catch (err) {
         if ((err as { code?: string }).code === "23505") continue; // join_code clash — retry

@@ -89,7 +89,7 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
               borderRadius: "var(--r-md)", outline: "none", colorScheme: "dark",
             }}
           >
-            <option value="draft">Draft — not visible yet</option>
+            <option value="draft">Draft (not visible yet)</option>
             <option value="upcoming">Upcoming</option>
             <option value="live">Live now</option>
           </select>
