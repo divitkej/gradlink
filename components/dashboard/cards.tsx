@@ -196,3 +196,60 @@ export function ErrorBlock({ title = "Couldn't load this", body }: { title?: str
     </div>
   );
 }
+
+/** Compact action button for rows and cards. Square corners, never a pill. */
+export function SmallButton({
+  children,
+  onClick,
+  tone = "default",
+  disabled = false,
+  icon,
+  type = "button",
+  ariaLabel,
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+  tone?: "default" | "primary" | "danger";
+  disabled?: boolean;
+  icon?: ReactNode;
+  type?: "button" | "submit";
+  ariaLabel?: string;
+}) {
+  const tones = {
+    default: { color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)" },
+    primary: { color: "#0A0A0A", background: "var(--accent)", border: "1px solid var(--accent)" },
+    danger: { color: "var(--danger)", background: "rgba(255,107,107,0.06)", border: "1px solid rgba(255,107,107,0.28)" },
+  }[tone];
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={ariaLabel}
+      className="gl-small-btn"
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, height: 34, padding: "0 12px",
+        fontSize: 12.5, fontWeight: 600, borderRadius: "var(--r-sm)", cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.55 : 1, whiteSpace: "nowrap", transition: "background 0.15s", ...tones,
+      }}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}
+
+/** Shared style for text inputs and selects in dashboard forms. */
+export const fieldStyle: React.CSSProperties = {
+  width: "100%", height: 40, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)",
+  border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none",
+};
+
+export function Labeled({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: "var(--text-2)" }}>
+      {label}
+      {children}
+    </label>
+  );
+}

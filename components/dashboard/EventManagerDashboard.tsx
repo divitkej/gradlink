@@ -62,7 +62,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
           <div>
             <Badge tone="amber" pulse>{event?.title ?? "Career Fair"} · Live Monitor</Badge>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{session?.org ?? "Career Center"}</h2>
-            <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity, and placement outcomes — connected to your event database.</p>
+            <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity, and placement outcomes, connected to your event database.</p>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
@@ -146,7 +146,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
       <SectionCard title="Students needing attention" hint="Low or no engagement" accent="rgba(247,201,72,0.22)">
         <div id="students" />
         {needHelp.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "All students are engaged 🎉"}</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "No student is below an engagement score of 40."}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {needHelp.map((a) => (

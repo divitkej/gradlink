@@ -107,8 +107,8 @@ export function buildReport(input: {
       ).length;
       const mine = shortlists.filter((s) => s.company_id === pid);
       return {
-        name: c.company_name ?? c.company ?? "—",
-        booth: c.booth_number ?? "—",
+        name: c.company_name ?? c.company ?? "Unnamed company",
+        booth: c.booth_number ?? "Not set",
         studentScans,
         shortlisted: mine.filter(positive).length,
         rejected: mine.filter((s) => s.status === "rejected").length,
@@ -134,9 +134,9 @@ export function buildReport(input: {
       return {
         name: s.full_name,
         email: s.email,
-        degree: s.degree ?? "—",
-        university: s.university ?? "—",
-        graduationYear: s.graduation_year ? String(s.graduation_year) : "—",
+        degree: s.degree ?? "Not set",
+        university: s.university ?? "Not set",
+        graduationYear: s.graduation_year ? String(s.graduation_year) : "Not set",
         resumeScore: score,
         companiesMet,
         shortlists: shortlistCount,
@@ -156,8 +156,8 @@ export function buildReport(input: {
 
   return {
     eventTitle: event?.title ?? "Career Fair",
-    eventDate: event?.start_date ? new Date(event.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "—",
-    location: event?.location ?? "—",
+    eventDate: event?.start_date ? new Date(event.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "Not set",
+    location: event?.location ?? "Not set",
     generatedAt: new Date().toLocaleString("en-GB"),
 
     studentsRegistered: students.length,
@@ -194,7 +194,7 @@ function csvRows(rows: unknown[][]): string {
 /** One CSV containing the summary, the employer table and the student table. */
 export function reportToCsv(r: OutcomeReport): string {
   const blocks: unknown[][] = [
-    ["GradLink — Post-event outcome report"],
+    ["GradLink: Post-event outcome report"],
     ["Event", r.eventTitle],
     ["Date", r.eventDate],
     ["Location", r.location],

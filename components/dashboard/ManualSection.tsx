@@ -10,13 +10,13 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     icon: GraduationCap,
     accent: "var(--accent)",
     steps: [
-      "View the companies registered for the event.",
-      "Filter companies by sector and role to find your best fits.",
-      "Save the companies you want to visit before the event.",
-      "During the event, scan company QR codes to capture roles and booths.",
-      "Show your own QR code so recruiters can pull up your profile instantly.",
-      "Track your checklist across the pre-, during-, and post-event phases.",
-      "After the event, follow up with companies that scanned or shortlisted you.",
+      "Complete your career profile: résumé, skills, projects, target roles and links.",
+      "Work through your action plan until you earn the Fair-Ready badge.",
+      "Book workshops, mock interviews and company sessions on the schedule. Full sessions have a waitlist.",
+      "Save the companies you want to meet. They join your booked sessions in your event plan.",
+      "At the event, check in at the entrance, show your QR at booths and scan company QR codes.",
+      "Your digital passport records each check-in, session, booth visit and follow-up.",
+      "After the event, follow up with companies and log applications, interviews and offers.",
     ],
   },
   company: {
@@ -24,11 +24,12 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     accent: "var(--accent-2)",
     steps: [
       "Scan a student's QR code at your booth.",
-      "View their full portfolio — skills, resume, links and bio.",
-      "Check their AI resume score and feedback at a glance.",
+      "View their full portfolio: skills, resume, links and bio.",
+      "Check their résumé score and feedback at a glance.",
       "Shortlist, reject, or mark a candidate as a maybe.",
       "Add private notes while the conversation is fresh.",
       "Message strong candidates directly from their profile.",
+      "Run company sessions, mock interviews or 1:1 slots from the event page and mark who attended.",
       "Review and export all scanned students after the event.",
     ],
   },
@@ -36,6 +37,7 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     icon: Briefcase,
     accent: "var(--amber)",
     steps: [
+      "Publish workshops, mock interviews and other sessions from the event page.",
       "Track scans and engagement live as the event runs.",
       "View per-student analytics and readiness scores.",
       "Monitor company activity and booth engagement.",
@@ -74,7 +76,7 @@ export default function ManualSection({ defaultRole = "student" }: { defaultRole
               key={t.key}
               onClick={() => setActive(t.key)}
               style={{
-                fontSize: 12.5, fontWeight: 600, padding: "7px 14px", borderRadius: "var(--r-full)", cursor: "pointer",
+                fontSize: 12.5, fontWeight: 600, padding: "7px 14px", borderRadius: "var(--r-sm)", cursor: "pointer",
                 color: on ? "#0A0A0A" : "var(--text-2)",
                 background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)",
                 border: `1px solid ${on ? "transparent" : "var(--border)"}`,

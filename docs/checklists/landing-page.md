@@ -67,4 +67,4 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Outside this checklist
 
-- Signed-in dashboards, scan views and event forms still use em dashes in about 20 places of visible copy (toasts, empty states, helper text). They belong in a dashboard checklist when that work starts.
+- Em dashes in the visible copy of the signed-in dashboards, scan views and event forms were removed in "Complete the student dashboard against the landing page". Dashboard work is tracked in `docs/checklists/student-dashboard.md`.

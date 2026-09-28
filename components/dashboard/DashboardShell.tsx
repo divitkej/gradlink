@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2,
   MessageSquare, BarChart3, Users, Briefcase, ScanLine,
-  Search, Bell, Menu, X, BookOpen, Network, LogOut, History,
+  Bell, Menu, X, BookOpen, Network, LogOut, History, Gauge, CalendarClock, Stamp,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
@@ -27,8 +27,12 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Event", href: EV, icon: CalendarDays },
     { label: "My QR", href: "/dashboard/student#qr", icon: QrCode },
     { label: "Scanner", href: "/scan", icon: ScanLine },
-    { label: "Checklist", href: "/dashboard/student#checklist", icon: ListChecks },
+    { label: "Readiness", href: "/dashboard/student#readiness", icon: Gauge },
+    { label: "Schedule", href: "/dashboard/student/schedule", icon: CalendarClock },
+    { label: "Passport", href: "/dashboard/student/passport", icon: Stamp },
     { label: "Companies", href: "/dashboard/student#companies", icon: Building2 },
+    { label: "Applications", href: "/dashboard/student/applications", icon: Briefcase },
+    { label: "Checklist", href: "/dashboard/student#checklist", icon: ListChecks },
     { label: "Career Profile", href: "/dashboard/profile", icon: UserCircle },
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Manual", href: "/dashboard/student#manual", icon: BookOpen },
@@ -197,11 +201,6 @@ export default function DashboardShell({
             {ROLE_LABEL[activeRole]}
           </span>
           <div style={{ flex: 1 }} />
-          <div className="dash-search" style={{ position: "relative", display: "flex", alignItems: "center", width: 220 }}>
-            <Search size={15} style={{ position: "absolute", left: 12, color: "var(--text-muted)" }} />
-            <input placeholder="Search…" aria-label="Search" className="gl-input"
-              style={{ width: "100%", height: 38, padding: "0 12px 0 34px", fontSize: 13, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", outline: "none" }} />
-          </div>
           <button
             onClick={() => router.push("/dashboard/messages")}
             aria-label={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "Notifications"}
@@ -237,14 +236,12 @@ export default function DashboardShell({
 
       <style>{`
         .dash-nav:hover { color: var(--text) !important; background: rgba(255,255,255,0.04); }
-        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
         @media (max-width: 920px) {
           .dash-sidebar { display: none !important; }
           .dash-main { margin-left: 0 !important; }
           .dash-burger { display: flex !important; }
-          .dash-search { width: 150px !important; }
         }
-        @media (max-width: 560px) { .dash-search, .dash-rolechip { display: none !important; } }
+        @media (max-width: 560px) { .dash-rolechip { display: none !important; } }
       `}</style>
     </div>
   );

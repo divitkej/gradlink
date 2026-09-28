@@ -149,7 +149,7 @@ function ResumeScore({ student }: { student: StudentRow }) {
   const evalr = evaluateResume(student);
   const tone = scoreTone(evalr.score);
   return (
-    <SectionCard title="AI resume score" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Auto-evaluated</span>}>
+    <SectionCard title="Résumé score" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Rule-based</span>}>
       <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
         <ScoreRing score={evalr.score} tone={tone} label="/ 100" />
         <div style={{ flex: 1, minWidth: 220 }}>
@@ -304,9 +304,9 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
     .slice(0, 3);
 
   const suggested =
-    companyScans === 0 ? "Nudge this student to visit booths — no company has scanned them yet."
+    companyScans === 0 ? "Nudge this student to visit booths. No company has scanned them yet."
     : resumeScore < 60 ? "Recommend a resume clinic before more recruiter meetings."
-    : engagement >= 75 ? "High performer — surface to top employers for fast-track interviews."
+    : engagement >= 75 ? "High performer. Surface to top employers for fast-track interviews."
     : "On track. Encourage follow-ups with scanned companies.";
 
   return (
@@ -352,7 +352,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
       )}
 
       {fb?.summary && (
-        <SectionCard title="AI resume feedback" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> AI</span>}>
+        <SectionCard title="Résumé feedback" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Rule-based</span>}>
           <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6 }}>{fb.summary}</p>
         </SectionCard>
       )}

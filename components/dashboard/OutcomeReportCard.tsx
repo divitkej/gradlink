@@ -94,7 +94,7 @@ export default function OutcomeReportCard({
             <span>
               {report.resumeReady} of {report.studentsRegistered} students are resume-ready, {report.totalScans} scans
               recorded across {report.employers} employers, and {report.shortlists} shortlists created.
-              Export the full breakdown — every student, every employer, every outcome.
+              Export the full breakdown: every student, every employer, every outcome.
             </span>
           </p>
 

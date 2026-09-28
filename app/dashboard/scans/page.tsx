@@ -46,7 +46,7 @@ export default function ScansPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "34px 24px 42px", textAlign: "center" }}>
             <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}><History size={22} /></div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No scans yet</div>
-            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Every QR scan you make — or that someone makes of you — will be logged here.</p>
+            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Every QR scan you make, or that someone makes of you, is logged here.</p>
           </div>
         ) : (
           scans.map((s) => {

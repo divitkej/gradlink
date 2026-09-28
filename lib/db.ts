@@ -1,6 +1,7 @@
 "use client";
 
 import { rpc, api } from "./api-client";
+import type { EngagementCounts } from "./engagement";
 
 /* ============================================================
    GradLink event-platform data access layer.
@@ -40,6 +41,15 @@ export interface StudentRow {
   bio: string | null;
   resume_score: number | null;
   ai_feedback: AIFeedback | string | null;
+  career_goal?: string | null;
+  target_roles?: string[] | null;
+  projects?: StudentProject[] | null;
+}
+
+export interface StudentProject {
+  title: string;
+  url?: string;
+  description?: string;
 }
 
 export interface CompanyRow {
@@ -121,6 +131,94 @@ export interface ChecklistProgressRow {
   completed: boolean;
   completed_at: string | null;
 }
+
+export type SessionKind = "workshop" | "mock_interview" | "company_session" | "recruiter_slot" | "networking" | "talk";
+export type BookingStatus = "booked" | "waitlisted" | "attended" | "cancelled";
+
+export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
+  workshop: "Workshop",
+  mock_interview: "Mock interview",
+  company_session: "Company session",
+  recruiter_slot: "1:1 recruiter slot",
+  networking: "Networking",
+  talk: "Talk",
+};
+
+export interface SessionRow {
+  id: string;
+  created_at: string;
+  event_id: string;
+  host_profile_id: string | null;
+  kind: SessionKind;
+  title: string;
+  description: string | null;
+  location: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  capacity: number | null;
+  host_name: string | null;
+  host_org: string | null;
+  host_role: string | null;
+  booked_count: number;
+  waitlist_count: number;
+  /** The signed-in user's booking, if any (never "cancelled"). */
+  my_status: BookingStatus | null;
+  my_waitlist_position: number | null;
+}
+
+export interface SessionBookingRow {
+  profile_id: string;
+  status: BookingStatus;
+  created_at: string;
+  full_name: string;
+  university: string | null;
+  degree: string | null;
+}
+
+export interface SavedCompanyRow {
+  student_id: string;
+  event_id: string;
+  company_id: string;
+  saved: boolean;
+  interested: boolean;
+  visited: boolean;
+  follow_up: boolean;
+  note: string | null;
+  updated_at: string;
+}
+
+export type ApplicationStatus = "applied" | "interviewing" | "offer" | "accepted" | "rejected" | "withdrawn";
+
+export const APPLICATION_STATUS_LABEL: Record<ApplicationStatus, string> = {
+  applied: "Applied",
+  interviewing: "Interviewing",
+  offer: "Offer",
+  accepted: "Accepted",
+  rejected: "Not selected",
+  withdrawn: "Withdrawn",
+};
+
+export interface ApplicationRow {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  student_id: string;
+  event_id: string | null;
+  company_id: string | null;
+  company_name: string;
+  role_title: string;
+  status: ApplicationStatus;
+  interview_at: string | null;
+  notes: string | null;
+}
+
+export interface StudentInsights {
+  total: number;
+  leaderboard: { rank: number; name: string; score: number; isMe: boolean }[];
+  me: { rank: number; score: number; counts: EngagementCounts } | null;
+}
+
+type Result<K extends string, T> = { ok: true } & { [key in K]: T } | { ok: false; error: string };
 
 function log(scope: string, error: unknown) {
   if (error) console.warn(`[gradlink/db] ${scope}:`, error);
@@ -268,6 +366,84 @@ export function getChecklistProgress(profileId: string): Promise<Record<string, 
 export function setChecklistProgress(itemId: string, profileId: string, completed: boolean): Promise<boolean> {
   if (!profileId || !itemId) return Promise.resolve(false);
   return safe("setChecklistProgress", false, () => rpc<boolean>("setChecklistProgress", itemId, profileId, completed));
+}
+
+/* ---------------- Sessions ---------------- */
+export function listSessions(eventId: string): Promise<SessionRow[]> {
+  return safe("listSessions", [], () => rpc<SessionRow[]>("listSessions", eventId));
+}
+
+export function createSession(input: {
+  eventId: string;
+  kind: SessionKind;
+  title: string;
+  description?: string;
+  location?: string;
+  startsAt: string;
+  endsAt?: string | null;
+  capacity?: number | null;
+}): Promise<Result<"session", SessionRow>> {
+  return safe("createSession", { ok: false, error: "Couldn't add the session. Please try again." }, () => rpc("createSession", input));
+}
+
+export function deleteSession(sessionId: string): Promise<boolean> {
+  return safe("deleteSession", false, () => rpc<boolean>("deleteSession", sessionId));
+}
+
+export function bookSession(sessionId: string): Promise<Result<"status", BookingStatus>> {
+  return safe("bookSession", { ok: false, error: "Couldn't book that session. Please try again." }, () => rpc("bookSession", sessionId));
+}
+
+export function cancelBooking(sessionId: string): Promise<boolean> {
+  return safe("cancelBooking", false, () => rpc<boolean>("cancelBooking", sessionId));
+}
+
+export function listSessionBookings(sessionId: string): Promise<SessionBookingRow[]> {
+  return safe("listSessionBookings", [], () => rpc<SessionBookingRow[]>("listSessionBookings", sessionId));
+}
+
+export function markAttendance(sessionId: string, profileId: string, attended: boolean): Promise<boolean> {
+  return safe("markAttendance", false, () => rpc<boolean>("markAttendance", sessionId, profileId, attended));
+}
+
+/* ---------------- Saved companies ---------------- */
+export function listSavedCompanies(eventId: string): Promise<SavedCompanyRow[]> {
+  return safe("listSavedCompanies", [], () => rpc<SavedCompanyRow[]>("listSavedCompanies", eventId));
+}
+
+export function saveCompany(
+  eventId: string,
+  companyId: string,
+  fields: Partial<Pick<SavedCompanyRow, "saved" | "interested" | "visited" | "follow_up" | "note">>,
+): Promise<Result<"saved", SavedCompanyRow>> {
+  return safe("saveCompany", { ok: false, error: "Couldn't save that. Please try again." }, () => rpc("saveCompany", eventId, companyId, fields));
+}
+
+/* ---------------- Applications ---------------- */
+export function listApplications(): Promise<ApplicationRow[]> {
+  return safe("listApplications", [], () => rpc<ApplicationRow[]>("listApplications"));
+}
+
+export function saveApplication(input: {
+  id?: string;
+  eventId?: string | null;
+  companyId?: string | null;
+  companyName: string;
+  roleTitle: string;
+  status: ApplicationStatus;
+  interviewAt?: string | null;
+  notes?: string | null;
+}): Promise<Result<"application", ApplicationRow>> {
+  return safe("saveApplication", { ok: false, error: "Couldn't save the application. Please try again." }, () => rpc("saveApplication", input));
+}
+
+export function deleteApplication(id: string): Promise<boolean> {
+  return safe("deleteApplication", false, () => rpc<boolean>("deleteApplication", id));
+}
+
+/* ---------------- Engagement ---------------- */
+export function getStudentEventInsights(eventId: string): Promise<StudentInsights | null> {
+  return safe("getStudentEventInsights", null, () => rpc<StudentInsights>("getStudentEventInsights", eventId));
 }
 
 /* ---------------- Files ---------------- */

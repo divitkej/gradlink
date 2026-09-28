@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
-  Star, HelpCircle, Bookmark, ScanLine, Search,
+  Star, HelpCircle, Bookmark, ScanLine, Search, CalendarClock,
 } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from "./cards";
 import { Badge } from "@/components/ui/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
+import SessionManager from "./SessionManager";
 import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
@@ -18,9 +19,10 @@ import {
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ShortlistRow,
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
+import { matchCompanies } from "@/lib/readiness";
 import GsapReveal from "@/components/anim/GsapReveal";
 
-type Tab = "overview" | "people" | "qr" | "checklist" | "manual";
+type Tab = "overview" | "people" | "sessions" | "qr" | "checklist" | "manual";
 
 export default function EventConsole({ eventId }: { eventId: string }) {
   const { session, ready } = useSession();
@@ -59,6 +61,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ size?: number }>; hide?: boolean }[] = [
     { key: "overview", label: "Overview", icon: LayoutGrid },
     { key: "people", label: role === "student" ? "Companies" : role === "company" ? "Students" : "People", icon: Users },
+    { key: "sessions", label: "Sessions", icon: CalendarClock, hide: role === "student" },
     { key: "qr", label: "My QR", icon: QrCode, hide: role === "event_manager" },
     { key: "checklist", label: "Checklist", icon: ListChecks },
     { key: "manual", label: "Manual", icon: BookOpen },
@@ -73,7 +76,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
           const Icon = t.icon; const on = tab === t.key;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-md)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
               <Icon size={15} /> {t.label}
             </button>
           );
@@ -93,6 +96,9 @@ export default function EventConsole({ eventId }: { eventId: string }) {
                 caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${role}-qr`}
               />
             </SectionCard>
+          )}
+          {tab === "sessions" && role !== "student" && (
+            <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId} />
           )}
           {tab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
           {tab === "manual" && <ManualSection defaultRole={role} />}
@@ -133,26 +139,18 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
 
 function Overview({ role, me, students, companies, analytics, eventId }: { role: AppRole; me: StudentRow | CompanyRow | null; students: StudentRow[]; companies: CompanyRow[]; analytics: AnalyticsRow[]; eventId: string }) {
   if (role === "student") {
-    const mySkills = ((me as StudentRow)?.skills ?? []).map((s) => s.toLowerCase());
-    const ranked = companies
-      .map((c) => {
-        const wanted = [...(c.skills_wanted ?? []), ...(c.hiring_roles ?? [])].map((x) => x.toLowerCase());
-        const overlap = mySkills.filter((s) => wanted.some((w) => w.includes(s) || s.includes(w))).length;
-        return { c, overlap };
-      })
-      .sort((a, b) => b.overlap - a.overlap)
-      .slice(0, 4);
+    const ranked = matchCompanies((me as StudentRow) ?? {}, companies).slice(0, 4);
     return (
-      <SectionCard title="Companies to visit first" hint="Matched to your skills">
+      <SectionCard title="Companies to visit first" hint="Matched to your skills and target roles">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {ranked.map(({ c, overlap }) => (
+          {ranked.map(({ company: c, score }) => (
             <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <Avatar name={c.company_name ?? c.company ?? "C"} size={38} tone="var(--accent-2)" />
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                 <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>Booth {c.booth_number} · {c.sector}</span>
               </span>
-              {overlap > 0 ? <FlagPill label={`${overlap} match`} tone="teal" /> : <FlagPill label="Explore" tone="muted" />}
+              {score ? <FlagPill label={`${score}% match`} tone="teal" /> : <FlagPill label="Explore" tone="muted" />}
             </Link>
           ))}
         </div>
@@ -202,7 +200,7 @@ function Overview({ role, me, students, companies, analytics, eventId }: { role:
       </SectionCard>
       <SectionCard title="Students needing attention" hint="Low engagement">
         {analytics.filter((a) => a.engagement_score < 40).length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Everyone is engaged 🎉</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No student is below an engagement score of 40.</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {analytics.filter((a) => a.engagement_score < 40).map((a) => {
@@ -346,7 +344,7 @@ function FilterBar({ q, setQ, placeholder, chips, active, setActive, chipLabel }
           const on = active === c;
           return (
             <button key={c} onClick={() => setActive(c)}
-              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "var(--accent)" : "var(--text-2)", background: on ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
+              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-sm)", cursor: "pointer", color: on ? "var(--accent)" : "var(--text-2)", background: on ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
               {chipLabel ? chipLabel(c) : c === "all" ? "All" : c}
             </button>
           );

@@ -104,7 +104,7 @@ export default function Scanner() {
         rafRef.current = requestAnimationFrame(tick);
       }, 60);
     } catch {
-      setCamErr("Couldn't access the camera — allow camera permission, or tap someone below / paste a link.");
+      setCamErr("Couldn't access the camera. Allow camera permission, or tap someone below or paste a link.");
     }
   }
 
@@ -147,12 +147,12 @@ export default function Scanner() {
   const peopleTitle = viewer === "student" ? "Companies to scan" : viewer === "company" ? "Students to scan" : "Scan anyone";
   const people: { id: string; name: string; sub: string; route: string; tone?: string }[] =
     viewer === "student"
-      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Booth ${c.booth_number ?? "—"} · ${c.sector ?? ""}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" }))
+      ? companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: [c.booth_number ? `Booth ${c.booth_number}` : "Booth not set", c.sector].filter(Boolean).join(" · "), route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" }))
       : viewer === "company"
       ? students.map((s) => ({ id: s.id, name: s.full_name, sub: [s.degree, s.university].filter(Boolean).join(" · "), route: `/scan/student/${s.profile_id}?eventId=${eventId}` }))
       : [
           ...students.map((s) => ({ id: s.id, name: s.full_name, sub: `Student · ${s.university ?? ""}`, route: `/scan/student/${s.profile_id}?eventId=${eventId}` })),
-          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: `Company · Booth ${c.booth_number ?? "—"}`, route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" })),
+          ...companies.map((c) => ({ id: c.id, name: c.company_name ?? c.company ?? "Company", sub: c.booth_number ? `Company · Booth ${c.booth_number}` : "Company", route: `/scan/company/${c.profile_id}?eventId=${eventId}`, tone: "var(--accent-2)" })),
         ];
 
   return (

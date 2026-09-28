@@ -110,7 +110,7 @@ export default function MessagesPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "36px 24px 44px", textAlign: "center" }}>
             <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}><MessageSquare size={22} /></div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No conversations yet</div>
-            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 380, lineHeight: 1.55 }}>Scan someone at the event and tap “Message” to start a conversation — it’ll show up here.</p>
+            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 380, lineHeight: 1.55 }}>Scan someone at the event and tap “Message” to start a conversation. It’ll show up here.</p>
           </div>
         </GlassPanel>
       ) : (
