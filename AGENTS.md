@@ -17,6 +17,7 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `components/site/` | Marketing chrome shared by public pages (`Navbar`, `Footer`) |
 | `components/gradlink/` | Auth and sign-up flow, plus the global background |
 | `components/dashboard/` | Signed-in dashboard UI |
+| `components/admin/` | Owner dashboard (`/admin`), only for the emails in `ADMIN_EMAILS` |
 | `components/events/`, `components/scan/` | Event and QR scan flows |
 | `components/ui/` | Generic building blocks (buttons, cards, meters, sections) |
 | `components/anim/` | Reusable motion helpers |

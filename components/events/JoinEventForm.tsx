@@ -8,8 +8,9 @@ import { useActiveEvent } from "@/lib/use-active-event";
 
 /**
  * Students and employers join an event with the short code their college
- * shares. Codes are case-insensitive and ignore spaces, because people type
- * them off a slide.
+ * shares. Each event has one code for students and a different one for
+ * employers, and each only works for its own account type. Codes are
+ * case-insensitive and ignore spaces, because people type them off a slide.
  */
 export default function JoinEventForm({ onJoined }: { onJoined?: (eventId: string) => void }) {
   const { session, selectEvent } = useSession();
@@ -39,7 +40,7 @@ export default function JoinEventForm({ onJoined }: { onJoined?: (eventId: strin
   return (
     <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <label htmlFor="join-code" style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-2)" }}>
-        Event code
+        {session?.role === "company" ? "Employer code" : "Student code"}
       </label>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <div style={{ position: "relative", flex: 1, minWidth: 180, display: "flex", alignItems: "center" }}>

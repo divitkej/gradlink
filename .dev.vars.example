@@ -26,3 +26,7 @@ EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
 STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
 STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
 STRIPE_PRICE_PRO=<STRIPE_PRICE_ID>
+
+# Optional. Comma-separated emails that can open the owner dashboard at /admin.
+# Sign up with that email first, so nobody else can register it.
+ADMIN_EMAILS=<YOUR_EMAIL>

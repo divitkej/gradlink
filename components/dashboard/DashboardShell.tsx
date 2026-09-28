@@ -12,7 +12,10 @@ import Logo from "@/components/Logo";
 import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { useUnreadMessages } from "@/lib/notifications";
-import { Avatar } from "./cards";
+import { getPlanChoice } from "@/lib/billing";
+import EventGate from "@/components/events/EventGate";
+import { Avatar, LoadingBlock } from "./cards";
+import PlanPicker from "./PlanPicker";
 
 export type DashRole = AppRole;
 
@@ -72,6 +75,35 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
   return nav;
 }
 
+/**
+ * Whether this college still has to pick a plan. Remembered per account for
+ * the life of the tab, so moving between pages doesn't ask the server again.
+ */
+const planChecked = new Map<string, boolean>();
+
+function usePlanRequired(profileId: string | undefined, isManager: boolean) {
+  // Bumped whenever planChecked changes, so the derived value re-reads it.
+  const [, setVersion] = useState(0);
+  const needed = isManager && !!profileId;
+  const known = needed ? planChecked.get(profileId!) : false;
+
+  useEffect(() => {
+    if (!needed || planChecked.has(profileId!)) return;
+    let cancelled = false;
+    getPlanChoice().then(({ required }) => {
+      planChecked.set(profileId!, required);
+      if (!cancelled) setVersion((v) => v + 1);
+    });
+    return () => { cancelled = true; };
+  }, [needed, profileId]);
+
+  const done = () => {
+    if (profileId) planChecked.set(profileId, false);
+    setVersion((v) => v + 1);
+  };
+  return { required: known ?? null, done };
+}
+
 function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
 }
@@ -91,6 +123,7 @@ export default function DashboardShell({
   const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
   const { count: unread } = useUnreadMessages(session?.profileId);
+  const plan = usePlanRequired(session?.profileId, session?.role === "event_manager");
 
   // Auth gate + role lock: must be signed in, and can only view your own role's pages.
   useEffect(() => {
@@ -111,6 +144,21 @@ export default function DashboardShell({
   }
 
   const activeRole: AppRole = session.role;
+
+  /**
+   * Colleges pick a plan before anything else. Students and employers must
+   * join an event with their code before any page opens, except the events
+   * page, which is where they enter it.
+   */
+  function content() {
+    if (activeRole === "event_manager") {
+      if (plan.required === null) return <LoadingBlock label="Loading your account…" />;
+      if (plan.required) return <PlanPicker onChosen={plan.done} />;
+      return children;
+    }
+    if (pathname === "/dashboard/events") return children;
+    return <EventGate>{() => children}</EventGate>;
+  }
   const nav = buildNav(eventId)[activeRole];
   const displayName = session.name || "Your account";
   const displayOrg = session.org || "";
@@ -231,7 +279,7 @@ export default function DashboardShell({
         </header>
 
         <main style={{ flex: 1, padding: "clamp(16px, 3vw, 32px)", maxWidth: 1280, width: "100%", margin: "0 auto" }}>
-          {children}
+          {content()}
         </main>
       </div>
 

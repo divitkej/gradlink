@@ -7,11 +7,12 @@ import { GlassPanel } from "@/components/dashboard/widgets";
 import { SectionCard, LoadingBlock } from "@/components/dashboard/cards";
 import { Badge } from "@/components/ui/primitives";
 import { Reveal } from "@/components/anim/primitives";
-import { CalendarDays, MapPin, ArrowRight, Plus, Ticket, Check, Copy } from "lucide-react";
+import { CalendarDays, MapPin, ArrowRight, Plus, Ticket } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { EVENT_STATUS_LABEL, type EventRow } from "@/lib/events";
 import EventForm from "@/components/events/EventForm";
+import EventCodes from "@/components/events/EventCodes";
 import JoinEventForm from "@/components/events/JoinEventForm";
 
 function statusTone(status: EventRow["status"]) {
@@ -26,38 +27,6 @@ function formatDate(iso: string | null) {
   return Number.isNaN(d.getTime())
     ? null
     : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-}
-
-/** The join code is the thing a college actually shares, so make it copyable. */
-function JoinCode({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* clipboard blocked — the code is on screen to read anyway */
-    }
-  }
-
-  return (
-    <button
-      onClick={copy}
-      title="Copy join code"
-      style={{
-        display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px",
-        borderRadius: "var(--r-full)", cursor: "pointer",
-        background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.28)",
-        color: "var(--accent-2)", fontFamily: "var(--font-display)", fontWeight: 700,
-        fontSize: 13, letterSpacing: "0.14em",
-      }}
-    >
-      {copied ? <Check size={13} /> : <Copy size={13} />}
-      {code}
-    </button>
-  );
 }
 
 function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean; onOpen: () => void }) {
@@ -100,9 +69,10 @@ function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean
             )}
           </div>
         </div>
-
-        {event.join_code && <JoinCode code={event.join_code} />}
       </div>
+
+      {/* Only the owner receives codes, so this only shows on events they created. */}
+      {(event.student_code || event.company_code) && <EventCodes event={event} />}
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <Link
@@ -150,7 +120,7 @@ export default function EventsPage() {
             </h2>
             <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
               {isManager
-                ? "Create an event, then share its join code with students and employers."
+                ? "Create an event, then share the student code with students and the employer code with employers."
                 : "Events you've joined. Add another with the code your college gave you."}
             </p>
           </div>

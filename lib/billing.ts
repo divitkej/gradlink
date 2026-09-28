@@ -131,3 +131,23 @@ export async function startCheckout(input: {
     return "Couldn't reach the payment service. Check your connection and try again.";
   }
 }
+
+/**
+ * Whether this college still has to pick a plan. Asked once, after sign-in.
+ * On any error the prompt is skipped rather than blocking the dashboard.
+ */
+export async function getPlanChoice(): Promise<{ required: boolean; choice: PlanId | null }> {
+  try {
+    return await rpc<{ required: boolean; choice: PlanId | null }>("getPlanChoice");
+  } catch {
+    return { required: false, choice: null };
+  }
+}
+
+export async function choosePlan(plan: PlanId): Promise<boolean> {
+  try {
+    return await rpc<boolean>("choosePlan", plan);
+  } catch {
+    return false;
+  }
+}
