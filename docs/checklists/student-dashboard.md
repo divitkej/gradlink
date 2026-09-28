@@ -6,7 +6,7 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 11 / 14 done, 3 need the live database or site
+## Progress: 14 / 17 done, 3 need the live database or site
 
 ## Before deploying
 
@@ -37,6 +37,17 @@ Status key as in `landing-page.md`.
   Done in "Complete the student dashboard against the landing page"
 - [x] **Automated check.** Production build driven by Playwright at 1440px and 375px against the real server code on Postgres 16: every student page loads with no console errors and no horizontal scroll, and booking, waitlisting, saving, applications, profile edits and host attendance all persist.
   Done in "Complete the student dashboard against the landing page"
+
+## Employer privacy
+
+Colleges want their students hired, so employers see strengths, never assessments. See the decision in `features-to-build.md`.
+
+- [x] **Scores and engagement are student and college only.** Résumé score, readiness, analytics, engagement, leaderboard and other people's scans are refused by the API for employers. The employer's view of a student shows goals, projects, skills and links instead of a score and an improvement list. The hard-coded "Checked in" badge is gone.
+  `lib/server/rpc.ts`, `components/scan/StudentScanView.tsx`, `components/dashboard/EventConsole.tsx` · Done in "Keep student assessments away from employers"
+- [x] **Shortlist decisions stay with their owner.** A company sees only its own decisions and notes. A student sees only who shortlisted them, without notes. Previously any account could read every company's "not a fit" and private notes.
+  `lib/server/rpc.ts` · Done in "Keep student assessments away from employers"
+- [x] **Company candidate tools.** Real filters replaced the decorative chips (which listed Readiness and Resume), the dead Export button became a CSV export, and bulk follow-up is limited to students that company scanned or shortlisted.
+  `components/dashboard/CompanyCandidates.tsx` · Done in "Keep student assessments away from employers"
 
 ## Verify on the live site
 

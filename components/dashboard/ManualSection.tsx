@@ -25,12 +25,12 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     steps: [
       "Scan a student's QR code at your booth.",
       "View their full portfolio: skills, resume, links and bio.",
-      "Check their résumé score and feedback at a glance.",
+      "See their target roles, projects and résumé at a glance.",
       "Shortlist, reject, or mark a candidate as a maybe.",
       "Add private notes while the conversation is fresh.",
       "Message strong candidates directly from their profile.",
       "Run company sessions, mock interviews or 1:1 slots from the event page and mark who attended.",
-      "Review and export all scanned students after the event.",
+      "Filter your candidates, message several at once, and export them to CSV after the event.",
     ],
   },
   event_manager: {

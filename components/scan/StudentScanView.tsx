@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
   FileText, Link as LinkIcon,
-  Star, ThumbsDown, HelpCircle, Send, Check, Sparkles, Activity, AlertTriangle, Building2, CalendarCheck, Eye,
+  Star, ThumbsDown, HelpCircle, Send, Check, Sparkles, Activity, Building2, CalendarCheck, Eye, Target, FolderGit2,
 } from "lucide-react";
 import ScanLayout from "./ScanLayout";
 import ViewerGate from "./ViewerGate";
-import { SectionCard, StatTile, FlagPill, ScoreRing, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
+import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
 import { Button, Meter } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import {
@@ -17,6 +17,7 @@ import {
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import GsapReveal from "@/components/anim/GsapReveal";
+import { safeHttpUrl } from "@/lib/utils";
 
 export default function StudentScanView({ studentProfileId, eventId }: { studentProfileId: string; eventId: string }) {
   const { session, ready } = useSession();
@@ -44,7 +45,8 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
     (async () => {
       setLoading(true);
       const s = await getStudentByProfile(studentProfileId);
-      const a = await getAnalytics(studentProfileId, eventId);
+      // Scores and engagement are for the student's college, never for employers.
+      const a = viewer === "event_manager" ? await getAnalytics(studentProfileId, eventId) : null;
       if (cancelled) return;
       setStudent(s);
       setAnalytics(a);
@@ -86,7 +88,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
         <ErrorBlock title="Student not found" body="This QR code doesn't match a registered student for this event." />
       ) : (
         <GsapReveal style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <ProfileHeader student={student} checkedIn={true} />
+          <ProfileHeader student={student} checkedIn={viewer === "event_manager" && scanHistory.some((x) => x.scanner_role === "event_manager")} />
           {viewer === "company" && (
             <CompanyView
               student={student} status={status} note={note} msg={msg} scanHistory={scanHistory}
@@ -145,51 +147,6 @@ function ProfileHeader({ student, checkedIn }: { student: StudentRow; checkedIn:
   );
 }
 
-function ResumeScore({ student }: { student: StudentRow }) {
-  const evalr = evaluateResume(student);
-  const tone = scoreTone(evalr.score);
-  return (
-    <SectionCard title="Résumé score" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Rule-based</span>}>
-      <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
-        <ScoreRing score={evalr.score} tone={tone} label="/ 100" />
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55, marginBottom: 12 }}>{evalr.summary}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {evalr.breakdown.map((b) => (
-              <div key={b.label}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)", marginBottom: 4 }}>
-                  <span>{b.label}</span><span>{Math.round(b.earned)}/{b.max}</span>
-                </div>
-                <Meter value={(b.earned / b.max) * 100} tone={tone} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="rs-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 16 }}>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)", marginBottom: 8 }}>Strengths</div>
-          {evalr.strengths.map((s) => <Row key={s} icon={<Check size={13} color="var(--accent-2)" />} text={s} />)}
-        </div>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--amber)", marginBottom: 8 }}>Improvements</div>
-          {evalr.improvements.map((s) => <Row key={s} icon={<AlertTriangle size={13} color="var(--amber)" />} text={s} />)}
-        </div>
-      </div>
-      <style>{`@media (max-width:560px){.rs-2col{grid-template-columns:1fr !important}}`}</style>
-    </SectionCard>
-  );
-}
-
-function Row({ icon, text }: { icon: React.ReactNode; text: string }) {
-  return (
-    <div style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "5px 0" }}>
-      <span style={{ marginTop: 2, flexShrink: 0 }}>{icon}</span>
-      <span style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.45 }}>{text}</span>
-    </div>
-  );
-}
-
 function LinkBtn({ href, icon, label }: { href: string | null; icon: React.ReactNode; label: string }) {
   if (!href) return null;
   return (
@@ -197,6 +154,47 @@ function LinkBtn({ href, icon, label }: { href: string | null; icon: React.React
       style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 12.5, fontWeight: 600, color: "var(--text-2)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "8px 13px", textDecoration: "none" }}>
       {icon} {label}
     </a>
+  );
+}
+
+/**
+ * What an employer sees beyond skills: what the student is aiming for and what
+ * they have built. Strengths only; scores and improvement lists stay private.
+ */
+function CareerHighlights({ student }: { student: StudentRow }) {
+  const roles = student.target_roles ?? [];
+  const projects = student.projects ?? [];
+  if (!roles.length && !student.career_goal && !projects.length) return null;
+  return (
+    <SectionCard title="Career goals and projects">
+      {(roles.length > 0 || student.career_goal) && (
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: projects.length ? 16 : 0 }}>
+          <Target size={15} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <div>
+            {roles.length > 0 && <div style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 600 }}>Looking for: {roles.join(", ")}</div>}
+            {student.career_goal && <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.55, marginTop: 3 }}>{student.career_goal}</p>}
+          </div>
+        </div>
+      )}
+      {projects.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {projects.map((p, i) => {
+            const href = safeHttpUrl(p.url);
+            return (
+              <div key={`${p.title}-${i}`} style={{ padding: "10px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <FolderGit2 size={14} color="var(--accent-2)" />
+                  {href
+                    ? <a href={href} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{p.title}</a>
+                    : <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{p.title}</span>}
+                </div>
+                {p.description && <p style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.5, marginTop: 4 }}>{p.description}</p>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </SectionCard>
   );
 }
 
@@ -218,7 +216,7 @@ function CompanyView({
         <SectionCard title="Skills"><TagRow items={student.skills} /></SectionCard>
       ) : null}
 
-      <ResumeScore student={student} />
+      <CareerHighlights student={student} />
 
       <SectionCard title="Decision">
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -243,9 +241,9 @@ function CompanyView({
       <SectionCard title="Resume & links">
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
           <LinkBtn href={student.resume_url} icon={<FileText size={14} />} label="View / download resume" />
-          <LinkBtn href={student.portfolio_url} icon={<LinkIcon size={14} />} label="Portfolio" />
-          <LinkBtn href={student.linkedin_url} icon={<LinkIcon size={14} />} label="LinkedIn" />
-          <LinkBtn href={student.github_url} icon={<LinkIcon size={14} />} label="GitHub" />
+          <LinkBtn href={safeHttpUrl(student.portfolio_url)} icon={<LinkIcon size={14} />} label="Portfolio" />
+          <LinkBtn href={safeHttpUrl(student.linkedin_url)} icon={<LinkIcon size={14} />} label="LinkedIn" />
+          <LinkBtn href={safeHttpUrl(student.github_url)} icon={<LinkIcon size={14} />} label="GitHub" />
           {!student.resume_url && !student.portfolio_url && !student.linkedin_url && !student.github_url && (
             <span style={{ fontSize: 13, color: "var(--text-muted)" }}>No links provided yet.</span>
           )}

@@ -11,11 +11,18 @@ import { engagementScore, shortName, type EngagementCounts } from "../engagement
    Each op keeps the name and argument list of the lib/db.ts /
    lib/events.ts function that calls it, so no component changed.
 
-   Authorization is a line-for-line port of firestore.rules:
+   Authorization started as a port of firestore.rules and is now
+   stricter wherever a student could be harmed:
      * every op requires a signed-in user;
-     * reads are open to any signed-in user, EXCEPT messages
-       (participants only), checklist progress, event membership
-       lists and subscriptions (owner only);
+     * profile and event reads are open to any signed-in user, EXCEPT
+       messages (participants only), checklist progress, event
+       membership lists and subscriptions (owner only);
+     * a student's scores, engagement and scans are for the student and
+       their college (the event's organiser) only, never for employers.
+       Colleges want students hired, so employers see strengths
+       (profile, skills, projects, résumé), not assessments;
+     * shortlist decisions are seen by the company that made them and
+       the organiser. A student sees only positive ones, without notes;
      * writes are owner-only, checked against the session's profile
        id — never against an id the browser claims.
    ============================================================ */
@@ -110,6 +117,22 @@ const APPLICATION_STATUSES = ["applied", "interviewing", "offer", "accepted", "r
 
 /* ---------------- event membership ---------------- */
 
+/** The college running the event: its creator. */
+async function isEventOwner(u: AuthUser, eventId: string) {
+  if (u.role !== "event_manager" || !eventId) return false;
+  const rows = await db()`select 1 from events where id = ${eventId} and created_by = ${u.id}`;
+  return rows.length > 0;
+}
+
+/**
+ * Stored assessments on a student row are for the student and colleges only.
+ * Everyone else gets the profile without them.
+ */
+function studentView(u: AuthUser, row: Row): Row {
+  if (u.id === row.id || u.role === "event_manager") return row;
+  return { ...row, resume_score: null, ai_feedback: null };
+}
+
 async function isRegistered(eventId: string, profileId: string) {
   const rows = await db()`select 1 from event_registrations where event_id = ${eventId} and profile_id = ${profileId}`;
   return rows.length > 0;
@@ -189,20 +212,21 @@ function analyticsRow(eventId: string, r: Row) {
 
 export const ops: Record<string, Op> = {
   /* Students */
-  async getStudentByProfile(_u, [profileId]) {
+  async getStudentByProfile(u, [profileId]) {
     const rows = await db().query(`select ${STUDENT_COLS} from students where id = $1`, [s(profileId)]);
-    return rows[0] ?? null;
+    return rows[0] ? studentView(u, rows[0]) : null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
     isMe(u, profileId);
     return upsertRoleRow("students", STUDENT_FIELDS, u.id, fields);
   },
-  async getRegisteredStudents(_u, [eventId]) {
-    return db().query(
+  async getRegisteredStudents(u, [eventId]) {
+    const rows = await db().query(
       `select ${STUDENT_COLS.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
        where r.event_id = $1 and r.role = 'student'`,
       [s(eventId)],
     );
+    return rows.map((r) => studentView(u, r));
   },
 
   /* Companies */
@@ -223,23 +247,28 @@ export const ops: Record<string, Op> = {
   },
 
   /* Analytics */
-  async getAnalytics(_u, [studentId, eventId]) {
+  /** The student themselves, or the college running the event. */
+  async getAnalytics(u, [studentId, eventId]) {
     if (!s(studentId) || !s(eventId)) return null;
+    if (u.id !== s(studentId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
     const rows = await studentActivity(s(eventId), s(studentId));
     return rows[0] ? analyticsRow(s(eventId), rows[0]) : null;
   },
-  async listAnalytics(_u, [eventId]) {
+  /** The college running the event only. */
+  async listAnalytics(u, [eventId]) {
     if (!s(eventId)) return [];
+    if (!(await isEventOwner(u, s(eventId)))) throw forbidden();
     const rows = await studentActivity(s(eventId));
     return rows.map((r) => analyticsRow(s(eventId), r));
   },
   /**
-   * The caller's engagement at an event, and the top five. Other students are
+   * The caller's engagement at an event, and the top five. Students only:
+   * employers never see engagement or the leaderboard. Other students are
    * shown by first name and last initial only.
    */
   async getStudentEventInsights(u, [eventId]) {
     const ev = s(eventId);
-    if (!ev || !(await isRegistered(ev, u.id))) throw forbidden();
+    if (u.role !== "student" || !ev || !(await isRegistered(ev, u.id))) throw forbidden();
     const scored = (await studentActivity(ev))
       .map((r) => ({ id: r.student_id as string, name: s(r.full_name), counts: countsOf(r) }))
       .map((r) => ({ ...r, score: engagementScore(r.counts) }))
@@ -267,8 +296,11 @@ export const ops: Record<string, Op> = {
     `;
     return true;
   },
-  async getScans(_u, [filter]) {
+  /** Scans you made or that were made of you. The event's college sees all of them. */
+  async getScans(u, [filter]) {
     const f = (filter ?? {}) as Row;
+    const involved = s(f.scannerProfileId) === u.id || s(f.scannedProfileId) === u.id;
+    if (!involved && !(await isEventOwner(u, s(f.eventId)))) throw forbidden();
     const where = ["event_id = $1"];
     const params: unknown[] = [s(f.eventId)];
     if (f.scannerProfileId) { params.push(s(f.scannerProfileId)); where.push(`scanner_profile_id = $${params.length}`); }
@@ -289,19 +321,34 @@ export const ops: Record<string, Op> = {
     `;
     return true;
   },
-  async getShortlist(_u, [companyId, studentId, eventId]) {
+  async getShortlist(u, [companyId, studentId, eventId]) {
+    if (u.id !== s(companyId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
     const rows = await db()`
       select * from shortlists where company_id = ${s(companyId)} and student_id = ${s(studentId)} and event_id = ${s(eventId)}
     `;
     return rows[0] ?? null;
   },
-  async listShortlistsForCompany(_u, [companyId, eventId]) {
+  async listShortlistsForCompany(u, [companyId, eventId]) {
+    if (u.id !== s(companyId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
     return db()`select * from shortlists where company_id = ${s(companyId)} and event_id = ${s(eventId)} order by created_at desc`;
   },
-  async listShortlistsForStudent(_u, [studentId, eventId]) {
-    return db()`select * from shortlists where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
+  /**
+   * For the student: only the companies that shortlisted them, never "maybe"
+   * or "not a fit", and never the company's private notes. The college sees all.
+   */
+  async listShortlistsForStudent(u, [studentId, eventId]) {
+    if (await isEventOwner(u, s(eventId))) {
+      return db()`select * from shortlists where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
+    }
+    if (u.id !== s(studentId)) throw forbidden();
+    return db()`
+      select id, created_at, event_id, company_id, student_id, status, null as notes from shortlists
+      where student_id = ${u.id} and event_id = ${s(eventId)} and status in ('shortlisted', 'priority')
+    `;
   },
-  async listShortlists(_u, [eventId]) {
+  /** Every company's decisions at an event: the college running it only. */
+  async listShortlists(u, [eventId]) {
+    if (!(await isEventOwner(u, s(eventId)))) throw forbidden();
     return db()`select * from shortlists where event_id = ${s(eventId)}`;
   },
 
@@ -316,6 +363,30 @@ export const ops: Record<string, Op> = {
       values (${s(i.eventId)}, ${u.id}, ${s(i.receiverProfileId)}, ${message})
     `;
     return true;
+  },
+  /**
+   * One follow-up to many candidates. A company may only message students it
+   * scanned or shortlisted at this event, so this can't be used to mass-message
+   * every attendee.
+   */
+  async sendBulkMessage(u, [eventId, studentIds, text]) {
+    if (u.role !== "company") throw forbidden();
+    const message = s(text).slice(0, 5000);
+    if (!message.trim()) return { ok: false, error: "Write a message first." };
+    const ids = Array.from(new Set(strArray(studentIds)));
+    if (!ids.length) return { ok: false, error: "Choose at least one candidate." };
+    if (ids.length > 200) return { ok: false, error: "You can message up to 200 candidates at once." };
+    const rows = await db()`
+      insert into messages (event_id, sender_profile_id, receiver_profile_id, message)
+      select ${s(eventId)}, ${u.id}, p.id, ${message}
+      from profiles p
+      where p.id = any(${ids}::text[]) and p.role = 'student' and (
+        exists (select 1 from scans x where x.event_id = ${s(eventId)} and x.scanner_profile_id = ${u.id} and x.scanned_profile_id = p.id)
+        or exists (select 1 from shortlists l where l.event_id = ${s(eventId)} and l.company_id = ${u.id} and l.student_id = p.id)
+      )
+      returning receiver_profile_id
+    `;
+    return { ok: true, sent: rows.length, skipped: ids.length - rows.length };
   },
   async listMessagesForProfile(u, [profileId, eventId]) {
     isMe(u, profileId);

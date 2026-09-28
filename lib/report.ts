@@ -2,6 +2,7 @@
 
 import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow } from "./db";
 import { evaluateResume } from "./resume";
+import { downloadCsv, slugify } from "./csv";
 
 /* ============================================================
    Post-event outcome report.
@@ -182,17 +183,8 @@ export function buildReport(input: {
 
 /* ---------------- CSV export ---------------- */
 
-function csvCell(v: unknown): string {
-  const s = String(v ?? "");
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-function csvRows(rows: unknown[][]): string {
-  return rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
-}
-
-/** One CSV containing the summary, the employer table and the student table. */
-export function reportToCsv(r: OutcomeReport): string {
+/** The rows of one CSV containing the summary, the employer table and the student table. */
+function reportBlocks(r: OutcomeReport): unknown[][] {
   const blocks: unknown[][] = [
     ["GradLink: Post-event outcome report"],
     ["Event", r.eventTitle],
@@ -227,20 +219,10 @@ export function reportToCsv(r: OutcomeReport): string {
   if (r.topSkills.length) {
     blocks.push([], ["Top skills"], ["Skill", "Students"], ...r.topSkills.map((s) => [s.skill, s.count]));
   }
-  return csvRows(blocks);
+  return blocks;
 }
 
 /** Trigger a browser download of the report as CSV. */
 export function downloadReportCsv(r: OutcomeReport) {
-  // The BOM makes Excel open UTF-8 correctly instead of mangling accents.
-  const blob = new Blob(["﻿" + reportToCsv(r)], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const slug = r.eventTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  a.href = url;
-  a.download = `gradlink-outcome-report-${slug || "event"}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadCsv(`gradlink-outcome-report-${slugify(r.eventTitle) || "event"}.csv`, reportBlocks(r));
 }

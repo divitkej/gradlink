@@ -17,6 +17,17 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Student application tracker with interview dates and outcomes (applied, interviewing, offer, accepted) at `/dashboard/student/applications`
 - Saved companies, interest, booth visits and notes stored per event in the database (were localStorage)
 - Manager analytics computed live from real activity (were stored rows seeded to zero)
+- Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
+
+## Decision: employers see strengths, never assessments
+
+Colleges are the customer and want their students hired, so nothing an employer sees should count against a student. Enforced in the API (`lib/server/rpc.ts`), not only hidden in the UI:
+
+- Résumé score, readiness, competencies, engagement score, leaderboard and scan history are visible to the student and their college (the event's organiser) only.
+- Employers see the profile the student chose to share: degree, year, skills, target roles, career goal, projects, résumé and links.
+- A company sees only its own shortlist decisions and notes. A student sees only the companies that shortlisted them, never "maybe" or "not a fit", and never a company's notes.
+
+So these are not planned for employers: filtering or sorting by readiness, résumé score, GPA or event activity. The landing page Employer CRM mockup was changed to match.
 - Role checklists for before, during and after each event
 - Events with join codes, statuses and check-in
 - QR codes and two-way scanning, with notes
@@ -33,10 +44,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 | Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
 | Booth queues | Platform tab "Live Event Mode", Journey step 02 | Session waitlists and 1:1 recruiter slots are built; a live queue at a booth is not |
-| Candidate filters (degree, graduation year, GPA, skills, readiness, résumé score, activity, stage) | Employer CRM filter chips | Check which filters the company dashboard supports; GPA is not stored |
 | Candidate stages "Contacted", "Interview", "Offer" | Employer CRM pipeline, Platform tab CRM mini | Real stages are shortlisted, priority, maybe, not a fit |
-| Bulk messages | Why GradLink card "Helps employers follow up faster" | Only one-to-one messages |
-| CSV export for companies | Employer CRM "Export CSV" | Only the college outcome report exports CSV |
 | Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
 | Year-over-year comparison | Pricing (Placement Pro) | |
 

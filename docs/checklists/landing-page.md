@@ -19,7 +19,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Automated check" below means a Playwright run against a production build (`next build` + `next start`) at 1440px and 375px.
 
-## Progress: 13 / 16 done, 1 tracked, 2 need a real device or the live site
+## Progress: 14 / 17 done, 1 tracked, 2 need a real device or the live site
 
 ## Phase 2: Navigation fixes
 
@@ -64,6 +64,9 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Hero and CTA buttons.** Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#product`.
   `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
+
+- [x] **Employer CRM mockup promised scores to employers.** Filters for GPA, readiness score, résumé score and event activity, and a readiness and résumé score on each candidate, contradicted the decision that employers see strengths only. Now shows degree, year, skills, target role and stage filters, and each candidate's target role and skills.
+  `components/landing/EmployerCRMSection.tsx` · Done in "Keep student assessments away from employers"
 
 ## Outside this checklist
 

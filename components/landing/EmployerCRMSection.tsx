@@ -5,7 +5,7 @@ import { GlassCard, Badge, Meter } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
-const filters = ["Degree", "Graduation Year", "GPA", "Skills", "Readiness Score", "Resume Score", "Event Activity", "Stage"];
+const filters = ["Degree", "Graduation Year", "Skills", "Target Role", "Stage"];
 
 const pipeline = [
   { l: "Scanned", v: 180, c: "var(--text-muted)", pct: 100 },
@@ -16,10 +16,10 @@ const pipeline = [
 ];
 
 const candidates = [
-  { n: "Sara Al Rashidi", d: "Business Admin · Year 3", r: 92, res: 88, s: "Shortlisted", tone: "teal" as const },
-  { n: "Mohammed Al Mansoori", d: "Computer Science · Year 4", r: 85, res: 91, s: "Contacted", tone: "cyan" as const },
-  { n: "Fatima Khalid", d: "Marketing · Year 3", r: 78, res: 82, s: "Interview", tone: "muted" as const },
-  { n: "Ahmed Nasser", d: "Finance · Year 4", r: 71, res: 75, s: "Scanned", tone: "muted" as const },
+  { n: "Sara Al Rashidi", d: "Business Admin · Year 3", role: "Business Analyst", skills: "SQL, Excel", s: "Shortlisted", tone: "teal" as const },
+  { n: "Mohammed Al Mansoori", d: "Computer Science · Year 4", role: "Software Engineer", skills: "React, Python", s: "Contacted", tone: "cyan" as const },
+  { n: "Fatima Khalid", d: "Marketing · Year 3", role: "Brand Associate", skills: "Content, Analytics", s: "Interview", tone: "muted" as const },
+  { n: "Ahmed Nasser", d: "Finance · Year 4", role: "Financial Analyst", skills: "Modelling, Excel", s: "Scanned", tone: "muted" as const },
 ];
 
 const actions = ["Shortlist", "Add Note", "Send Follow-up", "Invite to Interview"];
@@ -93,9 +93,9 @@ export default function EmployerCRMSection() {
                   </div>
                   <Badge tone={c.tone}>{c.s}</Badge>
                 </div>
-                <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Readiness <strong style={{ color: "var(--text)" }}>{c.r}%</strong></span>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{c.res}%</strong></span>
+                <div style={{ display: "flex", gap: "4px 16px", flexWrap: "wrap", marginBottom: 12 }}>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Looking for <strong style={{ color: "var(--text)" }}>{c.role}</strong></span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Skills <strong style={{ color: "var(--text)" }}>{c.skills}</strong></span>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   {actions.map((a) => (

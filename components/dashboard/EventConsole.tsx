@@ -277,7 +277,6 @@ function People({
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
           {filtered.map((s) => {
             const status = slMap.get(s.profile_id ?? "");
-            const score = evaluateResume(s).score;
             return (
               <div key={s.id} style={{ padding: "12px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -285,8 +284,8 @@ function People({
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{s.full_name}</div>
                     <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{[s.degree, s.graduation_year, s.university].filter(Boolean).join(" · ")}</div>
+                    {s.target_roles?.length ? <div style={{ fontSize: 11.5, color: "var(--text-2)", marginTop: 2 }}>Looking for {s.target_roles.slice(0, 2).join(", ")}</div> : null}
                   </div>
-                  <FlagPill label={`Resume ${score}`} tone={score >= 70 ? "teal" : score >= 50 ? "cyan" : "amber"} />
                 </div>
                 {s.skills?.length ? <div style={{ marginTop: 10 }}><TagRow items={s.skills.slice(0, 6)} /></div> : null}
                 <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap", alignItems: "center" }}>

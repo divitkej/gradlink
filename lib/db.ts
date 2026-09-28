@@ -332,6 +332,11 @@ export function sendMessage(input: {
   return safe("sendMessage", false, () => rpc<boolean>("sendMessage", input));
 }
 
+/** Send one follow-up to several scanned or shortlisted candidates (companies only). */
+export function sendBulkMessage(eventId: string, studentIds: string[], message: string): Promise<{ ok: true; sent: number; skipped: number } | { ok: false; error: string }> {
+  return safe("sendBulkMessage", { ok: false, error: "Couldn't send. Please try again." }, () => rpc("sendBulkMessage", eventId, studentIds, message));
+}
+
 export function listMessagesForProfile(profileId: string, eventId: string): Promise<MessageRow[]> {
   if (!profileId) return Promise.resolve([]);
   return safe("listMessagesForProfile", [], () => rpc<MessageRow[]>("listMessagesForProfile", profileId, eventId));
