@@ -27,9 +27,10 @@ A multi-campus plan (AED 3,600 per extra campus) was built and then cut until th
 - [x] **Free plan's one-event limit was not enforced.** `createEvent` now allows the first event, a subscriber, or an unused Event Pass, checked in one locked transaction.
   `lib/server/rpc.ts` · Done in "Add tiered pricing: trial event, Event Pass, founding, multi-year and multi-campus"
 
-## Before deploying this branch
+## Deploy
 
-- [ ] **Apply the database migration to production.** `npm run db:migrate` adds `subscriptions.term`, `founding` and the `event_passes` table. Every statement is `if not exists`. Deploy only after this: the new event-creation check reads `event_passes`.
+- [x] **Database migration applied to production.** `subscriptions.term`, `founding` and the `event_passes` table, then the Worker deployed to `gradlink.divitkej.workers.dev`. Live checks: `/pricing` 200, `/api/pricing` returns the founding price as open, checkout answers "Payments aren't configured yet" until Stripe is set up.
+  `db/schema.sql` · Done in "Deploy tiered pricing to production"
 
 ## Before taking payments
 
