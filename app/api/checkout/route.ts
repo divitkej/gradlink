@@ -3,6 +3,7 @@ import { db } from "@/lib/server/sql";
 import { serverEnv } from "@/lib/server/env";
 import { currentUser } from "@/lib/server/session";
 import { HttpError, assertSameOrigin } from "@/lib/server/http";
+import { OPERATOR } from "@/lib/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,8 +21,10 @@ export async function POST(request: Request) {
   const priceId = env.STRIPE_PRICE_PRO;
 
   if (!secret || !priceId) {
+    // Shown to colleges, so it says what to do rather than which keys are missing.
+    console.error("[checkout] STRIPE_SECRET_KEY or STRIPE_PRICE_PRO is not set");
     return Response.json(
-      { error: "Payments aren't configured yet. Add STRIPE_SECRET_KEY and STRIPE_PRICE_PRO." },
+      { error: `Online payment isn't available yet. To upgrade to Placement Pro, email ${OPERATOR.email}.` },
       { status: 503 }
     );
   }

@@ -24,8 +24,9 @@ export const LIMITS = {
   /** Wrong passwords from one IP, across all accounts. Correct sign-ins don't count. */
   signInFailures: { bucket: "sign-in-fail", max: 30, windowSeconds: 15 * 60 },
   signUp: { bucket: "sign-up", max: 50, windowSeconds: 60 * 60 },
-  /** Each request can send an email, which the mail provider meters. */
+  /** Password reset and confirmation-resend requests. Each can send an email, which the mail provider meters. */
   resetRequest: { bucket: "reset-request", max: 10, windowSeconds: 60 * 60 },
+  /** Attempts at reset and email confirmation links. */
   resetToken: { bucket: "reset-token", max: 30, windowSeconds: 15 * 60 },
 } satisfies Record<string, Limit>;
 

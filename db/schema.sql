@@ -77,6 +77,20 @@ create table if not exists rate_limits (
 );
 create index if not exists rate_limits_window_idx on rate_limits (window_start);
 
+-- Email confirmation. Sign-in is refused until email_verified_at is set,
+-- whenever the server can send email (lib/server/auth-api.ts). Tokens are
+-- stored hashed, like reset tokens.
+alter table auth_credentials add column if not exists email_verified_at timestamptz;
+
+create table if not exists email_verification_tokens (
+  token_hash  text primary key,
+  profile_id  text not null references profiles (id) on delete cascade,
+  created_at  timestamptz not null default now(),
+  expires_at  timestamptz not null,
+  used_at     timestamptz
+);
+create index if not exists email_verification_tokens_profile_idx on email_verification_tokens (profile_id);
+
 -- ------------------------------------------------------------- role rows --
 create table if not exists students (
   id               text primary key default gen_random_uuid()::text,
@@ -233,6 +247,9 @@ create table if not exists checklist_items (
   order_index  integer not null default 0
 );
 create index if not exists checklist_items_event_role_idx on checklist_items (event_id, role, order_index);
+-- Lets the default checklist (lib/server/checklist-template.ts) be added to an
+-- event safely more than once: repeats are ignored.
+create unique index if not exists checklist_items_event_item_uniq on checklist_items (event_id, role, phase, title);
 
 create table if not exists checklist_progress (
   id                 text primary key default gen_random_uuid()::text,
