@@ -12,9 +12,10 @@ import { Button } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, sendMessage, recordScan,
-  getStudentByProfile, listSavedCompanies, saveCompany,
-  type CompanyRow, type ScanRow, type ShortlistRow, type SavedCompanyRow,
+  getStudentByProfile, listSavedCompanies, saveCompany, listMyQueues, getEvent,
+  type CompanyRow, type ScanRow, type ShortlistRow, type SavedCompanyRow, type MyQueueRow,
 } from "@/lib/db";
+import QueueControl from "@/components/dashboard/QueueControl";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 type Saves = { saved: boolean; interested: boolean; visited: boolean; followUp: boolean; note: string };
@@ -53,6 +54,8 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
   const [topSkills, setTopSkills] = useState<string[]>([]);
   const [saves, setSaves] = useState<Saves>(empty);
+  const [queue, setQueue] = useState<MyQueueRow | undefined>(undefined);
+  const [live, setLive] = useState(false);
   const [msg, setMsg] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const scanned = useRef(false);
@@ -72,7 +75,12 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
         const row = (await listSavedCompanies(eventId)).find((r) => r.company_id === companyProfileId);
         const legacy = row ? null : takeLegacySaves(session.profileId, companyProfileId);
         if (legacy) saveCompany(eventId, companyProfileId, toRow(legacy));
-        if (!cancelled) setSaves(row ? fromRow(row) : legacy ?? empty);
+        const [queues, ev] = await Promise.all([listMyQueues(eventId), getEvent(eventId)]);
+        if (!cancelled) {
+          setSaves(row ? fromRow(row) : legacy ?? empty);
+          setQueue(queues.find((q) => q.company_id === companyProfileId));
+          setLive(ev?.status === "live");
+        }
       } else if (viewer === "event_manager") {
         const inbound = await getScans({ eventId, scannedProfileId: companyProfileId });
         const sl = await listShortlistsForCompany(companyProfileId, eventId);
@@ -141,6 +149,10 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
                 setMsg(""); flash("Message sent");
               }}
               onNote={editNote}
+              queueSlot={
+                <QueueControl eventId={eventId} companyId={companyProfileId} queue={queue} live={live}
+                  onChange={async () => setQueue((await listMyQueues(eventId)).find((q) => q.company_id === companyProfileId))} />
+              }
             />
           )}
           {viewer === "event_manager" && <ManagerCompanyView company={company} scans={scans} shortlists={shortlists} topSkills={topSkills} />}
@@ -176,10 +188,11 @@ function CompanyHeader({ company }: { company: CompanyRow }) {
 }
 
 function StudentView({
-  company, saves, msg, setMsg, onToggle, onSend, onNote,
+  company, saves, msg, setMsg, onToggle, onSend, onNote, queueSlot,
 }: {
   company: CompanyRow; saves: Saves; msg: string; setMsg: (v: string) => void;
   onToggle: (k: keyof Saves, label: string) => void; onSend: () => void; onNote: (v: string) => void;
+  queueSlot: React.ReactNode;
 }) {
   return (
     <>
@@ -200,7 +213,7 @@ function StudentView({
         <SectionCard title="Skills they're looking for"><TagRow items={company.skills_wanted} tone="teal" /></SectionCard>
       ) : null}
 
-      <SectionCard title="Your actions">
+      <SectionCard title="Your actions" right={queueSlot}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Toggle on={saves.saved} onClick={() => onToggle("saved", "Saved company")} icon={<Bookmark size={15} />} label="Save company" />
           <Toggle on={saves.interested} onClick={() => onToggle("interested", "Marked interested")} icon={<Heart size={15} />} label="Interested" />

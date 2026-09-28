@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import {
   getStudentByProfile, getRegisteredCompanies, listSessions, listSavedCompanies, getScans,
   listShortlistsForStudent, listMessagesForProfile, getStudentEventInsights, getChecklistItems,
-  getChecklistProgress, getProfileNames,
+  getChecklistProgress, getProfileNames, listInterviewInvitesForStudent, listMyQueues,
   type StudentRow, type CompanyRow, type SessionRow, type SavedCompanyRow, type ScanRow,
-  type ShortlistRow, type MessageRow, type StudentInsights,
+  type ShortlistRow, type MessageRow, type StudentInsights, type InterviewInviteRow, type MyQueueRow,
 } from "./db";
 import type { StudentActivity } from "./readiness";
 
@@ -28,6 +28,10 @@ export interface StudentData {
   insights: StudentInsights | null;
   checklistPct: number;
   names: Record<string, { name: string; role: string; org: string }>;
+  /** Interview invites from any event, pending first. */
+  invites: InterviewInviteRow[];
+  /** Booth queues the student is in at this event. */
+  queues: MyQueueRow[];
 }
 
 export function activityOf(d: StudentData, profileId: string): StudentActivity {
@@ -53,7 +57,7 @@ export function useStudentData(profileId: string, eventId: string) {
     if (!profileId || !eventId) return;
     let cancelled = false;
     (async () => {
-      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress] = await Promise.all([
+      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress, invites, queues] = await Promise.all([
         getStudentByProfile(profileId),
         getRegisteredCompanies(eventId),
         listSessions(eventId),
@@ -65,6 +69,8 @@ export function useStudentData(profileId: string, eventId: string) {
         getStudentEventInsights(eventId),
         getChecklistItems("student", eventId),
         getChecklistProgress(profileId),
+        listInterviewInvitesForStudent(),
+        listMyQueues(eventId),
       ]);
       const ids = [
         ...scansIn.map((s) => s.scanner_profile_id),
@@ -75,7 +81,7 @@ export function useStudentData(profileId: string, eventId: string) {
       if (cancelled) return;
       const done = items.filter((i) => progress[i.id]).length;
       setData({
-        me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, names,
+        me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, names, invites, queues,
         checklistPct: items.length ? Math.round((done / items.length) * 100) : 0,
       });
     })();

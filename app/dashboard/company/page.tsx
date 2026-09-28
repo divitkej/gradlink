@@ -14,10 +14,12 @@ import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import EventGate from "@/components/events/EventGate";
 import {
-  getCompanyByProfile, getScans, listShortlistsForCompany, getStudentByProfile,
-  type CompanyRow, type ShortlistRow, type StudentRow, type ScanRow,
+  getCompanyByProfile, getScans, listShortlistsForCompany, getStudentByProfile, listInterviewInvitesForCompany,
+  type CompanyRow, type ShortlistRow, type StudentRow, type ScanRow, type InterviewInviteRow,
 } from "@/lib/db";
 import CompanyCandidates from "@/components/dashboard/CompanyCandidates";
+import CompanyQueue from "@/components/dashboard/CompanyQueue";
+import { EVENT_STATUS_LABEL } from "@/lib/events";
 
 function CompanyOverview({ eventId }: { eventId: string }) {
   const { session } = useSession();
@@ -25,21 +27,24 @@ function CompanyOverview({ eventId }: { eventId: string }) {
   const profileId = session?.profileId ?? "";
   const orgName = session?.org || "Your company";
   const eventTitle = event?.title ?? "This event";
+  const isLive = event?.status === "live";
 
   const [me, setMe] = useState<CompanyRow | null>(null);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [scans, setScans] = useState<ScanRow[]>([]);
+  const [invites, setInvites] = useState<InterviewInviteRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [c, sc, sl] = await Promise.all([
+      const [c, sc, sl, inv] = await Promise.all([
         getCompanyByProfile(profileId),
         getScans({ eventId, scannerProfileId: profileId }),
         listShortlistsForCompany(profileId, eventId),
+        listInterviewInvitesForCompany(eventId),
       ]);
       const ids = Array.from(new Set([
         ...sc.map((s) => s.scanned_profile_id).filter(Boolean) as string[],
@@ -47,7 +52,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
       ]));
       const rows = (await Promise.all(ids.map((id) => getStudentByProfile(id)))).filter(Boolean) as StudentRow[];
       if (cancelled) return;
-      setMe(c); setShortlists(sl); setScans(sc); setStudents(rows); setLoading(false);
+      setMe(c); setShortlists(sl); setScans(sc); setInvites(inv); setStudents(rows); setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [profileId, eventId]);
@@ -74,7 +79,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
           <GlassPanel style={{ border: "1px solid var(--border-strong)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
               <div>
-                <Badge tone="amber" pulse>{eventTitle} · Booth {me?.booth_number ?? "not set"}</Badge>
+                <Badge tone={isLive ? "amber" : "muted"} pulse={isLive}>{eventTitle} · Booth {me?.booth_number ?? "not set"}</Badge>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{orgName} Recruiting</h2>
                 <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 460 }}>Scan students at your booth, shortlist your best matches, and follow up, all from here.</p>
               </div>
@@ -101,9 +106,10 @@ function CompanyOverview({ eventId }: { eventId: string }) {
         </div>
 
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20 }}>
-          <CompanyCandidates eventId={eventId} eventTitle={eventTitle} loading={loading} students={students} shortlists={shortlists} scans={scans} />
+          <CompanyCandidates eventId={eventId} eventTitle={eventTitle} loading={loading} students={students} shortlists={shortlists} scans={scans} invites={invites} />
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <CompanyQueue eventId={eventId} live={isLive} />
             <GlassPanel id="pipeline">
               <PanelTitle>Candidate pipeline</PanelTitle>
               {hasPipeline ? <Pipeline stages={pipeline} /> : <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Your pipeline fills up as you scan and shortlist students.</p>}
@@ -113,7 +119,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "12px 14px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{eventTitle}</span>
-                  <Badge tone="amber" pulse>Live</Badge>
+                  {event?.status && <Badge tone={isLive ? "amber" : "muted"} pulse={isLive}>{EVENT_STATUS_LABEL[event.status]}</Badge>}
                 </div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "not set"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
               </div>

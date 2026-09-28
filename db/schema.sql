@@ -16,6 +16,8 @@
 --   * event_sessions, session_bookings, saved_companies, applications:
 --       the student readiness hub, schedule, passport and application tracker
 --   * seed_event_checklist(): the default checklist every event starts with
+--   * notifications, interview_invites, booth_queue: alerts, interview
+--       invites and live booth queues
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
@@ -252,7 +254,7 @@ create table if not exists event_sessions (
   created_at       timestamptz not null default now(),
   event_id         text not null references events (id) on delete cascade,
   host_profile_id  text references profiles (id) on delete set null,
-  kind             text not null check (kind in ('workshop', 'mock_interview', 'company_session', 'recruiter_slot', 'networking', 'talk')),
+  kind             text not null,
   title            text not null,
   description      text,
   location         text,
@@ -307,6 +309,65 @@ create table if not exists applications (
   notes         text
 );
 create index if not exists applications_student_idx on applications (student_id, updated_at desc);
+
+-- Alumni mentoring joined the session types after the table was first created,
+-- so the check is replaced rather than relying on create table.
+alter table event_sessions drop constraint if exists event_sessions_kind_check;
+alter table event_sessions add constraint event_sessions_kind_check
+  check (kind in ('workshop', 'mock_interview', 'company_session', 'recruiter_slot', 'networking', 'talk', 'mentoring'));
+
+-- ---------------------------------------------------------- notifications --
+-- In-app alerts: an interview invite, a waitlist place opening up, your turn
+-- in a booth queue. Written only by the server.
+create table if not exists notifications (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  profile_id  text not null references profiles (id) on delete cascade,
+  kind        text not null,
+  title       text not null,
+  body        text,
+  href        text,
+  read_at     timestamptz
+);
+create index if not exists notifications_profile_idx on notifications (profile_id, created_at desc);
+create index if not exists notifications_unread_idx on notifications (profile_id) where read_at is null;
+
+-- ------------------------------------------------------ interview invites --
+-- A company invites a student it met at an event, with up to five proposed
+-- times. Accepting books the chosen time into the student's applications.
+create table if not exists interview_invites (
+  id              text primary key default gen_random_uuid()::text,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+  event_id        text references events (id) on delete set null,
+  company_id      text not null references profiles (id) on delete cascade,
+  student_id      text not null references profiles (id) on delete cascade,
+  role_title      text not null,
+  message         text,
+  location        text,
+  proposed_times  timestamptz[] not null default '{}',
+  status          text not null default 'pending' check (status in ('pending', 'accepted', 'declined', 'cancelled')),
+  chosen_time     timestamptz,
+  application_id  text references applications (id) on delete set null
+);
+create index if not exists interview_invites_student_idx on interview_invites (student_id, created_at desc);
+create index if not exists interview_invites_company_idx on interview_invites (company_id, event_id);
+
+-- ------------------------------------------------------------ booth queues --
+-- A live queue at each company's booth. One row per student per booth;
+-- re-joining after being seen or leaving puts the student at the back.
+create table if not exists booth_queue (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  event_id    text not null references events (id) on delete cascade,
+  company_id  text not null references profiles (id) on delete cascade,
+  student_id  text not null references profiles (id) on delete cascade,
+  status      text not null default 'waiting' check (status in ('waiting', 'called', 'seen', 'left')),
+  called_at   timestamptz,
+  unique (event_id, company_id, student_id)
+);
+create index if not exists booth_queue_booth_idx on booth_queue (event_id, company_id, status, created_at);
 
 -- ------------------------------------------------- default checklists --
 -- Every event starts with the same checklist for each role. createEvent calls

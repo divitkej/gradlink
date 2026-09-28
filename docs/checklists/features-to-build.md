@@ -17,6 +17,12 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Student application tracker with interview dates and outcomes (applied, interviewing, offer, accepted) at `/dashboard/student/applications`
 - Saved companies, interest, booth visits and notes stored per event in the database (were localStorage)
 - Manager analytics computed live from real activity (were stored rows seeded to zero)
+- Interview invites: a company invites a student it met with up to five proposed times; the student picks one, which books it into their applications; either side is notified (`components/scan/InterviewInvite.tsx`, `components/dashboard/StudentApplications.tsx`)
+- Live booth queues: students join from their plan or a company's page (up to 3 at once) and see their place; the company calls the next student, who is told it is their turn (`components/dashboard/QueueControl.tsx`, `components/dashboard/CompanyQueue.tsx`)
+- In-app notifications for interview invites and replies, waitlist places and queue calls, behind the header bell (`/dashboard/notifications`)
+- Opportunities: every open role at the event, ranked for the student, with internships marked and one-click tracking (`/dashboard/student/opportunities`)
+- Alumni mentoring as a session type the college publishes and students book
+- Event history and company connections on the career profile, across every event (`components/dashboard/StudentHistory.tsx`)
 - Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
 
 ## Decision: employers see strengths, never assessments
@@ -40,12 +46,11 @@ So these are not planned for employers: filtering or sorting by readiness, résu
 
 | Feature | Where the site shows it | Notes |
 |---|---|---|
-| Interview tracking (invites, bookings) | Analytics funnel, Employer CRM pipeline and actions ("Invite to Interview"), Hero dashboard, Product reveal, Journey step 03 and 04, Platform tab "Employer CRM" | Students log their own interviews in the application tracker. Companies cannot invite to interview yet, and colleges do not see interview counts |
+| Interview counts for colleges | Analytics funnel, Hero dashboard, Product reveal, Journey step 04 | Invites and bookings are built for students and companies; the college dashboard and outcome report do not count them yet |
 | Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
-| Booth queues | Platform tab "Live Event Mode", Journey step 02 | Session waitlists and 1:1 recruiter slots are built; a live queue at a booth is not |
-| Candidate stages "Contacted", "Interview", "Offer" | Employer CRM pipeline, Platform tab CRM mini | Real stages are shortlisted, priority, maybe, not a fit |
-| Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
+| Candidate stages "Contacted" and "Offer" | Employer CRM pipeline, Platform tab CRM mini | "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies |
+| Alumni accounts | Why GradLink card "Useful all year round" | Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves |
 | Year-over-year comparison | Pricing (Placement Pro) | |
 
 ## Removed from the footer until they exist

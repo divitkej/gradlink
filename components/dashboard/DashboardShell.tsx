@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2,
+  LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2, Compass,
   MessageSquare, BarChart3, Users, Briefcase, ScanLine,
   Bell, Menu, X, BookOpen, Network, LogOut, History, Gauge, CalendarClock, Stamp,
 } from "lucide-react";
@@ -31,6 +31,7 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Schedule", href: "/dashboard/student/schedule", icon: CalendarClock },
     { label: "Passport", href: "/dashboard/student/passport", icon: Stamp },
     { label: "Companies", href: "/dashboard/student#companies", icon: Building2 },
+    { label: "Opportunities", href: "/dashboard/student/opportunities", icon: Compass },
     { label: "Applications", href: "/dashboard/student/applications", icon: Briefcase },
     { label: "Checklist", href: "/dashboard/student#checklist", icon: ListChecks },
     { label: "Career Profile", href: "/dashboard/profile", icon: UserCircle },
@@ -80,7 +81,8 @@ export default function DashboardShell({
   const { session, ready, signOut } = useSession();
   const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
-  const { count: unread } = useUnreadMessages(session?.profileId);
+  const { count: unread, alerts } = useUnreadMessages(session?.profileId);
+  const bellCount = unread + alerts;
 
   // Auth gate + role lock: must be signed in, and can only view your own role's pages.
   useEffect(() => {
@@ -202,13 +204,13 @@ export default function DashboardShell({
           </span>
           <div style={{ flex: 1 }} />
           <button
-            onClick={() => router.push("/dashboard/messages")}
-            aria-label={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "Notifications"}
-            title={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "Notifications"}
+            onClick={() => router.push("/dashboard/notifications")}
+            aria-label={bellCount > 0 ? `Notifications, ${bellCount} unread` : "Notifications"}
+            title={bellCount > 0 ? `${bellCount} unread` : "Notifications"}
             style={{ position: "relative", background: "var(--glass)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", color: "var(--text-2)", width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
           >
             <Bell size={17} />
-            {unread > 0 && (
+            {bellCount > 0 && (
               <span style={{ position: "absolute", top: 8, right: 9, width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", boxShadow: "0 0 6px var(--amber)" }} />
             )}
           </button>

@@ -10,7 +10,7 @@ import {
 import type { AppRole } from "@/lib/session";
 import { fmtDay, fmtTime, fromLocalInput } from "@/lib/format";
 
-const ALL_KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk"];
+const ALL_KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 const COMPANY_KINDS: SessionKind[] = ["company_session", "recruiter_slot", "mock_interview"];
 
 

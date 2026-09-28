@@ -132,7 +132,7 @@ export interface ChecklistProgressRow {
   completed_at: string | null;
 }
 
-export type SessionKind = "workshop" | "mock_interview" | "company_session" | "recruiter_slot" | "networking" | "talk";
+export type SessionKind = "workshop" | "mock_interview" | "company_session" | "recruiter_slot" | "networking" | "talk" | "mentoring";
 export type BookingStatus = "booked" | "waitlisted" | "attended" | "cancelled";
 
 export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
@@ -142,6 +142,7 @@ export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
   recruiter_slot: "1:1 recruiter slot",
   networking: "Networking",
   talk: "Talk",
+  mentoring: "Alumni mentoring",
 };
 
 export interface SessionRow {
@@ -444,6 +445,142 @@ export function saveApplication(input: {
 
 export function deleteApplication(id: string): Promise<boolean> {
   return safe("deleteApplication", false, () => rpc<boolean>("deleteApplication", id));
+}
+
+/* ---------------- Notifications ---------------- */
+export interface NotificationRow {
+  id: string;
+  created_at: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  read_at: string | null;
+}
+
+export function listNotifications(): Promise<NotificationRow[]> {
+  return safe("listNotifications", [], () => rpc<NotificationRow[]>("listNotifications"));
+}
+
+export function getUnreadNotificationCount(): Promise<number> {
+  return safe("getUnreadNotificationCount", 0, () => rpc<number>("getUnreadNotificationCount"));
+}
+
+export function markNotificationsRead(): Promise<number> {
+  return safe("markNotificationsRead", 0, () => rpc<number>("markNotificationsRead"));
+}
+
+/* ---------------- Interview invites ---------------- */
+export type InviteStatus = "pending" | "accepted" | "declined" | "cancelled";
+
+export interface InterviewInviteRow {
+  id: string;
+  created_at: string;
+  event_id: string | null;
+  company_id: string;
+  student_id: string;
+  role_title: string;
+  message: string | null;
+  location: string | null;
+  proposed_times: string[];
+  status: InviteStatus;
+  chosen_time: string | null;
+  application_id: string | null;
+  /** Present on the student's list. */
+  company_name?: string;
+  booth_number?: string | null;
+  /** Present on the company's list. */
+  student_name?: string;
+}
+
+export function sendInterviewInvite(input: {
+  eventId: string;
+  studentId: string;
+  roleTitle: string;
+  message?: string;
+  location?: string;
+  proposedTimes: string[];
+}): Promise<Result<"invite", InterviewInviteRow>> {
+  return safe("sendInterviewInvite", { ok: false, error: "Couldn't send the invite. Please try again." }, () => rpc("sendInterviewInvite", input));
+}
+
+export function listInterviewInvitesForStudent(): Promise<InterviewInviteRow[]> {
+  return safe("listInterviewInvitesForStudent", [], () => rpc<InterviewInviteRow[]>("listInterviewInvitesForStudent"));
+}
+
+export function listInterviewInvitesForCompany(eventId: string): Promise<InterviewInviteRow[]> {
+  return safe("listInterviewInvitesForCompany", [], () => rpc<InterviewInviteRow[]>("listInterviewInvitesForCompany", eventId));
+}
+
+export function respondInterviewInvite(inviteId: string, accept: boolean, chosenTime?: string | null): Promise<{ ok: true; application?: ApplicationRow } | { ok: false; error: string }> {
+  return safe("respondInterviewInvite", { ok: false, error: "Couldn't send your reply. Please try again." }, () => rpc("respondInterviewInvite", inviteId, accept, chosenTime ?? null));
+}
+
+export function cancelInterviewInvite(inviteId: string): Promise<boolean> {
+  return safe("cancelInterviewInvite", false, () => rpc<boolean>("cancelInterviewInvite", inviteId));
+}
+
+/* ---------------- Booth queues ---------------- */
+export interface MyQueueRow {
+  company_id: string;
+  status: "waiting" | "called";
+  created_at: string;
+  called_at: string | null;
+  company_name: string;
+  booth_number: string | null;
+  position: number | null;
+}
+
+export interface BoothQueueRow {
+  student_id: string;
+  status: "waiting" | "called";
+  created_at: string;
+  called_at: string | null;
+  full_name: string;
+  degree: string | null;
+  graduation_year: number | null;
+  target_roles: string[] | null;
+  skills: string[] | null;
+}
+
+export function joinQueue(eventId: string, companyId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  return safe("joinQueue", { ok: false, error: "Couldn't join the queue. Please try again." }, () => rpc("joinQueue", eventId, companyId));
+}
+
+export function leaveQueue(eventId: string, companyId: string): Promise<boolean> {
+  return safe("leaveQueue", false, () => rpc<boolean>("leaveQueue", eventId, companyId));
+}
+
+export function listMyQueues(eventId: string): Promise<MyQueueRow[]> {
+  return safe("listMyQueues", [], () => rpc<MyQueueRow[]>("listMyQueues", eventId));
+}
+
+export function listBoothQueue(eventId: string): Promise<BoothQueueRow[]> {
+  return safe("listBoothQueue", [], () => rpc<BoothQueueRow[]>("listBoothQueue", eventId));
+}
+
+export function callNextInQueue(eventId: string): Promise<string | null> {
+  return safe("callNextInQueue", null, () => rpc<string | null>("callNextInQueue", eventId));
+}
+
+export function markQueueEntry(eventId: string, studentId: string, status: "seen" | "left"): Promise<boolean> {
+  return safe("markQueueEntry", false, () => rpc<boolean>("markQueueEntry", eventId, studentId, status));
+}
+
+/* ---------------- Student history ---------------- */
+export interface StudentHistory {
+  events: {
+    id: string; title: string; start_date: string | null; status: string; location: string | null;
+    recruiter_scans: number; booths_visited: number; sessions_attended: number; shortlists: number;
+  }[];
+  connections: {
+    company_id: string; name: string; sector: string | null; visited: boolean; scanned_you: boolean;
+    messaged: boolean; shortlisted: boolean; interview: boolean; last_at: string;
+  }[];
+}
+
+export function getStudentHistory(): Promise<StudentHistory | null> {
+  return safe("getStudentHistory", null, () => rpc<StudentHistory>("getStudentHistory"));
 }
 
 /* ---------------- Engagement ---------------- */

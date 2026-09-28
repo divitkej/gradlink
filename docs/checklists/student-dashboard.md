@@ -6,11 +6,12 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 14 / 17 done, 3 need the live database or site
+## Progress: 20 / 23 done, 3 need the live database or site
 
 ## Before deploying
 
 - [ ] **Apply the schema to Neon before the new code goes live.** Run `npm run db:migrate`. It adds `event_sessions`, `session_bookings`, `saved_companies`, `applications`, three student columns and `seed_event_checklist()`, and backfills a default checklist for every event that has none. `createEvent` calls the new function, so creating an event fails until this has run.
+  Also adds `notifications`, `interview_invites`, `booth_queue` and the mentoring session type.
   `db/schema.sql` · Verify live
 
 ## Built
@@ -37,6 +38,21 @@ Status key as in `landing-page.md`.
   Done in "Complete the student dashboard against the landing page"
 - [x] **Automated check.** Production build driven by Playwright at 1440px and 375px against the real server code on Postgres 16: every student page loads with no console errors and no horizontal scroll, and booking, waitlisting, saving, applications, profile edits and host attendance all persist.
   Done in "Complete the student dashboard against the landing page"
+
+## Student side, second pass
+
+- [x] **Interview invites and bookings.** Company proposes up to five times; the student picks one, which books the interview into their applications (updating an existing application for that role rather than duplicating it). Only students the company scanned or shortlisted can be invited, one open invite at a time.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
+- [x] **Booth queues.** Only while the event is live, up to 3 queues per student, re-joining goes to the back, the student's page checks for their turn every 20 seconds.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
+- [x] **Notifications.** Interview invites and replies, a waitlist place opening up, and "It's your turn". The bell counts these and unread messages.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
+- [x] **Opportunities.** Every open role at the event, target-role matches first, internships marked, "I applied" adds it to applications.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
+- [x] **Alumni mentoring sessions.** New session type, counted toward Communication.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
+- [x] **Event history and company connections** on the career profile, across every event the student joined.
+  Done in "Finish the student side: invites, queues, alerts, opportunities"
 
 ## Employer privacy
 

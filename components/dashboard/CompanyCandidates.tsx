@@ -6,11 +6,11 @@ import { Download, Search, Send, ScanLine, Users } from "lucide-react";
 import { GlassPanel, PanelTitle } from "./widgets";
 import { Avatar, LoadingBlock, SmallButton, fieldStyle } from "./cards";
 import { Badge } from "@/components/ui/primitives";
-import { sendBulkMessage, type ScanRow, type ShortlistRow, type StudentRow } from "@/lib/db";
+import { sendBulkMessage, type ScanRow, type ShortlistRow, type StudentRow, type InterviewInviteRow } from "@/lib/db";
 import { downloadCsv, slugify } from "@/lib/csv";
 import { fmtDateTime } from "@/lib/format";
 
-type Stage = "all" | "undecided" | ShortlistRow["status"];
+type Stage = "all" | "undecided" | "interview" | ShortlistRow["status"];
 
 const STAGE_LABEL: Record<Exclude<Stage, "all">, string> = {
   undecided: "Scanned, no decision",
@@ -18,10 +18,14 @@ const STAGE_LABEL: Record<Exclude<Stage, "all">, string> = {
   shortlisted: "Shortlisted",
   maybe: "Maybe",
   rejected: "Not a fit",
+  interview: "Interview invited or booked",
 };
 
 const statusTone = (s?: string) =>
   s === "priority" ? "amber" : s === "shortlisted" ? "teal" : s === "maybe" ? "cyan" : "muted";
+
+const inviteLabel = (i?: InterviewInviteRow) =>
+  !i ? "" : i.status === "accepted" ? `Interview ${i.chosen_time ? fmtDateTime(i.chosen_time) : "booked"}` : "Interview invited";
 
 const select: React.CSSProperties = { ...fieldStyle, height: 36, fontSize: 12.5, width: "auto", minWidth: 0, flex: "1 1 140px" };
 
@@ -31,8 +35,9 @@ const select: React.CSSProperties = { ...fieldStyle, height: 36, fontSize: 12.5,
  * target roles) plus the company's own stage. No scores are shown to employers.
  */
 export default function CompanyCandidates({
-  eventId, eventTitle, loading, students, shortlists, scans,
+  eventId, eventTitle, loading, students, shortlists, scans, invites,
 }: {
+  invites: InterviewInviteRow[];
   eventId: string;
   eventTitle: string;
   loading: boolean;
@@ -53,6 +58,10 @@ export default function CompanyCandidates({
   const [result, setResult] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
 
   const slBy = useMemo(() => new Map(shortlists.map((s) => [s.student_id, s])), [shortlists]);
+  const inviteBy = useMemo(
+    () => new Map(invites.filter((i) => i.status === "pending" || i.status === "accepted").map((i) => [i.student_id, i])),
+    [invites],
+  );
   const firstScan = useMemo(() => {
     const m = new Map<string, string>();
     for (const s of scans) {
@@ -77,7 +86,7 @@ export default function CompanyCandidates({
       (year === "all" || String(s.graduation_year) === year) &&
       (skill === "all" || (s.skills ?? []).includes(skill)) &&
       (role === "all" || (s.target_roles ?? []).includes(role)) &&
-      (stage === "all" || (stage === "undecided" ? !st : st === stage)) &&
+      (stage === "all" || (stage === "undecided" ? !st : stage === "interview" ? inviteBy.has(s.profile_id ?? "") : st === stage)) &&
       (!needle || [s.full_name, s.degree, s.university, ...(s.skills ?? []), ...(s.target_roles ?? [])].join(" ").toLowerCase().includes(needle))
     );
   });
@@ -99,7 +108,9 @@ export default function CompanyCandidates({
         const scanned = firstScan.get(s.profile_id ?? "");
         return [
           s.full_name, s.email, s.degree ?? "", s.university ?? "", s.graduation_year ?? "", (s.skills ?? []).join("; "),
-          (s.target_roles ?? []).join("; "), sl ? STAGE_LABEL[sl.status] : STAGE_LABEL.undecided, sl?.notes ?? "",
+          (s.target_roles ?? []).join("; "),
+          [sl ? STAGE_LABEL[sl.status] : STAGE_LABEL.undecided, inviteLabel(inviteBy.get(s.profile_id ?? ""))].filter(Boolean).join(", "),
+          sl?.notes ?? "",
           abs(s.resume_url), s.linkedin_url ?? "", s.portfolio_url ?? "", s.github_url ?? "", scanned ? fmtDateTime(scanned) : "",
         ];
       }),
@@ -208,6 +219,7 @@ export default function CompanyCandidates({
                   </div>
                 ) : null}
               </div>
+              {inviteBy.has(id) && <Badge tone="teal">{inviteLabel(inviteBy.get(id))}</Badge>}
               <Badge tone={statusTone(status) as "teal" | "cyan" | "amber" | "muted"}>{status ? STAGE_LABEL[status] : "Scanned"}</Badge>
               <Link href={`/scan/student/${id}?eventId=${eventId}`} style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", textDecoration: "none", whiteSpace: "nowrap" }}>View →</Link>
             </div>

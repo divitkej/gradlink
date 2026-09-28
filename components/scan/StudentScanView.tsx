@@ -18,6 +18,7 @@ import {
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import GsapReveal from "@/components/anim/GsapReveal";
 import { safeHttpUrl } from "@/lib/utils";
+import InterviewInvite from "./InterviewInvite";
 
 export default function StudentScanView({ studentProfileId, eventId }: { studentProfileId: string; eventId: string }) {
   const { session, ready } = useSession();
@@ -91,6 +92,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
           <ProfileHeader student={student} checkedIn={viewer === "event_manager" && scanHistory.some((x) => x.scanner_role === "event_manager")} />
           {viewer === "company" && (
             <CompanyView
+              inviteSlot={<InterviewInvite eventId={eventId} companyId={session!.profileId} studentId={studentProfileId} firstName={student.full_name.split(" ")[0]} />}
               student={student} status={status} note={note} msg={msg} scanHistory={scanHistory}
               setNote={setNote} setMsg={setMsg}
               onStatus={async (st) => {
@@ -199,8 +201,9 @@ function CareerHighlights({ student }: { student: StudentRow }) {
 }
 
 function CompanyView({
-  student, status, note, msg, scanHistory, setNote, setMsg, onStatus, onSaveNote, onSend,
+  student, status, note, msg, scanHistory, setNote, setMsg, onStatus, onSaveNote, onSend, inviteSlot,
 }: {
+  inviteSlot: React.ReactNode;
   student: StudentRow; status: ShortlistRow["status"] | null; note: string; msg: string; scanHistory: ScanRow[];
   setNote: (v: string) => void; setMsg: (v: string) => void;
   onStatus: (s: ShortlistRow["status"]) => void; onSaveNote: () => void; onSend: () => void;
@@ -237,6 +240,8 @@ function CompanyView({
           <div style={{ marginTop: 8 }}><Button variant="secondary" onClick={onSaveNote} icon={<Check size={14} />}>Save note</Button></div>
         </div>
       </SectionCard>
+
+      {inviteSlot}
 
       <SectionCard title="Resume & links">
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>

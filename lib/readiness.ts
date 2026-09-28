@@ -73,7 +73,7 @@ export function competencies(me: Partial<StudentRow>, a: StudentActivity): Compe
         { label: "Write a bio", max: 20, earned: yes(bio.trim().length > 0, 20), href: PROFILE },
         { label: "Make your bio 120+ characters", max: 20, earned: yes(bio.trim().length >= 120, 20), href: PROFILE },
         { label: "Write your career goal", max: 20, earned: yes(!!me.career_goal?.trim(), 20), href: PROFILE },
-        sessionEvidence(a.sessions, ["workshop", "talk"], "Attend a workshop or talk", 20, 10),
+        sessionEvidence(a.sessions, ["workshop", "talk", "mentoring"], "Attend a workshop, talk or mentoring session", 20, 10),
         { label: "Message a recruiter", max: 20, earned: yes(a.companiesMessaged > 0, 20), href: MESSAGES },
       ],
     },

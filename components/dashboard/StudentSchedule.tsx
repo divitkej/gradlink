@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CalendarDays, Check, Clock, MapPin, Users, CircleAlert, CheckCircle2 } from "lucide-react";
 import { GlassPanel } from "./widgets";
@@ -8,13 +8,15 @@ import { SectionCard, LoadingBlock, SmallButton } from "./cards";
 import { Badge } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import { useStudentData } from "@/lib/use-student-data";
+import { useActiveEvent } from "@/lib/use-active-event";
+import QueueControl from "./QueueControl";
 import {
-  bookSession, cancelBooking, listSessions, saveCompany, SESSION_KIND_LABEL,
+  bookSession, cancelBooking, listSessions, saveCompany, listMyQueues, SESSION_KIND_LABEL,
   type SessionRow, type SessionKind, type CompanyRow,
 } from "@/lib/db";
 import { fmtDay, fmtTime, sessionEnd, sessionPhase } from "@/lib/format";
 
-const KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk"];
+const KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 
 export default function StudentSchedule({ eventId }: { eventId: string }) {
   const { session } = useSession();
@@ -23,6 +25,20 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
   const [kind, setKind] = useState<SessionKind | "all">("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<{ id: string; text: string } | null>(null);
+  const { event } = useActiveEvent();
+  const live = event?.status === "live";
+  const inQueue = (data?.queues.length ?? 0) > 0;
+
+  // While waiting in a queue, check for your turn every 20 seconds (visible tab only).
+  useEffect(() => {
+    if (!inQueue) return;
+    const t = window.setInterval(async () => {
+      if (document.visibilityState !== "visible") return;
+      const queues = await listMyQueues(eventId);
+      patch((d) => ({ ...d, queues }));
+    }, 20_000);
+    return () => window.clearInterval(t);
+  }, [inQueue, eventId, patch]);
 
   if (loading || !data) return <GlassPanel><LoadingBlock label="Loading the schedule…" /></GlassPanel>;
 
@@ -63,6 +79,14 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
     .filter((s) => s.saved && companies.has(s.company_id))
     .map((s) => ({ s, c: companies.get(s.company_id) as CompanyRow }))
     .sort((a, b) => (a.c.booth_number ?? "").localeCompare(b.c.booth_number ?? "", undefined, { numeric: true }));
+
+  const refreshQueues = async () => {
+    const queues = await listMyQueues(eventId);
+    patch((d) => ({ ...d, queues }));
+  };
+  const queueFor = new Map(data.queues.map((q) => [q.company_id, q]));
+  const savedIds = new Set(plan.map((p) => p.s.company_id));
+  const otherQueues = data.queues.filter((q) => !savedIds.has(q.company_id));
 
   async function toggleVisited(companyId: string, visited: boolean) {
     const res = await saveCompany(eventId, companyId, { visited });
@@ -135,14 +159,38 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
                     <Link href={`/scan/company/${s.company_id}?eventId=${eventId}`} style={{ display: "block", fontSize: 13, fontWeight: 600, color: s.visited ? "var(--text-2)" : "var(--text)", textDecoration: "none" }}>{c.company_name ?? c.company ?? c.full_name}</Link>
                     <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>{c.booth_number ? `Booth ${c.booth_number}` : "Booth not set"}{s.note ? ` · ${s.note}` : ""}</span>
                   </span>
-                  <SmallButton onClick={() => toggleVisited(s.company_id, !s.visited)} tone={s.visited ? "primary" : "default"} icon={s.visited ? <Check size={13} /> : undefined}>
-                    {s.visited ? "Visited" : "Mark visited"}
-                  </SmallButton>
+                  <span style={{ display: "inline-flex", gap: 8, alignItems: "flex-start", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                    <QueueControl eventId={eventId} companyId={s.company_id} queue={queueFor.get(s.company_id)} live={live} onChange={refreshQueues} />
+                    <SmallButton onClick={() => toggleVisited(s.company_id, !s.visited)} tone={s.visited ? "primary" : "default"} icon={s.visited ? <Check size={13} /> : undefined}>
+                      {s.visited ? "Visited" : "Mark visited"}
+                    </SmallButton>
+                  </span>
                 </div>
               ))}
             </div>
           )}
+          {live && plan.length > 0 && (
+            <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 10, lineHeight: 1.5 }}>
+              Join a booth queue and you are told here and in your notifications when it is your turn. You can wait in up to 3 queues at once.
+            </p>
+          )}
         </SectionCard>
+
+        {otherQueues.length > 0 && (
+          <SectionCard title="Other booth queues">
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {otherQueues.map((q) => (
+                <div key={q.company_id} style={{ display: "flex", gap: 10, alignItems: "center", padding: "10px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{q.company_name}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>{q.booth_number ? `Booth ${q.booth_number}` : "Booth not set"}</span>
+                  </span>
+                  <QueueControl eventId={eventId} companyId={q.company_id} queue={q} live={live} onChange={refreshQueues} />
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        )}
       </div>
 
       <style>{`@media (max-width: 960px) { .sched-grid { grid-template-columns: minmax(0, 1fr) !important; } }`}</style>

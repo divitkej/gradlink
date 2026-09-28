@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { getUnreadMessageCount } from "./db";
+import { getUnreadMessageCount, getUnreadNotificationCount } from "./db";
 
 /** Broadcast that the user has read messages, so badges refresh immediately. */
 const MSG_READ_EVT = "gl-messages-read";
@@ -11,10 +11,13 @@ export function notifyMessagesRead() {
   window.dispatchEvent(new Event(MSG_READ_EVT));
 }
 
+/** Same, for alerts (interview invites, queue calls, waitlist places). */
+export const notifyAlertsRead = notifyMessagesRead;
+
 const POLL_MS = 60_000;
 
 /**
- * Live unread-message count for the given profile.
+ * Live unread-message and unread-alert counts for the given profile.
  * Refreshes on mount, on window focus, when messages are marked read
  * (via `notifyMessagesRead`), and on a light interval so new incoming
  * messages surface without a full reload.
@@ -25,18 +28,21 @@ const POLL_MS = 60_000;
  */
 export function useUnreadMessages(profileId: string | null | undefined) {
   const [fetched, setFetched] = useState(0);
+  const [alerts, setAlerts] = useState(0);
 
   const refresh = useCallback(async () => {
     if (!profileId) return;
-    setFetched(await getUnreadMessageCount(profileId));
+    const [n, a] = await Promise.all([getUnreadMessageCount(profileId), getUnreadNotificationCount()]);
+    setFetched(n);
+    setAlerts(a);
   }, [profileId]);
 
   useEffect(() => {
     if (!profileId) return;
     let cancelled = false;
     const run = async () => {
-      const n = await getUnreadMessageCount(profileId);
-      if (!cancelled) setFetched(n);
+      const [n, a] = await Promise.all([getUnreadMessageCount(profileId), getUnreadNotificationCount()]);
+      if (!cancelled) { setFetched(n); setAlerts(a); }
     };
     run();
 
@@ -56,5 +62,5 @@ export function useUnreadMessages(profileId: string | null | undefined) {
   }, [profileId]);
 
   // Signed out, or no profile yet: there is nothing unread by definition.
-  return { count: profileId ? fetched : 0, refresh };
+  return { count: profileId ? fetched : 0, alerts: profileId ? alerts : 0, refresh };
 }

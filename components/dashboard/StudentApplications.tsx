@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Briefcase, CalendarClock, Pencil, Plus, Trash2 } from "lucide-react";
+import { Briefcase, CalendarCheck, CalendarClock, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { GlassPanel } from "./widgets";
 import { SectionCard, LoadingBlock, SmallButton, StatTile, Labeled, fieldStyle as field } from "./cards";
 import {
   listApplications, saveApplication, deleteApplication, getRegisteredCompanies, APPLICATION_STATUS_LABEL,
-  type ApplicationRow, type ApplicationStatus, type CompanyRow,
+  listInterviewInvitesForStudent, respondInterviewInvite,
+  type ApplicationRow, type ApplicationStatus, type CompanyRow, type InterviewInviteRow,
 } from "@/lib/db";
 import { fmtDateTime, fromLocalInput, toLocalInput } from "@/lib/format";
 
@@ -29,6 +30,7 @@ const blank: Draft = { companyId: "", companyName: "", roleTitle: "", status: "a
 export default function StudentApplications({ eventId }: { eventId: string }) {
   const [apps, setApps] = useState<ApplicationRow[] | null>(null);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
+  const [invites, setInvites] = useState<InterviewInviteRow[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -36,8 +38,8 @@ export default function StudentApplications({ eventId }: { eventId: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([listApplications(), getRegisteredCompanies(eventId)]).then(([a, c]) => {
-      if (!cancelled) { setApps(a); setCompanies(c); }
+    Promise.all([listApplications(), getRegisteredCompanies(eventId), listInterviewInvitesForStudent()]).then(([a, c, i]) => {
+      if (!cancelled) { setApps(a); setCompanies(c); setInvites(i); }
     });
     return () => { cancelled = true; };
   }, [eventId]);
@@ -83,8 +85,27 @@ export default function StudentApplications({ eventId }: { eventId: string }) {
     .sort((a, b) => (a.interview_at ?? "").localeCompare(b.interview_at ?? ""));
   const count = (...s: ApplicationStatus[]) => apps.filter((a) => s.includes(a.status)).length;
 
+  async function respond(invite: InterviewInviteRow, accept: boolean, time: string | null) {
+    const res = await respondInterviewInvite(invite.id, accept, time);
+    if (!res.ok) return res.error;
+    const [a, i] = await Promise.all([listApplications(), listInterviewInvitesForStudent()]);
+    setApps(a);
+    setInvites(i);
+    return null;
+  }
+
+  const openInvites = invites.filter((i) => i.status === "pending");
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {openInvites.length > 0 && (
+        <SectionCard title="Interview invites" hint={`${openInvites.length} waiting for your reply`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {openInvites.map((i) => <InviteCard key={i.id} invite={i} onRespond={respond} />)}
+          </div>
+        </SectionCard>
+      )}
+
       <div className="apps-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
         <StatTile label="Applications" value={apps.length} />
         <StatTile label="Interviewing" value={count("interviewing")} />
@@ -206,3 +227,53 @@ export default function StudentApplications({ eventId }: { eventId: string }) {
   );
 }
 
+
+function InviteCard({ invite, onRespond }: {
+  invite: InterviewInviteRow;
+  onRespond: (i: InterviewInviteRow, accept: boolean, time: string | null) => Promise<string | null>;
+}) {
+  const [now] = useState(() => Date.now());
+  const times = invite.proposed_times.filter((t) => new Date(t).getTime() > now);
+  const [time, setTime] = useState<string | null>(times[0] ?? null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const expired = invite.proposed_times.length > 0 && times.length === 0;
+
+  async function go(accept: boolean) {
+    if (!accept && !window.confirm(`Decline the ${invite.role_title} interview with ${invite.company_name}?`)) return;
+    setBusy(true);
+    setError(await onRespond(invite, accept, accept ? time : null));
+    setBusy(false);
+  }
+
+  return (
+    <div style={{ padding: 16, background: "rgba(255,255,255,0.05)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <CalendarCheck size={18} color="var(--accent)" style={{ flexShrink: 0, marginTop: 2 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>{invite.role_title} · {invite.company_name}</div>
+          {invite.location && <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12.5, color: "var(--text-2)", marginTop: 3 }}><MapPin size={12} /> {invite.location}</div>}
+          {invite.message && <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.55, marginTop: 8 }}>{invite.message}</p>}
+        </div>
+      </div>
+      {times.length > 0 && (
+        <fieldset style={{ border: "none", margin: "14px 0 0", padding: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+          <legend style={{ fontSize: 12, color: "var(--text-2)", marginBottom: 6 }}>Pick a time</legend>
+          {times.map((t) => (
+            <label key={t} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", fontSize: 13, color: "var(--text)", background: time === t ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${time === t ? "var(--border-strong)" : "var(--border)"}`, borderRadius: "var(--r-sm)", cursor: "pointer" }}>
+              <input type="radio" name={`invite-${invite.id}`} checked={time === t} onChange={() => setTime(t)} />
+              {fmtDateTime(t)}
+            </label>
+          ))}
+        </fieldset>
+      )}
+      {invite.proposed_times.length === 0 && <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 10 }}>No time proposed yet. Accept and the company will confirm one with you.</p>}
+      {expired && <p style={{ fontSize: 12.5, color: "var(--amber)", marginTop: 10 }}>All proposed times have passed. Message the company for a new one.</p>}
+      {error && <p role="alert" style={{ fontSize: 12.5, color: "var(--danger)", marginTop: 10 }}>{error}</p>}
+      <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+        <SmallButton tone="primary" disabled={busy || expired} onClick={() => go(true)}>{busy ? "Saving…" : times.length ? "Accept this time" : "Accept"}</SmallButton>
+        <SmallButton disabled={busy} onClick={() => go(false)}>Decline</SmallButton>
+      </div>
+    </div>
+  );
+}

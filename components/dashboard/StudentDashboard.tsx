@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import {
   Sparkles, AlertTriangle, ScanLine, Building2, History, CalendarClock, Stamp, Briefcase, Award, Bookmark, BookmarkCheck, ArrowRight,
+  Users, CalendarCheck,
 } from "lucide-react";
 import { GlassPanel, PanelTitle, StatCard } from "./widgets";
 import { SectionCard, ScoreRing, LoadingBlock, SmallButton } from "./cards";
@@ -56,6 +57,8 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
   const next = booked.find((s) => s.my_status === "booked") ?? booked[0];
   const upcoming = data.sessions.filter((s) => sessionPhase(s) !== "ended").length;
 
+  const pendingInvites = data.invites.filter((i) => i.status === "pending");
+  const called = data.queues.filter((q) => q.status === "called");
   const savedMap = new Map(data.saved.map((s) => [s.company_id, s]));
   const matches = matchCompanies(me, data.companies);
   const shown = showAll ? matches : matches.slice(0, 6);
@@ -124,11 +127,35 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
         </Reveal>
       </div>
 
+      {/* Things that need the student now */}
+      {(pendingInvites.length > 0 || called.length > 0) && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }} role="region" aria-label="Needs your attention">
+          {called.map((q) => (
+            <Link key={q.company_id} href="/dashboard/student/schedule" className="dash-next" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+              <Users size={18} color="var(--accent)" />
+              <span style={{ flex: 1, fontSize: 13.5, color: "var(--text)" }}>
+                <strong>It&apos;s your turn at {q.company_name}.</strong> {q.booth_number ? `Head to booth ${q.booth_number} now.` : "Head to their booth now."}
+              </span>
+              <ArrowRight size={15} color="var(--text-muted)" />
+            </Link>
+          ))}
+          {pendingInvites.map((i) => (
+            <Link key={i.id} href="/dashboard/student/applications" className="dash-next" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+              <CalendarCheck size={18} color="var(--accent)" />
+              <span style={{ flex: 1, fontSize: 13.5, color: "var(--text)" }}>
+                <strong>{i.company_name} invited you to interview</strong> for {i.role_title}. Pick a time.
+              </span>
+              <ArrowRight size={15} color="var(--text-muted)" />
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Shortcuts to the other student pages */}
       <div className="dash-shortcuts" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
         <Shortcut href="/dashboard/student/schedule" icon={<CalendarClock size={17} />} title="Schedule and plan" sub={`${booked.length} booked · ${data.saved.filter((s) => s.saved).length} companies saved`} />
         <Shortcut href="/dashboard/student/passport" icon={<Stamp size={17} />} title="Digital passport" sub={data.insights?.me ? `Engagement ${data.insights.me.score}/100 · rank ${data.insights.me.rank} of ${data.insights.total}` : "Your event journey"} />
-        <Shortcut href="/dashboard/student/applications" icon={<Briefcase size={17} />} title="Applications" sub="Track interviews and offers" />
+        <Shortcut href="/dashboard/student/applications" icon={<Briefcase size={17} />} title="Applications" sub={pendingInvites.length ? `${pendingInvites.length} interview ${pendingInvites.length === 1 ? "invite" : "invites"} waiting` : "Track interviews and offers"} />
       </div>
 
       <StudentReadiness comps={comps} plan={plan} readiness={rd} fairReady={fr} />

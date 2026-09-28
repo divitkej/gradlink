@@ -110,10 +110,36 @@ function randomCode(length = 6): string {
 
 const EVENT_STATUSES = ["draft", "upcoming", "live", "ended"];
 const SHORTLIST_STATUSES = ["shortlisted", "maybe", "rejected", "priority"];
-const SESSION_KINDS = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk"];
+const SESSION_KINDS = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 /** The session types a company may run at an event it is registered for. */
 const COMPANY_SESSION_KINDS = ["company_session", "recruiter_slot", "mock_interview"];
 const APPLICATION_STATUSES = ["applied", "interviewing", "offer", "accepted", "rejected", "withdrawn"];
+
+/* ---------------- notifications ---------------- */
+
+/** An in-app alert. Returned as a query so it can join a transaction. */
+function notifyQuery(profileId: string, kind: string, title: string, body: string | null, href: string | null) {
+  return db()`insert into notifications (profile_id, kind, title, body, href)
+              values (${profileId}, ${kind}, ${title.slice(0, 200)}, ${body?.slice(0, 500) ?? null}, ${href})`;
+}
+
+/** The name a company goes by: its company name, else the account's organisation. */
+async function companyName(companyId: string): Promise<string> {
+  const rows = await db()`
+    select coalesce(nullif(c.company_name, ''), nullif(c.company, ''), nullif(p.organization, ''), p.full_name) as name
+    from profiles p left join companies c on c.id = p.id where p.id = ${companyId}
+  `;
+  return (rows[0]?.name as string) || "A company";
+}
+
+/** A company may contact a student it scanned or shortlisted at this event. */
+async function companyMetStudent(companyId: string, studentId: string, eventId: string) {
+  const rows = await db()`
+    select 1 where exists (select 1 from scans where event_id = ${eventId} and scanner_profile_id = ${companyId} and scanned_profile_id = ${studentId})
+       or exists (select 1 from shortlists where event_id = ${eventId} and company_id = ${companyId} and student_id = ${studentId})
+  `;
+  return rows.length > 0;
+}
 
 /* ---------------- event membership ---------------- */
 
@@ -638,7 +664,7 @@ export const ops: Record<string, Op> = {
   async cancelBooking(u, [sessionId]) {
     const id = s(sessionId);
     const sql = db();
-    const [, cancelled] = await sql.transaction([
+    const [, cancelled, promoted] = await sql.transaction([
       sql`select id from event_sessions where id = ${id} for update`,
       sql`update session_bookings set status = 'cancelled'
           where session_id = ${id} and profile_id = ${u.id} and status in ('booked', 'waitlisted') returning id`,
@@ -649,8 +675,13 @@ export const ops: Record<string, Op> = {
                 select count(*) from session_bookings b where b.session_id = es.id and b.status in ('booked', 'attended')
               ) < es.capacity)
             order by w.created_at, w.id limit 1
-          )`,
+          ) returning profile_id`,
     ]);
+    if (promoted.length) {
+      const [session] = await sql`select title from event_sessions where id = ${id}`;
+      await notifyQuery(promoted[0].profile_id as string, "waitlist_promoted", `You're booked for ${session?.title ?? "a session"}`,
+        "A place opened up, so you moved off the waitlist.", "/dashboard/student/schedule");
+    }
     return cancelled.length > 0;
   },
   async listSessionBookings(u, [sessionId]) {
@@ -732,6 +763,244 @@ export const ops: Record<string, Op> = {
   async deleteApplication(u, [id]) {
     const rows = await db()`delete from applications where id = ${s(id)} and student_id = ${u.id} returning id`;
     return rows.length > 0;
+  },
+
+  /* Notifications: the caller's own. */
+  async listNotifications(u) {
+    return db()`select * from notifications where profile_id = ${u.id} order by created_at desc limit 50`;
+  },
+  async getUnreadNotificationCount(u) {
+    const rows = await db()`select count(*)::int as n from notifications where profile_id = ${u.id} and read_at is null`;
+    return rows[0]?.n ?? 0;
+  },
+  async markNotificationsRead(u) {
+    const rows = await db()`update notifications set read_at = now() where profile_id = ${u.id} and read_at is null returning id`;
+    return rows.length;
+  },
+
+  /* Interview invites: company to a student it met; the student books a time. */
+  async sendInterviewInvite(u, [input]) {
+    if (u.role !== "company") throw forbidden();
+    const i = (input ?? {}) as Row;
+    const eventId = s(i.eventId);
+    const studentId = s(i.studentId);
+    const roleTitle = s(i.roleTitle).trim().slice(0, 200);
+    if (!roleTitle) return { ok: false, error: "Add the role you are interviewing for." };
+    const now = Date.now();
+    const times = Array.from(new Set((Array.isArray(i.proposedTimes) ? i.proposedTimes : []).map(isoOrNull).filter((t): t is string => !!t)))
+      .filter((t) => new Date(t).getTime() > now)
+      .sort()
+      .slice(0, 5);
+    if (Array.isArray(i.proposedTimes) && i.proposedTimes.some((t) => s(t)) && !times.length) {
+      return { ok: false, error: "Proposed times must be in the future." };
+    }
+    if (!(await companyMetStudent(u.id, studentId, eventId))) {
+      return { ok: false, error: "You can invite students you scanned or shortlisted at this event." };
+    }
+    const open = await db()`select 1 from interview_invites where company_id = ${u.id} and student_id = ${studentId} and status = 'pending'`;
+    if (open.length) return { ok: false, error: "This candidate already has an open invite from you. Cancel it to send a new one." };
+
+    const name = await companyName(u.id);
+    const sql = db();
+    const [rows] = await sql.transaction([
+      sql`insert into interview_invites (event_id, company_id, student_id, role_title, message, location, proposed_times)
+          values (${eventId}, ${u.id}, ${studentId}, ${roleTitle}, ${textOrNull(i.message, 2000)?.trim() || null},
+                  ${textOrNull(i.location, 300)?.trim() || null}, ${times}::timestamptz[])
+          returning *`,
+      notifyQuery(studentId, "interview_invite", `${name} invited you to interview`, roleTitle, "/dashboard/student/applications"),
+    ]);
+    return { ok: true, invite: rows[0] };
+  },
+  async listInterviewInvitesForStudent(u) {
+    return db()`
+      select i.*, coalesce(nullif(c.company_name, ''), nullif(c.company, ''), nullif(p.organization, ''), p.full_name) as company_name, c.booth_number
+      from interview_invites i join profiles p on p.id = i.company_id left join companies c on c.id = i.company_id
+      where i.student_id = ${u.id} and i.status <> 'cancelled'
+      order by case i.status when 'pending' then 0 else 1 end, i.created_at desc
+    `;
+  },
+  async listInterviewInvitesForCompany(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    return db()`
+      select i.*, p.full_name as student_name from interview_invites i join profiles p on p.id = i.student_id
+      where i.company_id = ${u.id} and i.event_id = ${s(eventId)} order by i.created_at desc
+    `;
+  },
+  /**
+   * Accept one of the proposed times (or accept when none were proposed), or
+   * decline. Accepting books the interview into the student's applications.
+   */
+  async respondInterviewInvite(u, [inviteId, accept, chosenTime]) {
+    const sql = db();
+    const [invite] = await sql`select * from interview_invites where id = ${s(inviteId)} and student_id = ${u.id}`;
+    if (!invite) throw forbidden();
+    if (invite.status !== "pending") return { ok: false, error: "This invite is no longer open." };
+    const proposed = ((invite.proposed_times as string[]) ?? []).map((t) => new Date(t).toISOString());
+    const chosen = isoOrNull(chosenTime);
+    if (accept && proposed.length && (!chosen || !proposed.includes(chosen))) return { ok: false, error: "Pick one of the proposed times." };
+
+    // Claim the invite first so a double click can't book it twice.
+    const claimed = await sql`
+      update interview_invites set status = ${accept ? "accepted" : "declined"}, chosen_time = ${accept ? chosen : null}, updated_at = now()
+      where id = ${invite.id as string} and status = 'pending' returning id
+    `;
+    if (!claimed.length) return { ok: false, error: "This invite is no longer open." };
+
+    const [me] = await sql`select full_name from profiles where id = ${u.id}`;
+    const studentName = (me?.full_name as string) || "A student";
+    const href = `/scan/student/${u.id}${invite.event_id ? `?eventId=${invite.event_id}` : ""}`;
+    if (!accept) {
+      await notifyQuery(invite.company_id as string, "interview_declined", `${studentName} declined your interview invite`, invite.role_title as string, href);
+      return { ok: true };
+    }
+
+    const name = await companyName(invite.company_id as string);
+    const existing = await sql`
+      select id from applications where student_id = ${u.id} and company_id = ${invite.company_id as string}
+        and lower(role_title) = lower(${invite.role_title as string}) order by updated_at desc limit 1
+    `;
+    const app = existing.length
+      ? await sql`update applications set status = 'interviewing', interview_at = ${chosen}, updated_at = now()
+                  where id = ${existing[0].id as string} returning *`
+      : await sql`insert into applications (student_id, event_id, company_id, company_name, role_title, status, interview_at)
+                  values (${u.id}, ${invite.event_id as string | null}, ${invite.company_id as string}, ${name}, ${invite.role_title as string}, 'interviewing', ${chosen})
+                  returning *`;
+    await sql.transaction([
+      sql`update interview_invites set application_id = ${app[0].id as string} where id = ${invite.id as string}`,
+      notifyQuery(invite.company_id as string, "interview_accepted", `${studentName} accepted your interview invite`,
+        invite.role_title as string, href),
+    ]);
+    return { ok: true, application: app[0] };
+  },
+  async cancelInterviewInvite(u, [inviteId]) {
+    const sql = db();
+    const rows = await sql`
+      update interview_invites set status = 'cancelled', updated_at = now()
+      where id = ${s(inviteId)} and company_id = ${u.id} and status in ('pending', 'accepted') returning student_id, role_title
+    `;
+    if (!rows.length) return false;
+    const name = await companyName(u.id);
+    await notifyQuery(rows[0].student_id as string, "interview_cancelled", `${name} cancelled an interview`, rows[0].role_title as string, "/dashboard/student/applications");
+    return true;
+  },
+
+  /* Booth queues: live, while the event is running. */
+  async joinQueue(u, [eventId, companyId]) {
+    if (u.role !== "student") return { ok: false, error: "Only students can join a booth queue." };
+    const ev = s(eventId), co = s(companyId);
+    const sql = db();
+    const [event] = await sql`select status from events where id = ${ev}`;
+    if (!event) return { ok: false, error: "That event no longer exists." };
+    if (event.status !== "live") return { ok: false, error: "Booth queues open when the event is live." };
+    if (!(await isRegistered(ev, u.id))) return { ok: false, error: "Join this event first." };
+    const booth = await sql`select 1 from event_registrations where event_id = ${ev} and profile_id = ${co} and role = 'company'`;
+    if (!booth.length) return { ok: false, error: "That company isn't at this event." };
+    const active = await sql`
+      select count(*)::int as n from booth_queue
+      where event_id = ${ev} and student_id = ${u.id} and status in ('waiting', 'called') and company_id <> ${co}
+    `;
+    if ((active[0]?.n ?? 0) >= 3) return { ok: false, error: "You can wait in up to 3 queues at once. Leave one first." };
+    await sql`
+      insert into booth_queue (event_id, company_id, student_id) values (${ev}, ${co}, ${u.id})
+      on conflict (event_id, company_id, student_id) do update
+        set status = 'waiting', created_at = now(), updated_at = now(), called_at = null
+        where booth_queue.status in ('seen', 'left')
+    `;
+    return { ok: true };
+  },
+  async leaveQueue(u, [eventId, companyId]) {
+    const rows = await db()`
+      update booth_queue set status = 'left', updated_at = now()
+      where event_id = ${s(eventId)} and company_id = ${s(companyId)} and student_id = ${u.id} and status in ('waiting', 'called')
+      returning id
+    `;
+    return rows.length > 0;
+  },
+  /** The student's queues, with their place in each. */
+  async listMyQueues(u, [eventId]) {
+    return db()`
+      select q.company_id, q.status, q.created_at, q.called_at,
+        coalesce(nullif(c.company_name, ''), nullif(c.company, ''), nullif(p.organization, ''), p.full_name) as company_name, c.booth_number,
+        case when q.status = 'waiting' then 1 + (
+          select count(*)::int from booth_queue w where w.event_id = q.event_id and w.company_id = q.company_id
+            and w.status = 'waiting' and (w.created_at, w.id) < (q.created_at, q.id)
+        ) end as position
+      from booth_queue q join profiles p on p.id = q.company_id left join companies c on c.id = q.company_id
+      where q.event_id = ${s(eventId)} and q.student_id = ${u.id} and q.status in ('waiting', 'called')
+      order by q.created_at
+    `;
+  },
+  /** The company's own queue: called students first, then waiting in order. Strengths only. */
+  async listBoothQueue(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    return db()`
+      select q.student_id, q.status, q.created_at, q.called_at, p.full_name, st.degree, st.graduation_year, st.target_roles, st.skills
+      from booth_queue q join profiles p on p.id = q.student_id left join students st on st.id = q.student_id
+      where q.event_id = ${s(eventId)} and q.company_id = ${u.id} and q.status in ('waiting', 'called')
+      order by case q.status when 'called' then 0 else 1 end, q.created_at, q.id
+    `;
+  },
+  /** Call the student at the front. Skips rows another tab is calling at the same moment. */
+  async callNextInQueue(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    const rows = await db()`
+      update booth_queue set status = 'called', called_at = now(), updated_at = now()
+      where id = (
+        select id from booth_queue where event_id = ${s(eventId)} and company_id = ${u.id} and status = 'waiting'
+        order by created_at, id limit 1 for update skip locked
+      ) returning student_id
+    `;
+    if (!rows.length) return null;
+    const [booth] = await db()`select booth_number from companies where id = ${u.id}`;
+    const name = await companyName(u.id);
+    await notifyQuery(rows[0].student_id as string, "queue_called", `It's your turn at ${name}`,
+      booth?.booth_number ? `Head to booth ${booth.booth_number} now.` : "Head to their booth now.", "/dashboard/student/schedule");
+    return rows[0].student_id;
+  },
+  async markQueueEntry(u, [eventId, studentId, status]) {
+    if (u.role !== "company" || !["seen", "left"].includes(s(status))) throw forbidden();
+    const rows = await db()`
+      update booth_queue set status = ${s(status)}, updated_at = now()
+      where event_id = ${s(eventId)} and company_id = ${u.id} and student_id = ${s(studentId)} and status in ('waiting', 'called')
+      returning id
+    `;
+    return rows.length > 0;
+  },
+
+  /* A student's history across every event, for the career profile. */
+  async getStudentHistory(u) {
+    if (u.role !== "student") throw forbidden();
+    const sql = db();
+    const [events, connections] = await Promise.all([
+      sql`
+        select e.id, e.title, e.start_date, e.status, e.location,
+          (select count(distinct x.scanner_profile_id)::int from scans x where x.event_id = e.id and x.scanned_profile_id = ${u.id} and x.scanner_role = 'company') as recruiter_scans,
+          (select count(distinct x.scanned_profile_id)::int from scans x where x.event_id = e.id and x.scanner_profile_id = ${u.id} and x.scanned_role = 'company') as booths_visited,
+          (select count(*)::int from session_bookings b join event_sessions es on es.id = b.session_id where es.event_id = e.id and b.profile_id = ${u.id} and b.status = 'attended') as sessions_attended,
+          (select count(*)::int from shortlists l where l.event_id = e.id and l.student_id = ${u.id} and l.status in ('shortlisted', 'priority')) as shortlists
+        from event_registrations r join events e on e.id = r.event_id
+        where r.profile_id = ${u.id} order by e.start_date desc nulls last, e.created_at desc
+      `,
+      sql`
+        with touch as (
+          select scanned_profile_id as cid, 'visited' as k, created_at from scans where scanner_profile_id = ${u.id} and scanned_role = 'company'
+          union all select company_id, 'visited', updated_at from saved_companies where student_id = ${u.id} and visited
+          union all select scanner_profile_id, 'scanned_you', created_at from scans where scanned_profile_id = ${u.id} and scanner_role = 'company'
+          union all select m.receiver_profile_id, 'messaged', m.created_at from messages m join profiles rp on rp.id = m.receiver_profile_id
+            where m.sender_profile_id = ${u.id} and rp.role = 'company'
+          union all select company_id, 'shortlisted', created_at from shortlists where student_id = ${u.id} and status in ('shortlisted', 'priority')
+          union all select company_id, 'interview', created_at from interview_invites where student_id = ${u.id} and status in ('pending', 'accepted')
+        )
+        select t.cid as company_id,
+          coalesce(nullif(c.company_name, ''), nullif(c.company, ''), nullif(p.organization, ''), p.full_name) as name, c.sector,
+          bool_or(t.k = 'visited') as visited, bool_or(t.k = 'scanned_you') as scanned_you, bool_or(t.k = 'messaged') as messaged,
+          bool_or(t.k = 'shortlisted') as shortlisted, bool_or(t.k = 'interview') as interview, max(t.created_at) as last_at
+        from touch t join profiles p on p.id = t.cid left join companies c on c.id = t.cid
+        group by t.cid, c.company_name, c.company, p.organization, p.full_name, c.sector
+        order by last_at desc
+      `,
+    ]);
+    return { events, connections };
   },
 
   /* Billing — read-only, owner only. Only the Stripe webhook writes it. */
