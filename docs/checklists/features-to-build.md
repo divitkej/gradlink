@@ -35,7 +35,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 | Candidate filters (degree, graduation year, GPA, skills, readiness, résumé score, activity, stage) | Employer CRM filter chips | Check which filters the company dashboard supports; GPA is not stored |
 | Candidate stages "Contacted", "Interview", "Offer" | Employer CRM pipeline, Platform tab CRM mini | Real stages are shortlisted, priority, maybe, not a fit |
 | Bulk messages | Why GradLink card "Helps employers follow up faster" | Only one-to-one messages |
-| CSV export for companies | Employer CRM "Export CSV" | Only the college outcome report exports CSV |
+| CSV export for companies | Not shown any more (the mockup's "Export CSV" was removed) | Only the college outcome report exports CSV |
 | Applications | Journey step 03 | |
 | Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
 | Year-over-year comparison | Pricing (Placement Pro) | |
@@ -46,7 +46,7 @@ These footer links pointed nowhere. They were taken out and will come back once 
 
 Career Profiles, Events Hub, Readiness Hub, Employer CRM (as separate pages), Find Events, Mock Interviews, Job Board, Post Roles, Manage Candidates, Book Fair Booth, Campus Partnerships, Talent Pipeline, Career Centre Dashboard, Workshop Tools, Alumni Network.
 
-Also removed: LinkedIn, Twitter and Instagram (no accounts yet), and Privacy Policy, Terms of Service and Contact (no pages yet, see launch blockers).
+Also removed: LinkedIn, Twitter and Instagram (no accounts yet), and Contact (no page yet). Privacy Policy and Terms are back as of "Add Privacy Policy and Terms pages".
 
 ## Claims to confirm
 
@@ -57,5 +57,8 @@ These are service promises, not features. Confirm each is true before launch or 
 | "Setup in 48 hours" | CTA section |
 | "No contract lock-in" | CTA section |
 | "Dedicated onboarding" | CTA section |
-| "UAE data residency" | CTA section. The app runs on Neon and Cloudflare; confirm the data region before keeping this |
-| "GradLink Technologies LLC" | Footer copyright. Confirm the registered company name |
+
+## Resolved claims
+
+- [x] **"GradLink Technologies LLC" in the footer.** The company is not registered yet, so the footer now reads "© GradLink". Put the registered name back once it exists. Done in "Drop the unregistered company name from the footer"
+- [x] **"UAE data residency" in the CTA section.** False, data is stored in Singapore. Replaced with "Free for students and employers". Done in "Add Privacy Policy and Terms pages"

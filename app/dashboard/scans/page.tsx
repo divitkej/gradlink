@@ -8,7 +8,7 @@ import { Avatar, LoadingBlock } from "@/components/dashboard/cards";
 import { History } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
-import { getScans, getProfileNames, type ScanRow } from "@/lib/db";
+import { scanLabel, getScans, getProfileNames, type ScanRow } from "@/lib/db";
 
 export default function ScansPage() {
   const { session, ready } = useSession();
@@ -46,7 +46,7 @@ export default function ScansPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "34px 24px 42px", textAlign: "center" }}>
             <div style={{ width: 48, height: 48, borderRadius: "var(--r-lg)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}><History size={22} /></div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No scans yet</div>
-            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Every QR scan you make — or that someone makes of you — will be logged here.</p>
+            <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>Every QR scan you make, or that someone makes of you, will be logged here.</p>
           </div>
         ) : (
           scans.map((s) => {
@@ -59,7 +59,7 @@ export default function ScansPage() {
                   <Avatar name={other?.name ?? "GradLink"} size={32} tone={other?.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                   <div>
                     <div style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 500 }}>{mineScanner ? `You scanned ${other?.name ?? "a profile"}` : `${other?.name ?? "Someone"} scanned you`}</div>
-                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{s.scan_context ?? "scan"}{s.notes ? ` · ${s.notes}` : ""}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{scanLabel(s.scan_context)}{s.notes ? ` · ${s.notes}` : ""}</div>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

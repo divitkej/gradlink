@@ -58,8 +58,8 @@ function MiniProfile() {
         ))}
       </div>
       <div style={{ display: "flex", gap: 8 }}>
-        {["Resume ✓", "Portfolio ✓", "LinkedIn ✓"].map((l) => (
-          <span key={l} style={{ flex: 1, fontSize: 11, textAlign: "center", color: "var(--accent-2)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "var(--r-sm)", padding: "6px 4px" }}>{l}</span>
+        {["Resume", "Portfolio", "LinkedIn"].map((l) => (
+          <span key={l} style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, color: "var(--accent-2)", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "var(--r-sm)", padding: "6px 4px" }}>{l} <Check size={11} aria-hidden /></span>
         ))}
       </div>
     </div>

@@ -40,34 +40,61 @@ export interface SignedInProfile {
 /** The server's messages are written for people; network failures aren't. */
 function friendlyError(err: unknown): string {
   if (err instanceof ApiError) return err.message;
-  return "Network problem — check your connection and try again.";
+  return "Network problem. Check your connection and try again.";
 }
 
 /**
- * Creates the account, its profile and its role row in one transaction, and
- * signs the user in. The profile id is the account id throughout GradLink.
+ * Creates the account, its profile and its role row in one transaction.
+ * When the server can send email, the account must be confirmed first:
+ * `verify` is true and `sent` says whether the link went out. Otherwise the
+ * user is signed in straight away and `profileId` is set. The profile id is
+ * the account id throughout GradLink.
  */
 export async function signUpUser(
   input: SignUpInput
-): Promise<{ ok: boolean; error?: string; profileId?: string }> {
+): Promise<{ ok: boolean; error?: string; profileId?: string; verify?: boolean; sent?: boolean }> {
   try {
-    const res = await api<{ profile: SignedInProfile }>("/api/auth/sign-up", input);
-    return { ok: true, profileId: res.profile.profileId };
+    const res = await api<{ profile?: SignedInProfile; verify?: boolean; sent?: boolean }>("/api/auth/sign-up", input);
+    if (res.verify) return { ok: true, verify: true, sent: res.sent };
+    return { ok: true, profileId: res.profile!.profileId };
   } catch (err) {
     return { ok: false, error: friendlyError(err) };
   }
 }
 
-/** Email + password sign-in. Returns the profile, so no second lookup is needed. */
+/** Opens the link from the confirmation email. Signs this device in. */
+export async function verifyEmail(token: string): Promise<{ ok: boolean; error?: string; profile?: SignedInProfile }> {
+  try {
+    const res = await api<{ profile: SignedInProfile }>("/api/auth/verify-email", { token });
+    return { ok: true, profile: res.profile };
+  } catch (err) {
+    return { ok: false, error: friendlyError(err) };
+  }
+}
+
+/** Emails a fresh confirmation link to an account that hasn't confirmed yet. */
+export async function resendVerification(email: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await api("/api/auth/resend-verification", { email: email.trim() });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: friendlyError(err) };
+  }
+}
+
+/**
+ * Email + password sign-in. Returns the profile, so no second lookup is needed.
+ * `unverified` means the password was right but the email isn't confirmed yet.
+ */
 export async function signIn(
   email: string,
   password: string
-): Promise<{ ok: boolean; error?: string; uid?: string; profile?: SignedInProfile }> {
+): Promise<{ ok: boolean; error?: string; uid?: string; profile?: SignedInProfile; unverified?: boolean }> {
   try {
     const res = await api<{ profile: SignedInProfile }>("/api/auth/sign-in", { email: email.trim(), password });
     return { ok: true, uid: res.profile.profileId, profile: res.profile };
   } catch (err) {
-    return { ok: false, error: friendlyError(err) };
+    return { ok: false, error: friendlyError(err), unverified: err instanceof ApiError && err.code === "unverified" };
   }
 }
 

@@ -81,7 +81,7 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
 
   // record student→company scan once
   useEffect(() => {
-    if (!viewer || !session || !company || scanned.current) return;
+    if (!viewer || !session || !company || !eventId || scanned.current) return;
     if (viewer === "student") {
       scanned.current = true;
       recordScan({ eventId, scannerProfileId: session.profileId, scannedProfileId: companyProfileId, scannerRole: "student", scannedRole: "company", scanContext: "qr" });
@@ -245,7 +245,7 @@ function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company
           <StatTile label="Total interactions" value={totalInbound} />
           <StatTile label="Shortlisted" value={shortlisted} accent />
           <StatTile label="Maybe" value={maybes} />
-          <StatTile label="Booth" value={company.booth_number ?? "—"} />
+          <StatTile label="Booth" value={company.booth_number ?? "Not set"} />
           <StatTile label="Follow-up" value={followUp} tone={shortlisted > 0 ? "var(--accent-2)" : "var(--amber)"} />
         </div>
         <style>{`@media (max-width:560px){.mgr-stats{grid-template-columns:repeat(2,1fr) !important}}`}</style>
@@ -267,7 +267,7 @@ function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company
       <SectionCard title="Manager note" accent="rgba(255,255,255,0.22)" style={{ background: "rgba(255,255,255,0.05)" }}>
         <p style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55 }}>
           <Sparkles size={15} color="var(--accent-2)" />
-          {studentScans === 0 ? "Low booth traffic — consider promoting this employer to students." : "Healthy engagement. Encourage post-event follow-ups with shortlisted students."}
+          {studentScans === 0 ? "Low booth traffic. Consider promoting this employer to students." : "Healthy engagement. Encourage post-event follow-ups with shortlisted students."}
         </p>
       </SectionCard>
     </>

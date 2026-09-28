@@ -26,7 +26,7 @@ function autoRule(title: string, sig: StudentSignals): boolean | null {
   const t = title.toLowerCase();
   if (t.includes("complete your profile")) return sig.profileComplete;
   if (t.includes("upload your resume")) return sig.hasResume;
-  if (t.includes("ai resume score")) return sig.hasResume;
+  if (t.includes("resume score")) return sig.hasResume;
   if (t.includes("portfolio")) return sig.hasLinks;
   if (t.includes("save target")) return sig.savedCount > 0;
   if (t.includes("show your qr")) return sig.scannedByCompany > 0;
@@ -175,6 +175,8 @@ export default function Checklist({
     >
       {loading ? (
         <LoadingBlock label="Loading your checklist…" />
+      ) : items.length === 0 ? (
+        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>This event has no checklist yet.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <Meter value={pct} tone="var(--accent-2)" />

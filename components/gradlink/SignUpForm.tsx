@@ -8,7 +8,7 @@ import type { ComponentType } from "react";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import PasswordChecklist, { passwordIsStrong } from "./PasswordChecklist";
-import { signUpUser, type Role } from "@/lib/auth";
+import { signUpUser, resendVerification, type Role } from "@/lib/auth";
 import { setSession, type AppRole } from "@/lib/session";
 
 function roleHome(role: AppRole) {
@@ -83,6 +83,18 @@ export default function SignUpForm({ role }: { role: Role }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  // Set when the account needs its email confirmed: the address it was sent to.
+  const [checkEmail, setCheckEmail] = useState<{ email: string; sent: boolean } | null>(null);
+  const [resend, setResend] = useState<{ busy: boolean; msg: string | null; error: boolean }>({ busy: false, msg: null, error: false });
+
+  async function handleResend() {
+    if (!checkEmail) return;
+    setResend({ busy: true, msg: null, error: false });
+    const res = await resendVerification(checkEmail.email);
+    setResend(res.ok
+      ? { busy: false, msg: `A new link is on its way to ${checkEmail.email}.`, error: false }
+      : { busy: false, msg: res.error ?? "Couldn't send the email. Please try again.", error: true });
+  }
 
   const canSubmit = fullName.trim() && email.trim() && org.trim() && passwordIsStrong(password) && !submitting;
 
@@ -95,7 +107,10 @@ export default function SignUpForm({ role }: { role: Role }) {
     }
     setSubmitting(true);
     const res = await signUpUser({ role, fullName, email, password, organization: org });
-    if (res.ok) {
+    if (res.ok && res.verify) {
+      setSubmitting(false);
+      setCheckEmail({ email: email.trim(), sent: Boolean(res.sent) });
+    } else if (res.ok) {
       // Continue into the user's OWN connected workspace (real profile, empty to start).
       setSession({
         role: appRole,
@@ -111,6 +126,39 @@ export default function SignUpForm({ role }: { role: Role }) {
       setSubmitting(false);
       setError(res.error || "Something went wrong. Please try again.");
     }
+  }
+
+  if (checkEmail) {
+    return (
+      <Card>
+        <div style={{ textAlign: "center" }}>
+          <Mail size={44} color="var(--accent-2)" style={{ margin: "0 auto 16px" }} />
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+            Check your email
+          </h1>
+          <p style={{ fontSize: 14, color: "var(--text-2)", marginBottom: 8, lineHeight: 1.6 }}>
+            {checkEmail.sent
+              ? `We sent a confirmation link to ${checkEmail.email}. Open it to finish creating your ${c.label} account.`
+              : `Your account is created, but we couldn't send the confirmation email to ${checkEmail.email} just now. Tap below to try again.`}
+          </p>
+          <p style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 22, lineHeight: 1.6 }}>
+            The link expires in 24 hours. If you can&apos;t find it, check your spam folder.
+          </p>
+          {resend.msg && (
+            <p role="status" style={{ fontSize: 12.5, color: resend.error ? "var(--danger)" : "var(--accent-2)", marginBottom: 14 }}>{resend.msg}</p>
+          )}
+          <button type="button" onClick={handleResend} disabled={resend.busy} className="gl-link"
+            style={{ fontSize: 13.5, fontWeight: 600, color: "var(--accent)", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+            {resend.busy ? "Sending…" : "Resend confirmation email"}
+          </button>
+          <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 18 }}>
+            Already confirmed?{" "}
+            <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
+          </p>
+          <style>{`.gl-link:hover { text-decoration: underline; }`}</style>
+        </div>
+      </Card>
+    );
   }
 
   if (done) {

@@ -51,8 +51,12 @@ export default function Footer() {
           ))}
         </div>
 
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 24 }}>
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>© {new Date().getFullYear()} GradLink Technologies LLC. All rights reserved. UAE.</span>
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 24, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12 }}>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>© {new Date().getFullYear()} GradLink. All rights reserved.</span>
+          <div style={{ display: "flex", gap: 20 }}>
+            <a href="/privacy" className="footer-link" style={{ fontSize: 12, color: "var(--text-muted)", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/terms" className="footer-link" style={{ fontSize: 12, color: "var(--text-muted)", textDecoration: "none" }}>Terms and Conditions</a>
+          </div>
         </div>
       </div>
 

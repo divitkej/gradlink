@@ -41,8 +41,6 @@ yarn-error.log*
 /.open-next/
 cloudflare-env.d.ts
 
-# vercel
-.vercel
 
 # migration secrets — the real (unscrubbed) data export and any service account key
 /migration/.private/
