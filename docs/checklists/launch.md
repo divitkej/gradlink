@@ -40,5 +40,5 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   `components/landing/CTASection.tsx` · Done in "Add Privacy Policy and Terms pages"
 - [x] **Unregistered company name removed.** Footer now reads "© GradLink".
   `components/site/Footer.tsx` · Done in "Drop the unregistered company name from the footer"
-- [x] **Favicon.** `app/icon.svg` and `app/apple-icon.png` served live.
-  Done before this checklist
+- [x] **Favicon.** `app/icon.svg` and `app/apple-icon.png` served live. The G mark read as a monochrome Google logo, so the logo, favicon, home-screen icon and share images now use a graduation cap whose tassel ends in a dot.
+  `components/Logo.tsx`, `app/icon.svg`, `docs/brand/` · Done in "Replace the G logo with a graduation cap"
