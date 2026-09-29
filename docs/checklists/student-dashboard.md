@@ -6,13 +6,16 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 22 / 25 done, 3 need the live database or site
+## Progress: 23 / 25 done, 2 need a real device or the go-live step
 
 ## Before deploying
 
-- [ ] **Apply the schema to Neon before the new code goes live.** Run `npm run db:migrate`. It adds `event_sessions`, `session_bookings`, `saved_companies`, `applications`, three student columns and `seed_event_checklist()`, and backfills a default checklist for every event that has none. `createEvent` calls the new function, so creating an event fails until this has run.
-  Also adds `notifications`, `interview_invites`, `booth_queue`, `student_courses` and the mentoring session type.
-  `db/schema.sql` · Verify live
+- [x] **Schema applied to the live Neon database.** `npm run db:migrate` on 2026-09-29, after merging main: 30 tables, including `event_sessions`, `session_bookings`, `saved_companies`, `applications`, `notifications`, `interview_invites`, `booth_queue` and `student_courses`. Additive only; the live site kept working throughout.
+  `db/schema.sql` · Done on 2026-09-29, no commit (database change)
+- [x] **Tested live on a preview version.** Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards.
+  Done on 2026-09-29
+- [ ] **Put the branch live.** Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote version `1efa9168` with `wrangler versions deploy`).
+  Verify live
 
 ## Built
 
