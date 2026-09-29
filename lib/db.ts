@@ -8,8 +8,8 @@ import { rpc, api } from "./api-client";
    Every function keeps the name, arguments and return shape it had
    on Firestore, so no component changed in the move to Neon. Each
    one is now a call to the Worker (/api/rpc → lib/server/rpc.ts),
-   which runs the query against Neon Postgres and enforces the same
-   ownership rules firestore.rules did.
+   which runs the query against Neon Postgres and checks that the
+   caller owns the row or belongs to the event it is about.
 
    Row field names are the Postgres column names (snake_case) and
    timestamps arrive as ISO strings.
@@ -180,6 +180,11 @@ export function getAnalytics(studentId: string, eventId: string): Promise<Analyt
 
 export function listAnalytics(eventId: string): Promise<AnalyticsRow[]> {
   return safe("listAnalytics", [], () => rpc<AnalyticsRow[]>("listAnalytics", eventId));
+}
+
+/** How many students and employers are registered, for anyone in the event. */
+export function getEventCounts(eventId: string): Promise<{ students: number; companies: number }> {
+  return safe("getEventCounts", { students: 0, companies: 0 }, () => rpc<{ students: number; companies: number }>("getEventCounts", eventId));
 }
 
 /* ---------------- Scans ---------------- */

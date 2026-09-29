@@ -2,6 +2,8 @@ import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
 import { CHECKLIST_TEMPLATE } from "./checklist-template";
+import { evaluateResume } from "../resume";
+import type { StudentRow } from "../db";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -18,6 +20,8 @@ import { CHECKLIST_TEMPLATE } from "./checklist-template";
        college account registered for it);
      * shortlists and their private notes belong to the company that
        made them; the student sees their status, never the notes;
+     * a profile is visible to its owner, or to someone who shares an
+       event with it (fellow students see no contact details);
      * messages, checklist progress, memberships and subscriptions
        are visible to their owner only;
      * writes are owner-only, checked against the session's profile
@@ -163,6 +167,62 @@ function withoutNotes(rows: Row[]): Row[] {
   return rows.map((r) => ({ ...r, notes: null }));
 }
 
+/**
+ * Whether the caller shares an event with someone registered in `role`, and
+ * so may see their profile: as that event's owner, or registered for it.
+ */
+async function sharesEventWith(u: AuthUser, profileId: string, role: "student" | "company"): Promise<boolean> {
+  const rows = await db()`
+    select 1 from event_registrations t join events e on e.id = t.event_id
+    where t.profile_id = ${profileId} and t.role = ${role}
+      and (e.created_by = ${u.id}
+        or exists (select 1 from event_registrations me where me.event_id = t.event_id and me.profile_id = ${u.id}))
+    limit 1
+  `;
+  return rows.length > 0;
+}
+
+/* ---------------- analytics ---------------- */
+
+/**
+ * Per-student event stats, computed from what actually happened (scans,
+ * shortlists, messages) rather than stored counters that nothing updated.
+ *
+ * Engagement is 0 to 100: 15 per company that scanned the student, 10 per
+ * company the student scanned, 20 per shortlist and 10 per message sent.
+ */
+async function computeAnalytics(eventId: string, studentId?: string) {
+  const rows = await db().query(
+    `select ${STUDENT_COLS.replace(/(\w+)/g, "s.$1")}, r.profile_id as reg_profile_id, a.id as analytics_id,
+       (select count(*) from scans x where x.event_id = $1 and x.scanned_profile_id = r.profile_id)::int as profile_views,
+       (select count(distinct x.scanner_profile_id) from scans x where x.event_id = $1 and x.scanned_profile_id = r.profile_id and x.scanner_role = 'company')::int as company_scans,
+       (select count(distinct x.scanned_profile_id) from scans x where x.event_id = $1 and x.scanner_profile_id = r.profile_id and x.scanned_role = 'company')::int as companies_scanned,
+       (select count(*) from shortlists l where l.event_id = $1 and l.student_id = r.profile_id and l.status in ('shortlisted', 'priority'))::int as shortlists,
+       (select count(*) from messages m where m.event_id = $1 and m.receiver_profile_id = r.profile_id)::int as messages_received,
+       (select count(*) from messages m where m.event_id = $1 and m.sender_profile_id = r.profile_id)::int as messages_sent
+     from event_registrations r
+     left join students s on s.id = r.profile_id
+     left join student_event_analytics a on a.event_id = r.event_id and a.student_id = r.profile_id
+     where r.event_id = $1 and r.role = 'student' ${studentId ? "and r.profile_id = $2" : ""}`,
+    studentId ? [eventId, studentId] : [eventId],
+  );
+  return rows.map((r) => {
+    const n = (k: string) => Number(r[k]) || 0;
+    const engagement = n("company_scans") * 15 + n("companies_scanned") * 10 + n("shortlists") * 20 + n("messages_sent") * 10;
+    return {
+      id: (r.analytics_id as string) ?? `${eventId}:${r.reg_profile_id}`,
+      event_id: eventId,
+      student_id: r.reg_profile_id as string,
+      profile_views: n("profile_views"),
+      company_scans: n("company_scans"),
+      shortlists: n("shortlists"),
+      messages_received: n("messages_received"),
+      resume_score: r.id ? evaluateResume(r as unknown as StudentRow).score : 0,
+      engagement_score: Math.min(100, engagement),
+    };
+  });
+}
+
 /* ---------------- join codes ---------------- */
 
 /** Typed by hand off a slide or poster, so 0/O and 1/I/L are left out. */
@@ -183,8 +243,11 @@ export const ops: Record<string, Op> = {
   /* Students */
   /** Companies and colleges see the full profile; a fellow student sees no contact details. */
   async getStudentByProfile(u, [profileId]) {
-    const cols = u.role === "student" && profileId !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
-    const rows = await db().query(`select ${cols} from students where id = $1`, [s(profileId)]);
+    const id = s(profileId);
+    // Someone else's profile only when you share an event with them.
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
+    const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
@@ -203,8 +266,10 @@ export const ops: Record<string, Op> = {
   },
 
   /* Companies */
-  async getCompanyByProfile(_u, [profileId]) {
-    const rows = await db().query(`select ${COMPANY_COLS} from companies where id = $1`, [s(profileId)]);
+  async getCompanyByProfile(u, [profileId]) {
+    const id = s(profileId);
+    if (id !== u.id && !(await sharesEventWith(u, id, "company"))) return null;
+    const rows = await db().query(`select ${COMPANY_COLS} from companies where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateCompanyProfile(u, [profileId, fields]) {
@@ -228,12 +293,21 @@ export const ops: Record<string, Op> = {
       if (u.role === "student") throw forbidden();
       await requireMember(u, eventId);
     }
-    const rows = await db()`select * from student_event_analytics where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
+    const rows = await computeAnalytics(s(eventId), s(studentId));
     return rows[0] ?? null;
   },
   async listAnalytics(u, [eventId]) {
     await requireStaff(u, eventId);
-    return db()`select * from student_event_analytics where event_id = ${s(eventId)}`;
+    return computeAnalytics(s(eventId));
+  },
+  /** Headcounts anyone in the event may see, without the people behind them. */
+  async getEventCounts(u, [eventId]) {
+    await requireMember(u, eventId);
+    const rows = await db()`
+      select count(*) filter (where role = 'student')::int as students, count(*) filter (where role = 'company')::int as companies
+      from event_registrations where event_id = ${s(eventId)}
+    `;
+    return rows[0] ?? { students: 0, companies: 0 };
   },
 
   /* Scans: append-only, and only for a scan you performed at an event you're in. */
@@ -244,12 +318,15 @@ export const ops: Record<string, Op> = {
     // nothing to record, so it is skipped rather than failing.
     if (!i.eventId) return false;
     await requireMember(u, i.eventId);
-    // The scanner's role is the account's real role, not whatever the browser sends.
+    // Both roles come from the accounts, not whatever the browser sends, and
+    // the scanned person must be registered for the same event, so the stats
+    // built from scans can be trusted.
     const rows = await db()`
       insert into scans (event_id, scanner_profile_id, scanned_profile_id, scanner_role, scanned_role, scan_context, notes)
-      select ${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${u.role},
-             ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
-      where exists (select 1 from profiles where id = ${s(i.scannedProfileId)})
+      select ${s(i.eventId)}, ${u.id}, r.profile_id, ${u.role}, r.role,
+             ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
+      from event_registrations r
+      where r.event_id = ${s(i.eventId)} and r.profile_id = ${s(i.scannedProfileId)}
       returning id
     `;
     return rows.length > 0;
@@ -272,6 +349,11 @@ export const ops: Record<string, Op> = {
     if (u.role !== "company") throw forbidden();
     await requireMember(u, i.eventId);
     if (!SHORTLIST_STATUSES.includes(s(i.status))) throw new HttpError(400, "Unknown shortlist status.");
+    // Only students registered for this event can be shortlisted at it.
+    const student = await db()`
+      select 1 from event_registrations where event_id = ${s(i.eventId)} and profile_id = ${s(i.studentId)} and role = 'student'
+    `;
+    if (!student.length) throw forbidden();
     // created_at is kept across status changes, as before.
     await db()`
       insert into shortlists (event_id, company_id, student_id, status, notes)
@@ -451,6 +533,7 @@ export const ops: Record<string, Op> = {
     };
     const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined);
     if (!entries.length) return true;
+    if (f.title !== undefined && !s(f.title).trim()) throw new HttpError(400, "Give your event a name.");
     const sets = entries.map(([k], idx) => `${k} = $${idx + 3}`);
     const rows = await db().query(
       `update events set ${sets.join(", ")} where id = $1 and created_by = $2 returning id`,
@@ -471,15 +554,8 @@ export const ops: Record<string, Op> = {
     if (event.status === "ended") return { ok: false, error: `${event.title} has already finished.` };
 
     // The registration role is the account's real role, not whatever the browser sends.
-    const queries = [
-      sql`insert into event_registrations (event_id, profile_id, role) values (${event.id}, ${u.id}, ${u.role})
-          on conflict (event_id, profile_id) do nothing`,
-    ];
-    if (u.role === "student") {
-      queries.push(sql`insert into student_event_analytics (event_id, student_id) values (${event.id}, ${u.id})
-                       on conflict (event_id, student_id) do nothing`);
-    }
-    await sql.transaction(queries);
+    await sql`insert into event_registrations (event_id, profile_id, role) values (${event.id}, ${u.id}, ${u.role})
+              on conflict (event_id, profile_id) do nothing`;
     return { ok: true, event };
   },
 

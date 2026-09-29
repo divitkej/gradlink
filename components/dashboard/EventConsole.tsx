@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
-  Star, HelpCircle, Bookmark, ScanLine, Search,
+  Star, HelpCircle, Bookmark, ScanLine, Search, Pencil,
 } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from "./cards";
 import { Badge } from "@/components/ui/primitives";
@@ -13,10 +13,11 @@ import Checklist from "./Checklist";
 import JoinCode from "@/components/events/JoinCode";
 import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
+import EventForm from "@/components/events/EventForm";
 import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
-  listAnalytics, listShortlistsForCompany, upsertShortlist,
+  listAnalytics, listShortlistsForCompany, upsertShortlist, getEventCounts,
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ShortlistRow,
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
@@ -35,6 +36,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   const [analytics, setAnalytics] = useState<AnalyticsRow[]>([]);
   const [me, setMe] = useState<StudentRow | CompanyRow | null>(null);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
+  const [counts, setCounts] = useState({ students: 0, companies: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,9 +44,15 @@ export default function EventConsole({ eventId }: { eventId: string }) {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [ev, st, co] = await Promise.all([getEvent(eventId), getRegisteredStudents(eventId), getRegisteredCompanies(eventId)]);
+      // Students can't see who else registered, only how many.
+      const [ev, st, co, n] = await Promise.all([
+        getEvent(eventId),
+        role === "student" ? Promise.resolve([]) : getRegisteredStudents(eventId),
+        getRegisteredCompanies(eventId),
+        getEventCounts(eventId),
+      ]);
       if (cancelled) return;
-      setEvent(ev); setStudents(st); setCompanies(co);
+      setEvent(ev); setStudents(st); setCompanies(co); setCounts(n);
       if (role === "event_manager") setAnalytics(await listAnalytics(eventId));
       if (role === "student") setMe(await getStudentByProfile(session.profileId));
       if (role === "company") {
@@ -68,7 +76,10 @@ export default function EventConsole({ eventId }: { eventId: string }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      <EventHeader event={event} role={role} studentCount={students.length} companyCount={companies.length} />
+      <EventHeader
+        event={event} role={role} studentCount={counts.students} companyCount={counts.companies}
+        canEdit={!!event && event.created_by === session.profileId} onSaved={setEvent}
+      />
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {tabs.filter((t) => !t.hide).map((t) => {
@@ -104,13 +115,32 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   );
 }
 
-function EventHeader({ event, role, studentCount, companyCount }: { event: EventRow | null; role: AppRole; studentCount: number; companyCount: number }) {
+function EventHeader({
+  event, role, studentCount, companyCount, canEdit, onSaved,
+}: {
+  event: EventRow | null; role: AppRole; studentCount: number; companyCount: number;
+  canEdit: boolean; onSaved: (event: EventRow) => void;
+}) {
+  const [editing, setEditing] = useState(false);
   const status = event?.status ?? "live";
+
+  if (editing && event) {
+    return (
+      <SectionCard title="Edit event" accent="var(--border-strong)">
+        <EventForm
+          event={event}
+          onSaved={(next) => { onSaved(next); setEditing(false); }}
+          onCancel={() => setEditing(false)}
+        />
+      </SectionCard>
+    );
+  }
+
   return (
     <SectionCard accent="var(--border-strong)">
       <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
         <div>
-          <Badge tone={status === "live" ? "amber" : "cyan"} pulse={status === "live"}>{EVENT_STATUS_LABEL[status]}</Badge>
+          <Badge tone={status === "live" ? "amber" : status === "ended" ? "muted" : "cyan"} pulse={status === "live"}>{EVENT_STATUS_LABEL[status] ?? status}</Badge>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "12px 0 6px" }}>
             {event?.title ?? "Event"}
           </h1>
@@ -119,8 +149,16 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
             {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
           {role === "event_manager" && event?.join_code && <JoinCode code={event.join_code} labelled />}
+          {canEdit && (
+            <button
+              onClick={() => setEditing(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", cursor: "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--text-2)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)" }}
+            >
+              <Pencil size={15} /> Edit event
+            </button>
+          )}
           <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 18px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}>
             <ScanLine size={16} /> Open scanner
           </Link>
