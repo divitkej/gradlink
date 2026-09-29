@@ -9,6 +9,7 @@ import { getStudentByProfile, updateStudentProfile, uploadPublicFile, type Stude
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import type { GLSession } from "@/lib/session";
 import GsapReveal from "@/components/anim/GsapReveal";
+import StudentCourses from "./StudentCourses";
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
   const id = useId();
@@ -70,6 +71,16 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
     .map((p) => ({ title: p.title.trim(), url: (p.url ?? "").trim(), description: (p.description ?? "").trim() }))
     .filter((p) => p.title);
   const splitList = (v: string) => v.split(",").map((s) => s.trim()).filter(Boolean);
+
+  /** Skills from a verified course: added to the form and saved straight away. */
+  async function addSkills(extra: string[]) {
+    const current = splitList(skills);
+    const have = new Set(current.map((x) => x.toLowerCase()));
+    const merged = [...current, ...extra.filter((x) => !have.has(x.toLowerCase()))];
+    setSkills(merged.join(", "));
+    const ok = await updateStudentProfile(session.profileId, { skills: merged });
+    flash(ok ? `${merged.length - current.length} skills added to your profile` : "Couldn't save, try again");
+  }
 
   const preview: Partial<StudentRow> = {
     full_name: session.name, email: "x@y.z",
@@ -213,6 +224,8 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
           </div>
         </GlassPanel>
       </div>
+
+      <StudentCourses profileId={session.profileId} skills={splitList(skills)} onAddSkills={addSkills} />
 
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>

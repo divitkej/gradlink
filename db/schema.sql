@@ -18,6 +18,8 @@
 --   * seed_event_checklist(): the default checklist every event starts with
 --   * notifications, interview_invites, booth_queue: alerts, interview
 --       invites and live booth queues
+--   * student_courses: Coursera certificates verified with Coursera, and
+--       courses in progress
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
@@ -368,6 +370,29 @@ create table if not exists booth_queue (
   unique (event_id, company_id, student_id)
 );
 create index if not exists booth_queue_booth_idx on booth_queue (event_id, company_id, status, created_at);
+
+-- --------------------------------------------------------- student courses --
+-- Online courses on a student's profile. A "certificate" row was verified
+-- against the provider's public verify page (the learner name matched the
+-- student); an "in_progress" row is a real course the student says they are
+-- taking. One certificate can belong to one student only.
+create table if not exists student_courses (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  provider             text not null default 'coursera',
+  status               text not null check (status in ('certificate', 'in_progress')),
+  certificate_code     text,
+  course_id            text,
+  course_slug          text,
+  course_name          text not null,
+  partner_name         text,
+  completed_at         timestamptz,
+  skills               text[] not null default '{}',
+  visible_to_employers boolean not null default true,
+  unique (provider, certificate_code)
+);
+create index if not exists student_courses_student_idx on student_courses (student_id, created_at desc);
 
 -- ------------------------------------------------- default checklists --
 -- Every event starts with the same checklist for each role. createEvent calls

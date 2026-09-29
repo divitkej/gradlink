@@ -583,6 +583,47 @@ export function getStudentHistory(): Promise<StudentHistory | null> {
   return safe("getStudentHistory", null, () => rpc<StudentHistory>("getStudentHistory"));
 }
 
+/* ---------------- Online courses ---------------- */
+export interface StudentCourseRow {
+  id: string;
+  created_at?: string;
+  provider: "coursera";
+  status: "certificate" | "in_progress";
+  certificate_code: string | null;
+  course_slug: string | null;
+  course_name: string;
+  partner_name: string | null;
+  completed_at: string | null;
+  skills: string[];
+  /** Only on the student's own list. */
+  visible_to_employers?: boolean;
+}
+
+/** Coursera's public page for a certificate, where anyone can check it. */
+export const courseraVerifyUrl = (code: string) => `https://www.coursera.org/account/accomplishments/verify/${encodeURIComponent(code)}`;
+export const courseraCourseUrl = (slug: string) => `https://www.coursera.org/learn/${encodeURIComponent(slug)}`;
+
+export function addCourseraCertificate(link: string): Promise<{ ok: true; course: StudentCourseRow; newSkills: string[] } | { ok: false; error: string }> {
+  return safe("addCourseraCertificate", { ok: false, error: "Couldn't check that certificate. Please try again." }, () => rpc("addCourseraCertificate", link));
+}
+
+export function addCourseraCourse(link: string): Promise<{ ok: true; course: StudentCourseRow } | { ok: false; error: string }> {
+  return safe("addCourseraCourse", { ok: false, error: "Couldn't add that course. Please try again." }, () => rpc("addCourseraCourse", link));
+}
+
+export function listStudentCourses(studentId: string): Promise<StudentCourseRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentCourses", [], () => rpc<StudentCourseRow[]>("listStudentCourses", studentId));
+}
+
+export function setStudentCourseVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentCourseVisible", false, () => rpc<boolean>("setStudentCourseVisible", id, visible));
+}
+
+export function deleteStudentCourse(id: string): Promise<boolean> {
+  return safe("deleteStudentCourse", false, () => rpc<boolean>("deleteStudentCourse", id));
+}
+
 /* ---------------- Engagement ---------------- */
 export function getStudentEventInsights(eventId: string): Promise<StudentInsights | null> {
   return safe("getStudentEventInsights", null, () => rpc<StudentInsights>("getStudentEventInsights", eventId));

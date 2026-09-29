@@ -17,6 +17,8 @@ export interface StudentActivity {
   checkedIn: boolean;
   /** Share of the event checklist that is done, 0 to 100. */
   checklistPct: number;
+  /** Coursera certificates verified on the profile. */
+  verifiedCourses: number;
 }
 
 export interface Evidence {
@@ -213,6 +215,7 @@ export function actionPlan(me: Partial<StudentRow>, a: StudentActivity): ActionI
       ? { key: "company", label: "Attend a company session", status: rec(taken(company)), required: false, href: SCHEDULE }
       : { key: "company", label: "Attend a company session", detail: "None scheduled yet", status: "unavailable", required: false, href: SCHEDULE },
     { key: "impact", label: "Show a measurable result in your bio", status: rec(RESULT_RE.test(corpus(me))), required: false, href: PROFILE },
+    { key: "courses", label: "Add a verified Coursera certificate", status: rec(a.verifiedCourses > 0), required: false, href: `${PROFILE}#courses` },
   ];
 }
 

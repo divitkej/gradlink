@@ -3,6 +3,9 @@ import { HttpError } from "./http";
 import type { AuthUser } from "./session";
 import { evaluateResume } from "../resume";
 import { engagementScore, shortName, type EngagementCounts } from "../engagement";
+import {
+  CourseraError, certificateCode, courseSlug, fetchCertificate, courseById, courseBySlug, namesMatch, nameHidden,
+} from "./coursera";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -1001,6 +1004,89 @@ export const ops: Record<string, Op> = {
       `,
     ]);
     return { events, connections };
+  },
+
+  /* Online courses. Certificates are verified with Coursera, never trusted from the browser. */
+  async addCourseraCertificate(u, [link]) {
+    if (u.role !== "student") throw forbidden();
+    try {
+      const code = certificateCode(s(link));
+      if (!code) return { ok: false, error: "That doesn't look like a Coursera certificate link. It looks like coursera.org/verify/ABC123XYZ." };
+      const sql = db();
+      const taken = await sql`select * from student_courses where provider = 'coursera' and certificate_code = ${code}`;
+      if (taken.length) {
+        if (taken[0].student_id === u.id) return { ok: true, course: taken[0], newSkills: [] };
+        return { ok: false, error: "This certificate is already on another GradLink account." };
+      }
+      const cert = await fetchCertificate(code);
+      if (!cert) return { ok: false, error: "Coursera has no certificate at that link. Check it and try again." };
+      if (nameHidden(cert.matchName)) {
+        return { ok: false, error: "Coursera is hiding the learner's name on this certificate, so we can't confirm it is yours. Make sure your name shows on the certificate page, then try again." };
+      }
+      const [me] = await sql`select p.full_name, st.skills from profiles p left join students st on st.id = p.id where p.id = ${u.id}`;
+      const myName = s(me?.full_name);
+      if (!namesMatch(cert.matchName, myName)) {
+        return { ok: false, error: `The name on this certificate (${cert.learnerName}) doesn't match your GradLink name (${myName}). Only your own certificates can be added.` };
+      }
+      const fallback = !cert.courseName && cert.courseId ? await courseById(cert.courseId) : null;
+      const [row] = await sql.transaction([
+        sql`insert into student_courses (student_id, status, certificate_code, course_id, course_slug, course_name, partner_name, completed_at, skills)
+            values (${u.id}, 'certificate', ${code}, ${cert.courseId}, ${cert.courseSlug ?? fallback?.slug ?? null},
+                    ${cert.courseName ?? fallback?.name ?? "Retired Coursera course"}, ${cert.partnerName ?? fallback?.partnerName ?? null},
+                    ${cert.completedAt}, ${cert.skills})
+            returning *`,
+        // A course the student was "taking" is now finished.
+        sql`delete from student_courses where student_id = ${u.id} and status = 'in_progress'
+              and ((course_id is not null and course_id = ${cert.courseId}) or (course_slug is not null and course_slug = ${cert.courseSlug}))`,
+      ]);
+      const have = new Set(((me?.skills as string[]) ?? []).map((x) => x.toLowerCase()));
+      return { ok: true, course: row[0], newSkills: cert.skills.filter((k) => !have.has(k.toLowerCase())) };
+    } catch (err) {
+      if (err instanceof CourseraError) return { ok: false, error: err.message };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This certificate is already on another GradLink account." };
+      throw err;
+    }
+  },
+  /** A course the student is taking now, checked to exist in Coursera's catalog. */
+  async addCourseraCourse(u, [link]) {
+    if (u.role !== "student") throw forbidden();
+    try {
+      const slug = courseSlug(s(link));
+      if (!slug) return { ok: false, error: "Paste the course's page link. It looks like coursera.org/learn/course-name." };
+      const course = await courseBySlug(slug);
+      if (!course) return { ok: false, error: "Coursera has no course at that link." };
+      const sql = db();
+      const existing = await sql`select * from student_courses where student_id = ${u.id} and course_id = ${course.id}`;
+      if (existing.length) return { ok: true, course: existing[0] };
+      const [row] = await sql`
+        insert into student_courses (student_id, status, course_id, course_slug, course_name, partner_name)
+        values (${u.id}, 'in_progress', ${course.id}, ${course.slug}, ${course.name}, ${course.partnerName})
+        returning *
+      `;
+      return { ok: true, course: row };
+    } catch (err) {
+      if (err instanceof CourseraError) return { ok: false, error: err.message };
+      throw err;
+    }
+  },
+  /** The student sees all of theirs; everyone else only what the student shows employers. */
+  async listStudentCourses(u, [studentId]) {
+    const id = s(studentId);
+    return u.id === id
+      ? db()`select * from student_courses where student_id = ${id} order by status, completed_at desc nulls last, created_at desc`
+      : db()`
+          select id, provider, status, certificate_code, course_slug, course_name, partner_name, completed_at, skills
+          from student_courses where student_id = ${id} and visible_to_employers
+          order by status, completed_at desc nulls last, created_at desc
+        `;
+  },
+  async setStudentCourseVisible(u, [id, visible]) {
+    const rows = await db()`update student_courses set visible_to_employers = ${Boolean(visible)} where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
+  },
+  async deleteStudentCourse(u, [id]) {
+    const rows = await db()`delete from student_courses where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
   },
 
   /* Billing — read-only, owner only. Only the Stripe webhook writes it. */

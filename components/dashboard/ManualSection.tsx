@@ -11,6 +11,7 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
     accent: "var(--accent)",
     steps: [
       "Complete your career profile: résumé, skills, projects, target roles and links.",
+      "Add your Coursera certificates. We verify each one with Coursera, then employers see it as verified.",
       "Work through your action plan until you earn the Fair-Ready badge.",
       "Book workshops, mock interviews, company sessions and alumni mentoring on the schedule. Full sessions have a waitlist.",
       "Browse every open role and internship at the event under Opportunities, and track the ones you apply for.",

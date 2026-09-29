@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import {
   getStudentByProfile, getRegisteredCompanies, listSessions, listSavedCompanies, getScans,
   listShortlistsForStudent, listMessagesForProfile, getStudentEventInsights, getChecklistItems,
-  getChecklistProgress, getProfileNames, listInterviewInvitesForStudent, listMyQueues,
+  getChecklistProgress, getProfileNames, listInterviewInvitesForStudent, listMyQueues, listStudentCourses,
   type StudentRow, type CompanyRow, type SessionRow, type SavedCompanyRow, type ScanRow,
-  type ShortlistRow, type MessageRow, type StudentInsights, type InterviewInviteRow, type MyQueueRow,
+  type ShortlistRow, type MessageRow, type StudentInsights, type InterviewInviteRow, type MyQueueRow, type StudentCourseRow,
 } from "./db";
 import type { StudentActivity } from "./readiness";
 
@@ -32,6 +32,7 @@ export interface StudentData {
   invites: InterviewInviteRow[];
   /** Booth queues the student is in at this event. */
   queues: MyQueueRow[];
+  courses: StudentCourseRow[];
 }
 
 export function activityOf(d: StudentData, profileId: string): StudentActivity {
@@ -46,6 +47,7 @@ export function activityOf(d: StudentData, profileId: string): StudentActivity {
     companiesMessaged,
     checkedIn: d.insights?.me?.counts.checked_in ?? d.scansIn.some((s) => s.scanner_role === "event_manager"),
     checklistPct: d.checklistPct,
+    verifiedCourses: d.courses.filter((c) => c.status === "certificate").length,
   };
 }
 
@@ -57,7 +59,7 @@ export function useStudentData(profileId: string, eventId: string) {
     if (!profileId || !eventId) return;
     let cancelled = false;
     (async () => {
-      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress, invites, queues] = await Promise.all([
+      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress, invites, queues, courses] = await Promise.all([
         getStudentByProfile(profileId),
         getRegisteredCompanies(eventId),
         listSessions(eventId),
@@ -71,6 +73,7 @@ export function useStudentData(profileId: string, eventId: string) {
         getChecklistProgress(profileId),
         listInterviewInvitesForStudent(),
         listMyQueues(eventId),
+        listStudentCourses(profileId),
       ]);
       const ids = [
         ...scansIn.map((s) => s.scanner_profile_id),
@@ -81,7 +84,7 @@ export function useStudentData(profileId: string, eventId: string) {
       if (cancelled) return;
       const done = items.filter((i) => progress[i.id]).length;
       setData({
-        me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, names, invites, queues,
+        me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, names, invites, queues, courses,
         checklistPct: items.length ? Math.round((done / items.length) * 100) : 0,
       });
     })();

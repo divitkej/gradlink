@@ -36,3 +36,8 @@ export function fromLocalInput(v: string): string | null {
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
+
+/** "Jun 2017": for things where the year matters more than the day, like a course completion. */
+export function fmtMonthYear(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+}
