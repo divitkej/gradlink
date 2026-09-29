@@ -1,6 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
+import { CHECKLIST_TEMPLATE } from "./checklist-template";
 import { evaluateResume } from "../resume";
 import { engagementScore, shortName, type EngagementCounts } from "../engagement";
 import {
@@ -14,26 +15,42 @@ import {
    Each op keeps the name and argument list of the lib/db.ts /
    lib/events.ts function that calls it, so no component changed.
 
-   Authorization started as a port of firestore.rules and is now
-   stricter wherever a student could be harmed:
+   Authorization:
      * every op requires a signed-in user;
-     * profile and event reads are open to any signed-in user, EXCEPT
-       messages (participants only), checklist progress, event
-       membership lists and subscriptions (owner only);
-     * a student's scores, engagement and scans are for the student and
-       their college (the event's organiser) only, never for employers.
-       Colleges want students hired, so employers see strengths
-       (profile, skills, projects, résumé), not assessments;
-     * shortlist decisions are seen by the company that made them and
-       the organiser. A student sees only positive ones, without notes;
+     * event data (attendees, scans, shortlists, analytics, messages)
+       is only visible to people registered for that event, and the
+       whole-event views only to the event's staff (its owner, or a
+       college account registered for it);
+     * a student's scores, engagement and analytics are for the student
+       and the event's staff only, never for employers. Colleges want
+       students hired, so employers see strengths (profile, skills,
+       projects, verified courses, résumé), not assessments;
+     * shortlists and their private notes belong to the company that
+       made them; a student sees only the companies that shortlisted
+       them, never "maybe", "not a fit" or the notes;
+     * messages, checklist progress, memberships and subscriptions
+       are visible to their owner only;
      * writes are owner-only, checked against the session's profile
-       id — never against an id the browser claims.
+       id and role, never against an id or role the browser claims.
    ============================================================ */
 
 type Args = unknown[];
 type Op = (user: AuthUser, args: Args) => Promise<unknown>;
 
 const forbidden = () => new HttpError(403, "You don't have permission to do that.");
+
+/** Adds the default checklist to an event. Safe to repeat: existing items are kept. */
+async function addDefaultChecklist(eventId: string): Promise<void> {
+  await db()`
+    insert into checklist_items (event_id, role, phase, order_index, title, description)
+    select ${eventId}, x.role, x.phase, x.order_index, x.title, x.description
+    from json_to_recordset(${JSON.stringify(CHECKLIST_TEMPLATE)}::json)
+      as x(role text, phase text, order_index int, title text, description text)
+    where exists (select 1 from events where id = ${eventId})
+      and not exists (select 1 from checklist_items where event_id = ${eventId})
+    on conflict do nothing
+  `;
+}
 
 function isMe(user: AuthUser, id: unknown) {
   if (id !== user.id) throw forbidden();
@@ -42,18 +59,35 @@ function isMe(user: AuthUser, id: unknown) {
 const s = (v: unknown) => (typeof v === "string" ? v : "");
 const textOrNull = (v: unknown, max = 5000) => (typeof v === "string" ? v.slice(0, max) : null);
 const intOrNull = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? Math.round(v) : null);
-const strArray = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").map((x) => x.slice(0, 200)) : []);
+const strArray = (v: unknown, maxItems = 50) =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").slice(0, maxItems).map((x) => x.slice(0, 200)) : [];
+
+/**
+ * Links that other users click. Only http(s) is stored, so a profile can never
+ * carry a `javascript:` or `data:` link. A bare domain gets https:// added.
+ */
+function urlOrNull(v: unknown): string | null {
+  const raw = typeof v === "string" ? v.trim().slice(0, 2000) : "";
+  if (!raw) return null;
+  try {
+    const url = new URL(/^[a-z][a-z0-9+.-]*:/i.test(raw) ? raw : `https://${raw}`);
+    if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error();
+    return url.toString();
+  } catch {
+    throw new HttpError(400, "One of the links isn't a valid web address. Use a link that starts with https://");
+  }
+}
 /** A timestamp from the browser as ISO, or null when missing or unparseable. */
 const isoOrNull = (v: unknown) => {
   if (typeof v !== "string" || !v) return null;
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 };
-/** Up to 10 {title, url, description} projects, with empty titles dropped. */
+/** Up to 10 {title, url, description} projects, with empty titles dropped. Links are http(s) only. */
 const projectList = (v: unknown) =>
   (Array.isArray(v) ? v : [])
     .map((p) => (p ?? {}) as Row)
-    .map((p) => ({ title: s(p.title).trim().slice(0, 120), url: s(p.url).trim().slice(0, 500), description: s(p.description).trim().slice(0, 1000) }))
+    .map((p) => ({ title: s(p.title).trim().slice(0, 120), url: urlOrNull(p.url) ?? "", description: s(p.description).trim().slice(0, 1000) }))
     .filter((p) => p.title)
     .slice(0, 10);
 
@@ -64,22 +98,29 @@ const STUDENT_COLS = `id, profile_id, created_at, full_name, email, university, 
 const COMPANY_COLS = `id, profile_id, created_at, full_name, email, company, company_name, sector, industry, website,
   description, logo_url, hiring_roles, booth_number, skills_wanted, brochure_url`;
 
-/** Profile fields a user may edit on their own role row, and how each is coerced. */
+/**
+ * Profile fields a user may edit on their own role row, and how each is coerced.
+ * resume_score and ai_feedback are deliberately absent: companies rely on them,
+ * so a student must not be able to set their own score.
+ */
 const STUDENT_FIELDS: Record<string, (v: unknown) => unknown> = {
   full_name: (v) => textOrNull(v, 200) ?? "",
-  university: textOrNull, degree: textOrNull, graduation_year: intOrNull, skills: strArray,
-  resume_url: textOrNull, portfolio_url: textOrNull, linkedin_url: textOrNull, github_url: textOrNull,
-  bio: textOrNull, resume_score: intOrNull,
-  ai_feedback: (v) => (v == null ? null : JSON.stringify(v)),
-  career_goal: (v) => textOrNull(v, 500), target_roles: (v) => strArray(v).slice(0, 10),
+  university: (v) => textOrNull(v, 300), degree: (v) => textOrNull(v, 300), graduation_year: intOrNull, skills: (v) => strArray(v),
+  resume_url: urlOrNull, portfolio_url: urlOrNull, linkedin_url: urlOrNull, github_url: urlOrNull,
+  bio: textOrNull,
+  career_goal: (v) => textOrNull(v, 500), target_roles: (v) => strArray(v, 10),
   projects: (v) => JSON.stringify(projectList(v)),
 };
 const COMPANY_FIELDS: Record<string, (v: unknown) => unknown> = {
   full_name: (v) => textOrNull(v, 200) ?? "",
-  company: textOrNull, company_name: textOrNull, sector: textOrNull, industry: textOrNull, website: textOrNull,
-  description: textOrNull, logo_url: textOrNull, hiring_roles: strArray, booth_number: textOrNull,
-  skills_wanted: strArray, brochure_url: textOrNull,
+  company: (v) => textOrNull(v, 300), company_name: (v) => textOrNull(v, 300), sector: (v) => textOrNull(v, 200),
+  industry: (v) => textOrNull(v, 200), website: urlOrNull,
+  description: textOrNull, logo_url: urlOrNull, hiring_roles: (v) => strArray(v), booth_number: (v) => textOrNull(v, 50),
+  skills_wanted: (v) => strArray(v), brochure_url: urlOrNull,
 };
+/** What a student sees of a fellow student: no contact details. */
+const PEER_STUDENT_COLS = `id, profile_id, created_at, full_name, university, degree, graduation_year, skills, bio`;
+
 
 /**
  * Upsert the caller's own role row with only whitelisted columns — the
@@ -98,6 +139,53 @@ async function upsertRoleRow(table: "students" | "companies", fields: Record<str
     [id, ...values],
   );
   return true;
+}
+
+/* ---------------- event access ---------------- */
+
+interface EventAccess {
+  /** Created the event. */
+  owner: boolean;
+  /** Registered for it (joined by code, or the organiser). */
+  member: boolean;
+  /** Sees the whole event: the owner, or a college account registered for it. */
+  staff: boolean;
+}
+
+async function eventAccess(u: AuthUser, eventId: unknown): Promise<EventAccess> {
+  const rows = await db()`
+    select e.created_by = ${u.id} as owner,
+           exists (select 1 from event_registrations r where r.event_id = e.id and r.profile_id = ${u.id}) as member
+    from events e where e.id = ${s(eventId)}
+  `;
+  const owner = Boolean(rows[0]?.owner);
+  const member = Boolean(rows[0]?.member);
+  return { owner, member, staff: owner || (member && u.role === "event_manager") };
+}
+
+/** Throws unless the caller is registered for (or owns) the event. */
+async function requireMember(u: AuthUser, eventId: unknown): Promise<EventAccess> {
+  const a = await eventAccess(u, eventId);
+  if (!a.owner && !a.member) throw forbidden();
+  return a;
+}
+
+async function requireStaff(u: AuthUser, eventId: unknown): Promise<void> {
+  if (!(await eventAccess(u, eventId)).staff) throw forbidden();
+}
+
+/** Whether someone other than the caller is registered for (or owns) the event. */
+async function isInEvent(profileId: string, eventId: string): Promise<boolean> {
+  const rows = await db()`
+    select 1 from events e where e.id = ${eventId} and (e.created_by = ${profileId}
+      or exists (select 1 from event_registrations r where r.event_id = e.id and r.profile_id = ${profileId}))
+  `;
+  return rows.length > 0;
+}
+
+/** Private notes on a shortlist entry are for the company and the event staff only. */
+function withoutNotes(rows: Row[]): Row[] {
+  return rows.map((r) => ({ ...r, notes: null }));
 }
 
 /* ---------------- join codes ---------------- */
@@ -146,13 +234,6 @@ async function companyMetStudent(companyId: string, studentId: string, eventId: 
 
 /* ---------------- event membership ---------------- */
 
-/** The college running the event: its creator. */
-async function isEventOwner(u: AuthUser, eventId: string) {
-  if (u.role !== "event_manager" || !eventId) return false;
-  const rows = await db()`select 1 from events where id = ${eventId} and created_by = ${u.id}`;
-  return rows.length > 0;
-}
-
 /**
  * Stored assessments on a student row are for the student and colleges only.
  * Everyone else gets the profile without them.
@@ -160,11 +241,6 @@ async function isEventOwner(u: AuthUser, eventId: string) {
 function studentView(u: AuthUser, row: Row): Row {
   if (u.id === row.id || u.role === "event_manager") return row;
   return { ...row, resume_score: null, ai_feedback: null };
-}
-
-async function isRegistered(eventId: string, profileId: string) {
-  const rows = await db()`select 1 from event_registrations where event_id = ${eventId} and profile_id = ${profileId}`;
-  return rows.length > 0;
 }
 
 /** The session's event organiser or its host may manage it. */
@@ -241,17 +317,25 @@ function analyticsRow(eventId: string, r: Row) {
 
 export const ops: Record<string, Op> = {
   /* Students */
+  /**
+   * Companies and colleges see the full profile, without stored assessments for
+   * companies; a fellow student sees no contact details.
+   */
   async getStudentByProfile(u, [profileId]) {
-    const rows = await db().query(`select ${STUDENT_COLS} from students where id = $1`, [s(profileId)]);
+    const cols = u.role === "student" && profileId !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const rows = await db().query(`select ${cols} from students where id = $1`, [s(profileId)]);
     return rows[0] ? studentView(u, rows[0]) : null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
     isMe(u, profileId);
+    if (u.role !== "student") throw forbidden();
     return upsertRoleRow("students", STUDENT_FIELDS, u.id, fields);
   },
   async getRegisteredStudents(u, [eventId]) {
+    await requireMember(u, eventId);
+    const cols = u.role === "student" ? PEER_STUDENT_COLS : STUDENT_COLS;
     const rows = await db().query(
-      `select ${STUDENT_COLS.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
+      `select ${cols.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
        where r.event_id = $1 and r.role = 'student'`,
       [s(eventId)],
     );
@@ -265,9 +349,11 @@ export const ops: Record<string, Op> = {
   },
   async updateCompanyProfile(u, [profileId, fields]) {
     isMe(u, profileId);
+    if (u.role !== "company") throw forbidden();
     return upsertRoleRow("companies", COMPANY_FIELDS, u.id, fields);
   },
-  async getRegisteredCompanies(_u, [eventId]) {
+  async getRegisteredCompanies(u, [eventId]) {
+    await requireMember(u, eventId);
     return db().query(
       `select ${COMPANY_COLS.replace(/(\w+)/g, "c.$1")} from event_registrations r join companies c on c.id = r.profile_id
        where r.event_id = $1 and r.role = 'company'`,
@@ -276,17 +362,16 @@ export const ops: Record<string, Op> = {
   },
 
   /* Analytics */
-  /** The student themselves, or the college running the event. */
+  /** A student's own stats, or any attendee's for the event's staff. Never for companies. */
   async getAnalytics(u, [studentId, eventId]) {
     if (!s(studentId) || !s(eventId)) return null;
-    if (u.id !== s(studentId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
+    if (studentId !== u.id) await requireStaff(u, eventId);
     const rows = await studentActivity(s(eventId), s(studentId));
     return rows[0] ? analyticsRow(s(eventId), rows[0]) : null;
   },
-  /** The college running the event only. */
   async listAnalytics(u, [eventId]) {
     if (!s(eventId)) return [];
-    if (!(await isEventOwner(u, s(eventId)))) throw forbidden();
+    await requireStaff(u, eventId);
     const rows = await studentActivity(s(eventId));
     return rows.map((r) => analyticsRow(s(eventId), r));
   },
@@ -297,7 +382,8 @@ export const ops: Record<string, Op> = {
    */
   async getStudentEventInsights(u, [eventId]) {
     const ev = s(eventId);
-    if (u.role !== "student" || !ev || !(await isRegistered(ev, u.id))) throw forbidden();
+    if (u.role !== "student" || !ev) throw forbidden();
+    await requireMember(u, ev);
     const scored = (await studentActivity(ev))
       .map((r) => ({ id: r.student_id as string, name: s(r.full_name), counts: countsOf(r) }))
       .map((r) => ({ ...r, score: engagementScore(r.counts) }))
@@ -314,22 +400,28 @@ export const ops: Record<string, Op> = {
     };
   },
 
-  /* Scans — append-only, and only for a scan you performed. */
+  /* Scans: append-only, and only for a scan you performed at an event you're in. */
   async recordScan(u, [input]) {
     const i = (input ?? {}) as Row;
     isMe(u, i.scannerProfileId);
-    await db()`
+    // A scan belongs to an event. Without one (a hand-typed link) there is
+    // nothing to record, so it is skipped rather than failing.
+    if (!i.eventId) return false;
+    await requireMember(u, i.eventId);
+    // The scanner's role is the account's real role, not whatever the browser sends.
+    const rows = await db()`
       insert into scans (event_id, scanner_profile_id, scanned_profile_id, scanner_role, scanned_role, scan_context, notes)
-      values (${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${textOrNull(i.scannerRole, 50)},
-              ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)})
+      select ${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${u.role},
+             ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
+      where exists (select 1 from profiles where id = ${s(i.scannedProfileId)})
+      returning id
     `;
-    return true;
+    return rows.length > 0;
   },
-  /** Scans you made or that were made of you. The event's college sees all of them. */
+  /** Scans you made or received; the whole event's scans for its staff. */
   async getScans(u, [filter]) {
     const f = (filter ?? {}) as Row;
-    const involved = s(f.scannerProfileId) === u.id || s(f.scannedProfileId) === u.id;
-    if (!involved && !(await isEventOwner(u, s(f.eventId)))) throw forbidden();
+    if (f.scannerProfileId !== u.id && f.scannedProfileId !== u.id) await requireStaff(u, f.eventId);
     const where = ["event_id = $1"];
     const params: unknown[] = [s(f.eventId)];
     if (f.scannerProfileId) { params.push(s(f.scannerProfileId)); where.push(`scanner_profile_id = $${params.length}`); }
@@ -341,6 +433,8 @@ export const ops: Record<string, Op> = {
   async upsertShortlist(u, [input]) {
     const i = (input ?? {}) as Row;
     isMe(u, i.companyId);
+    if (u.role !== "company") throw forbidden();
+    await requireMember(u, i.eventId);
     if (!SHORTLIST_STATUSES.includes(s(i.status))) throw new HttpError(400, "Unknown shortlist status.");
     // created_at is kept across status changes, as before.
     await db()`
@@ -351,33 +445,35 @@ export const ops: Record<string, Op> = {
     return true;
   },
   async getShortlist(u, [companyId, studentId, eventId]) {
-    if (u.id !== s(companyId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
+    if (companyId !== u.id && studentId !== u.id) await requireStaff(u, eventId);
     const rows = await db()`
       select * from shortlists where company_id = ${s(companyId)} and student_id = ${s(studentId)} and event_id = ${s(eventId)}
     `;
-    return rows[0] ?? null;
+    if (!rows[0]) return null;
+    // A student only learns that a company shortlisted them, never "maybe" or "not a fit".
+    if (studentId === u.id && companyId !== u.id) return ["shortlisted", "priority"].includes(s(rows[0].status)) ? withoutNotes(rows)[0] : null;
+    return rows[0];
   },
   async listShortlistsForCompany(u, [companyId, eventId]) {
-    if (u.id !== s(companyId) && !(await isEventOwner(u, s(eventId)))) throw forbidden();
+    if (companyId !== u.id) await requireStaff(u, eventId);
     return db()`select * from shortlists where company_id = ${s(companyId)} and event_id = ${s(eventId)} order by created_at desc`;
   },
   /**
    * For the student: only the companies that shortlisted them, never "maybe"
-   * or "not a fit", and never the company's private notes. The college sees all.
+   * or "not a fit", and never the company's private notes. Staff see all.
    */
   async listShortlistsForStudent(u, [studentId, eventId]) {
-    if (await isEventOwner(u, s(eventId))) {
+    if (studentId !== u.id) {
+      await requireStaff(u, eventId);
       return db()`select * from shortlists where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
     }
-    if (u.id !== s(studentId)) throw forbidden();
     return db()`
       select id, created_at, event_id, company_id, student_id, status, null as notes from shortlists
       where student_id = ${u.id} and event_id = ${s(eventId)} and status in ('shortlisted', 'priority')
     `;
   },
-  /** Every company's decisions at an event: the college running it only. */
   async listShortlists(u, [eventId]) {
-    if (!(await isEventOwner(u, s(eventId)))) throw forbidden();
+    await requireStaff(u, eventId);
     return db()`select * from shortlists where event_id = ${s(eventId)}`;
   },
 
@@ -387,6 +483,9 @@ export const ops: Record<string, Op> = {
     isMe(u, i.senderProfileId);
     const message = s(i.message).slice(0, 5000);
     if (!message.trim() || !s(i.receiverProfileId)) throw new HttpError(400, "Write a message first.");
+    // Both people must be at the same event, so the API can't be used to message strangers.
+    await requireMember(u, i.eventId);
+    if (!(await isInEvent(s(i.receiverProfileId), s(i.eventId)))) throw forbidden();
     await db()`
       insert into messages (event_id, sender_profile_id, receiver_profile_id, message)
       values (${s(i.eventId)}, ${u.id}, ${s(i.receiverProfileId)}, ${message})
@@ -402,7 +501,8 @@ export const ops: Record<string, Op> = {
     if (u.role !== "company") throw forbidden();
     const message = s(text).slice(0, 5000);
     if (!message.trim()) return { ok: false, error: "Write a message first." };
-    const ids = Array.from(new Set(strArray(studentIds)));
+    // Counted before any cap, so an over-limit selection is refused, not silently cut short.
+    const ids = Array.from(new Set(strArray(studentIds, 1000)));
     if (!ids.length) return { ok: false, error: "Choose at least one candidate." };
     if (ids.length > 200) return { ok: false, error: "You can message up to 200 candidates at once." };
     const rows = await db()`
@@ -443,6 +543,8 @@ export const ops: Record<string, Op> = {
 
   /* Checklist */
   async getChecklistItems(_u, [role, eventId]) {
+    // Events created before the default checklist existed get it on first view.
+    if (s(eventId)) await addDefaultChecklist(s(eventId));
     return db()`
       select id, event_id, role, title, description, phase, order_index from checklist_items
       where event_id = ${s(eventId)} and role = ${s(role)} order by order_index asc
@@ -466,7 +568,7 @@ export const ops: Record<string, Op> = {
 
   /* Profiles */
   async getProfileNames(_u, [ids]) {
-    const list = Array.from(new Set(strArray(ids))).slice(0, 1000);
+    const list = Array.from(new Set(strArray(ids, 1000)));
     if (!list.length) return {};
     const rows = await db()`select id, full_name, role, organization from profiles where id = any(${list}::text[])`;
     return Object.fromEntries(
@@ -475,12 +577,16 @@ export const ops: Record<string, Op> = {
   },
 
   /* Events */
-  async getEvent(_u, [eventId]) {
+  /** Registered people and the owner only, since the row carries the join code. */
+  async getEvent(u, [eventId]) {
+    const a = await eventAccess(u, eventId);
+    if (!a.owner && !a.member) return null;
     const rows = await db()`select * from events where id = ${s(eventId)}`;
     return rows[0] ?? null;
   },
-  async listEventsForManager(_u, [managerProfileId]) {
-    return db()`select * from events where created_by = ${s(managerProfileId)} order by created_at desc`;
+  async listEventsForManager(u, [managerProfileId]) {
+    isMe(u, managerProfileId);
+    return db()`select * from events where created_by = ${u.id} order by created_at desc`;
   },
   /** Your own memberships only, as the registrations collection-group rule allowed. */
   async listEventsForProfile(u, [profileId]) {
@@ -522,8 +628,10 @@ export const ops: Record<string, Op> = {
           // their event list the same way a joined event does.
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
               values (${id}, ${u.id}, 'event_manager', true)`,
-          sql`select seed_event_checklist(${id})`,
         ]);
+        // A failure here must not report the event as failed: the checklist is
+        // also added the first time anyone opens it.
+        await addDefaultChecklist(id).catch((err) => console.error("[rpc] default checklist", err));
         return { ok: true, event: rows[0] };
       } catch (err) {
         if ((err as { code?: string }).code === "23505") continue; // join_code clash — retry
@@ -612,7 +720,7 @@ export const ops: Record<string, Op> = {
     const events = await db()`select created_by from events where id = ${eventId}`;
     if (!events.length) return { ok: false, error: "That event no longer exists." };
     const owner = events[0].created_by === u.id;
-    const company = u.role === "company" && COMPANY_SESSION_KINDS.includes(kind) && (await isRegistered(eventId, u.id));
+    const company = u.role === "company" && COMPANY_SESSION_KINDS.includes(kind) && (await isInEvent(u.id, eventId));
     if (!owner && !company) throw forbidden();
 
     const rows = await db()`
@@ -660,7 +768,7 @@ export const ops: Record<string, Op> = {
     if (existing.length) return { ok: true, status: existing[0].status };
     const found = await sql`select event_id from event_sessions where id = ${id}`;
     if (!found.length) return { ok: false, error: "That session no longer exists." };
-    if (!(await isRegistered(found[0].event_id as string, u.id))) return { ok: false, error: "Join this event first to book its sessions." };
+    if (!(await isInEvent(u.id, found[0].event_id as string))) return { ok: false, error: "Join this event first to book its sessions." };
     return { ok: false, error: "This session has already finished." };
   },
   /** Cancelling frees a place, which goes to the longest-waiting student. */
@@ -895,7 +1003,7 @@ export const ops: Record<string, Op> = {
     const [event] = await sql`select status from events where id = ${ev}`;
     if (!event) return { ok: false, error: "That event no longer exists." };
     if (event.status !== "live") return { ok: false, error: "Booth queues open when the event is live." };
-    if (!(await isRegistered(ev, u.id))) return { ok: false, error: "Join this event first." };
+    if (!(await isInEvent(u.id, ev))) return { ok: false, error: "Join this event first." };
     const booth = await sql`select 1 from event_registrations where event_id = ${ev} and profile_id = ${co} and role = 'company'`;
     if (!booth.length) return { ok: false, error: "That company isn't at this event." };
     const active = await sql`

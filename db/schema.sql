@@ -4,8 +4,8 @@
 -- Apply with:   npm run db:migrate        (reads DATABASE_URL from .dev.vars)
 -- or paste into the Neon console's SQL Editor.
 --
--- Idempotent: every statement is `if not exists` (or `create or replace`, or
--- guarded by `not exists`), so re-running is safe.
+-- Idempotent: every statement is `if not exists` (or guarded the same way),
+-- so re-running is safe.
 --
 -- Table and column names match the original Supabase schema (and the snake_case
 -- fields the Firestore layer carried over), so the app's row types are
@@ -15,7 +15,6 @@
 --   * auth_credentials / password_reset_tokens — replaces Supabase/Firebase Auth
 --   * event_sessions, session_bookings, saved_companies, applications:
 --       the student readiness hub, schedule, passport and application tracker
---   * seed_event_checklist(): the default checklist every event starts with
 --   * notifications, interview_invites, booth_queue: alerts, interview
 --       invites and live booth queues
 --   * student_courses: Coursera certificates verified with Coursera, and
@@ -72,6 +71,32 @@ create table if not exists password_reset_tokens (
   used_at     timestamptz
 );
 create index if not exists password_reset_tokens_profile_idx on password_reset_tokens (profile_id);
+
+-- Per-IP counters for the auth endpoints (lib/server/rate-limit.ts). One row
+-- per bucket, hashed IP and fixed time window; rows older than a day are
+-- swept by the app, since the Workers Free plan has no cron.
+create table if not exists rate_limits (
+  bucket        text not null,
+  ip_hash       text not null,
+  window_start  timestamptz not null,
+  hits          integer not null default 0,
+  primary key (bucket, ip_hash, window_start)
+);
+create index if not exists rate_limits_window_idx on rate_limits (window_start);
+
+-- Email confirmation. Sign-in is refused until email_verified_at is set,
+-- whenever the server can send email (lib/server/auth-api.ts). Tokens are
+-- stored hashed, like reset tokens.
+alter table auth_credentials add column if not exists email_verified_at timestamptz;
+
+create table if not exists email_verification_tokens (
+  token_hash  text primary key,
+  profile_id  text not null references profiles (id) on delete cascade,
+  created_at  timestamptz not null default now(),
+  expires_at  timestamptz not null,
+  used_at     timestamptz
+);
+create index if not exists email_verification_tokens_profile_idx on email_verification_tokens (profile_id);
 
 -- ------------------------------------------------------------- role rows --
 create table if not exists students (
@@ -229,6 +254,9 @@ create table if not exists checklist_items (
   order_index  integer not null default 0
 );
 create index if not exists checklist_items_event_role_idx on checklist_items (event_id, role, order_index);
+-- Lets the default checklist (lib/server/checklist-template.ts) be added to an
+-- event safely more than once: repeats are ignored.
+create unique index if not exists checklist_items_event_item_uniq on checklist_items (event_id, role, phase, title);
 
 create table if not exists checklist_progress (
   id                 text primary key default gen_random_uuid()::text,
@@ -393,62 +421,6 @@ create table if not exists student_courses (
   unique (provider, certificate_code)
 );
 create index if not exists student_courses_student_idx on student_courses (student_id, created_at desc);
-
--- ------------------------------------------------- default checklists --
--- Every event starts with the same checklist for each role. createEvent calls
--- this in the same transaction that creates the event; the select below
--- backfills events that were created before it existed. An event that already
--- has items is left alone.
-create or replace function seed_event_checklist(p_event_id text) returns void language sql as $$
-  insert into checklist_items (event_id, role, phase, order_index, title, description)
-  select p_event_id, v.role, v.phase, v.order_index, v.title, v.description
-  from (values
-    ('student', 'pre_event', 1, 'Complete your profile', 'Fill in degree, graduation year, skills and a short bio.'),
-    ('student', 'pre_event', 2, 'Upload your resume', 'Add a PDF so companies can review and download it.'),
-    ('student', 'pre_event', 3, 'Get your resume score', 'Check your score and act on the suggestions.'),
-    ('student', 'pre_event', 4, 'Add portfolio / LinkedIn / GitHub', 'Link your work so recruiters can go deeper.'),
-    ('student', 'pre_event', 5, 'Save target companies', 'Browse registered companies and save the ones you want to meet.'),
-    ('student', 'pre_event', 6, 'Book a workshop or mock interview', 'Reserve a place in a prep session on the event schedule.'),
-    ('student', 'pre_event', 7, 'Prepare your elevator pitch', 'A 30-second intro you can give at any booth.'),
-    ('student', 'during_event', 1, 'Check in at the entrance', 'Have the event team scan your QR when you arrive.'),
-    ('student', 'during_event', 2, 'Show your QR to companies', 'Let recruiters scan you to share your profile instantly.'),
-    ('student', 'during_event', 3, 'Scan companies of interest', 'Scan booth QR codes to save companies and open roles.'),
-    ('student', 'during_event', 4, 'Visit your saved companies', 'Work through your saved list booth by booth.'),
-    ('student', 'during_event', 5, 'Send messages / follow-ups', 'Reach out to recruiters you connected with.'),
-    ('student', 'post_event', 1, 'Review companies you scanned', 'Revisit the companies and roles you captured.'),
-    ('student', 'post_event', 2, 'Message shortlisted companies', 'Follow up with companies that shortlisted you.'),
-    ('student', 'post_event', 3, 'Log your applications', 'Track applications, interviews and offers from the fair.'),
-    ('student', 'post_event', 4, 'Track responses', 'Keep an eye on replies and next steps.'),
-    ('company', 'pre_event', 1, 'Complete company profile', 'Add sector, description, website and logo.'),
-    ('company', 'pre_event', 2, 'Add hiring roles', 'List the roles you are recruiting for at the event.'),
-    ('company', 'pre_event', 3, 'Review registered students', 'Browse the talent pool before the event.'),
-    ('company', 'pre_event', 4, 'Pre-shortlist candidates', 'Flag priority candidates to visit your booth.'),
-    ('company', 'pre_event', 5, 'Prepare booth instructions', 'Brief your team on the scan-and-shortlist flow.'),
-    ('company', 'during_event', 1, 'Scan student QR codes', 'Capture each student you meet at the booth.'),
-    ('company', 'during_event', 2, 'Shortlist candidates', 'Mark students as shortlist, maybe or not a fit.'),
-    ('company', 'during_event', 3, 'Add notes', 'Record context for each candidate while it is fresh.'),
-    ('company', 'during_event', 4, 'Message strong candidates', 'Reach out to your best matches during the event.'),
-    ('company', 'post_event', 1, 'Export your shortlist', 'Download the candidate list for your team.'),
-    ('company', 'post_event', 2, 'Send follow-up messages', 'Keep momentum with shortlisted students.'),
-    ('company', 'post_event', 3, 'Review analytics', 'See your booth engagement and top skills.'),
-    ('company', 'post_event', 4, 'Update hiring pipeline', 'Move candidates into your interview pipeline.'),
-    ('event_manager', 'pre_event', 1, 'Approve companies', 'Confirm the employers attending the event.'),
-    ('event_manager', 'pre_event', 2, 'Monitor student registrations', 'Track sign-ups and check-in readiness.'),
-    ('event_manager', 'pre_event', 3, 'Review readiness', 'Check resume readiness across registered students.'),
-    ('event_manager', 'pre_event', 4, 'Confirm QR setup', 'Ensure every booth and student has a working QR.'),
-    ('event_manager', 'pre_event', 5, 'Publish the session schedule', 'Add workshops, mock interviews and company sessions.'),
-    ('event_manager', 'during_event', 1, 'Monitor live scans', 'Watch scan and engagement activity in real time.'),
-    ('event_manager', 'during_event', 2, 'Help inactive students', 'Reach out to students with low or no engagement.'),
-    ('event_manager', 'during_event', 3, 'Track booth engagement', 'See which employers are drawing the most interest.'),
-    ('event_manager', 'post_event', 1, 'Generate report', 'Compile the post-event outcome report.'),
-    ('event_manager', 'post_event', 2, 'Export analytics', 'Download engagement and outcome data.'),
-    ('event_manager', 'post_event', 3, 'Review outcomes', 'Assess shortlists, offers and follow-up completion.')
-  ) as v(role, phase, order_index, title, description)
-  where not exists (select 1 from checklist_items c where c.event_id = p_event_id);
-$$;
-
-select seed_event_checklist(e.id) from events e
-where not exists (select 1 from checklist_items c where c.event_id = e.id);
 
 -- --------------------------------------------------------------- billing --
 -- Written ONLY by the Stripe webhook. The API exposes it read-only to its

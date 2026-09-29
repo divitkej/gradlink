@@ -6,10 +6,12 @@ import { Activity, ScanLine, Sparkles } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock } from "./cards";
 import { Badge, Meter } from "@/components/ui/primitives";
 import Checklist from "./Checklist";
+import JoinCode from "@/components/events/JoinCode";
+import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
 import OutcomeReportCard from "./OutcomeReportCard";
 import { useSession } from "@/lib/session";
-import {
+import { scanLabel,
   getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists,
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow,
 } from "@/lib/db";
@@ -60,11 +62,14 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
       <SectionCard accent="var(--border-strong)">
         <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div>
-            <Badge tone="amber" pulse>{event?.title ?? "Career Fair"} · Live Monitor</Badge>
+            <Badge tone={event?.status === "live" ? "amber" : "cyan"} pulse={event?.status === "live"}>
+              {`${event?.title ?? "Career Fair"} · ${EVENT_STATUS_LABEL[event?.status ?? "upcoming"]}`}
+            </Badge>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{session?.org ?? "Career Center"}</h2>
             <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity, and placement outcomes, connected to your event database.</p>
           </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+            {event?.join_code && <JoinCode code={event.join_code} labelled />}
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
           </div>
         </div>
@@ -114,7 +119,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
                   <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>
                     {nameOf(s.scanner_profile_id)} → {nameOf(s.scanned_profile_id)}
                   </span>
-                  <Badge tone={s.scanner_role === "event_manager" ? "teal" : "cyan"}>{s.scan_context ?? "scan"}</Badge>
+                  <Badge tone={s.scanner_role === "event_manager" ? "teal" : "cyan"}>{scanLabel(s.scan_context)}</Badge>
                 </div>
               ))}
             </div>

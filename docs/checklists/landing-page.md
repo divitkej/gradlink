@@ -32,7 +32,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 - [x] **Social links go nowhere.** Removed until the accounts exist.
   `components/site/Footer.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
-- [x] **20 footer column links go nowhere.** Footer rebuilt with 11 links, all to real pages or sections (automated check: pages return 200, section ids exist). Links for unbuilt pages are listed in `features-to-build.md`. Privacy, Terms and Contact removed until those pages exist (see launch blockers).
+- [x] **20 footer column links go nowhere.** Footer rebuilt with 11 links, all to real pages or sections (automated check: pages return 200, section ids exist). Links for unbuilt pages are listed in `features-to-build.md`. Contact removed until it has a page. Privacy and Terms are back in the footer bottom bar, done in "Add Privacy Policy and Terms pages" (see `launch.md`).
   `components/site/Footer.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Invented results in the outcome funnel.** Funnel, stats and "What a college sees after one fair" are labelled "Product preview · sample data"; "Career Fair 2025" and dates replaced with "Sample event".
   `components/landing/AnalyticsSection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
@@ -40,12 +40,15 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `components/landing/*`, `components/gradlink/SignUpForm.tsx`, `components/dashboard/CompanyProfileEditor.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Mockups show unlabelled sample data.** Every mock screen carries a "Product preview · sample data" label (`components/landing/SampleDataLabel.tsx`). Invented hero stats (12+ colleges, 18K+ students, 200+ employers) removed.
   `HeroDashboard.tsx`, `ProductReveal.tsx`, `ReadinessSection.tsx`, `LiveEventSection.tsx`, `SpatialShowcaseSection.tsx`, `EmployerCRMSection.tsx`, `AnalyticsSection.tsx`, `HeroSection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
+- [x] **Employer CRM mockup buttons do nothing.** The candidate action buttons and "Export CSV" were decorative. Actions are now one line of text under the list, and "Export CSV" is replaced by a "Product preview · sample data" label on the list itself (on phones the pipeline card's label is a screen away). Done in "Stop the Employer CRM mockup looking clickable"
+  The filter chips now work on the preview: each opens its options, filters the 7 sample students, shows "Showing N of 7" and has Clear filters and an empty state. Chips are square, not pill-shaped. Automated check at 390px and 1440px: every option of all 8 filters returns the right students, combined filters narrow correctly, no horizontal scroll. The real company dashboard does not have these filters yet (see `features-to-build.md`).
+  `components/landing/EmployerCRMSection.tsx` · Done in "Make the Employer CRM preview filters work on sample students"
 - [ ] **Promises features that are not built.** Kept on the page by decision. Every unbuilt feature, and where it appears, is listed in `docs/checklists/features-to-build.md`.
   `components/landing/*` · Tracked
 
 ## Phase 4: SEO
 
-- [x] **Add robots.txt and sitemap.** `app/robots.ts` (blocks dashboards, API, scan, events, reset) and `app/sitemap.ts` (7 public pages). Both use `NEXT_PUBLIC_SITE_URL`, so set it to the real domain at build time.
+- [x] **Add robots.txt and sitemap.** `app/robots.ts` (blocks dashboards, API, scan, events, reset) and `app/sitemap.ts` (9 public pages, Privacy and Terms added in "Add Privacy Policy and Terms pages"). Both use `NEXT_PUBLIC_SITE_URL`, so set it to the real domain at build time.
   `app/robots.ts`, `app/sitemap.ts`, `lib/site.ts` · Done in "Fix landing links, sample-data labels and SEO basics"
 
 ## Test pass
@@ -54,7 +57,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `components/anim/SmoothScroll.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [ ] **Opening hero on a low-end phone.** WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU (software rendering), so its frame rate is not meaningful: still check on a real low-end Android for frame rate and heat.
   `components/landing/OpeningHero.tsx`, `components/ui/shader-background.tsx` · Verify on device
-- [ ] **Link preview card.** Share image regenerated with the new logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`); `og:image` and `twitter:image` tags present. After deploying with `NEXT_PUBLIC_SITE_URL` set, paste the URL into LinkedIn and WhatsApp.
+- [ ] **Link preview card.** Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in "Replace the G logo with a graduation cap"); `og:image` and `twitter:image` tags present. Deployed with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev`: `og:url`, `og:image` and `twitter:image` point at the live site and the image returns 200. Still paste the URL into LinkedIn and WhatsApp, and again after the custom domain goes live.
   `app/opengraph-image.png` · Verify live
 - [x] **Scroll progress bar and thread.** Removed with all other scroll-triggered animations ahead of the redesign, so there is nothing left to test.
   Done in `1317868`
@@ -70,4 +73,4 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Outside this checklist
 
-- Em dashes in the visible copy of the signed-in dashboards, scan views and event forms were removed in "Complete the student dashboard against the landing page". Dashboard work is tracked in `docs/checklists/student-dashboard.md`.
+- Em dashes in signed-in dashboards, scan views and event forms were removed; see `dashboard.md`. Student dashboard work is tracked in `student-dashboard.md`.

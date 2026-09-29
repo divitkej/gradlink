@@ -12,8 +12,30 @@ import type { AuthUser } from "./session";
    upload, and keys are `{folder}/{profileId}-{timestamp}-{name}`.
    ============================================================ */
 
-const FOLDERS = ["resumes", "brochures", "logos", "avatars"];
 const MAX_BYTES = 10 * 1024 * 1024;
+
+/**
+ * File types each folder accepts, by extension. The stored content type comes
+ * from this table, never from the browser, so a renamed HTML or SVG file can't
+ * be uploaded as something the browser would run.
+ */
+const TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  gif: "image/gif",
+};
+const IMAGES = ["png", "jpg", "jpeg", "webp", "gif"];
+const FOLDERS: Record<string, string[]> = {
+  resumes: ["pdf", "doc", "docx"],
+  brochures: ["pdf"],
+  logos: IMAGES,
+  avatars: IMAGES,
+};
 
 /**
  * Files are served from GradLink's own origin, so anything that a browser
@@ -38,13 +60,18 @@ export async function uploadFile(request: Request, user: AuthUser): Promise<{ ur
   const form = await request.formData().catch(() => null);
   const folder = form?.get("folder");
   const file = form?.get("file");
-  if (typeof folder !== "string" || !FOLDERS.includes(folder)) throw new HttpError(400, "Unknown upload folder.");
+  if (typeof folder !== "string" || !Object.hasOwn(FOLDERS, folder)) throw new HttpError(400, "Unknown upload folder.");
   if (!file || typeof file === "string") throw new HttpError(400, "Choose a file to upload.");
   if (file.size > MAX_BYTES) throw new HttpError(413, "That file is over 10 MB.");
+  if (file.size === 0) throw new HttpError(400, "That file is empty.");
 
   const safe = (file.name || "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-120);
+  const ext = safe.includes(".") ? safe.split(".").pop()!.toLowerCase() : "";
+  if (!FOLDERS[folder].includes(ext)) {
+    throw new HttpError(415, `That file type isn't supported here. Use ${FOLDERS[folder].map((e) => `.${e}`).join(", ")}.`);
+  }
   const key = `${folder}/${user.id}-${Date.now()}-${safe}`;
-  const meta: FileMeta = { contentType: file.type || "application/octet-stream", name: safe, owner: user.id };
+  const meta: FileMeta = { contentType: TYPES[ext], name: safe, owner: user.id };
   await bucket().put(key, await file.arrayBuffer(), { metadata: meta });
 
   const base = serverEnv().APP_URL?.replace(/\/$/, "") || new URL(request.url).origin;
@@ -63,6 +90,7 @@ export async function serveFile(key: string): Promise<Response> {
       "Content-Type": inline ? type : "application/octet-stream",
       "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${name}"`,
       "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN",
       // Signed-in users only, so browsers may cache it but shared caches must not.
       "Cache-Control": "private, max-age=3600",
     },

@@ -22,9 +22,16 @@ export interface ServerEnv {
   AUTH_SECRET?: string;
   /** Public origin used in emailed links, e.g. https://gradlink.example.workers.dev */
   APP_URL?: string;
-  /** Optional: Resend API key for password-reset email. Secret. */
+  /** Mailbox that sends account email over SMTP, e.g. you@gmail.com. */
+  SMTP_USER?: string;
+  /** Its app password (Gmail: Google Account, Security, App passwords). Secret. */
+  SMTP_PASS?: string;
+  /** Defaults to smtp.gmail.com and 465 (implicit TLS). */
+  SMTP_HOST?: string;
+  SMTP_PORT?: string;
+  /** Optional: Resend API key, used instead of SMTP once there is a verified domain. Secret. */
   RESEND_API_KEY?: string;
-  /** Optional: sender address for password-reset email. */
+  /** Header From for account email, e.g. `GradLink <you@gmail.com>`. Required for Resend. */
   EMAIL_FROM?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;

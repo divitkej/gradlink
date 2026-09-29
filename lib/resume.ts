@@ -1,8 +1,8 @@
 import type { StudentRow } from "./db";
 
 /* ============================================================
-   Résumé score: a rule-based, deterministic check (not AI).
-   Swap the body of evaluateResume() for a real model call later;
+   Resume Score: modular, deterministic, rule-based scoring (no AI).
+   Swap the body of evaluateResume() for a real LLM/API call later;
    the return shape is the stable contract the UI depends on.
    ============================================================ */
 
@@ -48,9 +48,9 @@ export function evaluateResume(student: Partial<StudentRow>): ResumeEvaluation {
     { label: "Profile basics", earned: baselineEarned, max: 10 },
   ];
 
-  // No résumé attached: the score is 0 until one is uploaded.
+  // No résumé attached → the résumé score is 0 until one is uploaded.
   if (!student.resume_url) {
-    const improvements = ["Attach your résumé (PDF) to get your score"];
+    const improvements = ["Attach your résumé (PDF) to raise your score"];
     if (skills.length < 5) improvements.push("List at least 5 relevant skills");
     if (!student.linkedin_url && !student.github_url && !student.portfolio_url)
       improvements.push("Add a LinkedIn, GitHub, or portfolio link");
@@ -58,9 +58,9 @@ export function evaluateResume(student: Partial<StudentRow>): ResumeEvaluation {
     if (bio.length < 120) improvements.push("Write a short bio with measurable achievements");
     return {
       score: 0,
-      strengths: skills.length ? ["Skills added, a good start"] : ["Profile created"],
+      strengths: skills.length ? ["Skills added, a great start"] : ["Profile created"],
       improvements,
-      summary: "No résumé attached yet. Upload your résumé to unlock your score.",
+      summary: "No résumé attached yet. Upload your résumé to raise your score.",
       breakdown,
     };
   }
@@ -87,7 +87,7 @@ export function evaluateResume(student: Partial<StudentRow>): ResumeEvaluation {
   if (!student.linkedin_url) improvements.push("Add your LinkedIn profile");
   if (!student.graduation_year) improvements.push("Add your graduation year");
   if (bio.length < 120) improvements.push("Expand your bio with measurable achievements");
-  if (!improvements.length) improvements.push("Looking great. Keep your profile current.");
+  if (!improvements.length) improvements.push("Looking great. Keep your profile current");
 
   // ---- summary ----
   let summary: string;

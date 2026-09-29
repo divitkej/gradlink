@@ -82,6 +82,12 @@ export interface ScanRow {
   notes: string | null;
 }
 
+/** How a scan happened, in words people read ("qr" is stored). */
+export function scanLabel(context: string | null | undefined): string {
+  if (!context || context === "qr") return "QR scan";
+  return context.charAt(0).toUpperCase() + context.slice(1).replace(/_/g, " ");
+}
+
 export interface ShortlistRow {
   id: string;
   created_at: string;

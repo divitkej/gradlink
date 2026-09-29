@@ -17,10 +17,14 @@ AUTH_SECRET=<AUTH_SECRET>
 # Optional. Public origin used in password-reset links; defaults to the request origin.
 APP_URL=http://localhost:3000
 
-# Optional locally (reset links are printed to the console instead).
-# Required in production for "Forgot password" — Resend free tier, https://resend.com
-RESEND_API_KEY=<RESEND_API_KEY>
-EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
+# Account email (confirm your email, password reset). Optional locally: with
+# `npm run dev` the links are printed to the console instead. SMTP needs the
+# Workers runtime, so real mail only goes out from `npm run preview` or deploy.
+SMTP_USER=you@gmail.com
+SMTP_PASS=<GMAIL_APP_PASSWORD>
+# Or, once there is a verified domain, Resend instead of SMTP:
+# RESEND_API_KEY=<RESEND_API_KEY>
+# EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
 
 # Optional — only needed to test the Placement Pro upgrade.
 STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>

@@ -10,7 +10,7 @@ import ViewerGate from "./ViewerGate";
 import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
 import { Button, Meter } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
-import {
+import { scanLabel,
   getStudentByProfile, getAnalytics, getScans, getShortlist, upsertShortlist, sendMessage,
   getRegisteredCompanies, recordScan, normalizeFeedback,
   type StudentRow, type AnalyticsRow, type ScanRow, type ShortlistRow, type CompanyRow,
@@ -69,7 +69,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
 
   // record the scan once for company / manager viewers
   useEffect(() => {
-    if (!viewer || !session || !student || scanned.current) return;
+    if (!viewer || !session || !student || !eventId || scanned.current) return;
     if (viewer === "company" || viewer === "event_manager") {
       scanned.current = true;
       recordScan({
@@ -271,7 +271,7 @@ function CompanyView({
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {scanHistory.map((s) => (
               <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{s.scan_context ?? "scan"}{s.notes ? ` · ${s.notes}` : ""}</span>
+                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{scanLabel(s.scan_context)}{s.notes ? ` · ${s.notes}` : ""}</span>
                 <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{new Date(s.created_at).toLocaleString()}</span>
               </div>
             ))}
@@ -379,7 +379,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
                 <div style={{ paddingBottom: 14 }}>
                   <div style={{ fontSize: 13, color: "var(--text)" }}>
                     {s.scanner_role === "event_manager" ? "Check-in / manager scan" : "Scanned by a company"}
-                    {s.scan_context ? ` · ${s.scan_context}` : ""}
+                    {` · ${scanLabel(s.scan_context)}`}
                   </div>
                   <div style={{ fontSize: 11.5, color: "var(--text-muted)", display: "inline-flex", alignItems: "center", gap: 5 }}>
                     <Eye size={11} /> {new Date(s.created_at).toLocaleString()}

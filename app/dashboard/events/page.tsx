@@ -7,11 +7,12 @@ import { GlassPanel } from "@/components/dashboard/widgets";
 import { SectionCard, LoadingBlock } from "@/components/dashboard/cards";
 import { Badge } from "@/components/ui/primitives";
 import { Reveal } from "@/components/anim/primitives";
-import { CalendarDays, MapPin, ArrowRight, Plus, Ticket, Check, Copy } from "lucide-react";
+import { CalendarDays, MapPin, ArrowRight, Plus, Ticket } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { EVENT_STATUS_LABEL, type EventRow } from "@/lib/events";
 import CreateEventForm from "@/components/events/CreateEventForm";
+import JoinCode from "@/components/events/JoinCode";
 import JoinEventForm from "@/components/events/JoinEventForm";
 
 function statusTone(status: EventRow["status"]) {
@@ -29,37 +30,6 @@ function formatDate(iso: string | null) {
 }
 
 /** The join code is the thing a college actually shares, so make it copyable. */
-function JoinCode({ code }: { code: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* clipboard blocked — the code is on screen to read anyway */
-    }
-  }
-
-  return (
-    <button
-      onClick={copy}
-      title="Copy join code"
-      style={{
-        display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px",
-        borderRadius: "var(--r-full)", cursor: "pointer",
-        background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.28)",
-        color: "var(--accent-2)", fontFamily: "var(--font-display)", fontWeight: 700,
-        fontSize: 13, letterSpacing: "0.14em",
-      }}
-    >
-      {copied ? <Check size={13} /> : <Copy size={13} />}
-      {code}
-    </button>
-  );
-}
-
 function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean; onOpen: () => void }) {
   const date = formatDate(event.start_date);
   return (

@@ -24,7 +24,7 @@ export function GlassPanel({ children, style, id }: { children: ReactNode; style
 
 export function PanelTitle({ children, hint }: { children: ReactNode; hint?: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "4px 12px", marginBottom: 16 }}>
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", columnGap: 12, rowGap: 4, marginBottom: 16 }}>
       <h2 style={{ fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 600, color: "var(--text)" }}>{children}</h2>
       {hint && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{hint}</span>}
     </div>

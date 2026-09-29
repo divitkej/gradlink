@@ -101,7 +101,7 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
 
   // record student→company scan once
   useEffect(() => {
-    if (!viewer || !session || !company || scanned.current) return;
+    if (!viewer || !session || !company || !eventId || scanned.current) return;
     if (viewer === "student") {
       scanned.current = true;
       recordScan({ eventId, scannerProfileId: session.profileId, scannedProfileId: companyProfileId, scannerRole: "student", scannedRole: "company", scanContext: "qr" });

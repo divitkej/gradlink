@@ -99,7 +99,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
     if (url) {
       setResumeUrl(url);
       await updateStudentProfile(session.profileId, { resume_url: url });
-      flash("Résumé attached, score unlocked");
+      flash("Résumé attached. Score updated.");
     } else {
       flash("Upload failed, try again");
     }
@@ -124,7 +124,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       projects: cleanProjects,
     });
     setSaving(false);
-    flash(ok ? "Profile saved, checklist updated" : "Couldn't save, try again");
+    flash(ok ? "Profile saved. Checklist updated." : "Couldn't save, try again");
   }
 
   if (loading) return <GlassPanel><LoadingBlock label="Loading your profile…" /></GlassPanel>;
@@ -148,7 +148,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
 
       {/* Résumé attach */}
       <GlassPanel style={{ border: resumeUrl ? "1px solid var(--border)" : "1px solid rgba(247,201,72,0.3)", background: resumeUrl ? undefined : "rgba(247,201,72,0.04)" }}>
-        <PanelTitle hint={resumeUrl ? "Attached" : "Required for your résumé score"}>Your résumé</PanelTitle>
+        <PanelTitle hint={resumeUrl ? "Attached" : "Counts toward your score"}>Your résumé</PanelTitle>
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={() => fileRef.current?.click()} disabled={uploading}
             style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", border: "none" }}>
@@ -169,7 +169,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20 }}>
         <GlassPanel>
           <PanelTitle hint="Edits auto-update your checklist & QR">Edit your profile</PanelTitle>
-          <div className="sp-fields" style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 14 }}>
+          <div className="sp-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 14 }}>
             <Field label="Degree" value={degree} onChange={setDegree} placeholder="Business Administration" />
             <Field label="Graduation year" value={year} onChange={setYear} placeholder="2026" type="number" />
             <Field label="University" value={university} onChange={setUniversity} placeholder="Your university" />
@@ -234,7 +234,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       )}
       <style>{`
         @media (max-width: 900px) { .dash-2col { grid-template-columns: minmax(0, 1fr) !important; } }
-        @media (max-width: 560px) { .sp-fields { grid-template-columns: minmax(0, 1fr) !important; } }
+        @media (max-width: 640px) { .sp-grid { grid-template-columns: minmax(0, 1fr) !important; } }
       `}</style>
     </GsapReveal>
   );

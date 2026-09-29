@@ -94,7 +94,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
       description: description || null,
     });
     setSaving(false);
-    flash(ok ? "Company profile saved, checklist updated" : "Couldn't save, try again");
+    flash(ok ? "Company profile saved. Checklist updated." : "Couldn't save, try again");
   }
 
   if (loading) return <GlassPanel><LoadingBlock label="Loading your company profile…" /></GlassPanel>;
@@ -118,7 +118,7 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
 
       {/* Brochure attach */}
       <GlassPanel>
-        <PanelTitle hint={brochureUrl ? "Attached" : "Optional, students can view it"}>Company brochure</PanelTitle>
+        <PanelTitle hint={brochureUrl ? "Attached" : "Optional. Students can view it"}>Company brochure</PanelTitle>
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={() => fileRef.current?.click()} disabled={uploading}
             style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", border: "none" }}>

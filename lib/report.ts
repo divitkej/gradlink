@@ -109,7 +109,7 @@ export function buildReport(input: {
       const mine = shortlists.filter((s) => s.company_id === pid);
       return {
         name: c.company_name ?? c.company ?? "Unnamed company",
-        booth: c.booth_number ?? "Not set",
+        booth: c.booth_number ?? "",
         studentScans,
         shortlisted: mine.filter(positive).length,
         rejected: mine.filter((s) => s.status === "rejected").length,
@@ -135,9 +135,9 @@ export function buildReport(input: {
       return {
         name: s.full_name,
         email: s.email,
-        degree: s.degree ?? "Not set",
-        university: s.university ?? "Not set",
-        graduationYear: s.graduation_year ? String(s.graduation_year) : "Not set",
+        degree: s.degree ?? "",
+        university: s.university ?? "",
+        graduationYear: s.graduation_year ? String(s.graduation_year) : "",
         resumeScore: score,
         companiesMet,
         shortlists: shortlistCount,
@@ -186,7 +186,7 @@ export function buildReport(input: {
 /** The rows of one CSV containing the summary, the employer table and the student table. */
 function reportBlocks(r: OutcomeReport): unknown[][] {
   const blocks: unknown[][] = [
-    ["GradLink: Post-event outcome report"],
+    ["GradLink: post-event outcome report"],
     ["Event", r.eventTitle],
     ["Date", r.eventDate],
     ["Location", r.location],
