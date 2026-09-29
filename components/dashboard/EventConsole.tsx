@@ -10,7 +10,6 @@ import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from ".
 import { Badge } from "@/components/ui/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
-import JoinCode from "@/components/events/JoinCode";
 import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
 import EventForm from "@/components/events/EventForm";
@@ -150,7 +149,6 @@ function EventHeader({
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
-          {role === "event_manager" && event?.join_code && <JoinCode code={event.join_code} labelled />}
           {canEdit && (
             <button
               onClick={() => setEditing(true)}

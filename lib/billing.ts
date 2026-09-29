@@ -5,9 +5,9 @@ import { rpc } from "./api-client";
 /* ============================================================
    GradLink billing — colleges pay, companies and students are free.
 
-   The free tier runs one real event end to end. The paid tier unlocks
-   what a placement office needs after the fair: the outcome report,
-   exports, unlimited events and year-over-year comparison.
+   The free tier runs real events end to end, with no limit on how many.
+   The paid tier unlocks what a placement office needs after the fair:
+   the outcome report, exports and year-over-year comparison.
 
    Entitlement lives in the `subscriptions` table, keyed by the event
    manager's profile id. That row is written ONLY by the Stripe webhook
@@ -39,14 +39,14 @@ export const PLANS: Plan[] = [
     cadence: "forever",
     tagline: "Run a real career fair, end to end.",
     features: [
-      "One live event",
+      "Unlimited events",
       "Student & employer registration",
       "QR check-in and booth scanning",
       "Live scan monitor",
       "Readiness dashboard",
       "Two-way messaging",
     ],
-    missing: ["Post-event outcome report", "Data exports", "Unlimited events"],
+    missing: ["Post-event outcome report", "Data exports"],
     cta: "Start free",
   },
   {
@@ -57,7 +57,6 @@ export const PLANS: Plan[] = [
     tagline: "Prove the outcome, not just the attendance.",
     features: [
       "Everything in Starter",
-      "Unlimited events",
       "Post-event outcome report",
       "CSV exports of students, employers & shortlists",
       "Year-over-year comparison",
@@ -129,5 +128,25 @@ export async function startCheckout(input: {
     return null;
   } catch {
     return "Couldn't reach the payment service. Check your connection and try again.";
+  }
+}
+
+/**
+ * Whether this college still has to pick a plan. Asked once, after sign-in.
+ * On any error the prompt is skipped rather than blocking the dashboard.
+ */
+export async function getPlanChoice(): Promise<{ required: boolean; choice: PlanId | null }> {
+  try {
+    return await rpc<{ required: boolean; choice: PlanId | null }>("getPlanChoice");
+  } catch {
+    return { required: false, choice: null };
+  }
+}
+
+export async function choosePlan(plan: PlanId): Promise<boolean> {
+  try {
+    return await rpc<boolean>("choosePlan", plan);
+  } catch {
+    return false;
   }
 }

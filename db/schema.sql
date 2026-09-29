@@ -140,6 +140,10 @@ create table if not exists colleges (
   email        text not null default '',
   institution  text
 );
+-- Set the first time the organiser picks a plan after signing in. Picking
+-- Pro only records the choice; paid features still come from subscriptions.
+alter table colleges add column if not exists plan_choice text check (plan_choice in ('free', 'pro'));
+alter table colleges add column if not exists plan_selected_at timestamptz;
 create index if not exists colleges_email_lower_idx on colleges (lower(email));
 
 -- ---------------------------------------------------------------- events --
@@ -154,9 +158,51 @@ create table if not exists events (
   status       text not null default 'upcoming' check (status in ('draft', 'upcoming', 'live', 'ended')),
   created_by   text references profiles (id) on delete set null,
   host_org     text,
+  -- Legacy single join code. Codes now live in event_codes; this column is
+  -- kept so events created before the split still resolve (as student codes).
   join_code    text unique
 );
 create index if not exists events_created_by_idx on events (created_by, created_at desc);
+
+-- Each event has one code for students and a different one for employers.
+-- The code is the primary key, so no two codes are ever the same across
+-- events or roles, and a code alone says which event and which role it is.
+create table if not exists event_codes (
+  code        text primary key,
+  created_at  timestamptz not null default now(),
+  event_id    text not null references events (id) on delete cascade,
+  role        text not null check (role in ('student', 'company')),
+  unique (event_id, role)
+);
+
+-- Carry legacy join codes over as student codes.
+insert into event_codes (code, event_id, role)
+select join_code, id, 'student' from events where join_code is not null
+on conflict do nothing;
+
+-- Give every event that lacks one a code for each role. Same alphabet as
+-- lib/server/rpc.ts (no 0/O or 1/I/L, since codes are typed off a slide).
+do $$
+declare
+  r record;
+  c text;
+begin
+  for r in
+    select e.id, x.role from events e cross join (values ('student'), ('company')) as x(role)
+    where not exists (select 1 from event_codes k where k.event_id = e.id and k.role = x.role)
+  loop
+    loop
+      c := (select string_agg(substr('ABCDEFGHJKMNPQRSTUVWXYZ23456789', 1 + floor(random() * 31)::int, 1), '')
+            from generate_series(1, 6));
+      begin
+        insert into event_codes (code, event_id, role) values (c, r.id, r.role);
+        exit;
+      exception when unique_violation then
+        -- code taken, draw another
+      end;
+    end loop;
+  end loop;
+end $$;
 
 create table if not exists event_registrations (
   id          text primary key default gen_random_uuid()::text,
@@ -284,3 +330,14 @@ create table if not exists orders (
   profile_id  text references profiles (id) on delete set null,
   details     jsonb not null default '{}'
 );
+
+-- ------------------------------------------------------------ monitoring --
+-- Unexpected server errors (500s) from the API, for the owner dashboard.
+-- Written by lib/server/http.ts; holds no request bodies or secrets.
+create table if not exists app_errors (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  scope       text not null,
+  message     text not null
+);
+create index if not exists app_errors_created_idx on app_errors (created_at desc);

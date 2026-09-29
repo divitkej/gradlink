@@ -1,4 +1,5 @@
-import { NotConfiguredError } from "./sql";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { NotConfiguredError, db } from "./sql";
 import { ConfigError } from "./session";
 
 /** An error whose message is safe to show the user. */
@@ -35,5 +36,27 @@ export function handleError(scope: string, err: unknown): Response {
     return json({ error: "GradLink isn't connected yet. The server is missing its configuration." }, { status: 503 });
   }
   console.error(`[${scope}]`, err);
+  recordError(scope, err);
   return json({ error: "Something went wrong. Please try again." }, { status: 500 });
+}
+
+/**
+ * Keep a copy of an unexpected error for the owner dashboard. Runs after the
+ * response is sent and can never fail the request it is reporting on.
+ */
+function recordError(scope: string, err: unknown) {
+  try {
+    const message = (err instanceof Error ? err.message : String(err)).slice(0, 1000);
+    const write = db()`insert into app_errors (scope, message) values (${scope.slice(0, 100)}, ${message})`.then(
+      () => undefined,
+      () => undefined,
+    );
+    try {
+      getCloudflareContext().ctx.waitUntil(write);
+    } catch {
+      /* not on Workers (next dev): the promise still runs */
+    }
+  } catch {
+    /* database not configured */
+  }
 }
