@@ -24,7 +24,10 @@ export default function Image() {
         <div style={{ display: "flex", alignItems: "center", gap: 30 }}>
           <svg width="112" height="112" viewBox="0 0 32 32">
             <rect width="32" height="32" rx="7" fill="#F5F5F5" />
-            <path d="M21.75 11.18 A7.5 7.5 0 1 0 23.5 16 H16" fill="none" stroke="#0A0A0A" strokeWidth="3" />
+            <path d="M16 7.5 L27 12.5 L16 17.5 L5 12.5 Z" fill="#0A0A0A" />
+            <path d="M10 15.2 V20 C10 22 13 23.5 16 23.5 C19 23.5 22 22 22 20 V15.2" fill="none" stroke="#0A0A0A" strokeWidth="2.4" />
+            <path d="M25 13.5 V21" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" />
+            <circle cx="25" cy="23" r="2.2" fill="#0A0A0A" />
           </svg>
           <div style={{ display: "flex", fontSize: 100, fontWeight: 600, letterSpacing: "-3px", color: "#F5F5F5" }}>
             GradLink

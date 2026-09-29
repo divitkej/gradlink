@@ -7,7 +7,7 @@ import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react"
 import AuthShell from "./AuthShell";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
-import { signIn, sendReset } from "@/lib/auth";
+import { signIn, sendReset, resendVerification } from "@/lib/auth";
 import { setSession } from "@/lib/session";
 
 function roleHome(role: "student" | "company" | "event_manager") {
@@ -47,6 +47,21 @@ export default function GradLinkSignIn() {
   const [error, setError] = useState<string | null>(null);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [resetBusy, setResetBusy] = useState(false);
+  // True after a correct password on an account whose email isn't confirmed.
+  const [unverified, setUnverified] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
+
+  async function handleResend() {
+    setResendBusy(true);
+    const res = await resendVerification(email);
+    setResendBusy(false);
+    if (!res.ok) setError(res.error ?? "Couldn't send the confirmation email.");
+    else {
+      setError(null);
+      setUnverified(false);
+      setResetMsg(`We've sent a new confirmation link to ${email.trim()}. Check your inbox and spam folder.`);
+    }
+  }
 
   async function handleForgot() {
     setError(null);
@@ -65,6 +80,7 @@ export default function GradLinkSignIn() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setUnverified(false);
     if (!email.trim() || !password) {
       setError("Enter your email and password.");
       return;
@@ -74,6 +90,7 @@ export default function GradLinkSignIn() {
     if (!res.ok || !res.profile) {
       setBusy(false);
       setError(res.error ?? "Incorrect email or password.");
+      setUnverified(Boolean(res.unverified));
       return;
     }
 
@@ -129,7 +146,18 @@ export default function GradLinkSignIn() {
           {error && (
             <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "var(--danger)", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.25)", borderRadius: "var(--r-sm)", padding: "10px 12px" }}>
               <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>{error}</span>
+              <span>
+                {error}
+                {unverified && (
+                  <>
+                    {" "}
+                    <button type="button" onClick={handleResend} disabled={resendBusy} className="gl-link"
+                      style={{ font: "inherit", fontWeight: 600, color: "var(--text)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
+                      {resendBusy ? "Sending…" : "Resend the link"}
+                    </button>
+                  </>
+                )}
+              </span>
             </div>
           )}
 

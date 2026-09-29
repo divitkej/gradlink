@@ -12,7 +12,7 @@ import Checklist from "./Checklist";
 import ManualSection from "./ManualSection";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
-import {
+import { scanLabel,
   getStudentByProfile, getScans, getRegisteredCompanies, listShortlistsForStudent,
   type StudentRow, type ScanRow, type CompanyRow, type ShortlistRow,
 } from "@/lib/db";
@@ -127,7 +127,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
         <Checklist role="student" profileId={profileId} eventId={eventId} onProgress={setReadiness} />
 
         <SectionCard
-          title="AI resume analysis"
+          title="Resume analysis"
           right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Auto-evaluated</span>}
         >
           <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap" }}>
@@ -182,10 +182,10 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontFamily: "var(--font-display)", fontSize: 14.5, fontWeight: 700, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                   {overlap > 0
-                    ? <span style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>{overlap}★</span>
+                    ? <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--accent-2)" }}>{`${overlap} skill${overlap === 1 ? "" : "s"} match`}</span>
                     : null}
                 </div>
-                <p style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.5, flex: 1 }}>{c.sector} · Booth {c.booth_number}</p>
+                <p style={{ fontSize: 11.5, color: "var(--text-muted)", lineHeight: 1.5, flex: 1 }}>{[c.sector, c.booth_number ? `Booth ${c.booth_number}` : ""].filter(Boolean).join(" · ") || "Booth not set"}</p>
                 <span style={{ fontSize: 11.5, color: "var(--text-2)" }}>{(c.hiring_roles ?? []).length} open roles</span>
                 {overlap > 0
                   ? <FlagPill label={`${overlap} skill match`} tone="teal" />
@@ -208,7 +208,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
             </div>
             <div style={{ fontSize: 14.5, fontWeight: 600, color: "var(--text)" }}>No scans yet</div>
             <p style={{ fontSize: 13, color: "var(--text-muted)", maxWidth: 360, lineHeight: 1.55 }}>
-              Show your QR at company booths — when a recruiter scans you, they&apos;ll appear here.
+              Show your QR at company booths. When a recruiter scans you, they&apos;ll appear here.
             </p>
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", padding: "9px 16px", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <ScanLine size={15} /> Open my QR
@@ -225,7 +225,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
                 </span>
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Badge tone={s.scanner_role === "company" ? "teal" : "cyan"}>{s.scan_context ?? "scan"}</Badge>
+                <Badge tone={s.scanner_role === "company" ? "teal" : "cyan"}>{scanLabel(s.scan_context)}</Badge>
                 <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{new Date(s.created_at).toLocaleDateString()}</span>
               </span>
             </div>

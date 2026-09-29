@@ -1,11 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Section } from "../ui/Section";
 import { GlassCard, Badge, Meter } from "../ui/primitives";
 import { SectionHeading } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
-
-const filters = ["Degree", "Graduation Year", "GPA", "Skills", "Readiness Score", "Resume Score", "Event Activity", "Stage"];
 
 const pipeline = [
   { l: "Scanned", v: 180, c: "var(--text-muted)", pct: 100 },
@@ -15,16 +14,81 @@ const pipeline = [
   { l: "Offer", v: 14, c: "var(--text-2)", pct: 8 },
 ];
 
-const candidates = [
-  { n: "Sara Al Rashidi", d: "Business Admin · Year 3", r: 92, res: 88, s: "Shortlisted", tone: "teal" as const },
-  { n: "Mohammed Al Mansoori", d: "Computer Science · Year 4", r: 85, res: 91, s: "Contacted", tone: "cyan" as const },
-  { n: "Fatima Khalid", d: "Marketing · Year 3", r: 78, res: 82, s: "Interview", tone: "muted" as const },
-  { n: "Ahmed Nasser", d: "Finance · Year 4", r: 71, res: 75, s: "Scanned", tone: "muted" as const },
+type Stage = "Scanned" | "Shortlisted" | "Contacted" | "Interview";
+
+interface Candidate {
+  name: string;
+  degree: string;
+  gradYear: number;
+  gpa: number;
+  skills: string[];
+  readiness: number;
+  resume: number;
+  booths: number;
+  stage: Stage;
+}
+
+// Sample students for the preview. The filters below run against these only.
+const candidates: Candidate[] = [
+  { name: "Sara Al Rashidi", degree: "Business Administration", gradYear: 2027, gpa: 3.7, skills: ["Excel", "Communication", "SQL"], readiness: 92, resume: 88, booths: 6, stage: "Shortlisted" },
+  { name: "Mohammed Al Mansoori", degree: "Computer Science", gradYear: 2026, gpa: 3.8, skills: ["Python", "SQL", "Communication"], readiness: 85, resume: 91, booths: 8, stage: "Contacted" },
+  { name: "Fatima Khalid", degree: "Marketing", gradYear: 2027, gpa: 3.4, skills: ["Design", "Communication", "Excel"], readiness: 78, resume: 82, booths: 4, stage: "Interview" },
+  { name: "Ahmed Nasser", degree: "Finance", gradYear: 2026, gpa: 3.1, skills: ["Excel", "SQL"], readiness: 71, resume: 75, booths: 2, stage: "Scanned" },
+  { name: "Layla Haddad", degree: "Computer Science", gradYear: 2027, gpa: 3.9, skills: ["Python", "Design"], readiness: 88, resume: 84, booths: 5, stage: "Shortlisted" },
+  { name: "Omar Farouk", degree: "Engineering", gradYear: 2026, gpa: 3.3, skills: ["Python", "Excel"], readiness: 66, resume: 72, booths: 3, stage: "Scanned" },
+  { name: "Aisha Rahman", degree: "Finance", gradYear: 2027, gpa: 3.6, skills: ["SQL", "Excel", "Communication"], readiness: 81, resume: 79, booths: 7, stage: "Interview" },
 ];
 
-const actions = ["Shortlist", "Add Note", "Send Follow-up", "Invite to Interview"];
+const stageTone: Record<Stage, "teal" | "cyan" | "muted"> = {
+  Scanned: "muted",
+  Shortlisted: "teal",
+  Contacted: "cyan",
+  Interview: "muted",
+};
+
+interface Filter {
+  id: string;
+  label: string;
+  options: { label: string; test: (c: Candidate) => boolean }[];
+}
+
+const oneOf = <T,>(values: T[], pick: (c: Candidate) => T, show: (v: T) => string = String) =>
+  values.map((v) => ({ label: show(v), test: (c: Candidate) => pick(c) === v }));
+const atLeast = (n: number, pick: (c: Candidate) => number, show: (n: number) => string) => ({
+  label: show(n),
+  test: (c: Candidate) => pick(c) >= n,
+});
+
+const filters: Filter[] = [
+  { id: "degree", label: "Degree", options: oneOf(["Business Administration", "Computer Science", "Engineering", "Finance", "Marketing"], (c) => c.degree) },
+  { id: "year", label: "Graduation Year", options: oneOf([2026, 2027], (c) => c.gradYear) },
+  { id: "gpa", label: "GPA", options: [atLeast(3.5, (c) => c.gpa, (n) => `${n} and above`), atLeast(3.0, (c) => c.gpa, (n) => `${n.toFixed(1)} and above`)] },
+  { id: "skills", label: "Skills", options: ["Python", "SQL", "Excel", "Design", "Communication"].map((s) => ({ label: s, test: (c: Candidate) => c.skills.includes(s) })) },
+  { id: "readiness", label: "Readiness Score", options: [atLeast(80, (c) => c.readiness, (n) => `${n}% and above`), atLeast(70, (c) => c.readiness, (n) => `${n}% and above`)] },
+  { id: "resume", label: "Resume Score", options: [atLeast(85, (c) => c.resume, (n) => `${n}% and above`), atLeast(75, (c) => c.resume, (n) => `${n}% and above`)] },
+  { id: "activity", label: "Event Activity", options: [atLeast(5, (c) => c.booths, (n) => `${n}+ booths visited`), atLeast(3, (c) => c.booths, (n) => `${n}+ booths visited`)] },
+  { id: "stage", label: "Stage", options: oneOf<Stage>(["Scanned", "Shortlisted", "Contacted", "Interview"], (c) => c.stage) },
+];
 
 export default function EmployerCRMSection() {
+  // Chosen option index per filter id, and which filter's options are open.
+  const [chosen, setChosen] = useState<Record<string, number>>({});
+  const [open, setOpen] = useState<string | null>(null);
+
+  const shown = candidates.filter((c) => filters.every((f) => chosen[f.id] === undefined || f.options[chosen[f.id]].test(c)));
+  const anyChosen = Object.keys(chosen).length > 0;
+  const openFilter = filters.find((f) => f.id === open);
+
+  function pick(filterId: string, index: number | null) {
+    setChosen((prev) => {
+      const next = { ...prev };
+      if (index === null) delete next[filterId];
+      else next[filterId] = index;
+      return next;
+    });
+    setOpen(null);
+  }
+
   return (
     <Section id="employers" bg="var(--bg-2)">
       <SectionHeading
@@ -56,15 +120,46 @@ export default function EmployerCRMSection() {
             </GlassCard>
           </div>
 
-          {/* Filters */}
+          {/* Filters: work on the sample students in the list */}
           <div>
             <GlassCard padding={22}>
-              <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginBottom: 12 }}>Filter candidates by:</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {filters.map((f) => (
-                  <span key={f} style={{ fontSize: 12, color: "var(--text-2)", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", padding: "5px 12px", cursor: "pointer", transition: "all 0.18s" }} className="filter-chip">{f}</span>
-                ))}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 12.5, color: "var(--text-muted)" }}>Filter candidates by:</span>
+                {anyChosen && (
+                  <button type="button" className="crm-clear" onClick={() => { setChosen({}); setOpen(null); }}>
+                    Clear filters
+                  </button>
+                )}
               </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {filters.map((f) => {
+                  const active = chosen[f.id] !== undefined;
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      className={`crm-chip${active || open === f.id ? " is-on" : ""}`}
+                      aria-expanded={open === f.id}
+                      aria-controls="crm-filter-options"
+                      onClick={() => setOpen(open === f.id ? null : f.id)}
+                    >
+                      {active ? `${f.label}: ${f.options[chosen[f.id]].label}` : f.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {openFilter && (
+                <div id="crm-filter-options" role="group" aria-label={openFilter.label} style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)", display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <button type="button" className={`crm-opt${chosen[openFilter.id] === undefined ? " is-on" : ""}`} aria-pressed={chosen[openFilter.id] === undefined} onClick={() => pick(openFilter.id, null)}>
+                    Any
+                  </button>
+                  {openFilter.options.map((o, i) => (
+                    <button key={o.label} type="button" className={`crm-opt${chosen[openFilter.id] === i ? " is-on" : ""}`} aria-pressed={chosen[openFilter.id] === i} onClick={() => pick(openFilter.id, i)}>
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </GlassCard>
           </div>
         </div>
@@ -72,46 +167,62 @@ export default function EmployerCRMSection() {
         {/* Candidate list */}
         <div>
           <GlassCard padding={0} style={{ overflow: "hidden", border: "1px solid var(--border-strong)" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Scanned Candidates</div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>42 students · Fintech firm</div>
+                <div aria-live="polite" style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 2 }}>
+                  {`Showing ${shown.length} of ${candidates.length} sample students · Fintech firm`}
+                </div>
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)", padding: "6px 12px", cursor: "pointer" }}>Export CSV</span>
+              <SampleDataLabel />
             </div>
-            {candidates.map((c, i) => (
-              <div key={c.n} className="cand-row" style={{ padding: "16px 20px", borderBottom: i < candidates.length - 1 ? "1px solid var(--border)" : "none", transition: "background 0.18s" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                  <div style={{ display: "flex", gap: 11, alignItems: "center" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.10)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-display)" }}>
-                      {c.n.split(" ").map((x) => x[0]).slice(0, 2).join("")}
+            {shown.length === 0 && (
+              <div style={{ padding: "28px 20px", fontSize: 13, color: "var(--text-2)" }}>
+                No sample students match these filters.{" "}
+                <button type="button" className="crm-clear" onClick={() => { setChosen({}); setOpen(null); }}>Clear filters</button>
+              </div>
+            )}
+            {shown.map((c) => (
+              <div key={c.name} style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                  <div style={{ display: "flex", gap: 11, alignItems: "center", minWidth: 0 }}>
+                    <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.10)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-display)" }}>
+                      {c.name.split(" ").map((x) => x[0]).slice(0, 2).join("")}
                     </div>
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.n}</div>
-                      <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{c.d}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.name}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`${c.degree} · Class of ${c.gradYear} · GPA ${c.gpa.toFixed(1)}`}</div>
                     </div>
                   </div>
-                  <Badge tone={c.tone}>{c.s}</Badge>
+                  <Badge tone={stageTone[c.stage]}>{c.stage}</Badge>
                 </div>
-                <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Readiness <strong style={{ color: "var(--text)" }}>{c.r}%</strong></span>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{c.res}%</strong></span>
+                <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Readiness <strong style={{ color: "var(--text)" }}>{c.readiness}%</strong></span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{c.resume}%</strong></span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Booths visited <strong style={{ color: "var(--text)" }}>{c.booths}</strong></span>
                 </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {actions.map((a) => (
-                    <button key={a} className="cand-action" style={{ fontSize: 11, fontWeight: 600, color: a === "Shortlist" ? "var(--accent-2)" : "var(--text-2)", background: a === "Shortlist" ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)", border: `1px solid ${a === "Shortlist" ? "rgba(255,255,255,0.25)" : "var(--border)"}`, borderRadius: "var(--r-sm)", padding: "6px 11px", cursor: "pointer", transition: "all 0.18s" }}>{a}</button>
-                  ))}
-                </div>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`Skills: ${c.skills.join(", ")}`}</div>
               </div>
             ))}
+            <div style={{ padding: "14px 20px", fontSize: 11.5, color: "var(--text-muted)" }}>
+              From each card a recruiter can shortlist, add a note, send a follow-up or invite to interview.
+            </div>
           </GlassCard>
         </div>
       </div>
 
       <style>{`
-        .filter-chip:hover { color: var(--accent) !important; border-color: var(--border-strong) !important; }
-        .cand-row:hover { background: rgba(255,255,255,0.02); }
-        .cand-action:hover { border-color: var(--border-strong) !important; color: var(--text) !important; }
+        .crm-chip, .crm-opt {
+          font: inherit; font-size: 12px; color: var(--text-2); cursor: pointer;
+          background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: var(--r-sm);
+          padding: 6px 12px; transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .crm-chip:hover, .crm-opt:hover { color: var(--text); border-color: var(--border-strong); }
+        .crm-chip.is-on, .crm-opt.is-on { color: var(--text); background: rgba(255,255,255,0.12); border-color: var(--border-strong); }
+        .crm-clear {
+          font: inherit; font-size: 12px; color: var(--text); background: none; border: none; padding: 0;
+          cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+        }
         @media (max-width: 900px) { .crm-grid { grid-template-columns: 1fr !important; gap: 24px !important; } }
       `}</style>
     </Section>

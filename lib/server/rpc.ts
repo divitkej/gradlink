@@ -1,7 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
-import { seedChecklistQuery } from "./checklist-defaults";
+import { CHECKLIST_TEMPLATE } from "./checklist-template";
 import { evaluateResume } from "../resume";
 import type { StudentRow } from "../db";
 
@@ -14,22 +14,37 @@ import type { StudentRow } from "../db";
 
    Authorization:
      * every op requires a signed-in user;
-     * anything about an event (its people, scans, shortlists,
-       analytics, messages) needs the caller to belong to that event,
-       as its organiser or through a registration. Organiser-only
-       views (all analytics, all shortlists, every scan) need the
-       event's owner;
-     * a profile can be read by its owner, or by someone who shares
-       an event with it in a role that should see it;
-     * join codes are only returned to the event's owner;
+     * event data (attendees, scans, shortlists, analytics, messages)
+       is only visible to people registered for that event, and the
+       whole-event views only to the event's staff (its owner, or a
+       college account registered for it);
+     * shortlists and their private notes belong to the company that
+       made them; the student sees their status, never the notes;
+     * a profile is visible to its owner, or to someone who shares an
+       event with it (fellow students see no contact details);
+     * messages, checklist progress, memberships and subscriptions
+       are visible to their owner only;
      * writes are owner-only, checked against the session's profile
-       id — never against an id the browser claims.
+       id and role, never against an id or role the browser claims.
    ============================================================ */
 
 type Args = unknown[];
 type Op = (user: AuthUser, args: Args) => Promise<unknown>;
 
 const forbidden = () => new HttpError(403, "You don't have permission to do that.");
+
+/** Adds the default checklist to an event. Safe to repeat: existing items are kept. */
+async function addDefaultChecklist(eventId: string): Promise<void> {
+  await db()`
+    insert into checklist_items (event_id, role, phase, order_index, title, description)
+    select ${eventId}, x.role, x.phase, x.order_index, x.title, x.description
+    from json_to_recordset(${JSON.stringify(CHECKLIST_TEMPLATE)}::json)
+      as x(role text, phase text, order_index int, title text, description text)
+    where exists (select 1 from events where id = ${eventId})
+      and not exists (select 1 from checklist_items where event_id = ${eventId})
+    on conflict do nothing
+  `;
+}
 
 function isMe(user: AuthUser, id: unknown) {
   if (id !== user.id) throw forbidden();
@@ -38,45 +53,133 @@ function isMe(user: AuthUser, id: unknown) {
 const s = (v: unknown) => (typeof v === "string" ? v : "");
 const textOrNull = (v: unknown, max = 5000) => (typeof v === "string" ? v.slice(0, max) : null);
 const intOrNull = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? Math.round(v) : null);
-const strArray = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").map((x) => x.slice(0, 200)) : []);
+const strArray = (v: unknown, maxItems = 50) =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string").slice(0, maxItems).map((x) => x.slice(0, 200)) : [];
+
+/**
+ * Links that other users click. Only http(s) is stored, so a profile can never
+ * carry a `javascript:` or `data:` link. A bare domain gets https:// added.
+ */
+function urlOrNull(v: unknown): string | null {
+  const raw = typeof v === "string" ? v.trim().slice(0, 2000) : "";
+  if (!raw) return null;
+  try {
+    const url = new URL(/^[a-z][a-z0-9+.-]*:/i.test(raw) ? raw : `https://${raw}`);
+    if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error();
+    return url.toString();
+  } catch {
+    throw new HttpError(400, "One of the links isn't a valid web address. Use a link that starts with https://");
+  }
+}
+
+/* ---------------- column sets ---------------- */
+
+const STUDENT_COLS = `id, profile_id, created_at, full_name, email, university, degree, graduation_year, skills,
+  resume_url, portfolio_url, linkedin_url, github_url, bio, resume_score, ai_feedback`;
+const COMPANY_COLS = `id, profile_id, created_at, full_name, email, company, company_name, sector, industry, website,
+  description, logo_url, hiring_roles, booth_number, skills_wanted, brochure_url`;
+
+/**
+ * Profile fields a user may edit on their own role row, and how each is coerced.
+ * resume_score and ai_feedback are deliberately absent: companies rely on them,
+ * so a student must not be able to set their own score.
+ */
+const STUDENT_FIELDS: Record<string, (v: unknown) => unknown> = {
+  full_name: (v) => textOrNull(v, 200) ?? "",
+  university: (v) => textOrNull(v, 300), degree: (v) => textOrNull(v, 300), graduation_year: intOrNull, skills: (v) => strArray(v),
+  resume_url: urlOrNull, portfolio_url: urlOrNull, linkedin_url: urlOrNull, github_url: urlOrNull,
+  bio: textOrNull,
+};
+const COMPANY_FIELDS: Record<string, (v: unknown) => unknown> = {
+  full_name: (v) => textOrNull(v, 200) ?? "",
+  company: (v) => textOrNull(v, 300), company_name: (v) => textOrNull(v, 300), sector: (v) => textOrNull(v, 200),
+  industry: (v) => textOrNull(v, 200), website: urlOrNull,
+  description: textOrNull, logo_url: urlOrNull, hiring_roles: (v) => strArray(v), booth_number: (v) => textOrNull(v, 50),
+  skills_wanted: (v) => strArray(v), brochure_url: urlOrNull,
+};
+/** What a student sees of a fellow student: no contact details. */
+const PEER_STUDENT_COLS = `id, profile_id, created_at, full_name, university, degree, graduation_year, skills, bio`;
+
+
+/**
+ * Upsert the caller's own role row with only whitelisted columns — the
+ * equivalent of Firestore's `setDoc(..., { merge: true })`.
+ */
+async function upsertRoleRow(table: "students" | "companies", fields: Record<string, (v: unknown) => unknown>, id: string, input: unknown) {
+  const entries = Object.entries((input ?? {}) as Row).filter(([k, v]) => k in fields && v !== undefined);
+  if (!entries.length) return true;
+  const cols = entries.map(([k]) => k);
+  const values = entries.map(([k, v]) => fields[k](v));
+  const placeholders = cols.map((_, i) => `$${i + 2}`);
+  // Column names come from the whitelist above, never from the request.
+  await db().query(
+    `insert into ${table} (id, profile_id, ${cols.join(", ")}) values ($1, $1, ${placeholders.join(", ")})
+     on conflict (id) do update set ${cols.map((c) => `${c} = excluded.${c}`).join(", ")}`,
+    [id, ...values],
+  );
+  return true;
+}
 
 /* ---------------- event access ---------------- */
 
-type Access = "owner" | "student" | "company" | "event_manager" | null;
-
-/** The caller's standing in an event: its owner, their registration role, or null. */
-async function eventAccess(u: AuthUser, eventId: string): Promise<Access> {
-  if (!eventId) return null;
-  const rows = await db()`
-    select e.created_by, r.role from events e
-    left join event_registrations r on r.event_id = e.id and r.profile_id = ${u.id}
-    where e.id = ${eventId}
-  `;
-  const r = rows[0];
-  if (!r) return null;
-  if (r.created_by === u.id) return "owner";
-  return (r.role as Access) ?? null;
+interface EventAccess {
+  /** Created the event. */
+  owner: boolean;
+  /** Registered for it (joined by code, or the organiser). */
+  member: boolean;
+  /** Sees the whole event: the owner, or a college account registered for it. */
+  staff: boolean;
 }
 
-async function requireAccess(u: AuthUser, eventId: unknown, allowed?: Access[]): Promise<Access> {
-  const a = await eventAccess(u, s(eventId));
-  if (!a || (allowed && !allowed.includes(a))) throw forbidden();
+async function eventAccess(u: AuthUser, eventId: unknown): Promise<EventAccess> {
+  const rows = await db()`
+    select e.created_by = ${u.id} as owner,
+           exists (select 1 from event_registrations r where r.event_id = e.id and r.profile_id = ${u.id}) as member
+    from events e where e.id = ${s(eventId)}
+  `;
+  const owner = Boolean(rows[0]?.owner);
+  const member = Boolean(rows[0]?.member);
+  return { owner, member, staff: owner || (member && u.role === "event_manager") };
+}
+
+/** Throws unless the caller is registered for (or owns) the event. */
+async function requireMember(u: AuthUser, eventId: unknown): Promise<EventAccess> {
+  const a = await eventAccess(u, eventId);
+  if (!a.owner && !a.member) throw forbidden();
   return a;
 }
 
-/** The role someone is registered under in an event, or null if they aren't in it. */
-async function registeredRole(eventId: string, profileId: string): Promise<string | null> {
-  const rows = await db()`select role from event_registrations where event_id = ${eventId} and profile_id = ${profileId}`;
-  return (rows[0]?.role as string) ?? null;
+async function requireStaff(u: AuthUser, eventId: unknown): Promise<void> {
+  if (!(await eventAccess(u, eventId)).staff) throw forbidden();
 }
 
-/** Join codes are the key to an event, so only its owner ever receives them. */
-function forViewer(u: AuthUser, event: Row | undefined): Row | null {
-  if (!event) return null;
-  if (event.created_by === u.id) return event;
-  const rest = { ...event };
-  delete rest.join_code;
-  return rest;
+/** Whether someone other than the caller is registered for (or owns) the event. */
+async function isInEvent(profileId: string, eventId: string): Promise<boolean> {
+  const rows = await db()`
+    select 1 from events e where e.id = ${eventId} and (e.created_by = ${profileId}
+      or exists (select 1 from event_registrations r where r.event_id = e.id and r.profile_id = ${profileId}))
+  `;
+  return rows.length > 0;
+}
+
+/** Private notes on a shortlist entry are for the company and the event staff only. */
+function withoutNotes(rows: Row[]): Row[] {
+  return rows.map((r) => ({ ...r, notes: null }));
+}
+
+/**
+ * Whether the caller shares an event with someone registered in `role`, and
+ * so may see their profile: as that event's owner, or registered for it.
+ */
+async function sharesEventWith(u: AuthUser, profileId: string, role: "student" | "company"): Promise<boolean> {
+  const rows = await db()`
+    select 1 from event_registrations t join events e on e.id = t.event_id
+    where t.profile_id = ${profileId} and t.role = ${role}
+      and (e.created_by = ${u.id}
+        or exists (select 1 from event_registrations me where me.event_id = t.event_id and me.profile_id = ${u.id}))
+    limit 1
+  `;
+  return rows.length > 0;
 }
 
 /* ---------------- analytics ---------------- */
@@ -120,47 +223,6 @@ async function computeAnalytics(eventId: string, studentId?: string) {
   });
 }
 
-/* ---------------- column sets ---------------- */
-
-const STUDENT_COLS = `id, profile_id, created_at, full_name, email, university, degree, graduation_year, skills,
-  resume_url, portfolio_url, linkedin_url, github_url, bio, resume_score, ai_feedback`;
-const COMPANY_COLS = `id, profile_id, created_at, full_name, email, company, company_name, sector, industry, website,
-  description, logo_url, hiring_roles, booth_number, skills_wanted, brochure_url`;
-
-/** Profile fields a user may edit on their own role row, and how each is coerced. */
-const STUDENT_FIELDS: Record<string, (v: unknown) => unknown> = {
-  full_name: (v) => textOrNull(v, 200) ?? "",
-  university: textOrNull, degree: textOrNull, graduation_year: intOrNull, skills: strArray,
-  resume_url: textOrNull, portfolio_url: textOrNull, linkedin_url: textOrNull, github_url: textOrNull,
-  bio: textOrNull, resume_score: intOrNull,
-  ai_feedback: (v) => (v == null ? null : JSON.stringify(v)),
-};
-const COMPANY_FIELDS: Record<string, (v: unknown) => unknown> = {
-  full_name: (v) => textOrNull(v, 200) ?? "",
-  company: textOrNull, company_name: textOrNull, sector: textOrNull, industry: textOrNull, website: textOrNull,
-  description: textOrNull, logo_url: textOrNull, hiring_roles: strArray, booth_number: textOrNull,
-  skills_wanted: strArray, brochure_url: textOrNull,
-};
-
-/**
- * Upsert the caller's own role row with only whitelisted columns — the
- * equivalent of Firestore's `setDoc(..., { merge: true })`.
- */
-async function upsertRoleRow(table: "students" | "companies", fields: Record<string, (v: unknown) => unknown>, id: string, input: unknown) {
-  const entries = Object.entries((input ?? {}) as Row).filter(([k, v]) => k in fields && v !== undefined);
-  if (!entries.length) return true;
-  const cols = entries.map(([k]) => k);
-  const values = entries.map(([k, v]) => fields[k](v));
-  const placeholders = cols.map((_, i) => `$${i + 2}`);
-  // Column names come from the whitelist above, never from the request.
-  await db().query(
-    `insert into ${table} (id, profile_id, ${cols.join(", ")}) values ($1, $1, ${placeholders.join(", ")})
-     on conflict (id) do update set ${cols.map((c) => `${c} = excluded.${c}`).join(", ")}`,
-    [id, ...values],
-  );
-  return true;
-}
-
 /* ---------------- join codes ---------------- */
 
 /** Typed by hand off a slide or poster, so 0/O and 1/I/L are left out. */
@@ -179,57 +241,44 @@ const SHORTLIST_STATUSES = ["shortlisted", "maybe", "rejected", "priority"];
 
 export const ops: Record<string, Op> = {
   /* Students */
-  /** Yourself, or a student in an event where you are an employer or the organiser. */
+  /** Companies and colleges see the full profile; a fellow student sees no contact details. */
   async getStudentByProfile(u, [profileId]) {
     const id = s(profileId);
-    if (id !== u.id) {
-      const ok = await db()`
-        select 1 from event_registrations t join events e on e.id = t.event_id
-        left join event_registrations me on me.event_id = t.event_id and me.profile_id = ${u.id}
-        where t.profile_id = ${id} and t.role = 'student' and (e.created_by = ${u.id} or me.role = 'company')
-        limit 1
-      `;
-      if (!ok.length) return null;
-    }
-    const rows = await db().query(`select ${STUDENT_COLS} from students where id = $1`, [id]);
+    // Someone else's profile only when you share an event with them.
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
+    const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
     isMe(u, profileId);
+    if (u.role !== "student") throw forbidden();
     return upsertRoleRow("students", STUDENT_FIELDS, u.id, fields);
   },
-  /** Employers and the organiser see the students; students don't see each other. */
   async getRegisteredStudents(u, [eventId]) {
-    await requireAccess(u, eventId, ["owner", "company"]);
+    await requireMember(u, eventId);
+    const cols = u.role === "student" ? PEER_STUDENT_COLS : STUDENT_COLS;
     return db().query(
-      `select ${STUDENT_COLS.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
+      `select ${cols.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
        where r.event_id = $1 and r.role = 'student'`,
       [s(eventId)],
     );
   },
 
   /* Companies */
-  /** Yourself, or an employer registered in an event you belong to. */
   async getCompanyByProfile(u, [profileId]) {
     const id = s(profileId);
-    if (id !== u.id) {
-      const ok = await db()`
-        select 1 from event_registrations t join events e on e.id = t.event_id
-        left join event_registrations me on me.event_id = t.event_id and me.profile_id = ${u.id}
-        where t.profile_id = ${id} and t.role = 'company' and (e.created_by = ${u.id} or me.profile_id is not null)
-        limit 1
-      `;
-      if (!ok.length) return null;
-    }
+    if (id !== u.id && !(await sharesEventWith(u, id, "company"))) return null;
     const rows = await db().query(`select ${COMPANY_COLS} from companies where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateCompanyProfile(u, [profileId, fields]) {
     isMe(u, profileId);
+    if (u.role !== "company") throw forbidden();
     return upsertRoleRow("companies", COMPANY_FIELDS, u.id, fields);
   },
   async getRegisteredCompanies(u, [eventId]) {
-    await requireAccess(u, eventId);
+    await requireMember(u, eventId);
     return db().query(
       `select ${COMPANY_COLS.replace(/(\w+)/g, "c.$1")} from event_registrations r join companies c on c.id = r.profile_id
        where r.event_id = $1 and r.role = 'company'`,
@@ -238,20 +287,22 @@ export const ops: Record<string, Op> = {
   },
 
   /* Analytics */
-  /** The student themself, an employer at the event, or its organiser. */
+  /** A student's own stats, or any attendee's for companies and colleges at the event. */
   async getAnalytics(u, [studentId, eventId]) {
-    const a = await requireAccess(u, eventId);
-    if (s(studentId) !== u.id && a !== "owner" && a !== "company") throw forbidden();
+    if (studentId !== u.id) {
+      if (u.role === "student") throw forbidden();
+      await requireMember(u, eventId);
+    }
     const rows = await computeAnalytics(s(eventId), s(studentId));
     return rows[0] ?? null;
   },
   async listAnalytics(u, [eventId]) {
-    await requireAccess(u, eventId, ["owner"]);
+    await requireStaff(u, eventId);
     return computeAnalytics(s(eventId));
   },
   /** Headcounts anyone in the event may see, without the people behind them. */
   async getEventCounts(u, [eventId]) {
-    await requireAccess(u, eventId);
+    await requireMember(u, eventId);
     const rows = await db()`
       select count(*) filter (where role = 'student')::int as students, count(*) filter (where role = 'company')::int as companies
       from event_registrations where event_id = ${s(eventId)}
@@ -259,30 +310,31 @@ export const ops: Record<string, Op> = {
     return rows[0] ?? { students: 0, companies: 0 };
   },
 
-  /*
-   * Scans — append-only, only for a scan you performed, and only between two
-   * people in the same event. Roles are read from the registrations, not the
-   * request, so analytics can trust them.
-   */
+  /* Scans: append-only, and only for a scan you performed at an event you're in. */
   async recordScan(u, [input]) {
     const i = (input ?? {}) as Row;
     isMe(u, i.scannerProfileId);
-    const eventId = s(i.eventId);
-    const scannerRole = (await requireAccess(u, eventId)) === "owner" ? "event_manager" : u.role;
-    const scannedRole = await registeredRole(eventId, s(i.scannedProfileId));
-    if (!scannedRole) throw forbidden();
-    await db()`
+    // A scan belongs to an event. Without one (a hand-typed link) there is
+    // nothing to record, so it is skipped rather than failing.
+    if (!i.eventId) return false;
+    await requireMember(u, i.eventId);
+    // Both roles come from the accounts, not whatever the browser sends, and
+    // the scanned person must be registered for the same event, so the stats
+    // built from scans can be trusted.
+    const rows = await db()`
       insert into scans (event_id, scanner_profile_id, scanned_profile_id, scanner_role, scanned_role, scan_context, notes)
-      values (${eventId}, ${u.id}, ${s(i.scannedProfileId)}, ${scannerRole},
-              ${scannedRole}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)})
+      select ${s(i.eventId)}, ${u.id}, r.profile_id, ${u.role}, r.role,
+             ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
+      from event_registrations r
+      where r.event_id = ${s(i.eventId)} and r.profile_id = ${s(i.scannedProfileId)}
+      returning id
     `;
-    return true;
+    return rows.length > 0;
   },
-  /** The organiser sees every scan; everyone else only scans they made or received. */
+  /** Scans you made or received; the whole event's scans for its staff. */
   async getScans(u, [filter]) {
     const f = (filter ?? {}) as Row;
-    const a = await requireAccess(u, f.eventId);
-    if (a !== "owner" && f.scannerProfileId !== u.id && f.scannedProfileId !== u.id) throw forbidden();
+    if (f.scannerProfileId !== u.id && f.scannedProfileId !== u.id) await requireStaff(u, f.eventId);
     const where = ["event_id = $1"];
     const params: unknown[] = [s(f.eventId)];
     if (f.scannerProfileId) { params.push(s(f.scannerProfileId)); where.push(`scanner_profile_id = $${params.length}`); }
@@ -294,9 +346,14 @@ export const ops: Record<string, Op> = {
   async upsertShortlist(u, [input]) {
     const i = (input ?? {}) as Row;
     isMe(u, i.companyId);
+    if (u.role !== "company") throw forbidden();
+    await requireMember(u, i.eventId);
     if (!SHORTLIST_STATUSES.includes(s(i.status))) throw new HttpError(400, "Unknown shortlist status.");
-    await requireAccess(u, i.eventId, ["company"]);
-    if ((await registeredRole(s(i.eventId), s(i.studentId))) !== "student") throw forbidden();
+    // Only students registered for this event can be shortlisted at it.
+    const student = await db()`
+      select 1 from event_registrations where event_id = ${s(i.eventId)} and profile_id = ${s(i.studentId)} and role = 'student'
+    `;
+    if (!student.length) throw forbidden();
     // created_at is kept across status changes, as before.
     await db()`
       insert into shortlists (event_id, company_id, student_id, status, notes)
@@ -306,27 +363,24 @@ export const ops: Record<string, Op> = {
     return true;
   },
   async getShortlist(u, [companyId, studentId, eventId]) {
-    const a = await requireAccess(u, eventId);
-    if (a !== "owner" && companyId !== u.id) throw forbidden();
+    if (companyId !== u.id && studentId !== u.id) await requireStaff(u, eventId);
     const rows = await db()`
       select * from shortlists where company_id = ${s(companyId)} and student_id = ${s(studentId)} and event_id = ${s(eventId)}
     `;
-    return rows[0] ?? null;
+    if (!rows[0]) return null;
+    return studentId === u.id && companyId !== u.id ? withoutNotes(rows)[0] : rows[0];
   },
   async listShortlistsForCompany(u, [companyId, eventId]) {
-    const a = await requireAccess(u, eventId);
-    if (a !== "owner" && companyId !== u.id) throw forbidden();
+    if (companyId !== u.id) await requireStaff(u, eventId);
     return db()`select * from shortlists where company_id = ${s(companyId)} and event_id = ${s(eventId)} order by created_at desc`;
   },
-  /** A student sees who shortlisted them, but never the employer's private notes. */
   async listShortlistsForStudent(u, [studentId, eventId]) {
-    const a = await requireAccess(u, eventId);
-    if (a !== "owner" && studentId !== u.id) throw forbidden();
+    if (studentId !== u.id) await requireStaff(u, eventId);
     const rows = await db()`select * from shortlists where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
-    return a === "owner" ? rows : rows.map((r) => ({ ...r, notes: null }));
+    return studentId === u.id ? withoutNotes(rows) : rows;
   },
   async listShortlists(u, [eventId]) {
-    await requireAccess(u, eventId, ["owner"]);
+    await requireStaff(u, eventId);
     return db()`select * from shortlists where event_id = ${s(eventId)}`;
   },
 
@@ -336,10 +390,9 @@ export const ops: Record<string, Op> = {
     isMe(u, i.senderProfileId);
     const message = s(i.message).slice(0, 5000);
     if (!message.trim() || !s(i.receiverProfileId)) throw new HttpError(400, "Write a message first.");
-    // Both people must be in the event the message belongs to.
-    await requireAccess(u, i.eventId);
-    const receiver = await eventAccess({ ...u, id: s(i.receiverProfileId) }, s(i.eventId));
-    if (!receiver) throw forbidden();
+    // Both people must be at the same event, so the API can't be used to message strangers.
+    await requireMember(u, i.eventId);
+    if (!(await isInEvent(s(i.receiverProfileId), s(i.eventId)))) throw forbidden();
     await db()`
       insert into messages (event_id, sender_profile_id, receiver_profile_id, message)
       values (${s(i.eventId)}, ${u.id}, ${s(i.receiverProfileId)}, ${message})
@@ -371,29 +424,13 @@ export const ops: Record<string, Op> = {
   },
 
   /* Checklist */
-  async getChecklistItems(u, [role, eventId]) {
-    const sql = db();
-    const id = s(eventId);
-    const read = () => sql`
+  async getChecklistItems(_u, [role, eventId]) {
+    // Events created before the default checklist existed get it on first view.
+    if (s(eventId)) await addDefaultChecklist(s(eventId));
+    return db()`
       select id, event_id, role, title, description, phase, order_index from checklist_items
-      where event_id = ${id} and role = ${s(role)} order by order_index asc
+      where event_id = ${s(eventId)} and role = ${s(role)} order by order_index asc
     `;
-    const rows = await read();
-    if (rows.length) return rows;
-
-    // Events created before createEvent seeded a checklist have none at all.
-    // Backfill the defaults the first time a member of the event opens one.
-    // The advisory lock stops two tabs loading at once from seeding twice.
-    const [existing, member] = await Promise.all([
-      sql`select 1 from checklist_items where event_id = ${id} limit 1`,
-      sql`select 1 from event_registrations where event_id = ${id} and profile_id = ${u.id}`,
-    ]);
-    if (existing.length || !member.length) return rows;
-    await sql.transaction([
-      sql`select 1 from pg_advisory_xact_lock(hashtext(${"checklist:" + id}))`,
-      seedChecklistQuery(sql, id),
-    ]);
-    return read();
   },
   async getChecklistProgress(u, [profileId]) {
     isMe(u, profileId);
@@ -422,11 +459,12 @@ export const ops: Record<string, Op> = {
   },
 
   /* Events */
-  /** Members only; the join codes only for the owner. */
+  /** Registered people and the owner only, since the row carries the join code. */
   async getEvent(u, [eventId]) {
-    if (!(await eventAccess(u, s(eventId)))) return null;
+    const a = await eventAccess(u, eventId);
+    if (!a.owner && !a.member) return null;
     const rows = await db()`select * from events where id = ${s(eventId)}`;
-    return forViewer(u, rows[0]);
+    return rows[0] ?? null;
   },
   async listEventsForManager(u, [managerProfileId]) {
     isMe(u, managerProfileId);
@@ -435,17 +473,16 @@ export const ops: Record<string, Op> = {
   /** Your own memberships only, as the registrations collection-group rule allowed. */
   async listEventsForProfile(u, [profileId]) {
     isMe(u, profileId);
-    const rows = await db()`
+    return db()`
       select e.* from event_registrations r join events e on e.id = r.event_id
       where r.profile_id = ${u.id} order by e.start_date desc nulls last
     `;
-    return rows.map((e) => forViewer(u, e));
   },
-  async getEventByCode(u, [code]) {
+  async getEventByCode(_u, [code]) {
     const c = s(code).trim().toUpperCase();
     if (!c) return null;
     const rows = await db()`select * from events where join_code = ${c}`;
-    return forViewer(u, rows[0]);
+    return rows[0] ?? null;
   },
   /** Any college can create an event; it is always owned by the caller. */
   async createEvent(u, [input]) {
@@ -473,9 +510,10 @@ export const ops: Record<string, Op> = {
           // their event list the same way a joined event does.
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
               values (${id}, ${u.id}, 'event_manager', true)`,
-          // Every role's checklist starts from the default list.
-          seedChecklistQuery(sql, id),
         ]);
+        // A failure here must not report the event as failed: the checklist is
+        // also added the first time anyone opens it.
+        await addDefaultChecklist(id).catch((err) => console.error("[rpc] default checklist", err));
         return { ok: true, event: rows[0] };
       } catch (err) {
         if ((err as { code?: string }).code === "23505") continue; // join_code clash — retry
@@ -518,7 +556,7 @@ export const ops: Record<string, Op> = {
     // The registration role is the account's real role, not whatever the browser sends.
     await sql`insert into event_registrations (event_id, profile_id, role) values (${event.id}, ${u.id}, ${u.role})
               on conflict (event_id, profile_id) do nothing`;
-    return { ok: true, event: forViewer(u, event) };
+    return { ok: true, event };
   },
 
   /* Billing — read-only, owner only. Only the Stripe webhook writes it. */

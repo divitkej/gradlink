@@ -76,7 +76,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
     if (url) {
       setResumeUrl(url);
       await updateStudentProfile(session.profileId, { resume_url: url });
-      flash("Résumé attached — score unlocked");
+      flash("Résumé attached. Score updated.");
     } else {
       flash("Upload failed, try again");
     }
@@ -98,7 +98,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       github_url: githubUrl || null,
     });
     setSaving(false);
-    flash(ok ? "Profile saved — checklist updated" : "Couldn't save, try again");
+    flash(ok ? "Profile saved. Checklist updated." : "Couldn't save, try again");
   }
 
   if (loading) return <GlassPanel><LoadingBlock label="Loading your profile…" /></GlassPanel>;
@@ -122,7 +122,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
 
       {/* Résumé attach */}
       <GlassPanel style={{ border: resumeUrl ? "1px solid var(--border)" : "1px solid rgba(247,201,72,0.3)", background: resumeUrl ? undefined : "rgba(247,201,72,0.04)" }}>
-        <PanelTitle hint={resumeUrl ? "Attached" : "Required for your AI score"}>Your résumé</PanelTitle>
+        <PanelTitle hint={resumeUrl ? "Attached" : "Counts toward your score"}>Your résumé</PanelTitle>
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <button onClick={() => fileRef.current?.click()} disabled={uploading}
             style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "12px 18px", borderRadius: "var(--r-md)", cursor: uploading ? "default" : "pointer", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", border: "none" }}>
@@ -136,14 +136,14 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
             </a>
           )}
         </div>
-        <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 10 }}>PDF or Word. Companies can view & download it when they scan you. Your AI résumé score stays 0 until a résumé is attached.</p>
+        <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 10 }}>PDF or Word. Companies can view & download it when they scan you. Your résumé score stays 0 until a résumé is attached.</p>
         <style>{`.gl-spin{animation:glspin 0.9s linear infinite}@keyframes glspin{to{transform:rotate(360deg)}}`}</style>
       </GlassPanel>
 
       <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20 }}>
         <GlassPanel>
           <PanelTitle hint="Edits auto-update your checklist & QR">Edit your profile</PanelTitle>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div className="sp-grid" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 14 }}>
             <Field label="Degree" value={degree} onChange={setDegree} placeholder="Business Administration" />
             <Field label="Graduation year" value={year} onChange={setYear} placeholder="2026" type="number" />
             <Field label="University" value={university} onChange={setUniversity} placeholder="Your university" />
@@ -167,7 +167,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
         </GlassPanel>
 
         <GlassPanel>
-          <PanelTitle hint="AI-evaluated">Resume analysis</PanelTitle>
+          <PanelTitle hint="Rule-based">Resume analysis</PanelTitle>
           <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5, marginBottom: 14 }}>{evalr.summary}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>Strengths</div>
@@ -193,7 +193,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
           <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
-      <style>{`@media (max-width: 900px) { .dash-2col { grid-template-columns: 1fr !important; } }`}</style>
+      <style>{`@media (max-width: 900px) { .dash-2col { grid-template-columns: 1fr !important; } } @media (max-width: 640px) { .sp-grid { grid-template-columns: 1fr !important; } }`}</style>
     </GsapReveal>
   );
 }

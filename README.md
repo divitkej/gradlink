@@ -28,7 +28,7 @@ no always-on database compute.
 | Auth | Email + password in `lib/server/auth-api.ts`; HttpOnly signed session cookie |
 | Authorization | Per-operation checks in `lib/server/rpc.ts` (ported from the old `firestore.rules`) |
 | File uploads | Workers KV namespace `UPLOADS` (`lib/server/files.ts`) |
-| Password-reset email | Resend HTTP API (free tier), `lib/server/mail.ts` |
+| Account email (confirm email, password reset) | Gmail over SMTP from the Worker (`lib/server/smtp.ts`), no domain needed; Resend once there is a domain (`lib/server/mail.ts`) |
 | Payments | Stripe Checkout + webhook (`app/api/checkout`, `app/api/stripe/webhook`) |
 
 ## Stack
@@ -56,8 +56,12 @@ npm run dev                        # http://localhost:3000
 
 `npm run dev` is plain `next dev`, with the Worker's bindings and `.dev.vars`
 provided by `initOpenNextCloudflareForDev()` (see `next.config.ts`) — the
-`UPLOADS` KV namespace is simulated locally. Without a Resend key, password
-reset links are printed to the dev server console instead of emailed.
+`UPLOADS` KV namespace is simulated locally. Confirmation and password reset
+links are printed to the dev server console instead of emailed (SMTP needs the
+Workers runtime, so use `npm run preview` to send real mail locally).
+
+Email confirmation is enforced only when the server can send email. Without
+`SMTP_PASS` (or Resend) new accounts are confirmed on creation.
 
 To run the real Workers build locally (workerd, same as production):
 
@@ -75,9 +79,12 @@ into the build.
 |---|---|---|
 | `DATABASE_URL` | yes | Neon **pooled** connection string (Neon console → Connect) |
 | `AUTH_SECRET` | yes | ≥32 random characters; signs session cookies |
-| `RESEND_API_KEY` | for "Forgot password" | Resend API key (free tier) |
-| `EMAIL_FROM` | for "Forgot password" | e.g. `GradLink <no-reply@yourdomain>` (a Resend-verified domain) |
-| `APP_URL` | no | Public origin for emailed links; defaults to the request origin. Set in `wrangler.jsonc` `vars` |
+| `SMTP_USER` | for account email | Mailbox that sends mail (e.g. a Gmail). Not set yet: account email is paused |
+| `SMTP_PASS` | for account email | That Gmail's 16-character app password (Google Account, Security, 2-Step Verification, App passwords). Secret |
+| `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
+| `RESEND_API_KEY` | no | Alternative to SMTP once GradLink has a verified domain |
+| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLink <SMTP_USER>`; required with Resend |
+| `APP_URL` | yes, before launch | Public origin (your custom domain, for example `https://your-domain.example`) used in password-reset links, upload URLs and the Stripe return URL. Falls back to the request origin when empty. Set in `wrangler.jsonc` `vars` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
 
@@ -109,8 +116,7 @@ npx wrangler login
 npx wrangler kv namespace create UPLOADS      # paste the id into wrangler.jsonc
 npx wrangler secret put DATABASE_URL
 npx wrangler secret put AUTH_SECRET
-npx wrangler secret put RESEND_API_KEY        # optional, enables password reset
-npx wrangler secret put EMAIL_FROM            # optional, enables password reset
+npx wrangler secret put SMTP_PASS             # Gmail app password; turns on email confirmation and password reset
 ```
 
 ## Deploy
@@ -156,9 +162,13 @@ Components should not call `fetch('/api/…')` directly.
 ## Access rules
 
 Enforced in the Worker (`lib/server/rpc.ts`), not the browser: every operation
-needs a signed-in account; writes are owner-only; messages are readable only by
-their two participants; `subscriptions` is readable by its owner and writable
-only by the Stripe webhook, so a paid plan can't be forged from the browser.
+needs a signed-in account; writes are owner-only and checked against the
+account's role; event data (attendees, scans, shortlists, analytics) is visible
+only to people registered for that event, and whole-event views only to its
+staff; shortlist notes stay with the company that wrote them; messages are
+readable only by their two participants; `subscriptions` is readable by its
+owner and writable only by the Stripe webhook, so a paid plan can't be forged
+from the browser. Open items are tracked in `docs/checklists/security.md`.
 
 ## History
 
