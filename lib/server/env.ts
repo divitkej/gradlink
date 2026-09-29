@@ -36,6 +36,11 @@ export interface ServerEnv {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICE_PRO?: string;
+  /**
+   * Comma-separated emails allowed into the owner pages under /admin. Secret.
+   * Create the account with that email before setting this.
+   */
+  ADMIN_EMAILS?: string;
   /** Workers KV namespace holding résumés, brochures and logos. */
   UPLOADS?: KVLike;
 }

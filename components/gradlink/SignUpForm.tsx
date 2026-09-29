@@ -23,19 +23,19 @@ const ROLE_CONFIG: Record<Role, {
   student: {
     badge: "Student account", icon: GraduationCap, accent: "var(--accent)",
     orgLabel: "University name", orgPlaceholder: "Your university", orgIcon: GraduationCap,
-    emailPlaceholder: "you@university.ac.ae", emailNote: "Please use your university email address.",
+    emailPlaceholder: "you@university.ac.ae", emailNote: "Use your university email. Your university must already be registered on GradLink.",
     subtitle: "Get fair-ready and tracked from check-in to offer.", label: "student",
   },
   company: {
     badge: "Company account", icon: Building2, accent: "var(--accent-2)",
     orgLabel: "Company name", orgPlaceholder: "Your company", orgIcon: Building2,
-    emailPlaceholder: "you@company.com", emailNote: "Please use your company email address.",
+    emailPlaceholder: "you@company.com", emailNote: "Use your company email. Personal addresses like Gmail or Outlook are not accepted.",
     subtitle: "Scan once, shortlist smarter, follow up faster.", label: "company",
   },
   college: {
     badge: "College / Event host", icon: Briefcase, accent: "var(--amber)",
     orgLabel: "Institution / Organization name", orgPlaceholder: "Your career centre or organisation", orgIcon: Building2,
-    emailPlaceholder: "you@institution.ac.ae", emailNote: "Please use your official institution email address.",
+    emailPlaceholder: "you@institution.ac.ae", emailNote: "Use your official institution email. We review your domain before your students can sign up.",
     subtitle: "Run events, track engagement, and prove outcomes.", label: "college / event host",
   },
 };

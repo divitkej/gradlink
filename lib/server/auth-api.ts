@@ -5,6 +5,7 @@ import { currentUser, sessionCookie, clearedSessionCookie } from "./session";
 import { HttpError, json } from "./http";
 import { emailEnabled, sendEmail } from "./mail";
 import { LIMITS, assertUnderLimit, recordHit, takeHit } from "./rate-limit";
+import { checkSignUpEmail, collegeDomainRequest, type SignUpRole } from "./college-domains";
 import type { AppRole } from "../session";
 
 /* ============================================================
@@ -22,7 +23,6 @@ import type { AppRole } from "../session";
    ============================================================ */
 
 type Body = Record<string, unknown>;
-type SignUpRole = "student" | "company" | "college";
 
 const MAX_FAILED_ATTEMPTS = 10;
 const LOCK_MINUTES = 15;
@@ -108,6 +108,7 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   if (!fullName) throw new HttpError(400, "Enter your full name.");
   if (!validEmail(email)) throw new HttpError(400, MSG.badEmail);
   if (!validPassword(body.password)) throw new HttpError(400, MSG.weak);
+  await checkSignUpEmail(role, email);
 
   const sql = db();
   const taken = await sql`select 1 from auth_credentials where email_lower = ${emailLower}`;
@@ -127,6 +128,8 @@ async function signUp(request: Request, body: Body): Promise<Response> {
 
   // No email provider means no way to confirm, so the account starts confirmed.
   const confirmNow = !emailEnabled();
+  // A college's email domain joins the owner's approval queue with the account.
+  const domainRequest = role === "college" ? await collegeDomainRequest(email, organization, id) : null;
 
   try {
     // One transaction, so a failure can no longer leave a half-created account.
@@ -135,6 +138,7 @@ async function signUp(request: Request, body: Body): Promise<Response> {
       sql`insert into auth_credentials (profile_id, email_lower, password_hash, email_verified_at)
           values (${id}, ${emailLower}, ${hash}, ${confirmNow ? new Date().toISOString() : null})`,
       roleRow,
+      ...(domainRequest ? [domainRequest.query] : []),
     ]);
   } catch (err) {
     if ((err as { code?: string }).code === "23505") throw new HttpError(409, MSG.exists);

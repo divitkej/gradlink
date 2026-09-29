@@ -91,6 +91,19 @@ create table if not exists email_verification_tokens (
 );
 create index if not exists email_verification_tokens_profile_idx on email_verification_tokens (profile_id);
 
+-- Email domains colleges sign up with, approved by the owner at
+-- /admin/colleges. Students can only sign up with an address on an approved
+-- domain or one of its subdomains (lib/server/college-domains.ts).
+create table if not exists college_domains (
+  domain        text primary key,
+  institution   text not null,
+  requested_by  text references profiles (id) on delete set null,
+  status        text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
+  created_at    timestamptz not null default now(),
+  decided_at    timestamptz
+);
+create index if not exists college_domains_status_idx on college_domains (status);
+
 -- ------------------------------------------------------------- role rows --
 create table if not exists students (
   id               text primary key default gen_random_uuid()::text,
