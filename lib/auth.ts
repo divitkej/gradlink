@@ -28,6 +28,8 @@ export interface SignUpInput {
   password: string;
   /** University (students), company (companies), or institution (colleges). */
   organization: string;
+  /** Colleges only: an example of their students' email addresses. */
+  studentEmail?: string;
 }
 
 export interface SignedInProfile {
