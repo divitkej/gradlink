@@ -16,27 +16,28 @@ const pipeline = [
 
 type Stage = "Scanned" | "Shortlisted" | "Contacted" | "Interview";
 
+/**
+ * What an employer sees of a candidate: what the student chose to share. No
+ * scores, GPA or activity, since colleges want every student considered.
+ */
 interface Candidate {
   name: string;
   degree: string;
   gradYear: number;
-  gpa: number;
+  targetRole: string;
   skills: string[];
-  readiness: number;
-  resume: number;
-  booths: number;
   stage: Stage;
 }
 
 // Sample students for the preview. The filters below run against these only.
 const candidates: Candidate[] = [
-  { name: "Sara Al Rashidi", degree: "Business Administration", gradYear: 2027, gpa: 3.7, skills: ["Excel", "Communication", "SQL"], readiness: 92, resume: 88, booths: 6, stage: "Shortlisted" },
-  { name: "Mohammed Al Mansoori", degree: "Computer Science", gradYear: 2026, gpa: 3.8, skills: ["Python", "SQL", "Communication"], readiness: 85, resume: 91, booths: 8, stage: "Contacted" },
-  { name: "Fatima Khalid", degree: "Marketing", gradYear: 2027, gpa: 3.4, skills: ["Design", "Communication", "Excel"], readiness: 78, resume: 82, booths: 4, stage: "Interview" },
-  { name: "Ahmed Nasser", degree: "Finance", gradYear: 2026, gpa: 3.1, skills: ["Excel", "SQL"], readiness: 71, resume: 75, booths: 2, stage: "Scanned" },
-  { name: "Layla Haddad", degree: "Computer Science", gradYear: 2027, gpa: 3.9, skills: ["Python", "Design"], readiness: 88, resume: 84, booths: 5, stage: "Shortlisted" },
-  { name: "Omar Farouk", degree: "Engineering", gradYear: 2026, gpa: 3.3, skills: ["Python", "Excel"], readiness: 66, resume: 72, booths: 3, stage: "Scanned" },
-  { name: "Aisha Rahman", degree: "Finance", gradYear: 2027, gpa: 3.6, skills: ["SQL", "Excel", "Communication"], readiness: 81, resume: 79, booths: 7, stage: "Interview" },
+  { name: "Sara Al Rashidi", degree: "Business Administration", gradYear: 2027, targetRole: "Business Analyst", skills: ["Excel", "Communication", "SQL"], stage: "Shortlisted" },
+  { name: "Mohammed Al Mansoori", degree: "Computer Science", gradYear: 2026, targetRole: "Software Engineer", skills: ["Python", "SQL", "Communication"], stage: "Contacted" },
+  { name: "Fatima Khalid", degree: "Marketing", gradYear: 2027, targetRole: "Brand Associate", skills: ["Design", "Communication", "Excel"], stage: "Interview" },
+  { name: "Ahmed Nasser", degree: "Finance", gradYear: 2026, targetRole: "Financial Analyst", skills: ["Excel", "SQL"], stage: "Scanned" },
+  { name: "Layla Haddad", degree: "Computer Science", gradYear: 2027, targetRole: "Software Engineer", skills: ["Python", "Design"], stage: "Shortlisted" },
+  { name: "Omar Farouk", degree: "Engineering", gradYear: 2026, targetRole: "Data Analyst", skills: ["Python", "Excel"], stage: "Scanned" },
+  { name: "Aisha Rahman", degree: "Finance", gradYear: 2027, targetRole: "Business Analyst", skills: ["SQL", "Excel", "Communication"], stage: "Interview" },
 ];
 
 const stageTone: Record<Stage, "teal" | "cyan" | "muted"> = {
@@ -54,19 +55,12 @@ interface Filter {
 
 const oneOf = <T,>(values: T[], pick: (c: Candidate) => T, show: (v: T) => string = String) =>
   values.map((v) => ({ label: show(v), test: (c: Candidate) => pick(c) === v }));
-const atLeast = (n: number, pick: (c: Candidate) => number, show: (n: number) => string) => ({
-  label: show(n),
-  test: (c: Candidate) => pick(c) >= n,
-});
 
 const filters: Filter[] = [
   { id: "degree", label: "Degree", options: oneOf(["Business Administration", "Computer Science", "Engineering", "Finance", "Marketing"], (c) => c.degree) },
   { id: "year", label: "Graduation Year", options: oneOf([2026, 2027], (c) => c.gradYear) },
-  { id: "gpa", label: "GPA", options: [atLeast(3.5, (c) => c.gpa, (n) => `${n} and above`), atLeast(3.0, (c) => c.gpa, (n) => `${n.toFixed(1)} and above`)] },
   { id: "skills", label: "Skills", options: ["Python", "SQL", "Excel", "Design", "Communication"].map((s) => ({ label: s, test: (c: Candidate) => c.skills.includes(s) })) },
-  { id: "readiness", label: "Readiness Score", options: [atLeast(80, (c) => c.readiness, (n) => `${n}% and above`), atLeast(70, (c) => c.readiness, (n) => `${n}% and above`)] },
-  { id: "resume", label: "Resume Score", options: [atLeast(85, (c) => c.resume, (n) => `${n}% and above`), atLeast(75, (c) => c.resume, (n) => `${n}% and above`)] },
-  { id: "activity", label: "Event Activity", options: [atLeast(5, (c) => c.booths, (n) => `${n}+ booths visited`), atLeast(3, (c) => c.booths, (n) => `${n}+ booths visited`)] },
+  { id: "role", label: "Target Role", options: oneOf(["Business Analyst", "Data Analyst", "Software Engineer", "Financial Analyst", "Brand Associate"], (c) => c.targetRole) },
   { id: "stage", label: "Stage", options: oneOf<Stage>(["Scanned", "Shortlisted", "Contacted", "Interview"], (c) => c.stage) },
 ];
 
@@ -191,15 +185,14 @@ export default function EmployerCRMSection() {
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.name}</div>
-                      <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`${c.degree} · Class of ${c.gradYear} · GPA ${c.gpa.toFixed(1)}`}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`${c.degree} · Class of ${c.gradYear}`}</div>
                     </div>
                   </div>
                   <Badge tone={stageTone[c.stage]}>{c.stage}</Badge>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Readiness <strong style={{ color: "var(--text)" }}>{c.readiness}%</strong></span>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Resume <strong style={{ color: "var(--text)" }}>{c.resume}%</strong></span>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Booths visited <strong style={{ color: "var(--text)" }}>{c.booths}</strong></span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Looking for <strong style={{ color: "var(--text)" }}>{c.targetRole}</strong></span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Skills <strong style={{ color: "var(--text)" }}>{c.skills.join(", ")}</strong></span>
                 </div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`Skills: ${c.skills.join(", ")}`}</div>
               </div>

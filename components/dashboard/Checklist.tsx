@@ -6,6 +6,7 @@ import { SectionCard, LoadingBlock } from "./cards";
 import {
   getChecklistItems, getChecklistProgress, setChecklistProgress,
   getStudentByProfile, getCompanyByProfile, getScans, listMessagesForProfile, listShortlistsForCompany,
+  listSavedCompanies, listSessions, listApplications,
   type ChecklistItemRow,
 } from "@/lib/db";
 import type { AppRole } from "@/lib/session";
@@ -33,34 +34,41 @@ function autoRule(title: string, sig: StudentSignals): boolean | null {
   if (t.includes("scan companies")) return sig.scannedCompanies > 0;
   if (t.includes("visit your saved") || t.includes("booth visit")) return sig.visitedCount > 0;
   if (t.includes("send messages") || t.includes("follow-ups")) return sig.messagesSent > 0;
+  if (t.includes("workshop or mock")) return sig.prepBooked;
+  if (t.includes("check in")) return sig.checkedIn;
+  if (t.includes("log your applications")) return sig.applications > 0;
   return null;
 }
 
 interface StudentSignals {
   profileComplete: boolean; hasResume: boolean; hasSkills: boolean; hasLinks: boolean;
   savedCount: number; visitedCount: number; scannedByCompany: number; scannedCompanies: number; messagesSent: number;
+  prepBooked: boolean; checkedIn: boolean; applications: number;
 }
 
 async function loadStudentSignals(profileId: string, eventId: string): Promise<StudentSignals> {
-  const [me, inbound, outbound, msgs] = await Promise.all([
+  const [me, inbound, outbound, msgs, saved, sessions, applications] = await Promise.all([
     getStudentByProfile(profileId),
     getScans({ eventId, scannedProfileId: profileId }),
     getScans({ eventId, scannerProfileId: profileId }),
     listMessagesForProfile(profileId, eventId),
+    listSavedCompanies(eventId),
+    listSessions(eventId),
+    listApplications(),
   ]);
-  let saves: Record<string, { saved?: boolean; visited?: boolean }> = {};
-  try { saves = JSON.parse(localStorage.getItem(`gradlink.saves.${profileId}`) || "{}"); } catch { /* ignore */ }
-  const vals = Object.values(saves);
   return {
     profileComplete: !!(me?.degree && me?.graduation_year && (me?.skills?.length ?? 0) > 0 && me?.bio),
     hasResume: !!me?.resume_url,
     hasSkills: (me?.skills?.length ?? 0) > 0,
     hasLinks: !!(me?.linkedin_url || me?.github_url || me?.portfolio_url),
-    savedCount: vals.filter((s) => s?.saved).length,
-    visitedCount: vals.filter((s) => s?.visited).length,
+    savedCount: saved.filter((s) => s.saved).length,
+    visitedCount: saved.filter((s) => s.visited).length,
     scannedByCompany: inbound.filter((s) => s.scanner_role === "company").length,
     scannedCompanies: outbound.length,
     messagesSent: msgs.filter((m) => m.sender_profile_id === profileId).length,
+    prepBooked: sessions.some((s) => (s.kind === "workshop" || s.kind === "mock_interview") && (s.my_status === "booked" || s.my_status === "attended")),
+    checkedIn: inbound.some((s) => s.scanner_role === "event_manager"),
+    applications: applications.filter((a) => a.event_id === eventId).length,
   };
 }
 
@@ -101,10 +109,13 @@ export default function Checklist({
   role,
   profileId,
   eventId,
+  onProgress,
 }: {
   role: AppRole;
   profileId: string;
   eventId: string;
+  /** Called with the completed share (0 to 100) whenever it changes. */
+  onProgress?: (pct: number) => void;
 }) {
   const [items, setItems] = useState<ChecklistItemRow[]>([]);
   const [done, setDone] = useState<Record<string, boolean>>({});
@@ -162,6 +173,10 @@ export default function Checklist({
 
   const totalDone = items.filter((i) => done[i.id]).length;
   const pct = items.length ? Math.round((totalDone / items.length) * 100) : 0;
+
+  useEffect(() => {
+    if (!loading) onProgress?.(pct);
+  }, [loading, pct, onProgress]);
 
   return (
     <SectionCard

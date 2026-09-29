@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2,
+  LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2, Compass,
   MessageSquare, BarChart3, Users, Briefcase, ScanLine,
-  Bell, Menu, X, BookOpen, Network, LogOut, History,
+  Bell, Menu, X, BookOpen, Network, LogOut, History, Gauge, CalendarClock, Stamp,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
@@ -27,8 +27,13 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Event", href: EV, icon: CalendarDays },
     { label: "My QR", href: "/dashboard/student#qr", icon: QrCode },
     { label: "Scanner", href: "/scan", icon: ScanLine },
-    { label: "Checklist", href: "/dashboard/student#checklist", icon: ListChecks },
+    { label: "Readiness", href: "/dashboard/student#readiness", icon: Gauge },
+    { label: "Schedule", href: "/dashboard/student/schedule", icon: CalendarClock },
+    { label: "Passport", href: "/dashboard/student/passport", icon: Stamp },
     { label: "Companies", href: "/dashboard/student#companies", icon: Building2 },
+    { label: "Opportunities", href: "/dashboard/student/opportunities", icon: Compass },
+    { label: "Applications", href: "/dashboard/student/applications", icon: Briefcase },
+    { label: "Checklist", href: "/dashboard/student#checklist", icon: ListChecks },
     { label: "Career Profile", href: "/dashboard/profile", icon: UserCircle },
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Manual", href: "/dashboard/student#manual", icon: BookOpen },
@@ -76,7 +81,8 @@ export default function DashboardShell({
   const { session, ready, signOut } = useSession();
   const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
-  const { count: unread } = useUnreadMessages(session?.profileId);
+  const { count: unread, alerts } = useUnreadMessages(session?.profileId);
+  const bellCount = unread + alerts;
 
   // Auth gate + role lock: must be signed in, and can only view your own role's pages.
   useEffect(() => {
@@ -198,13 +204,13 @@ export default function DashboardShell({
           </span>
           <div style={{ flex: 1 }} />
           <button
-            onClick={() => router.push("/dashboard/messages")}
-            aria-label={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "Notifications"}
-            title={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "Notifications"}
+            onClick={() => router.push("/dashboard/notifications")}
+            aria-label={bellCount > 0 ? `Notifications, ${bellCount} unread` : "Notifications"}
+            title={bellCount > 0 ? `${bellCount} unread` : "Notifications"}
             style={{ position: "relative", background: "var(--glass)", border: "1px solid var(--border)", borderRadius: "var(--r-full)", color: "var(--text-2)", width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
           >
             <Bell size={17} />
-            {unread > 0 && (
+            {bellCount > 0 && (
               <span style={{ position: "absolute", top: 8, right: 9, width: 7, height: 7, borderRadius: "50%", background: "var(--amber)", boxShadow: "0 0 6px var(--amber)" }} />
             )}
           </button>
@@ -232,7 +238,6 @@ export default function DashboardShell({
 
       <style>{`
         .dash-nav:hover { color: var(--text) !important; background: rgba(255,255,255,0.04); }
-        .gl-input:focus { border-color: var(--border-strong) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
         @media (max-width: 920px) {
           .dash-sidebar { display: none !important; }
           .dash-main { margin-left: 0 !important; }

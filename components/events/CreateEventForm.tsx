@@ -5,6 +5,7 @@ import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react";
 import { createEvent, type EventStatus } from "@/lib/events";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
+import TimeZoneSelect, { useLocalZone } from "@/components/ui/TimeZoneSelect";
 
 function Field({
   id, label, value, onChange, placeholder, type = "text",
@@ -42,6 +43,10 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<EventStatus>("upcoming");
+  // The organiser's own zone until they pick another.
+  const [picked, setPicked] = useState<string | null>(null);
+  const localZone = useLocalZone();
+  const timezone = picked ?? localZone;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,7 +61,7 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
 
     setBusy(true);
     const res = await createEvent({
-      title, location, startDate, endDate, description, status,
+      title, location, startDate, endDate, description, status, timezone: timezone || undefined,
       createdBy: session.profileId,
       hostOrg: session.org,
     });
@@ -99,6 +104,19 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <Field id="ev-start" label="Starts" value={startDate} onChange={setStartDate} type="date" />
         <Field id="ev-end" label="Ends" value={endDate} onChange={setEndDate} type="date" />
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, minWidth: 160 }}>
+          <label htmlFor="ev-tz" style={{ fontSize: 12.5, fontWeight: 500, color: "var(--text-2)" }}>Time zone</label>
+          <TimeZoneSelect
+            id="ev-tz"
+            value={timezone}
+            onChange={setPicked}
+            style={{
+              height: 44, padding: "0 13px", fontSize: 14, color: "var(--text)",
+              background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)",
+              borderRadius: "var(--r-md)", outline: "none", colorScheme: "dark",
+            }}
+          />
+        </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
