@@ -3,6 +3,7 @@
 import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow } from "./db";
 import { evaluateResume } from "./resume";
 import { downloadCsv, slugify } from "./csv";
+import { fmtEventDate } from "./format";
 
 /* ============================================================
    Post-event outcome report.
@@ -157,7 +158,7 @@ export function buildReport(input: {
 
   return {
     eventTitle: event?.title ?? "Career Fair",
-    eventDate: event?.start_date ? new Date(event.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "Not set",
+    eventDate: fmtEventDate(event?.start_date ?? null, { day: "numeric", month: "long", year: "numeric" }) ?? "Not set",
     location: event?.location ?? "Not set",
     generatedAt: new Date().toLocaleString("en-GB"),
 

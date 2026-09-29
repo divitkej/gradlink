@@ -31,6 +31,8 @@ export interface EventRow {
   host_org?: string | null;
   join_code?: string | null;
   created_at?: string | null;
+  /** IANA zone session times are entered and shown in. Null for older events. */
+  timezone?: string | null;
 }
 
 export const EVENT_STATUS_LABEL: Record<EventStatus, string> = {
@@ -112,6 +114,7 @@ export interface CreateEventInput {
   status?: EventStatus;
   createdBy: string;
   hostOrg?: string;
+  timezone?: string;
 }
 
 /** Create an event owned by the calling college. */

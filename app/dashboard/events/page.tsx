@@ -14,6 +14,7 @@ import { EVENT_STATUS_LABEL, type EventRow } from "@/lib/events";
 import CreateEventForm from "@/components/events/CreateEventForm";
 import JoinCode from "@/components/events/JoinCode";
 import JoinEventForm from "@/components/events/JoinEventForm";
+import { fmtEventDate } from "@/lib/format";
 
 function statusTone(status: EventRow["status"]) {
   if (status === "live") return "amber" as const;
@@ -21,17 +22,9 @@ function statusTone(status: EventRow["status"]) {
   return "cyan" as const;
 }
 
-function formatDate(iso: string | null) {
-  if (!iso) return null;
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime())
-    ? null
-    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-}
-
 /** The join code is the thing a college actually shares, so make it copyable. */
 function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean; onOpen: () => void }) {
-  const date = formatDate(event.start_date);
+  const date = fmtEventDate(event.start_date);
   return (
     <div
       style={{

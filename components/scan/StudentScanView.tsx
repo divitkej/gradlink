@@ -20,6 +20,7 @@ import GsapReveal from "@/components/anim/GsapReveal";
 import { safeHttpUrl } from "@/lib/utils";
 import InterviewInvite from "./InterviewInvite";
 import VerifiedCourses from "./VerifiedCourses";
+import VerifiedScores from "./VerifiedScores";
 
 export default function StudentScanView({ studentProfileId, eventId }: { studentProfileId: string; eventId: string }) {
   const { session, ready } = useSession();
@@ -223,6 +224,7 @@ function CompanyView({
       <CareerHighlights student={student} />
 
       {student.profile_id && <VerifiedCourses studentId={student.profile_id} />}
+      {student.profile_id && <VerifiedScores studentId={student.profile_id} />}
 
       <SectionCard title="Decision">
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -324,6 +326,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
       )}
 
       {student.profile_id && <VerifiedCourses studentId={student.profile_id} />}
+      {student.profile_id && <VerifiedScores studentId={student.profile_id} />}
 
       <SectionCard title="Event analytics">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }} className="mgr-stats">

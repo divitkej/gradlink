@@ -20,7 +20,7 @@ import { useStudentData, activityOf } from "@/lib/use-student-data";
 import { saveCompany, type StudentRow } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import { competencies, readiness as readinessOf, actionPlan, fairReady as fairReadyOf, matchCompanies } from "@/lib/readiness";
-import { fmtDay, fmtTime, sessionPhase } from "@/lib/format";
+import { fmtDay, fmtEventDate, fmtTime, sessionPhase } from "@/lib/format";
 
 export default function StudentDashboard({ eventId }: { eventId: string }) {
   const { session } = useSession();
@@ -46,9 +46,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
   const evalr = evaluateResume(me);
   const tone = scoreTone(evalr.score);
 
-  const eventDate = event?.start_date
-    ? new Date(event.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
-    : null;
+  const eventDate = fmtEventDate(event?.start_date ?? null, { day: "numeric", month: "short" });
   const eventLabel = [event?.title ?? "Your event", eventDate].filter(Boolean).join(" · ");
 
   const booked = data.sessions
@@ -103,7 +101,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
               <CalendarClock size={18} color="var(--accent)" />
               <span style={{ flex: 1, minWidth: 0, fontSize: 13, color: "var(--text-2)" }}>
                 {next
-                  ? <>Up next: <strong style={{ color: "var(--text)" }}>{next.title}</strong> · {fmtDay(next.starts_at)}, {fmtTime(next.starts_at)}{next.location ? ` · ${next.location}` : ""}{next.my_status === "waitlisted" ? " · waitlisted" : ""}</>
+                  ? <>Up next: <strong style={{ color: "var(--text)" }}>{next.title}</strong> · {fmtDay(next.starts_at, next.event_timezone)}, {fmtTime(next.starts_at, next.event_timezone)}{next.location ? ` · ${next.location}` : ""}{next.my_status === "waitlisted" ? " · waitlisted" : ""}</>
                   : upcoming
                     ? <>{upcoming} upcoming {upcoming === 1 ? "session is" : "sessions are"} on the schedule. Open it to book a place.</>
                     : <>No upcoming sessions on the schedule yet.</>}

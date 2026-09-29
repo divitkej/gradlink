@@ -22,6 +22,7 @@ import {
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import { matchCompanies } from "@/lib/readiness";
+import { fmtEventDate } from "@/lib/format";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 type Tab = "overview" | "people" | "sessions" | "qr" | "checklist" | "manual";
@@ -100,7 +101,8 @@ export default function EventConsole({ eventId }: { eventId: string }) {
             </SectionCard>
           )}
           {tab === "sessions" && role !== "student" && (
-            <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId} />
+            <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId}
+              timezone={event?.timezone ?? null} onTimezoneChange={(tz) => setEvent((e) => (e ? { ...e, timezone: tz } : e))} />
           )}
           {tab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
           {tab === "manual" && <ManualSection defaultRole={role} />}
@@ -122,7 +124,7 @@ function EventHeader({ event, role, studentCount, companyCount }: { event: Event
           </h1>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, color: "var(--text-muted)" }}>
             {event?.location && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><MapPin size={14} /> {event.location}</span>}
-            {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
+            {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {fmtEventDate(event.start_date)}</span>}
           </div>
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>

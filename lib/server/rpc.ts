@@ -4,9 +4,14 @@ import type { AuthUser } from "./session";
 import { CHECKLIST_TEMPLATE } from "./checklist-template";
 import { evaluateResume } from "../resume";
 import { engagementScore, shortName, type EngagementCounts } from "../engagement";
+import { isTimeZone } from "../format";
 import {
   CourseraError, certificateCode, courseSlug, fetchCertificate, courseById, courseBySlug, namesMatch, nameHidden,
 } from "./coursera";
+import {
+  CodingError, leetcodeHandle, codeforcesHandle, fetchLeetCode, fetchCodeforces, codeforcesVerified, type CodingSite,
+} from "./coding";
+import { TEST_BY_KEY, scoreProblem, CODING_SITE_LABEL } from "../scores";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -192,6 +197,11 @@ function withoutNotes(rows: Row[]): Row[] {
 
 /** Typed by hand off a slide or poster, so 0/O and 1/I/L are left out. */
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function codingSite(v: unknown): CodingSite {
+  if (v === "leetcode" || v === "codeforces") return v;
+  throw new HttpError(400, "Unknown coding site");
+}
+
 function randomCode(length = 6): string {
   const bytes = crypto.getRandomValues(new Uint32Array(length));
   let out = "";
@@ -619,10 +629,10 @@ export const ops: Record<string, Op> = {
       const joinCode = randomCode(attempt < 4 ? 6 : 8);
       try {
         const [rows] = await sql.transaction([
-          sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, join_code)
+          sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, join_code, timezone)
               values (${id}, ${title}, ${s(i.description).trim() || null}, ${s(i.location).trim() || null},
                       ${s(i.startDate) || null}, ${s(i.endDate) || null}, ${status}, ${u.id},
-                      ${textOrNull(i.hostOrg, 300)}, ${joinCode})
+                      ${textOrNull(i.hostOrg, 300)}, ${joinCode}, ${isTimeZone(i.timezone) ? i.timezone : null})
               returning *`,
           // The organiser is registered into their own event so it appears in
           // their event list the same way a joined event does.
@@ -648,8 +658,9 @@ export const ops: Record<string, Op> = {
       title: (v) => s(v).trim().slice(0, 200), description: textOrNull, location: textOrNull,
       start_date: (v) => s(v) || null, end_date: (v) => s(v) || null, host_org: textOrNull,
       status: (v) => (EVENT_STATUSES.includes(s(v)) ? s(v) : "upcoming"),
+      timezone: (v) => v,
     };
-    const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined);
+    const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined && (k !== "timezone" || isTimeZone(v)));
     if (!entries.length) return true;
     const sets = entries.map(([k], idx) => `${k} = $${idx + 3}`);
     const rows = await db().query(
@@ -686,7 +697,7 @@ export const ops: Record<string, Op> = {
   /* Sessions: workshops, mock interviews, company sessions, recruiter slots. */
   async listSessions(u, [eventId]) {
     return db()`
-      select es.*, p.full_name as host_name, p.organization as host_org, p.role as host_role,
+      select es.*, p.full_name as host_name, p.organization as host_org, p.role as host_role, e.timezone as event_timezone,
         (select count(*)::int from session_bookings b where b.session_id = es.id and b.status in ('booked', 'attended')) as booked_count,
         (select count(*)::int from session_bookings b where b.session_id = es.id and b.status = 'waitlisted') as waitlist_count,
         mine.status as my_status,
@@ -695,6 +706,7 @@ export const ops: Record<string, Op> = {
             and (w.created_at, w.id) < (mine.created_at, mine.id)
         ) end as my_waitlist_position
       from event_sessions es
+      join events e on e.id = es.event_id
       left join profiles p on p.id = es.host_profile_id
       left join session_bookings mine on mine.session_id = es.id and mine.profile_id = ${u.id} and mine.status <> 'cancelled'
       where es.event_id = ${s(eventId)}
@@ -1195,6 +1207,142 @@ export const ops: Record<string, Op> = {
   },
   async deleteStudentCourse(u, [id]) {
     const rows = await db()`delete from student_courses where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
+  },
+
+  /*
+    Coding profiles. The student names a handle, proves it is theirs on the
+    site itself, and only then is it shown to anyone else. Stats are always
+    fetched here.
+  */
+  async startCodingProfile(u, [site, input]) {
+    if (u.role !== "student") throw forbidden();
+    const kind = codingSite(site);
+    const label = CODING_SITE_LABEL[kind];
+    const handle = kind === "leetcode" ? leetcodeHandle(s(input)) : codeforcesHandle(s(input));
+    if (!handle) return { ok: false, error: `Enter your ${label} username or profile link.` };
+    try {
+      const sql = db();
+      const [mine] = await sql`select * from student_scores where student_id = ${u.id} and kind = ${kind}`;
+      if (mine?.verified_at) {
+        if (s(mine.handle).toLowerCase() === handle.toLowerCase()) return { ok: true, score: mine };
+        return { ok: false, error: `Remove your current ${label} profile first.` };
+      }
+      const profile = kind === "leetcode" ? await fetchLeetCode(handle) : await fetchCodeforces(handle);
+      if (!profile) return { ok: false, error: `${label} has no user called ${handle}.` };
+      const taken = await sql`select 1 from student_scores where kind = ${kind} and lower(handle) = ${profile.handle.toLowerCase()} and verified_at is not null`;
+      if (taken.length) return { ok: false, error: `This ${label} profile is already on another GradLink account.` };
+      const code = kind === "leetcode" ? `gradlink-${randomCode(6).toLowerCase()}` : null;
+      const [row] = await sql`
+        insert into student_scores (student_id, kind, handle, verify_code, verify_started_at)
+        values (${u.id}, ${kind}, ${profile.handle}, ${code}, now())
+        on conflict (student_id, kind) where kind <> 'test'
+        do update set handle = excluded.handle, verify_code = excluded.verify_code, verify_started_at = excluded.verify_started_at,
+                      verified_at = null, stats = '{}', stats_at = null
+        returning *
+      `;
+      return { ok: true, score: row };
+    } catch (err) {
+      if (err instanceof CodingError) return { ok: false, error: err.message };
+      throw err;
+    }
+  },
+  async verifyCodingProfile(u, [site]) {
+    if (u.role !== "student") throw forbidden();
+    const kind = codingSite(site);
+    const label = CODING_SITE_LABEL[kind];
+    const sql = db();
+    const [row] = await sql`select * from student_scores where student_id = ${u.id} and kind = ${kind}`;
+    if (!row) return { ok: false, error: `Add your ${label} username first.` };
+    if (row.verified_at) return { ok: true, score: row };
+    const handle = s(row.handle);
+    try {
+      let profile;
+      if (kind === "leetcode") {
+        profile = await fetchLeetCode(handle);
+        if (!profile) return { ok: false, error: `${label} has no user called ${handle} any more.` };
+        if (!profile.about.toLowerCase().includes(s(row.verify_code).toLowerCase())) {
+          return { ok: false, error: `We couldn't find ${row.verify_code} in the Summary on your LeetCode profile yet. Save it there, wait a few seconds and try again.` };
+        }
+      } else {
+        if (!(await codeforcesVerified(handle, new Date(row.verify_started_at as string)))) {
+          return { ok: false, error: "We couldn't find a submission to problem 4A that failed to compile since you started. Submit one, wait until Codeforces shows its verdict, then try again." };
+        }
+        profile = await fetchCodeforces(handle);
+        if (!profile) return { ok: false, error: `${label} has no user called ${handle} any more.` };
+      }
+      const [saved] = await sql`
+        update student_scores set verified_at = now(), verify_code = null, stats = ${JSON.stringify(profile.stats)}::jsonb, stats_at = now()
+        where id = ${row.id} and student_id = ${u.id} returning *
+      `;
+      return { ok: true, score: saved };
+    } catch (err) {
+      if (err instanceof CodingError) return { ok: false, error: err.message };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: `This ${label} profile is already on another GradLink account.` };
+      throw err;
+    }
+  },
+  /** Re-read a verified profile's stats, at most every 10 minutes. */
+  async refreshCodingProfile(u, [id]) {
+    const sql = db();
+    const [row] = await sql`select * from student_scores where id = ${s(id)} and student_id = ${u.id} and verified_at is not null and kind <> 'test'`;
+    if (!row) return { ok: false, error: "That profile isn't on your account." };
+    if (row.stats_at && Date.now() - new Date(row.stats_at as string).getTime() < 10 * 60e3) return { ok: true, score: row };
+    const kind = codingSite(row.kind);
+    try {
+      const profile = kind === "leetcode" ? await fetchLeetCode(s(row.handle)) : await fetchCodeforces(s(row.handle));
+      if (!profile) return { ok: false, error: `${CODING_SITE_LABEL[kind]} has no user called ${row.handle} any more. Remove it and add your current username.` };
+      const [saved] = await sql`
+        update student_scores set stats = ${JSON.stringify(profile.stats)}::jsonb, stats_at = now()
+        where id = ${row.id} returning *
+      `;
+      return { ok: true, score: saved };
+    } catch (err) {
+      if (err instanceof CodingError) return { ok: false, error: err.message };
+      throw err;
+    }
+  },
+  /** An exam score the student reports; employers see it marked as self-reported. */
+  async addTestScore(u, [input]) {
+    if (u.role !== "student") throw forbidden();
+    const i = (input ?? {}) as Row;
+    const test = TEST_BY_KEY.get(s(i.testKey));
+    if (!test) return { ok: false, error: "Pick a test." };
+    const name = test.key === "other" ? s(i.testName).trim().slice(0, 80) : test.label;
+    if (!name) return { ok: false, error: "Enter the test's name." };
+    const score = s(i.score).trim();
+    const problem = scoreProblem(test, score);
+    if (problem) return { ok: false, error: problem };
+    const takenOn = /^\d{4}-\d{2}-\d{2}$/.test(s(i.takenOn)) ? s(i.takenOn) : null;
+    if (takenOn && (takenOn > new Date().toISOString().slice(0, 10) || takenOn < "1990-01-01")) return { ok: false, error: "Enter the date you took the test." };
+    const sql = db();
+    const [{ n }] = await sql`select count(*)::int as n from student_scores where student_id = ${u.id} and kind = 'test'`;
+    if (n >= 10) return { ok: false, error: "You can add up to 10 test scores." };
+    const [row] = await sql`
+      insert into student_scores (student_id, kind, test_key, test_name, score, taken_on)
+      values (${u.id}, 'test', ${test.key}, ${name}, ${score}, ${takenOn})
+      returning *
+    `;
+    return { ok: true, score: row };
+  },
+  /** The student sees all of theirs; everyone else only verified profiles and tests the student shows. */
+  async listStudentScores(u, [studentId]) {
+    const id = s(studentId);
+    return u.id === id
+      ? db()`select * from student_scores where student_id = ${id} order by kind <> 'test' desc, kind, created_at`
+      : db()`
+          select id, kind, handle, verified_at, stats, stats_at, test_key, test_name, score, taken_on
+          from student_scores
+          where student_id = ${id} and visible_to_employers and (kind = 'test' or verified_at is not null)
+          order by kind <> 'test' desc, kind, created_at
+        `;
+  },
+  async setStudentScoreVisible(u, [id, visible]) {
+    const rows = await db()`update student_scores set visible_to_employers = ${Boolean(visible)} where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
+  },
+  async deleteStudentScore(u, [id]) {
+    const rows = await db()`delete from student_scores where id = ${s(id)} and student_id = ${u.id} returning id`;
     return rows.length > 0;
   },
 

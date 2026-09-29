@@ -19,6 +19,8 @@
 --       invites and live booth queues
 --   * student_courses: Coursera certificates verified with Coursera, and
 --       courses in progress
+--   * student_scores: LeetCode and Codeforces profiles verified with those
+--       sites, and self-reported test scores
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
@@ -161,8 +163,12 @@ create table if not exists events (
   status       text not null default 'upcoming' check (status in ('draft', 'upcoming', 'live', 'ended')),
   created_by   text references profiles (id) on delete set null,
   host_org     text,
-  join_code    text unique
+  join_code    text unique,
+  -- IANA zone the event runs in (e.g. Asia/Kolkata). Session times are
+  -- entered and shown in it; null for events made before it was stored.
+  timezone     text
 );
+alter table events add column if not exists timezone text;
 create index if not exists events_created_by_idx on events (created_by, created_at desc);
 
 create table if not exists event_registrations (
@@ -421,6 +427,34 @@ create table if not exists student_courses (
   unique (provider, certificate_code)
 );
 create index if not exists student_courses_student_idx on student_courses (student_id, created_at desc);
+
+-- ---------------------------------------------------------- student scores --
+-- Coding profiles and test scores a student adds to their profile.
+--   * leetcode / codeforces: one per student. The row is pending (verify_code
+--     or verify_started_at set, verified_at null) until the student proves
+--     they own the handle; only verified rows are shown to anyone else, and a
+--     handle can be verified on one account only. Stats are read from the site.
+--   * test: an exam score (GRE, IELTS, ...) the student reports themselves.
+create table if not exists student_scores (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  kind                 text not null check (kind in ('leetcode', 'codeforces', 'test')),
+  handle               text,
+  verify_code          text,
+  verify_started_at    timestamptz,
+  verified_at          timestamptz,
+  stats                jsonb not null default '{}',
+  stats_at             timestamptz,
+  test_key             text,
+  test_name            text,
+  score                text,
+  taken_on             text, -- YYYY-MM-DD; text so no time zone can shift the day
+  visible_to_employers boolean not null default true
+);
+create index if not exists student_scores_student_idx on student_scores (student_id, created_at);
+create unique index if not exists student_scores_site_uniq on student_scores (student_id, kind) where kind <> 'test';
+create unique index if not exists student_scores_handle_uniq on student_scores (kind, lower(handle)) where verified_at is not null;
 
 -- --------------------------------------------------------------- billing --
 -- Written ONLY by the Stripe webhook. The API exposes it read-only to its

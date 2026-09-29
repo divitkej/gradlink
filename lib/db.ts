@@ -171,6 +171,8 @@ export interface SessionRow {
   /** The signed-in user's booking, if any (never "cancelled"). */
   my_status: BookingStatus | null;
   my_waitlist_position: number | null;
+  /** The event's IANA time zone; times are shown in it. Null for older events. */
+  event_timezone: string | null;
 }
 
 export interface SessionBookingRow {
@@ -628,6 +630,71 @@ export function setStudentCourseVisible(id: string, visible: boolean): Promise<b
 
 export function deleteStudentCourse(id: string): Promise<boolean> {
   return safe("deleteStudentCourse", false, () => rpc<boolean>("deleteStudentCourse", id));
+}
+
+/* ---------------- Coding profiles and test scores ---------------- */
+export type CodingSite = "leetcode" | "codeforces";
+
+export interface LeetCodeStats {
+  solved: number; easy: number; medium: number; hard: number;
+  contestRating: number | null; contestsAttended: number; topPercent: number | null;
+}
+
+export interface CodeforcesStats {
+  rating: number | null; maxRating: number | null; rank: string | null; maxRank: string | null; contests: number;
+}
+
+export interface StudentScoreRow {
+  id: string;
+  kind: CodingSite | "test";
+  handle: string | null;
+  verified_at: string | null;
+  /** LeetCodeStats or CodeforcesStats for a verified profile, {} otherwise. */
+  stats: Partial<LeetCodeStats & CodeforcesStats>;
+  stats_at: string | null;
+  test_key: string | null;
+  test_name: string | null;
+  score: string | null;
+  /** YYYY-MM-DD */
+  taken_on: string | null;
+  /** Only on the student's own list. */
+  verify_code?: string | null;
+  verify_started_at?: string | null;
+  visible_to_employers?: boolean;
+}
+
+export const codingProfileUrl = (site: CodingSite, handle: string) =>
+  site === "leetcode" ? `https://leetcode.com/u/${encodeURIComponent(handle)}/` : `https://codeforces.com/profile/${encodeURIComponent(handle)}`;
+
+type ScoreResult = { ok: true; score: StudentScoreRow } | { ok: false; error: string };
+
+export function startCodingProfile(site: CodingSite, handle: string): Promise<ScoreResult> {
+  return safe("startCodingProfile", { ok: false, error: "Couldn't check that profile. Please try again." }, () => rpc("startCodingProfile", site, handle));
+}
+
+export function verifyCodingProfile(site: CodingSite): Promise<ScoreResult> {
+  return safe("verifyCodingProfile", { ok: false, error: "Couldn't check that profile. Please try again." }, () => rpc("verifyCodingProfile", site));
+}
+
+export function refreshCodingProfile(id: string): Promise<ScoreResult> {
+  return safe("refreshCodingProfile", { ok: false, error: "Couldn't refresh that profile. Please try again." }, () => rpc("refreshCodingProfile", id));
+}
+
+export function addTestScore(input: { testKey: string; testName?: string; score: string; takenOn?: string }): Promise<ScoreResult> {
+  return safe("addTestScore", { ok: false, error: "Couldn't save that score. Please try again." }, () => rpc("addTestScore", input));
+}
+
+export function listStudentScores(studentId: string): Promise<StudentScoreRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentScores", [], () => rpc<StudentScoreRow[]>("listStudentScores", studentId));
+}
+
+export function setStudentScoreVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentScoreVisible", false, () => rpc<boolean>("setStudentScoreVisible", id, visible));
+}
+
+export function deleteStudentScore(id: string): Promise<boolean> {
+  return safe("deleteStudentScore", false, () => rpc<boolean>("deleteStudentScore", id));
 }
 
 /* ---------------- Engagement ---------------- */

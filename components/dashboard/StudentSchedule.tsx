@@ -14,7 +14,7 @@ import {
   bookSession, cancelBooking, listSessions, saveCompany, listMyQueues, SESSION_KIND_LABEL,
   type SessionRow, type SessionKind, type CompanyRow,
 } from "@/lib/db";
-import { fmtDay, fmtTime, sessionEnd, sessionPhase } from "@/lib/format";
+import { fmtDay, fmtTime, sessionEnd, sessionPhase, zoneNote } from "@/lib/format";
 
 const KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 
@@ -70,7 +70,7 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
   const list = data.sessions.filter((s) => kind === "all" || s.kind === kind);
   const days = new Map<string, SessionRow[]>();
   for (const s of list) {
-    const key = new Date(s.starts_at).toDateString();
+    const key = fmtDay(s.starts_at, s.event_timezone);
     days.set(key, [...(days.get(key) ?? []), s]);
   }
 
@@ -100,6 +100,11 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
           <Empty icon={<CalendarDays size={22} />} title="No sessions yet" body="Workshops, mock interviews and company sessions appear here once the organiser or companies publish them." />
         ) : (
           <>
+            {zoneNote(data.sessions[0].event_timezone) && (
+              <p style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--text-2)", marginBottom: 14 }}>
+                <Clock size={13} /> {zoneNote(data.sessions[0].event_timezone)}
+              </p>
+            )}
             {available.length > 1 && (
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }} role="group" aria-label="Filter by type">
                 {(["all", ...available] as const).map((k) => (
@@ -113,7 +118,7 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
               {Array.from(days.entries()).map(([day, sessions]) => (
                 <div key={day}>
-                  <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 8 }}>{fmtDay(sessions[0].starts_at)}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 8 }}>{fmtDay(sessions[0].starts_at, sessions[0].event_timezone)}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {sessions.map((s) => (
                       <SessionItem key={s.id} s={s} busy={busy === s.id} error={error?.id === s.id ? error.text : null} clash={clash(s)} onAct={(a) => act(s, a)} />
@@ -134,10 +139,10 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {mine.map((s) => (
                 <div key={s.id} style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-                  <span style={{ fontSize: 12, color: "var(--text-muted)", minWidth: 44, fontVariantNumeric: "tabular-nums", paddingTop: 1 }}>{fmtTime(s.starts_at)}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)", minWidth: 44, fontVariantNumeric: "tabular-nums", paddingTop: 1 }}>{fmtTime(s.starts_at, s.event_timezone)}</span>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s.title}</span>
-                    <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>{[fmtDay(s.starts_at), s.location].filter(Boolean).join(" · ")}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>{[fmtDay(s.starts_at, s.event_timezone), s.location].filter(Boolean).join(" · ")}</span>
                   </span>
                   <StatusText s={s} />
                 </div>
@@ -238,7 +243,7 @@ function SessionItem({ s, busy, error, clash, onAct }: {
     <div style={{ padding: "12px 14px", background: s.my_status === "booked" || s.my_status === "attended" ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)", border: `1px solid ${s.my_status === "booked" ? "var(--border-strong)" : "var(--border)"}`, borderRadius: "var(--r-md)", opacity: phase === "ended" && s.my_status !== "attended" ? 0.6 : 1 }}>
       <div className="sess-row" style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
         <div style={{ minWidth: 92, fontSize: 12.5, color: "var(--text-2)", fontVariantNumeric: "tabular-nums", paddingTop: 1 }}>
-          {fmtTime(s.starts_at)}{s.ends_at ? ` to ${fmtTime(s.ends_at)}` : ""}
+          {fmtTime(s.starts_at, s.event_timezone)}{s.ends_at ? ` to ${fmtTime(s.ends_at, s.event_timezone)}` : ""}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -258,7 +263,7 @@ function SessionItem({ s, busy, error, clash, onAct }: {
           )}
           {clash && s.my_status !== "attended" && phase !== "ended" && (
             <p style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-2)", marginTop: 6 }}>
-              <CircleAlert size={12} /> Overlaps with {clash.title} at {fmtTime(clash.starts_at)}
+              <CircleAlert size={12} /> Overlaps with {clash.title} at {fmtTime(clash.starts_at, clash.event_timezone)}
             </p>
           )}
           {error && <p role="alert" style={{ fontSize: 12, color: "var(--danger)", marginTop: 6 }}>{error}</p>}

@@ -23,6 +23,8 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Opportunities: every open role at the event, ranked for the student, with internships marked and one-click tracking (`/dashboard/student/opportunities`)
 - Alumni mentoring as a session type the college publishes and students book
 - Coursera courses on the career profile: certificate links verified with Coursera (course, issuer, completion date, skills; the name on the certificate must match the student), plus courses in progress; employers and the college see the ones the student chooses (`lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`)
+- Coding profiles and test scores on the career profile: LeetCode and Codeforces verified with each site after the student proves the account is theirs, and exam scores (GRE, IELTS and others) marked self-reported; employers see the ones the student chooses (`lib/server/coding.ts`, `components/dashboard/StudentScores.tsx`)
+- Event time zones: session times are entered and shown in the event's zone on every device (`lib/format.ts`)
 - Event history and company connections on the career profile, across every event (`components/dashboard/StudentHistory.tsx`)
 - Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
 

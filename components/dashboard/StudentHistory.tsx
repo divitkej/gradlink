@@ -6,7 +6,7 @@ import { CalendarDays } from "lucide-react";
 import { SectionCard, LoadingBlock } from "./cards";
 import { getStudentHistory, type StudentHistory as History } from "@/lib/db";
 import { EVENT_STATUS_LABEL, type EventStatus } from "@/lib/events";
-import { fmtDay } from "@/lib/format";
+import { fmtDay, fmtEventDate } from "@/lib/format";
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
@@ -40,7 +40,7 @@ export default function StudentHistory() {
                   <span style={{ fontSize: 11.5, color: "var(--text-muted)", whiteSpace: "nowrap" }}>{EVENT_STATUS_LABEL[e.status as EventStatus] ?? e.status}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>
-                  <CalendarDays size={12} /> {[e.start_date ? fmtDay(e.start_date) : null, e.location].filter(Boolean).join(" · ") || "Date not set"}
+                  <CalendarDays size={12} /> {[fmtEventDate(e.start_date), e.location].filter(Boolean).join(" · ") || "Date not set"}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-2)", marginTop: 6 }}>
                   {[

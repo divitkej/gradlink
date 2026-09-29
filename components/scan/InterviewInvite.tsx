@@ -7,7 +7,7 @@ import {
   getCompanyByProfile, listInterviewInvitesForCompany, sendInterviewInvite, cancelInterviewInvite,
   type InterviewInviteRow,
 } from "@/lib/db";
-import { fmtDateTime, fromLocalInput } from "@/lib/format";
+import { fmtDateTimeZoned, fromLocalInput } from "@/lib/format";
 
 /**
  * A company inviting a student it met to interview. The student picks one of
@@ -42,7 +42,7 @@ export default function InterviewInvite({ eventId, companyId, studentId, firstNa
     setError(null);
     const res = await sendInterviewInvite({
       eventId, studentId, roleTitle: role, location, message,
-      proposedTimes: times.map(fromLocalInput).filter((t): t is string => !!t),
+      proposedTimes: times.map((t) => fromLocalInput(t)).filter((t): t is string => !!t),
     });
     setBusy(false);
     if (!res.ok) { setError(res.error); return; }
@@ -67,7 +67,7 @@ export default function InterviewInvite({ eventId, companyId, studentId, firstNa
           <span style={{ flex: 1, minWidth: 200, fontSize: 13.5, color: "var(--text)" }}>
             {invite.status === "pending"
               ? <>Invite sent for <strong>{invite.role_title}</strong>. Waiting for {firstName} to pick a time.</>
-              : <>Interview booked for <strong>{invite.role_title}</strong>{invite.chosen_time ? `, ${fmtDateTime(invite.chosen_time)}` : ""}.</>}
+              : <>Interview booked for <strong>{invite.role_title}</strong>{invite.chosen_time ? `, ${fmtDateTimeZoned(invite.chosen_time)}` : ""}.</>}
           </span>
           <SmallButton tone="danger" onClick={cancel}>Cancel interview</SmallButton>
         </div>

@@ -9,7 +9,7 @@ import {
   listInterviewInvitesForStudent, respondInterviewInvite,
   type ApplicationRow, type ApplicationStatus, type CompanyRow, type InterviewInviteRow,
 } from "@/lib/db";
-import { fmtDateTime, fromLocalInput, toLocalInput } from "@/lib/format";
+import { fmtDateTimeZoned, fromLocalInput, toLocalInput } from "@/lib/format";
 
 const STATUSES = Object.keys(APPLICATION_STATUS_LABEL) as ApplicationStatus[];
 const OTHER = "__other__";
@@ -120,7 +120,7 @@ export default function StudentApplications({ eventId }: { eventId: string }) {
               <div key={a.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
                 <CalendarClock size={16} color="var(--accent)" />
                 <span style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{a.role_title} · {a.company_name}</span>
-                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{fmtDateTime(a.interview_at!)}</span>
+                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{fmtDateTimeZoned(a.interview_at!)}</span>
               </div>
             ))}
           </div>
@@ -199,7 +199,7 @@ export default function StudentApplications({ eventId }: { eventId: string }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{a.role_title}</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
-                      {[a.company_name, a.interview_at ? `Interview ${fmtDateTime(a.interview_at)}` : null].filter(Boolean).join(" · ")}
+                      {[a.company_name, a.interview_at ? `Interview ${fmtDateTimeZoned(a.interview_at)}` : null].filter(Boolean).join(" · ")}
                     </div>
                   </div>
                   <select aria-label={`Status of ${a.role_title} at ${a.company_name}`} value={a.status} onChange={(e) => quickStatus(a, e.target.value as ApplicationStatus)}
@@ -262,7 +262,7 @@ function InviteCard({ invite, onRespond }: {
           {times.map((t) => (
             <label key={t} style={{ display: "flex", alignItems: "center", gap: 9, padding: "9px 12px", fontSize: 13, color: "var(--text)", background: time === t ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.02)", border: `1px solid ${time === t ? "var(--border-strong)" : "var(--border)"}`, borderRadius: "var(--r-sm)", cursor: "pointer" }}>
               <input type="radio" name={`invite-${invite.id}`} checked={time === t} onChange={() => setTime(t)} />
-              {fmtDateTime(t)}
+              {fmtDateTimeZoned(t)}
             </label>
           ))}
         </fieldset>

@@ -8,7 +8,7 @@ import { Avatar, LoadingBlock, SmallButton, fieldStyle } from "./cards";
 import { Badge } from "@/components/ui/primitives";
 import { sendBulkMessage, type ScanRow, type ShortlistRow, type StudentRow, type InterviewInviteRow } from "@/lib/db";
 import { downloadCsv, slugify } from "@/lib/csv";
-import { fmtDateTime } from "@/lib/format";
+import { fmtDateTime, fmtDateTimeZoned } from "@/lib/format";
 
 type Stage = "all" | "undecided" | "interview" | ShortlistRow["status"];
 
@@ -25,7 +25,7 @@ const statusTone = (s?: string) =>
   s === "priority" ? "amber" : s === "shortlisted" ? "teal" : s === "maybe" ? "cyan" : "muted";
 
 const inviteLabel = (i?: InterviewInviteRow) =>
-  !i ? "" : i.status === "accepted" ? `Interview ${i.chosen_time ? fmtDateTime(i.chosen_time) : "booked"}` : "Interview invited";
+  !i ? "" : i.status === "accepted" ? `Interview ${i.chosen_time ? fmtDateTimeZoned(i.chosen_time) : "booked"}` : "Interview invited";
 
 const select: React.CSSProperties = { ...fieldStyle, height: 36, fontSize: 12.5, width: "auto", minWidth: 0, flex: "1 1 140px" };
 

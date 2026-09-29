@@ -8,6 +8,7 @@ import {
   type StudentRow, type CompanyRow, type SessionRow, type SavedCompanyRow, type ScanRow,
   type ShortlistRow, type MessageRow, type StudentInsights, type InterviewInviteRow, type MyQueueRow, type StudentCourseRow,
 } from "./db";
+import { getEvent } from "./events";
 import type { StudentActivity } from "./readiness";
 
 /**
@@ -33,6 +34,8 @@ export interface StudentData {
   /** Booth queues the student is in at this event. */
   queues: MyQueueRow[];
   courses: StudentCourseRow[];
+  /** The event's time zone, for times at the event. Null for older events. */
+  timezone: string | null;
 }
 
 export function activityOf(d: StudentData, profileId: string): StudentActivity {
@@ -59,7 +62,7 @@ export function useStudentData(profileId: string, eventId: string) {
     if (!profileId || !eventId) return;
     let cancelled = false;
     (async () => {
-      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress, invites, queues, courses] = await Promise.all([
+      const [me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, items, progress, invites, queues, courses, event] = await Promise.all([
         getStudentByProfile(profileId),
         getRegisteredCompanies(eventId),
         listSessions(eventId),
@@ -74,6 +77,7 @@ export function useStudentData(profileId: string, eventId: string) {
         listInterviewInvitesForStudent(),
         listMyQueues(eventId),
         listStudentCourses(profileId),
+        getEvent(eventId),
       ]);
       const ids = [
         ...scansIn.map((s) => s.scanner_profile_id),
@@ -85,6 +89,7 @@ export function useStudentData(profileId: string, eventId: string) {
       const done = items.filter((i) => progress[i.id]).length;
       setData({
         me, companies, sessions, saved, scansIn, scansOut, shortlists, messages, insights, names, invites, queues, courses,
+        timezone: event?.timezone ?? null,
         checklistPct: items.length ? Math.round((done / items.length) * 100) : 0,
       });
     })();

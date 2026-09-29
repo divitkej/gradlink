@@ -99,7 +99,7 @@ export default function StudentPassport({ eventId }: { eventId: string }) {
                 <div style={{ paddingBottom: i < list.length - 1 ? 16 : 0, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: p.done ? 600 : 400, color: p.done ? "var(--text)" : "var(--text-2)" }}>{p.label}</div>
                   <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 1 }}>
-                    {p.at ? `${p.done ? "" : "Planned · "}${fmtDay(p.at)}, ${fmtTime(p.at)}` : "Planned"}
+                    {p.at ? `${p.done ? "" : "Planned · "}${fmtDay(p.at, data.timezone)}, ${fmtTime(p.at, data.timezone)}` : "Planned"}
                   </div>
                 </div>
               </li>

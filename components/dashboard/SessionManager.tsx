@@ -8,7 +8,9 @@ import {
   type SessionRow, type SessionKind, type SessionBookingRow,
 } from "@/lib/db";
 import type { AppRole } from "@/lib/session";
-import { fmtDay, fmtTime, fromLocalInput } from "@/lib/format";
+import { updateEvent } from "@/lib/events";
+import { fmtDay, fmtTime, fromLocalInput, isTimeZone, localZone, zoneNote } from "@/lib/format";
+import TimeZoneSelect from "@/components/ui/TimeZoneSelect";
 
 const ALL_KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 const COMPANY_KINDS: SessionKind[] = ["company_session", "recruiter_slot", "mock_interview"];
@@ -19,7 +21,12 @@ const COMPANY_KINDS: SessionKind[] = ["company_session", "recruiter_slot", "mock
  * sessions and 1:1 slots. Hosts see who booked and mark who attended, which is
  * what students' passports and engagement scores count.
  */
-export default function SessionManager({ eventId, role, myId, isOwner }: { eventId: string; role: AppRole; myId: string; isOwner: boolean }) {
+export default function SessionManager({ eventId, role, myId, isOwner, timezone, onTimezoneChange }: {
+  eventId: string; role: AppRole; myId: string; isOwner: boolean;
+  /** The event's time zone. Session times are entered and shown in it. */
+  timezone: string | null;
+  onTimezoneChange: (tz: string) => void;
+}) {
   const kinds = isOwner ? ALL_KINDS : COMPANY_KINDS;
   const [sessions, setSessions] = useState<SessionRow[] | null>(null);
   const [form, setForm] = useState({ kind: kinds[0], title: "", description: "", location: "", start: "", end: "", capacity: "" });
@@ -36,6 +43,14 @@ export default function SessionManager({ eventId, role, myId, isOwner }: { event
   }, [eventId, version]);
 
   const canAdd = isOwner || role === "company";
+  const tz = isTimeZone(timezone) ? timezone : null;
+  const [tzError, setTzError] = useState<string | null>(null);
+
+  async function changeZone(next: string) {
+    setTzError(null);
+    if (await updateEvent(eventId, { timezone: next })) onTimezoneChange(next);
+    else setTzError("Couldn't change the time zone. Please try again.");
+  }
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -43,7 +58,7 @@ export default function SessionManager({ eventId, role, myId, isOwner }: { event
     setError(null);
     const res = await createSession({
       eventId, kind: form.kind, title: form.title, description: form.description, location: form.location,
-      startsAt: fromLocalInput(form.start) ?? "", endsAt: fromLocalInput(form.end),
+      startsAt: fromLocalInput(form.start, tz) ?? "", endsAt: fromLocalInput(form.end, tz),
       capacity: form.capacity ? Number(form.capacity) : null,
     });
     setSaving(false);
@@ -63,6 +78,8 @@ export default function SessionManager({ eventId, role, myId, isOwner }: { event
       {canAdd && (
         <SectionCard title="Add a session" hint={isOwner ? "Workshops, mock interviews, talks and more" : "Company sessions, mock interviews and 1:1 slots"}>
           <form onSubmit={add} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <ZoneLine tz={tz} isOwner={isOwner} onChange={changeZone} />
+            {tzError && <p role="alert" style={{ fontSize: 12.5, color: "var(--danger)" }}>{tzError}</p>}
             <div className="sm-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <Labeled label="Type">
                 <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value as SessionKind })} style={field}>
@@ -111,7 +128,7 @@ export default function SessionManager({ eventId, role, myId, isOwner }: { event
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.title}</div>
                       <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
-                        {[SESSION_KIND_LABEL[s.kind], `${fmtDay(s.starts_at)}, ${fmtTime(s.starts_at)}${s.ends_at ? ` to ${fmtTime(s.ends_at)}` : ""}`, s.location, s.host_org || s.host_name].filter(Boolean).join(" · ")}
+                        {[SESSION_KIND_LABEL[s.kind], `${fmtDay(s.starts_at, tz)}, ${fmtTime(s.starts_at, tz)}${s.ends_at ? ` to ${fmtTime(s.ends_at, tz)}` : ""}`, s.location, s.host_org || s.host_name].filter(Boolean).join(" · ")}
                       </div>
                     </div>
                     <span style={{ fontSize: 12.5, color: "var(--text-2)", whiteSpace: "nowrap" }}>
@@ -137,6 +154,33 @@ export default function SessionManager({ eventId, role, myId, isOwner }: { event
         @media (max-width: 720px) { .sm-form { grid-template-columns: 1fr !important; } }
         @media (max-width: 640px) { .sm-row { flex-wrap: wrap; } }
       `}</style>
+    </div>
+  );
+}
+
+/**
+ * Which zone the times are in. The organiser can change it; an older event
+ * with no zone uses each viewer's own, so the organiser is asked to set it.
+ */
+function ZoneLine({ tz, isOwner, onChange }: { tz: string | null; isOwner: boolean; onChange: (tz: string) => void }) {
+  const note = { fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.5 } as const;
+  if (!isOwner) {
+    return <p style={note}>{tz ? `Enter times in the event's time zone, ${tz.replace(/_/g, " ")}.` : "Enter times in your own time zone."}</p>;
+  }
+  if (!tz) {
+    const mine = localZone();
+    return (
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", padding: "10px 12px", border: "1px solid var(--border-strong)", borderRadius: "var(--r-sm)" }}>
+        <span style={{ ...note, flex: 1, minWidth: 220 }}>This event has no time zone yet, so everyone sees session times in their own. Set it so times read the same on every device.</span>
+        <SmallButton tone="primary" onClick={() => onChange(mine)}>Use {mine.replace(/_/g, " ")}</SmallButton>
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+      <label htmlFor="sm-tz" style={note}>Times are in the event&apos;s time zone</label>
+      <TimeZoneSelect id="sm-tz" value={tz} onChange={onChange} style={{ ...field, width: "auto", maxWidth: "100%" }} />
+      {zoneNote(tz) && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Your device is on a different zone.</span>}
     </div>
   );
 }

@@ -6,10 +6,12 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 23 / 25 done, 2 need a real device or the go-live step
+## Progress: 28 / 32 done, 4 need a real device, the live database or the go-live step
 
 ## Before deploying
 
+- [ ] **Apply the new schema to the live Neon database.** `npm run db:migrate` adds `events.timezone` and the `student_scores` table. Additive; until then the live site keeps working as before.
+  `db/schema.sql` · Verify live
 - [x] **Schema applied to the live Neon database.** `npm run db:migrate` on 2026-09-29, after merging main: 30 tables, including `event_sessions`, `session_bookings`, `saved_companies`, `applications`, `notifications`, `interview_invites`, `booth_queue` and `student_courses`. Additive only; the live site kept working throughout.
   `db/schema.sql` · Done on 2026-09-29, no commit (database change)
 - [x] **Tested live on a preview version.** Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards.
@@ -64,6 +66,15 @@ Status key as in `landing-page.md`.
 - [x] **Coursera check from Cloudflare.** A temporary Worker running this code on Cloudflare's network (deployed, tested, then deleted) read real certificates, the course catalog and issuer names from coursera.org in under a second each. It also runs in the local Workers runtime, the Cloudflare build succeeds, and a certificate page costs under 1 ms of CPU to parse. A Coursera outage shows "Coursera didn't respond", never "no such course".
   `lib/server/coursera.ts` · Done in "Tell a Coursera outage apart from a missing course"
 
+## Coding profiles and test scores
+
+- [x] **Verified LeetCode and Codeforces profiles.** Neither site lets a user sign in to another app, so the student proves the account is theirs on the site itself: a one-time code in their LeetCode Summary, or a Codeforces submission to problem 4A that fails to compile (it doesn't touch their rating). Only then is the profile shown to anyone else, and a handle can be verified on one account only. Stats are read from the sites, never from the browser: LeetCode problems solved by difficulty, contest rating, top percentage and contests; Codeforces rating, rank, best rating and rated contests. The student can refresh them (at most every 10 minutes). Tested with fakes for every path and against the real sites' public data.
+  `lib/server/coding.ts`, `components/dashboard/StudentScores.tsx`, `components/scan/VerifiedScores.tsx` · Done in "Add event time zones, coding profiles and test scores"
+- [x] **Test scores.** GRE, GMAT, TOEFL, IELTS, Duolingo, PTE, SAT, ACT, GATE, CAT or any other test, checked against each exam's real score range. None of these exams lets another site check a score, so employers see them marked "Self-reported".
+  `lib/scores.ts` · Done in "Add event time zones, coding profiles and test scores"
+- [ ] **LeetCode and Codeforces from Cloudflare.** Checked from a normal server so far. Confirm on a preview version that both sites answer requests from Cloudflare's network before going live.
+  Verify live
+
 ## Employer privacy
 
 Colleges want their students hired, so employers see strengths, never assessments. See the decision in `features-to-build.md`.
@@ -79,5 +90,7 @@ Colleges want their students hired, so employers see strengths, never assessment
 
 - [ ] **Two-account run on real phones.** Student books a full session, organiser marks attendance, student sees the passport stop and score change.
   Verify live
-- [ ] **Session times across time zones.** Times are entered and shown in the viewer's local time. Confirm with the organiser's real time zone.
-  Verify live
+- [x] **Session times across time zones.** Times used to follow each viewer's device, so a student whose phone was on another zone, or an organiser setting up from another city, saw different times for the same session. Events now store a time zone (picked on creation, defaulting to the organiser's), sessions are entered and shown in it, and the schedule says so when the viewer's device is on another zone. Older events without one ask the organiser to set it. Interview times name their zone. Tested with an organiser in New York and a student in London for an event in India: both see 10:00.
+  `lib/format.ts`, `components/dashboard/SessionManager.tsx`, `components/ui/TimeZoneSelect.tsx` · Done in "Add event time zones, coding profiles and test scores"
+- [x] **Event dates shifted a day west of London.** A 1 October event showed as 30 September in the Americas, because the date was read as midnight UTC in the viewer's zone. Event dates are now shown as calendar dates.
+  `lib/format.ts` · Done in "Add event time zones, coding profiles and test scores"
