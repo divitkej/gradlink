@@ -74,6 +74,21 @@ function jsonObjectAt(text: string, start: number): unknown {
 
 type Obj = Record<string, unknown>;
 
+/**
+ * The state is followed by the next `window.` assignment in the same script,
+ * so it can usually be cut there and parsed natively, which is much cheaper
+ * on the Worker's CPU budget than scanning it character by character.
+ */
+function fastJson(html: string, start: number): Obj | null {
+  const end = html.slice(start).search(/\}\s*;\s*(?:window\.|<\/script>)/);
+  if (end < 0) return null;
+  try {
+    return JSON.parse(html.slice(start, start + end + 1)) as Obj;
+  } catch {
+    return null;
+  }
+}
+
 /** Visit every object in the state, with the key it is stored under. */
 function walk(v: unknown, visit: (o: Obj, key: string) => void, key = "") {
   if (Array.isArray(v)) v.forEach((x) => walk(x, visit, key));
@@ -90,7 +105,8 @@ function walk(v: unknown, visit: (o: Obj, key: string) => void, key = "") {
 export function parseVerifyPage(html: string, code: string): VerifiedCertificate | null {
   const marker = html.search(/window\.__APOLLO_STATE__\s*=\s*\{/);
   if (marker < 0) throw new CourseraError("Coursera's page couldn't be read. Please try again later.");
-  const state = jsonObjectAt(html, html.indexOf("{", marker)) as Obj;
+  const start = html.indexOf("{", marker);
+  const state = fastJson(html, start) ?? (jsonObjectAt(html, start) as Obj);
 
   let membership: Obj | null = null, profile: Obj | null = null, accomplishment: Obj | null = null;
   const courses = new Map<string, Obj>(), partners = new Map<string, Obj>();

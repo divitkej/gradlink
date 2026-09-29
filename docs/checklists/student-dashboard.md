@@ -58,7 +58,7 @@ Status key as in `landing-page.md`.
 
 - [x] **Verified Coursera certificates and courses in progress.** Coursera has no API for a learner to share their own courses (its learner API is only for Coursera for Business and Campus customers), so students paste a certificate link and the Worker reads the facts from Coursera's public verify page: course, issuer, completion date and skills. The name on the certificate must match the student's GradLink name, and a certificate can sit on one account only. Courses in progress are checked against Coursera's catalog and shown as "Currently taking". The student picks which ones employers see, and can add the course's skills to their profile in one click. Tested against live coursera.org pages.
   `lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`, `components/scan/VerifiedCourses.tsx` · Done in "Verify Coursera certificates on the student profile"
-- [ ] **Coursera check from the deployed Worker.** Tested from a server here, not from Cloudflare. Add one real certificate on the live site; if Coursera refuses requests from Cloudflare, the add shows "Coursera didn't respond".
+- [ ] **Coursera check from the deployed Worker.** Runs in Cloudflare's Workers engine (checked locally with `wrangler dev` against live coursera.org), the Cloudflare build succeeds, and parsing a certificate page costs under 1 ms of CPU. Still unproven: whether Coursera answers requests coming from Cloudflare's network. Add one real certificate on the live site; if Coursera refuses, the add shows "Coursera didn't respond".
   Verify live
 
 ## Employer privacy
