@@ -1028,7 +1028,8 @@ export const ops: Record<string, Op> = {
       if (!namesMatch(cert.matchName, myName)) {
         return { ok: false, error: `The name on this certificate (${cert.learnerName}) doesn't match your GradLink name (${myName}). Only your own certificates can be added.` };
       }
-      const fallback = !cert.courseName && cert.courseId ? await courseById(cert.courseId) : null;
+      // Only for a name the page left out; the certificate itself is already verified.
+      const fallback = !cert.courseName && cert.courseId ? await courseById(cert.courseId).catch(() => null) : null;
       const [row] = await sql.transaction([
         sql`insert into student_courses (student_id, status, certificate_code, course_id, course_slug, course_name, partner_name, completed_at, skills)
             values (${u.id}, 'certificate', ${code}, ${cert.courseId}, ${cert.courseSlug ?? fallback?.slug ?? null},

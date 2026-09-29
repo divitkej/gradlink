@@ -164,19 +164,30 @@ export async function fetchCertificate(code: string): Promise<VerifiedCertificat
   return parseVerifyPage(await res.text(), code);
 }
 
+/** The issuer's name. Nice to have, so any failure just leaves it out. */
 async function partnerName(ids: unknown): Promise<string | null> {
   const id = Array.isArray(ids) && typeof ids[0] === "string" ? ids[0] : null;
   if (!id) return null;
-  const res = await get(`https://api.coursera.org/api/partners.v1?ids=${encodeURIComponent(id)}&fields=name`);
-  if (!res.ok) return null;
-  const body = (await res.json().catch(() => null)) as { elements?: { name?: string }[] } | null;
-  return body?.elements?.[0]?.name ?? null;
+  try {
+    const res = await get(`https://api.coursera.org/api/partners.v1?ids=${encodeURIComponent(id)}&fields=name`);
+    if (!res.ok) return null;
+    const body = (await res.json().catch(() => null)) as { elements?: { name?: string }[] } | null;
+    return body?.elements?.[0]?.name ?? null;
+  } catch {
+    return null;
+  }
 }
 
+/**
+ * A course from Coursera's public catalog. Null means Coursera answered and has
+ * no such course; a failed or garbled answer throws, so a hiccup is never
+ * reported to the student as "no course at that link".
+ */
 async function catalog(query: string): Promise<CatalogCourse | null> {
   const res = await get(`https://api.coursera.org/api/courses.v1?${query}&fields=name,slug,partnerIds`);
-  if (!res.ok) return null;
-  const body = (await res.json().catch(() => null)) as { elements?: Obj[] } | null;
+  if (res.status === 404) return null;
+  const body = res.ok ? ((await res.json().catch(() => null)) as { elements?: Obj[] } | null) : null;
+  if (!body || !Array.isArray(body.elements)) throw new CourseraError("Coursera didn't respond. Please try again in a minute.");
   const c = body?.elements?.[0];
   if (!c || typeof c.id !== "string" || typeof c.name !== "string") return null;
   return { id: c.id, slug: String(c.slug ?? ""), name: c.name.trim(), partnerName: await partnerName(c.partnerIds) };

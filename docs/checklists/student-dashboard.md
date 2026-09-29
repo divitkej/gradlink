@@ -6,7 +6,7 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 21 / 25 done, 4 need the live database or site
+## Progress: 22 / 25 done, 3 need the live database or site
 
 ## Before deploying
 
@@ -58,8 +58,8 @@ Status key as in `landing-page.md`.
 
 - [x] **Verified Coursera certificates and courses in progress.** Coursera has no API for a learner to share their own courses (its learner API is only for Coursera for Business and Campus customers), so students paste a certificate link and the Worker reads the facts from Coursera's public verify page: course, issuer, completion date and skills. The name on the certificate must match the student's GradLink name, and a certificate can sit on one account only. Courses in progress are checked against Coursera's catalog and shown as "Currently taking". The student picks which ones employers see, and can add the course's skills to their profile in one click. Tested against live coursera.org pages.
   `lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`, `components/scan/VerifiedCourses.tsx` · Done in "Verify Coursera certificates on the student profile"
-- [ ] **Coursera check from the deployed Worker.** Runs in Cloudflare's Workers engine (checked locally with `wrangler dev` against live coursera.org), the Cloudflare build succeeds, and parsing a certificate page costs under 1 ms of CPU. Still unproven: whether Coursera answers requests coming from Cloudflare's network. Add one real certificate on the live site; if Coursera refuses, the add shows "Coursera didn't respond".
-  Verify live
+- [x] **Coursera check from Cloudflare.** A temporary Worker running this code on Cloudflare's network (deployed, tested, then deleted) read real certificates, the course catalog and issuer names from coursera.org in under a second each. It also runs in the local Workers runtime, the Cloudflare build succeeds, and a certificate page costs under 1 ms of CPU to parse. A Coursera outage shows "Coursera didn't respond", never "no such course".
+  `lib/server/coursera.ts` · Done in "Tell a Coursera outage apart from a missing course"
 
 ## Employer privacy
 
