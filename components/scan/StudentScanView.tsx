@@ -10,7 +10,7 @@ import ViewerGate from "./ViewerGate";
 import { SectionCard, StatTile, FlagPill, ScoreRing, Avatar, TagRow, LoadingBlock, ErrorBlock } from "@/components/dashboard/cards";
 import { Button, Meter } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
-import {
+import { scanLabel,
   getStudentByProfile, getAnalytics, getScans, getShortlist, upsertShortlist, sendMessage,
   getRegisteredCompanies, recordScan, normalizeFeedback,
   type StudentRow, type AnalyticsRow, type ScanRow, type ShortlistRow, type CompanyRow,
@@ -65,7 +65,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
 
   // record the scan once for company / manager viewers
   useEffect(() => {
-    if (!viewer || !session || !student || scanned.current) return;
+    if (!viewer || !session || !student || !eventId || scanned.current) return;
     if (viewer === "company" || viewer === "event_manager") {
       scanned.current = true;
       recordScan({
@@ -149,7 +149,7 @@ function ResumeScore({ student }: { student: StudentRow }) {
   const evalr = evaluateResume(student);
   const tone = scoreTone(evalr.score);
   return (
-    <SectionCard title="AI resume score" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Auto-evaluated</span>}>
+    <SectionCard title="Resume score" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Auto-evaluated</span>}>
       <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
         <ScoreRing score={evalr.score} tone={tone} label="/ 100" />
         <div style={{ flex: 1, minWidth: 220 }}>
@@ -265,7 +265,7 @@ function CompanyView({
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {scanHistory.map((s) => (
               <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 12px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)" }}>
-                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{s.scan_context ?? "scan"}{s.notes ? ` · ${s.notes}` : ""}</span>
+                <span style={{ fontSize: 12.5, color: "var(--text-2)" }}>{scanLabel(s.scan_context)}{s.notes ? ` · ${s.notes}` : ""}</span>
                 <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{new Date(s.created_at).toLocaleString()}</span>
               </div>
             ))}
@@ -304,9 +304,9 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
     .slice(0, 3);
 
   const suggested =
-    companyScans === 0 ? "Nudge this student to visit booths — no company has scanned them yet."
+    companyScans === 0 ? "Nudge this student to visit booths. No company has scanned them yet."
     : resumeScore < 60 ? "Recommend a resume clinic before more recruiter meetings."
-    : engagement >= 75 ? "High performer — surface to top employers for fast-track interviews."
+    : engagement >= 75 ? "High performer. Surface to top employers for fast-track interviews."
     : "On track. Encourage follow-ups with scanned companies.";
 
   return (
@@ -352,7 +352,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
       )}
 
       {fb?.summary && (
-        <SectionCard title="AI resume feedback" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> AI</span>}>
+        <SectionCard title="Resume feedback" right={<span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}><Sparkles size={13} /> Rule-based</span>}>
           <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6 }}>{fb.summary}</p>
         </SectionCard>
       )}
@@ -371,7 +371,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
                 <div style={{ paddingBottom: 14 }}>
                   <div style={{ fontSize: 13, color: "var(--text)" }}>
                     {s.scanner_role === "event_manager" ? "Check-in / manager scan" : "Scanned by a company"}
-                    {s.scan_context ? ` · ${s.scan_context}` : ""}
+                    {` · ${scanLabel(s.scan_context)}`}
                   </div>
                   <div style={{ fontSize: 11.5, color: "var(--text-muted)", display: "inline-flex", alignItems: "center", gap: 5 }}>
                     <Eye size={11} /> {new Date(s.created_at).toLocaleString()}

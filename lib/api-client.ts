@@ -10,7 +10,7 @@
    ============================================================ */
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public code?: string) {
     super(message);
   }
 }
@@ -23,14 +23,14 @@ export async function api<T>(path: string, body?: unknown, init?: RequestInit): 
     body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
     ...init,
   });
-  const data = (await res.json().catch(() => ({}))) as T & { error?: string };
+  const data = (await res.json().catch(() => ({}))) as T & { error?: string; code?: string };
   if (res.status === 401 && !path.startsWith("/api/auth/")) {
     // The server session is gone (expired, signed out elsewhere, or a profile
     // cached from before the move to Neon). Drop the local copy so the
     // dashboards send the user to sign in instead of showing empty data.
     import("./session").then((m) => m.clearSession());
   }
-  if (!res.ok) throw new ApiError(res.status, data.error ?? `Request failed (${res.status})`);
+  if (!res.ok) throw new ApiError(res.status, data.error ?? `Request failed (${res.status})`, data.code);
   return data;
 }
 

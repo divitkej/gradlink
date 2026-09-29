@@ -27,7 +27,7 @@
   },
 
   // Résumés, brochures and logos (replaces Firebase Storage).
-  // Namespace created in the Cloudflare dashboard (Storage & Databases > KV).
+  // Namespace "UPLOADS" in the GradLink Cloudflare account.
   "kv_namespaces": [
     {
       "binding": "UPLOADS",
@@ -37,6 +37,9 @@
 
   // Non-secret configuration. APP_URL is optional — when empty, emailed links
   // use the origin of the request that triggered them.
+  // Account email (confirm your email, password reset) is paused: no sender
+  // is configured, so new accounts are confirmed on creation. To turn it on,
+  // add SMTP_USER here and the SMTP_PASS secret, or Resend (see README.md).
   "vars": {
     "APP_URL": ""
   },

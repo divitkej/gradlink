@@ -10,9 +10,9 @@ import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from ".
 import { Badge } from "@/components/ui/primitives";
 import QRCard from "./QRCard";
 import Checklist from "./Checklist";
+import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
 import EventForm from "@/components/events/EventForm";
-import { EVENT_STATUS_LABEL } from "@/lib/events";
 import { useSession, type AppRole } from "@/lib/session";
 import {
   getEvent, getRegisteredStudents, getRegisteredCompanies, getStudentByProfile, getCompanyByProfile,
@@ -148,7 +148,7 @@ function EventHeader({
             {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignSelf: "flex-start" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
           {canEdit && (
             <button
               onClick={() => setEditing(true)}
@@ -243,7 +243,9 @@ function Overview({ role, me, students, companies, analytics, eventId }: { role:
       </SectionCard>
       <SectionCard title="Students needing attention" hint="Low engagement">
         {analytics.filter((a) => a.engagement_score < 40).length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No students need attention right now.</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>
+            {students.length === 0 ? "No students have registered yet." : "No students need attention right now."}
+          </p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {analytics.filter((a) => a.engagement_score < 40).map((a) => {

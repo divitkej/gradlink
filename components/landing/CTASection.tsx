@@ -6,7 +6,7 @@ import { Button } from "../ui/primitives";
 import AnimatedTextCycle from "../anim/AnimatedTextCycle";
 import ParticleText from "../anim/ParticleText";
 
-const chips = ["Setup in 48 hours", "No contract lock-in", "Dedicated onboarding", "UAE data residency"];
+const chips = ["Setup in 48 hours", "No contract lock-in", "Dedicated onboarding", "Free for students and employers"];
 
 export default function CTASection() {
   return (

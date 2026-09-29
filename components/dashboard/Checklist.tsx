@@ -182,6 +182,8 @@ export default function Checklist({
     >
       {loading ? (
         <LoadingBlock label="Loading your checklist…" />
+      ) : items.length === 0 ? (
+        <p style={{ fontSize: 13, color: "var(--text-muted)" }}>This event has no checklist yet.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <Meter value={pct} tone="var(--accent-2)" />
