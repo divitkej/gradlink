@@ -5,12 +5,12 @@ import { myCollegeDomain, type DomainStatus } from "@/lib/college-domains";
 import { OPERATOR } from "@/lib/site";
 
 const COPY: Record<DomainStatus, (d: string) => string> = {
-  pending: (d) => `Your college domain @${d} is being reviewed. Students with @${d} addresses can sign up once it's approved. Employers and events are unaffected.`,
+  pending: (d) => `Your students' email domain @${d} is being reviewed. Students with @${d} addresses can sign up once it's approved. Employers and events are unaffected.`,
   approved: (d) => `@${d} is approved. Students with @${d} addresses can sign up.`,
   rejected: (d) => `@${d} wasn't approved, so students can't sign up with it. Email ${OPERATOR.email} from your official address to have it reviewed again.`,
 };
 
-/** Shows a college whether its email domain is approved for student sign-up. */
+/** Shows a college whether its students' email domain is approved for sign-up. */
 export default function CollegeDomainNotice() {
   const [reg, setReg] = useState<{ domain: string; status: DomainStatus } | null>(null);
 

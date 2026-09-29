@@ -5,7 +5,7 @@ import { currentUser, sessionCookie, clearedSessionCookie } from "./session";
 import { HttpError, json } from "./http";
 import { emailEnabled, sendEmail } from "./mail";
 import { LIMITS, assertUnderLimit, recordHit, takeHit } from "./rate-limit";
-import { checkSignUpEmail, collegeDomainRequest, type SignUpRole } from "./college-domains";
+import { checkSignUpEmail, collegeDomainRequest, studentDomainFromSample, type SignUpRole } from "./college-domains";
 import type { AppRole } from "../session";
 
 /* ============================================================
@@ -109,6 +109,8 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   if (!validEmail(email)) throw new HttpError(400, MSG.badEmail);
   if (!validPassword(body.password)) throw new HttpError(400, MSG.weak);
   await checkSignUpEmail(role, email);
+  // Colleges say what their students' emails look like; that domain is what gets approved.
+  const studentDomain = role === "college" ? studentDomainFromSample(str(body.studentEmail, 320)) : null;
 
   const sql = db();
   const taken = await sql`select 1 from auth_credentials where email_lower = ${emailLower}`;
@@ -124,12 +126,12 @@ async function signUp(request: Request, body: Body): Promise<Response> {
       ? sql`insert into students (id, profile_id, full_name, email, university) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`
       : role === "company"
         ? sql`insert into companies (id, profile_id, full_name, email, company) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`
-        : sql`insert into colleges (id, profile_id, full_name, email, institution) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`;
+        : sql`insert into colleges (id, profile_id, full_name, email, institution, student_domain) values (${id}, ${id}, ${fullName}, ${email}, ${organization}, ${studentDomain})`;
 
   // No email provider means no way to confirm, so the account starts confirmed.
   const confirmNow = !emailEnabled();
-  // A college's email domain joins the owner's approval queue with the account.
-  const domainRequest = role === "college" ? await collegeDomainRequest(email, organization, id) : null;
+  // A college's student domain joins the owner's approval queue with the account.
+  const domainRequest = studentDomain ? await collegeDomainRequest(studentDomain, organization, id) : null;
 
   try {
     // One transaction, so a failure can no longer leave a half-created account.

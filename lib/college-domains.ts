@@ -3,8 +3,9 @@
 import { api } from "./api-client";
 
 /* ============================================================
-   College email domains. Students can only sign up with an address
-   on a domain the owner approved at /admin/colleges.
+   Student email domains that colleges register at sign-up. Students
+   can only sign up with an address on a domain the owner approved at
+   /admin/colleges.
    ============================================================ */
 
 export type DomainStatus = "pending" | "approved" | "rejected";
@@ -14,6 +15,8 @@ export interface CollegeDomain {
   institution: string;
   status: DomainStatus;
   requested_by_email: string | null;
+  /** Whether the requester's own email is on the same organisation's domain. */
+  staff_domain_matches: boolean;
   created_at: string;
   decided_at: string | null;
 }

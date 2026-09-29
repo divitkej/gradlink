@@ -1,18 +1,21 @@
 import { db } from "./sql";
 import { serverEnv } from "./env";
 import { HttpError } from "./http";
-import { domainWithin, emailDomain, isBlockedDomain } from "./email-domains";
+import { domainWithin, emailDomain, isBlockedDomain, isSharedSuffix, sameOrganisation } from "./email-domains";
 import type { AuthUser } from "./session";
 
 /* ============================================================
    Who may sign up with which email.
 
-   Colleges register their email domain (for example ku.ac.ae) and the
-   owner approves it at /admin/colleges. Students can only sign up with an
-   address on an approved domain or one of its subdomains, so every
-   student account belongs to a known institution. Employers use any
-   work domain that is not personal, throwaway or an approved college.
-   Emails in ADMIN_EMAILS skip these rules so the owner can always get in.
+   A college signs up with its staff email and a sample of what its
+   students' emails look like (f20250409@dubai.bits-pilani.ac.in). The
+   domain of the sample (dubai.bits-pilani.ac.in) is the student domain,
+   and it waits for the owner to approve it at /admin/colleges, because
+   staff and students often use different domains. Students can only sign
+   up on an approved student domain or one of its subdomains, so every
+   student account belongs to a known institution. Employers use any work
+   domain that is not personal, throwaway or an approved student domain.
+   Emails in ADMIN_EMAILS skip the email rules so the owner can always get in.
    ============================================================ */
 
 export type DomainStatus = "pending" | "approved" | "rejected";
@@ -23,6 +26,8 @@ export interface CollegeDomain {
   institution: string;
   status: DomainStatus;
   requested_by_email: string | null;
+  /** Whether the requester's own email is on the same organisation's domain. */
+  staff_domain_matches: boolean;
   created_at: string;
   decided_at: string | null;
 }
@@ -32,7 +37,13 @@ const MSG = {
   studentPending: "Your university has applied to join GradLink and is being reviewed. You can sign up once it's approved.",
   studentUnknown: "Your university isn't on GradLink yet. Ask your careers office to register, then sign up with your university email.",
   companyIsCollege: "That's a university email address. Sign up as a student or college instead, or use your company email.",
+  sampleMissing: "Enter an example of your students' email addresses, like f20250409@dubai.bits-pilani.ac.in.",
+  samplePersonal: "Your students' example email must be on your institution's domain, not a personal one like Gmail.",
+  sampleShared: "That example email's domain is shared by many institutions. Use your students' full email domain, like dubai.bits-pilani.ac.in.",
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DOMAIN_RE = /^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
@@ -48,7 +59,7 @@ export function requireAdmin(u: AuthUser | null): asserts u is AuthUser {
 /** The approved or pending registration covering `domain`, most specific first. */
 async function registrationFor(domain: string): Promise<{ domain: string; status: DomainStatus } | null> {
   const labels = domain.split(".");
-  // Every parent of the domain down to two labels: student.ku.ac.ae, ku.ac.ae, ac.ae.
+  // Every parent of the domain down to two labels: dubai.bits-pilani.ac.in, bits-pilani.ac.in, ac.in.
   const candidates = labels.slice(0, -1).map((_, i) => labels.slice(i).join("."));
   const rows = await db()`
     select domain, status from college_domains
@@ -58,6 +69,20 @@ async function registrationFor(domain: string): Promise<{ domain: string; status
   const approved = rows.find((r) => r.status === "approved");
   const hit = approved ?? rows[0];
   return hit ? { domain: hit.domain as string, status: hit.status as DomainStatus } : null;
+}
+
+/**
+ * The student domain from a college's example student email, or a message
+ * the person can act on. Only the part after the @ is kept.
+ */
+export function studentDomainFromSample(sample: string): string {
+  const s = sample.trim();
+  if (!s || !EMAIL_RE.test(s)) throw new HttpError(400, MSG.sampleMissing);
+  const domain = emailDomain(s);
+  if (!DOMAIN_RE.test(domain)) throw new HttpError(400, MSG.sampleMissing);
+  if (isBlockedDomain(domain)) throw new HttpError(400, MSG.samplePersonal);
+  if (isSharedSuffix(domain)) throw new HttpError(400, MSG.sampleShared);
+  return domain;
 }
 
 /** Throws a message the person can act on when this role can't use this email. */
@@ -78,23 +103,21 @@ export async function checkSignUpEmail(role: SignUpRole, email: string): Promise
 }
 
 /**
- * The insert that queues a college's domain for approval, to run inside the
- * sign-up transaction; null when there is nothing to queue (the owner, or a
- * domain already covered by an approved parent such as staff.ku.ac.ae under
- * ku.ac.ae). A domain already pending (a second staff member signing up) is
- * left as it is; a rejected one goes back to pending so the owner sees it.
+ * The insert that queues a college's student domain for approval, to run
+ * inside the sign-up transaction; null when the domain is already covered
+ * by an approved registration. A domain already pending (a second staff
+ * member signing up) is left as it is; a rejected one goes back to pending
+ * so the owner sees the new request.
  *
  * Wrapped in an object on purpose: a query is a thenable, so returning it
  * bare from an async function would run it straight away, outside the
  * transaction.
  */
-export async function collegeDomainRequest(email: string, institution: string, profileId: string) {
-  if (isAdminEmail(email)) return null;
-  const domain = emailDomain(email);
-  if ((await registrationFor(domain))?.status === "approved") return null;
+export async function collegeDomainRequest(studentDomain: string, institution: string, profileId: string) {
+  if ((await registrationFor(studentDomain))?.status === "approved") return null;
   const query = db()`
     insert into college_domains (domain, institution, requested_by)
-    values (${domain}, ${institution || domain}, ${profileId})
+    values (${studentDomain}, ${institution || studentDomain}, ${profileId})
     on conflict (domain) do update set
       status = 'pending', institution = excluded.institution, requested_by = excluded.requested_by,
       created_at = now(), decided_at = null
@@ -103,12 +126,14 @@ export async function collegeDomainRequest(email: string, institution: string, p
   return { query };
 }
 
-/** The registration a college account's email falls under, for its dashboard notice. */
-export async function domainStatusFor(email: string): Promise<{ domain: string; status: DomainStatus } | null> {
-  const domain = emailDomain(email);
+/** A college account's student domain and its approval, for its dashboard notice. */
+export async function domainStatusFor(profileId: string): Promise<{ domain: string; status: DomainStatus } | null> {
+  const rows = await db()`select student_domain from colleges where profile_id = ${profileId}`;
+  const domain = rows[0]?.student_domain as string | null | undefined;
+  if (!domain) return null;
   const reg = await registrationFor(domain);
   if (reg) return reg;
-  const rejected = await db()`select domain from college_domains where domain = ${domain} and status = 'rejected'`;
+  const rejected = await db()`select 1 from college_domains where domain = ${domain} and status = 'rejected'`;
   return rejected.length ? { domain, status: "rejected" } : null;
 }
 
@@ -118,22 +143,17 @@ export async function listCollegeDomains(): Promise<CollegeDomain[]> {
     from college_domains d left join profiles p on p.id = d.requested_by
     order by (d.status = 'pending') desc, d.created_at desc
   `;
-  return rows as unknown as CollegeDomain[];
-}
-
-const DOMAIN_RE = /^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
-
-/** Shared suffixes like ac.ae or edu.in: approving one would admit every institution under it. */
-const SHARED_SECOND_LEVEL = new Set(["ac", "edu", "co", "com", "org", "net", "gov", "gob", "sch", "res", "mil", "nic", "govt"]);
-function isSharedSuffix(domain: string): boolean {
-  const labels = domain.split(".");
-  return labels.length < 2 || (labels.length === 2 && SHARED_SECOND_LEVEL.has(labels[0]));
+  return rows.map((r) => ({
+    ...(r as unknown as Omit<CollegeDomain, "staff_domain_matches">),
+    staff_domain_matches: !!r.requested_by_email && sameOrganisation(emailDomain(r.requested_by_email as string), r.domain as string),
+  }));
 }
 
 /**
  * Approve or reject a request. `approveAs` lets the owner widen a request to
- * its parent, for example staff.ku.ac.ae to ku.ac.ae, so students on any
- * subdomain of the university can sign up.
+ * a parent domain, for example staff.ku.ac.ae to ku.ac.ae. Widening admits
+ * every subdomain, so for a multi-campus university it also admits the
+ * other campuses.
  */
 export async function decideCollegeDomain(domain: string, action: "approve" | "reject", approveAs?: string): Promise<void> {
   const from = domain.trim().toLowerCase();

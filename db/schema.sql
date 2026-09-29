@@ -91,9 +91,9 @@ create table if not exists email_verification_tokens (
 );
 create index if not exists email_verification_tokens_profile_idx on email_verification_tokens (profile_id);
 
--- Email domains colleges sign up with, approved by the owner at
--- /admin/colleges. Students can only sign up with an address on an approved
--- domain or one of its subdomains (lib/server/college-domains.ts).
+-- Student email domains colleges register at sign-up, approved by the owner
+-- at /admin/colleges. Students can only sign up with an address on an
+-- approved domain or one of its subdomains (lib/server/college-domains.ts).
 create table if not exists college_domains (
   domain        text primary key,
   institution   text not null,
@@ -154,6 +154,9 @@ create table if not exists colleges (
   institution  text
 );
 create index if not exists colleges_email_lower_idx on colleges (lower(email));
+-- The domain of the example student email given at sign-up
+-- (dubai.bits-pilani.ac.in); its approval is in college_domains.
+alter table colleges add column if not exists student_domain text;
 
 -- ---------------------------------------------------------------- events --
 create table if not exists events (

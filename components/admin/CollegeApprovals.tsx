@@ -42,11 +42,16 @@ function Row({ d, busy, onDecide }: {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", overflowWrap: "anywhere" }}>{d.institution}</div>
-          <div style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2, overflowWrap: "anywhere" }}>@{d.domain}</div>
+          <div style={{ fontSize: 13, color: "var(--text-2)", marginTop: 2, overflowWrap: "anywhere" }}>Students: @{d.domain}</div>
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, overflowWrap: "anywhere" }}>
             {`Requested ${fmtDate(d.created_at)}${d.requested_by_email ? ` by ${d.requested_by_email}` : ""}`}
             {d.decided_at ? ` · ${s.label} ${fmtDate(d.decided_at)}` : ""}
           </div>
+          {d.requested_by_email && !d.staff_domain_matches && d.status === "pending" && (
+            <div style={{ fontSize: 12, color: "var(--amber)", marginTop: 4 }}>
+              The staff email is on a different domain from the students. Check this college is who it says before approving.
+            </div>
+          )}
         </div>
         <Badge tone={s.tone}>{s.label}</Badge>
       </div>
@@ -133,7 +138,7 @@ export default function CollegeApprovals() {
         {notice && <div role="status" style={{ fontSize: 13.5, color: "var(--text)", padding: "12px 14px", border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)" }}>{notice}</div>}
         <SectionCard title={`Waiting for approval (${pending.length})`}>
           <p style={{ fontSize: 13, lineHeight: 1.5, color: "var(--text-muted)", marginBottom: 4 }}>
-            Approve a domain to let its students sign up. Widen it to the university&apos;s main domain (for example ku.ac.ae) so every subdomain is covered.
+            Approving a domain lets students with that email sign up. Approve it exactly as given unless you are sure: widening dubai.bits-pilani.ac.in to bits-pilani.ac.in would also admit the other campuses.
           </p>
           {pending.length === 0
             ? <p style={{ fontSize: 13.5, color: "var(--text-muted)" }}>No colleges are waiting.</p>

@@ -50,3 +50,28 @@ export function isBlockedDomain(domain: string): boolean {
   }
   return false;
 }
+
+/** Second-level labels shared by many organisations: ac.ae, edu.in, co.uk. */
+const SHARED_SECOND_LEVEL = new Set(["ac", "edu", "co", "com", "org", "net", "gov", "gob", "sch", "res", "mil", "nic", "govt"]);
+
+/**
+ * A suffix used by many institutions (ac.ae, edu.in) or a bare top-level
+ * domain. Approving one would admit every institution under it.
+ */
+export function isSharedSuffix(domain: string): boolean {
+  const labels = domain.split(".");
+  return labels.length < 2 || (labels.length === 2 && SHARED_SECOND_LEVEL.has(labels[0]));
+}
+
+/**
+ * Whether two domains belong to the same organisation: they share a parent
+ * that is not a shared suffix. bits-pilani.ac.in and dubai.bits-pilani.ac.in
+ * match; ku.ac.ae and zu.ac.ae only share ac.ae, so they don't.
+ */
+export function sameOrganisation(a: string, b: string): boolean {
+  const x = a.split(".").reverse();
+  const y = b.split(".").reverse();
+  const common: string[] = [];
+  for (let i = 0; i < Math.min(x.length, y.length) && x[i] === y[i]; i++) common.unshift(x[i]);
+  return common.length >= 2 && !isSharedSuffix(common.join("."));
+}

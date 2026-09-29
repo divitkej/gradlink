@@ -35,7 +35,7 @@ const ROLE_CONFIG: Record<Role, {
   college: {
     badge: "College / Event host", icon: Briefcase, accent: "var(--amber)",
     orgLabel: "Institution / Organization name", orgPlaceholder: "Your career centre or organisation", orgIcon: Building2,
-    emailPlaceholder: "you@institution.ac.ae", emailNote: "Use your official institution email. We review your domain before your students can sign up.",
+    emailPlaceholder: "you@institution.ac.ae", emailNote: "Use your official institution email. Personal addresses like Gmail or Outlook are not accepted.",
     subtitle: "Run events, track engagement, and prove outcomes.", label: "college / event host",
   },
 };
@@ -80,6 +80,11 @@ export default function SignUpForm({ role }: { role: Role }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [org, setOrg] = useState("");
+  // Colleges only: what one of their students' emails looks like.
+  const [studentEmail, setStudentEmail] = useState("");
+  const isCollege = role === "college";
+  const at = studentEmail.lastIndexOf("@");
+  const studentDomain = at > 0 ? studentEmail.slice(at + 1).trim().toLowerCase() : "";
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -96,7 +101,7 @@ export default function SignUpForm({ role }: { role: Role }) {
       : { busy: false, msg: res.error ?? "Couldn't send the email. Please try again.", error: true });
   }
 
-  const canSubmit = fullName.trim() && email.trim() && org.trim() && passwordIsStrong(password) && !submitting;
+  const canSubmit = fullName.trim() && email.trim() && org.trim() && (!isCollege || studentDomain.includes(".")) && passwordIsStrong(password) && !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -106,7 +111,7 @@ export default function SignUpForm({ role }: { role: Role }) {
       return;
     }
     setSubmitting(true);
-    const res = await signUpUser({ role, fullName, email, password, organization: org });
+    const res = await signUpUser({ role, fullName, email, password, organization: org, ...(isCollege ? { studentEmail } : {}) });
     if (res.ok && res.verify) {
       setSubmitting(false);
       setCheckEmail({ email: email.trim(), sent: Boolean(res.sent) });
@@ -203,6 +208,16 @@ export default function SignUpForm({ role }: { role: Role }) {
             {c.emailNote}
           </p>
         </div>
+        {isCollege && (
+          <div>
+            <Field id="studentEmail" label="Student email example" type="email" placeholder="f20250409@dubai.bits-pilani.ac.in" icon={<GraduationCap size={16} />} value={studentEmail} onChange={setStudentEmail} autoComplete="off" />
+            <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 7 }}>
+              {studentDomain.includes(".")
+                ? `Students with @${studentDomain} addresses can sign up once GradLink approves your college.`
+                : "What one of your students' email addresses looks like. It can be made up; we only use the part after the @."}
+            </p>
+          </div>
+        )}
         <div>
           <Field id="password" label="Password" type="password" placeholder="Create a strong password" icon={<Lock size={16} />} value={password} onChange={setPassword} autoComplete="new-password" />
           <PasswordChecklist value={password} />
