@@ -11,7 +11,7 @@ import { CalendarDays, MapPin, ArrowRight, Plus, Ticket } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { EVENT_STATUS_LABEL, type EventRow } from "@/lib/events";
-import CreateEventForm from "@/components/events/CreateEventForm";
+import EventForm from "@/components/events/EventForm";
 import JoinCode from "@/components/events/JoinCode";
 import JoinEventForm from "@/components/events/JoinEventForm";
 
@@ -148,7 +148,7 @@ export default function EventsPage() {
             accent="var(--border-strong)"
           >
             {isManager ? (
-              <CreateEventForm onCreated={() => setShowForm(false)} />
+              <EventForm onCreated={() => setShowForm(false)} />
             ) : (
               <JoinEventForm onJoined={() => setShowForm(false)} />
             )}

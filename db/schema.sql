@@ -195,6 +195,9 @@ create table if not exists shortlists (
 );
 create index if not exists shortlists_student_idx on shortlists (event_id, student_id);
 
+-- Historical counters from the Supabase and Firebase eras. Nothing writes
+-- here any more: lib/server/rpc.ts computes each student's stats from scans,
+-- shortlists and messages when they are read. Kept so imported rows survive.
 create table if not exists student_event_analytics (
   id                 text primary key default gen_random_uuid()::text,
   created_at         timestamptz not null default now(),

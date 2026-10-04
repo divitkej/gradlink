@@ -14,7 +14,6 @@ import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { scanLabel,
   getStudentByProfile, getScans, getRegisteredCompanies, listShortlistsForStudent,
-  getChecklistItems, getChecklistProgress,
   type StudentRow, type ScanRow, type CompanyRow, type ShortlistRow,
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
@@ -29,6 +28,8 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
+  // Reported by the checklist below, so the tile always matches what it shows,
+  // including items it auto-ticks from real activity.
   const [readiness, setReadiness] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -36,21 +37,18 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [m, sc, co, sl, items, prog] = await Promise.all([
+      setReadiness(0);
+      const [m, sc, co, sl] = await Promise.all([
         getStudentByProfile(profileId),
         getScans({ eventId, scannedProfileId: profileId }),
         getRegisteredCompanies(eventId),
         listShortlistsForStudent(profileId, eventId),
-        getChecklistItems("student", eventId),
-        getChecklistProgress(profileId),
       ]);
       if (cancelled) return;
       setMe(m);
       setScans(sc);
       setCompanies(co);
       setShortlists(sl);
-      const done = items.filter((i) => prog[i.id]).length;
-      setReadiness(items.length ? Math.round((done / items.length) * 100) : 0);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -126,7 +124,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
 
       {/* Checklist + Resume analysis */}
       <div className="dash-2col" id="checklist" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Checklist role="student" profileId={profileId} eventId={eventId} />
+        <Checklist role="student" profileId={profileId} eventId={eventId} onProgress={setReadiness} />
 
         <SectionCard
           title="Resume analysis"
