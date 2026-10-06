@@ -502,6 +502,36 @@ export const ops: Record<string, Op> = {
     if (u.role !== "company") throw forbidden();
     return upsertRoleRow("companies", COMPANY_FIELDS, u.id, fields);
   },
+
+  /* Colleges: their own name and organisation, as set at sign-up. */
+  async getCollegeProfile(u) {
+    if (u.role !== "event_manager") throw forbidden();
+    const rows = await db()`select full_name, organization from profiles where id = ${u.id}`;
+    return rows[0] ?? null;
+  },
+  /**
+   * Renames the college, and the name on its student-domain request. The
+   * organisation is copied onto events as host_org when they are created, so
+   * this college's events that still carry the old name follow the change.
+   */
+  async updateCollegeProfile(u, [fields]) {
+    if (u.role !== "event_manager") throw forbidden();
+    const f = (fields ?? {}) as Row;
+    const fullName = s(f.full_name).trim().slice(0, 200);
+    const organization = s(f.organization).trim().slice(0, 300);
+    if (!fullName) throw new HttpError(400, "Enter your full name.");
+    if (!organization) throw new HttpError(400, "Enter your college or organisation name.");
+    const sql = db();
+    const [before] = await sql`select organization from profiles where id = ${u.id}`;
+    await sql.transaction([
+      sql`update profiles set full_name = ${fullName}, organization = ${organization} where id = ${u.id}`,
+      sql`update colleges set full_name = ${fullName}, institution = ${organization} where profile_id = ${u.id}`,
+      sql`update college_domains set institution = ${organization} where requested_by = ${u.id}`,
+      sql`update events set host_org = ${organization}
+          where created_by = ${u.id} and host_org is not distinct from ${(before?.organization as string | null) ?? null}`,
+    ]);
+    return { full_name: fullName, organization };
+  },
   async getRegisteredCompanies(u, [eventId]) {
     await requireMember(u, eventId);
     return db().query(

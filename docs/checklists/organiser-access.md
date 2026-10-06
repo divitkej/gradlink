@@ -6,7 +6,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Harness check" means the real `lib/server/rpc.ts` ops run against Postgres 16 with `db/schema.sql` applied. "Browser check" means the real app driven in Chromium against that database.
 
-## Progress: 7 / 9 done, 2 need the owner
+## Progress: 10 / 10 done
 
 ## Built
 
@@ -21,12 +21,14 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 - [x] **Colleges choose a plan after signing in.** The first time a college account opens its dashboard it must pick Starter or Placement Pro. Pro goes to Stripe Checkout; choosing Pro does not unlock anything until Stripe confirms payment. A college that already pays is not asked. Harness and browser check.
   Done in "Add separate student and employer codes, plan choice and owner dashboard"
 - [x] **Owner dashboard at `/admin`.** Site health (database response time, server errors in the last hour and day, scans in the last hour), events happening now with scans in the last 15 minutes and a warning when a live event goes quiet for 20 minutes, totals, and every college with its plan and every event's dates, location, both codes and activity. Refreshes every 30 seconds while visible. Anyone not listed in `ADMIN_EMAILS` sees "Page not found". Server errors (500s) are now saved to `app_errors` for this page. Harness and browser check.
+
+- [x] **Colleges can fix their name.** College Profile (`/dashboard/profile`, in the sidebar) edits the person's name and the college or organisation name. The new name also goes on the college's domain request and on its events that still show the old name. College accounts only. Done in "Let colleges edit their organisation name".
   Done in "Add separate student and employer codes, plan choice and owner dashboard"
 
 ## Owner actions before deploying
 
-- [ ] **Run the migration before deploying this code.** `npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.
-- [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away.** `npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.
+- [x] **Run the migration before deploying this code.** `npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once. Done: production has every table and column in `db/schema.sql` (checked 6 Oct).
+- [x] **Set `ADMIN_EMAILS`, then sign up with that email straight away.** `npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages. Done 6 Oct: set on the `gradlink` Worker and the owner account created.
 - [x] **Starter promised one live event but nothing enforced it.** Decided to change the wording rather than add a limit: Starter now lists "Unlimited events", and "Unlimited events" is no longer sold as a Pro feature on the pricing page, the plan picker, the outcome report upsell or the pricing page description.
   `lib/billing.ts`, `components/dashboard/OutcomeReportCard.tsx`, `app/pricing/page.tsx` · Done in "Say Starter includes unlimited events"
 

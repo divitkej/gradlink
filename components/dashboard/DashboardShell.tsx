@@ -67,6 +67,7 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Employers", href: "/dashboard/event-manager#employers", icon: Briefcase },
     { label: "Analytics", href: "/dashboard/event-manager#analytics", icon: BarChart3 },
     { label: "Scan Monitor", href: "/dashboard/event-manager#scans", icon: History },
+    { label: "College Profile", href: "/dashboard/profile", icon: UserCircle },
     { label: "Manual", href: "/dashboard/event-manager#manual", icon: BookOpen },
   ],
   };

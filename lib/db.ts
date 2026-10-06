@@ -269,6 +269,21 @@ export function updateCompanyProfile(profileId: string, fields: Partial<CompanyR
   return safe("updateCompanyProfile", false, () => rpc<boolean>("updateCompanyProfile", profileId, fields));
 }
 
+export interface CollegeProfile { full_name: string; organization: string | null }
+
+export function getCollegeProfile(): Promise<CollegeProfile | null> {
+  return safe("getCollegeProfile", null, () => rpc<CollegeProfile | null>("getCollegeProfile"));
+}
+
+/** Returns the saved profile, or an error message to show. */
+export async function updateCollegeProfile(fields: { full_name: string; organization: string }): Promise<{ ok: true; profile: CollegeProfile } | { ok: false; error: string }> {
+  try {
+    return { ok: true, profile: await rpc<CollegeProfile>("updateCollegeProfile", fields) };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error && e.message ? e.message : "Couldn't save, please try again." };
+  }
+}
+
 export function getRegisteredCompanies(eventId: string): Promise<CompanyRow[]> {
   return safe("getRegisteredCompanies", [], () => rpc<CompanyRow[]>("getRegisteredCompanies", eventId));
 }
