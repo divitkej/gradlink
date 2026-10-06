@@ -30,6 +30,8 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `docs/checklists/` | Live launch checklists, one file per area |
 | `docs/brand/` | Sources for the share images and icons in `app/` |
 | `docs/archive/` | Historical material, never imported or deployed |
+| `launch-board/` | Launch board generated from `docs/checklists/` by `launch-board/generate.mjs`. Edit `generate.mjs` or `template.html`, never the generated files |
+| `.github/workflows/` | GitHub Actions. `launch-board.yml` rebuilds `launch-board/` on `main` |
 | `migration/` | One-off data migration scripts and exports |
 | `vercel.json` | Redirect-only config for the retired Vercel project; the app deploys to Cloudflare |
 

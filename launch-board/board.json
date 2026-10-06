@@ -133,6 +133,98 @@
       }
     }
   ],
+  "phases": [
+    {
+      "key": "1",
+      "name": "Phase 1: Core loop",
+      "goal": "Create or join an event, open it, work the checklist, edit the event, with the access checks behind it.",
+      "total": 16,
+      "counts": {
+        "in_progress": 0,
+        "owner": 1,
+        "todo": 0,
+        "verify": 0,
+        "parked": 0,
+        "done": 15
+      },
+      "status": "Ongoing"
+    },
+    {
+      "key": "2",
+      "name": "Phase 2: Dead and misleading UI",
+      "goal": "Every visible button works, nothing claims what the app does not do.",
+      "total": 14,
+      "counts": {
+        "in_progress": 0,
+        "owner": 1,
+        "todo": 3,
+        "verify": 0,
+        "parked": 1,
+        "done": 9
+      },
+      "status": "Ongoing"
+    },
+    {
+      "key": "3",
+      "name": "Phase 3: Launch readiness",
+      "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
+      "total": 46,
+      "counts": {
+        "in_progress": 0,
+        "owner": 15,
+        "todo": 0,
+        "verify": 0,
+        "parked": 1,
+        "done": 30
+      },
+      "status": "Ongoing"
+    },
+    {
+      "key": "4",
+      "name": "Phase 4: Polish and SEO",
+      "goal": "Search basics, confirmations, redirects and live updates.",
+      "total": 5,
+      "counts": {
+        "in_progress": 0,
+        "owner": 0,
+        "todo": 4,
+        "verify": 0,
+        "parked": 0,
+        "done": 1
+      },
+      "status": "Ongoing"
+    },
+    {
+      "key": "5",
+      "name": "Phase 5: Product build-out",
+      "goal": "Organiser access, the full student dashboard and the features the site promises.",
+      "total": 48,
+      "counts": {
+        "in_progress": 0,
+        "owner": 2,
+        "todo": 6,
+        "verify": 2,
+        "parked": 0,
+        "done": 38
+      },
+      "status": "Ongoing"
+    },
+    {
+      "key": "test",
+      "name": "Test pass",
+      "goal": "Features that should work, checked once on a real device or the live site.",
+      "total": 8,
+      "counts": {
+        "in_progress": 0,
+        "owner": 0,
+        "todo": 0,
+        "verify": 2,
+        "parked": 0,
+        "done": 6
+      },
+      "status": "Ongoing"
+    }
+  ],
   "items": [
     {
       "area": "launch",
@@ -143,6 +235,7 @@
       "detail": "The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed. Owner action",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/cloudflare-github-builds-fail-on-every"
     },
     {
@@ -154,6 +247,7 @@
       "detail": "`https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it). Owner action",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/old-vercel-site-still-live"
     },
     {
@@ -165,6 +259,7 @@
       "detail": "Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action, then `wrangler.jsonc`",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/custom-domain"
     },
     {
@@ -176,6 +271,7 @@
       "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sending through `divitkej@gmail.com` is paused by decision, so no sender is configured: accounts are confirmed on creation and \"Forgot password\" says it is not set up. To turn it on, pick a sender (a dedicated Gmail with an app password as `SMTP_USER` + `SMTP_PASS`, or Resend once the domain exists), then add it to the Privacy Policy's list of services. Done in \"Send account email through Gmail and require email confirmation\" · Paused in \"Pause account email from the personal Gmail\"",
       "state": "owner",
       "doneIn": "Send account email through Gmail and require email confirmation",
+      "phase": "3",
       "id": "launch/account-email-confirm-email-and-password"
     },
     {
@@ -187,6 +283,7 @@
       "detail": "Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under old rules. Owner action: in the Firebase console, delete the Firestore data and Storage files (the export is in `migration/data/`), or deploy deny-all rules, or delete the project. `docs/archive/firebase-legacy/firestore.rules` · Verify live · Needs the owner",
       "state": "owner",
       "doneIn": null,
+      "phase": "1",
       "id": "core-loop/live-rules-match-the-repo"
     },
     {
@@ -198,6 +295,7 @@
       "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.",
       "state": "owner",
       "doneIn": null,
+      "phase": "5",
       "id": "organiser-access/run-the-migration-before-deploying-this"
     },
     {
@@ -209,6 +307,7 @@
       "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.",
       "state": "owner",
       "doneIn": null,
+      "phase": "5",
       "id": "organiser-access/set-admin-emails-then-sign-up"
     },
     {
@@ -220,6 +319,7 @@
       "detail": "Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging. Owner decision",
       "state": "owner",
       "doneIn": null,
+      "phase": "2",
       "id": "dashboard/several-claude-sessions-deploy-to-the"
     },
     {
@@ -231,6 +331,7 @@
       "detail": "in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/set-app-url"
     },
     {
@@ -242,6 +343,7 @@
       "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/run-npm-run-db-migrate"
     },
     {
@@ -253,6 +355,7 @@
       "detail": "add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/optional-after-the-custom-domain-is"
     },
     {
@@ -264,6 +367,7 @@
       "detail": "In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/least-privilege-database-role"
     },
     {
@@ -275,6 +379,7 @@
       "detail": "Confirm Neon's restore window covers at least 7 days.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/backups"
     },
     {
@@ -286,6 +391,7 @@
       "detail": "Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/secrets"
     },
     {
@@ -297,6 +403,7 @@
       "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). Still open: confirming the email itself needs a sender (see `launch.md`, account email), and a college whose domain is still pending can already create events.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/account-verification"
     },
     {
@@ -308,6 +415,7 @@
       "detail": "after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "security/verify-live"
     },
     {
@@ -319,6 +427,7 @@
       "detail": "Where: CTA section",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "features-to-build/setup-in-48-hours"
     },
     {
@@ -330,6 +439,7 @@
       "detail": "Where: CTA section",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "features-to-build/no-contract-lock-in"
     },
     {
@@ -341,6 +451,7 @@
       "detail": "Where: CTA section",
       "state": "owner",
       "doneIn": null,
+      "phase": "3",
       "id": "features-to-build/dedicated-onboarding"
     },
     {
@@ -349,9 +460,10 @@
       "section": "Pricing",
       "line": 19,
       "title": "\"Start free\" does nothing",
-      "detail": "`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button",
+      "detail": "`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2",
       "state": "todo",
       "doneIn": null,
+      "phase": "2",
       "id": "audit-follow-ups/start-free-does-nothing"
     },
     {
@@ -360,9 +472,10 @@
       "section": "Pricing",
       "line": 21,
       "title": "No message after Stripe checkout",
-      "detail": "Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way. `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial",
+      "detail": "Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way. `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4",
       "state": "todo",
       "doneIn": null,
+      "phase": "4",
       "id": "audit-follow-ups/no-message-after-stripe-checkout"
     },
     {
@@ -371,9 +484,10 @@
       "section": "Navigation",
       "line": 26,
       "title": "College sidebar has no Messages or Profile link",
-      "detail": "Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial",
+      "detail": "Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial · Phase 2",
       "state": "todo",
       "doneIn": null,
+      "phase": "2",
       "id": "audit-follow-ups/college-sidebar-has-no-messages-or"
     },
     {
@@ -382,9 +496,10 @@
       "section": "Navigation",
       "line": 28,
       "title": "Scan history is not linked anywhere",
-      "detail": "`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial",
+      "detail": "`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2",
       "state": "todo",
       "doneIn": null,
+      "phase": "2",
       "id": "audit-follow-ups/scan-history-is-not-linked-anywhere"
     },
     {
@@ -393,9 +508,10 @@
       "section": "Sign in",
       "line": 33,
       "title": "Signed-in people can still open the sign-in page",
-      "detail": "`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial",
+      "detail": "`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
       "state": "todo",
       "doneIn": null,
+      "phase": "4",
       "id": "audit-follow-ups/signed-in-people-can-still-open-the"
     },
     {
@@ -404,9 +520,10 @@
       "section": "Sign in",
       "line": 35,
       "title": "Signing in from a scanned QR loses the profile",
-      "detail": "The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial",
+      "detail": "The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
       "state": "todo",
       "doneIn": null,
+      "phase": "4",
       "id": "audit-follow-ups/signing-in-from-a-scanned-qr"
     },
     {
@@ -415,9 +532,10 @@
       "section": "Messages",
       "line": 40,
       "title": "New messages need a page reload",
-      "detail": "The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial",
+      "detail": "The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4",
       "state": "todo",
       "doneIn": null,
+      "phase": "4",
       "id": "audit-follow-ups/new-messages-need-a-page-reload"
     },
     {
@@ -429,6 +547,7 @@
       "detail": "Where the site shows it: Analytics funnel, Hero dashboard, Product reveal, Journey step 04. Notes: Invites and bookings are built for students and companies; the college dashboard and outcome report do not count them yet",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/interview-counts-for-colleges"
     },
     {
@@ -440,6 +559,7 @@
       "detail": "Where the site shows it: Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04. Notes: Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/offer-tracking-and-placement-rate"
     },
     {
@@ -451,6 +571,7 @@
       "detail": "Where the site shows it: Analytics stats. Notes: No formula or data",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/event-roi-score"
     },
     {
@@ -462,6 +583,7 @@
       "detail": "Where the site shows it: Employer CRM pipeline, Platform tab CRM mini. Notes: \"Interview\" now shows from invites; \"Contacted\" and \"Offer\" are not tracked for companies",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/candidate-stages-contacted-and-offer"
     },
     {
@@ -473,6 +595,7 @@
       "detail": "Where the site shows it: Why GradLink card \"Useful all year round\". Notes: Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/alumni-accounts"
     },
     {
@@ -484,6 +607,7 @@
       "detail": "Where the site shows it: Pricing (Placement Pro)",
       "state": "todo",
       "doneIn": null,
+      "phase": "5",
       "id": "features-to-build/year-over-year-comparison"
     },
     {
@@ -495,6 +619,7 @@
       "detail": "WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU (software rendering), so its frame rate is not meaningful: still check on a real low-end Android for frame rate and heat. `components/landing/OpeningHero.tsx`, `components/ui/shader-background.tsx` · Verify on device",
       "state": "verify",
       "doneIn": null,
+      "phase": "test",
       "id": "landing-page/opening-hero-on-a-low-end-phone"
     },
     {
@@ -506,6 +631,7 @@
       "detail": "Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in \"Replace the G logo with a graduation cap\"); `og:image` and `twitter:image` tags present. Deployed with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev`: `og:url`, `og:image` and `twitter:image` point at the live site and the image returns 200. Still paste the URL into LinkedIn and WhatsApp, and again after the custom domain goes live. `app/opengraph-image.png` · Verify live",
       "state": "verify",
       "doneIn": null,
+      "phase": "test",
       "id": "landing-page/link-preview-card"
     },
     {
@@ -517,6 +643,7 @@
       "detail": "Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since). Verify live",
       "state": "verify",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/put-the-branch-live"
     },
     {
@@ -528,6 +655,7 @@
       "detail": "Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live",
       "state": "verify",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/two-account-run-on-real-phones"
     },
     {
@@ -539,6 +667,7 @@
       "detail": "Kept on the page by decision. Every unbuilt feature, and where it appears, is listed in `docs/checklists/features-to-build.md`. `components/landing/*` · Tracked",
       "state": "parked",
       "doneIn": null,
+      "phase": "3",
       "id": "landing-page/promises-features-that-are-not-built"
     },
     {
@@ -550,6 +679,7 @@
       "detail": "Section badges on the landing page, role chips, the manual tabs and \"Back to site\" are fully rounded. Left as they are by decision for now. Tracked",
       "state": "parked",
       "doneIn": null,
+      "phase": "2",
       "id": "dashboard/pill-shapes-on-labels-and-tabs"
     },
     {
@@ -561,6 +691,7 @@
       "detail": "`npm run db:migrate` applied `db/schema.sql`: 17 tables including `password_reset_tokens`. No old data imported (by decision). `db/schema.sql` · Done on 2026-09-27, no commit (database change)",
       "state": "done",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/neon-tables-created"
     },
     {
@@ -572,6 +703,7 @@
       "detail": "`UPLOADS` binding set to the namespace created in the GradLink Cloudflare account. `wrangler.jsonc` · Done in \"Point the UPLOADS binding at the real KV namespace\"",
       "state": "done",
       "doneIn": "Point the UPLOADS binding at the real KV namespace",
+      "phase": "3",
       "id": "launch/worker-points-at-the-real-kv"
     },
     {
@@ -583,6 +715,7 @@
       "detail": "`AUTH_SECRET` and `DATABASE_URL` (Neon pooled string) are Worker secrets. Done on 2026-09-27, no commit (Cloudflare setting)",
       "state": "done",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/worker-secrets-set"
     },
     {
@@ -594,6 +727,7 @@
       "detail": "All public pages, robots.txt, sitemap and favicon return 200. A test student account signed up, held a session and signed in against Neon, then was deleted. Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`",
       "state": "done",
       "doneIn": null,
+      "phase": "3",
       "id": "launch/deployed-and-tested-live"
     },
     {
@@ -605,6 +739,7 @@
       "detail": "Starter SVGs in `public/` and the `.vercel` ignore entry deleted. Done in \"Remove leftover Vercel starter files and ignore entry\"",
       "state": "done",
       "doneIn": "Remove leftover Vercel starter files and ignore entry",
+      "phase": "3",
       "id": "launch/vercel-removed-from-the-repo"
     },
     {
@@ -616,6 +751,7 @@
       "detail": "Written from what the app stores and who can read it (`db/schema.sql`, `lib/server/rpc.ts`, `lib/server/files.ts`), under the UAE Personal Data Protection Law. Operator Divit Kejriwal, Dubai. Linked from the footer and sitemap. When the domain is live, change `OPERATOR.email` in `lib/site.ts` to an address on it. `app/privacy/page.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
       "doneIn": "Add Privacy Policy and Terms pages",
+      "phase": "3",
       "id": "launch/privacy-policy-page"
     },
     {
@@ -627,6 +763,7 @@
       "detail": "Covers accounts, acceptable use, employer use of student data, Placement Pro billing (AED 3,600 per campus per year, cancel by email, no refunds except as stated), liability cap and Dubai law. Not reviewed by a lawyer: get a one-off review before taking the first payment. `app/terms/page.tsx`, `components/legal/TermsOfService.tsx` · Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
       "doneIn": "Add Privacy Policy and Terms pages",
+      "phase": "3",
       "id": "launch/terms-and-conditions-page"
     },
     {
@@ -638,6 +775,7 @@
       "detail": "Data sits in Singapore and Neon has no UAE region. The chip now reads \"Free for students and employers\", which matches the pricing page. `components/landing/CTASection.tsx` · Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
       "doneIn": "Add Privacy Policy and Terms pages",
+      "phase": "3",
       "id": "launch/uae-data-residency-claim-removed"
     },
     {
@@ -649,6 +787,7 @@
       "detail": "Footer now reads \"© GradLink\". `components/site/Footer.tsx` · Done in \"Drop the unregistered company name from the footer\"",
       "state": "done",
       "doneIn": "Drop the unregistered company name from the footer",
+      "phase": "3",
       "id": "launch/unregistered-company-name-removed"
     },
     {
@@ -660,6 +799,7 @@
       "detail": "`app/icon.svg` and `app/apple-icon.png` served live. The G mark read as a monochrome Google logo, so the logo, favicon, home-screen icon and share images now use a graduation cap whose tassel ends in a dot. `components/Logo.tsx`, `app/icon.svg`, `docs/brand/` · Done in \"Replace the G logo with a graduation cap\"",
       "state": "done",
       "doneIn": "Replace the G logo with a graduation cap",
+      "phase": "3",
       "id": "launch/favicon"
     },
     {
@@ -671,6 +811,7 @@
       "detail": "Links now use `/#section` and the logo goes to `/`. Automated check: every link from `/pricing` lands on the right home-page section. `components/site/Navbar.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "2",
       "id": "landing-page/navbar-logo-and-section-links-fail"
     },
     {
@@ -682,6 +823,7 @@
       "detail": "\"Analytics\" removed; tabs now follow page order: How it works, Platform, Students, Live events, Colleges, Employers, Pricing. Each goes to a different place. `components/site/Navbar.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "2",
       "id": "landing-page/colleges-and-analytics-go-to-the"
     },
     {
@@ -693,6 +835,7 @@
       "detail": "Removed until the accounts exist. `components/site/Footer.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "3",
       "id": "landing-page/social-links-go-nowhere"
     },
     {
@@ -704,6 +847,7 @@
       "detail": "Footer rebuilt with 11 links, all to real pages or sections (automated check: pages return 200, section ids exist). Links for unbuilt pages are listed in `features-to-build.md`. Contact removed until it has a page. Privacy and Terms are back in the footer bottom bar, done in \"Add Privacy Policy and Terms pages\" (see `launch.md`). `components/site/Footer.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "3",
       "id": "landing-page/20-footer-column-links-go-nowhere"
     },
     {
@@ -715,6 +859,7 @@
       "detail": "Funnel, stats and \"What a college sees after one fair\" are labelled \"Product preview · sample data\"; \"Career Fair 2025\" and dates replaced with \"Sample event\". `components/landing/AnalyticsSection.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "3",
       "id": "landing-page/invented-results-in-the-outcome-funnel"
     },
     {
@@ -726,6 +871,7 @@
       "detail": "Careem, PwC UAE, G42, ADNOC, Mubadala and Abu Dhabi University replaced with generic names (Fintech firm, Consulting firm, AI startup, Energy company, Investment firm, Sample University) across the landing page, sign-up form placeholders and company profile editor. `components/landing/*`, `components/gradlink/SignUpForm.tsx`, `components/dashboard/CompanyProfileEditor.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "3",
       "id": "landing-page/real-brand-names-used-as-customers"
     },
     {
@@ -737,6 +883,7 @@
       "detail": "Every mock screen carries a \"Product preview · sample data\" label (`components/landing/SampleDataLabel.tsx`). Invented hero stats (12+ colleges, 18K+ students, 200+ employers) removed. `HeroDashboard.tsx`, `ProductReveal.tsx`, `ReadinessSection.tsx`, `LiveEventSection.tsx`, `SpatialShowcaseSection.tsx`, `EmployerCRMSection.tsx`, `AnalyticsSection.tsx`, `HeroSection.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "3",
       "id": "landing-page/mockups-show-unlabelled-sample-data"
     },
     {
@@ -748,6 +895,7 @@
       "detail": "The candidate action buttons and \"Export CSV\" were decorative. Actions are now one line of text under the list, and \"Export CSV\" is replaced by a \"Product preview · sample data\" label on the list itself (on phones the pipeline card's label is a screen away). Done in \"Stop the Employer CRM mockup looking clickable\" The filter chips now work on the preview: each opens its options, filters the 7 sample students, shows \"Showing N of 7\" and has Clear filters and an empty state. Chips are square, not pill-shaped. Automated check at 390px and 1440px: every option of all 8 filters returns the right students, combined filters narrow correctly, no horizontal scroll. The real company dashboard does not have these filters yet (see `features-to-build.md`). `components/landing/EmployerCRMSection.tsx` · Done in \"Make the Employer CRM preview filters work on sample students\"",
       "state": "done",
       "doneIn": "Stop the Employer CRM mockup looking clickable",
+      "phase": "3",
       "id": "landing-page/employer-crm-mockup-buttons-do-nothing"
     },
     {
@@ -759,6 +907,7 @@
       "detail": "`app/robots.ts` (blocks dashboards, API, scan, events, reset) and `app/sitemap.ts` (9 public pages, Privacy and Terms added in \"Add Privacy Policy and Terms pages\"). Both use `NEXT_PUBLIC_SITE_URL`, so set it to the real domain at build time. `app/robots.ts`, `app/sitemap.ts`, `lib/site.ts` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "4",
       "id": "landing-page/add-robots-txt-and-sitemap"
     },
     {
@@ -770,6 +919,7 @@
       "detail": "Automated check with Lenis active: all 6 section links land with the section at the top, from `/` and from `/pricing`, desktop and mobile. `components/anim/SmoothScroll.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "test",
       "id": "landing-page/smooth-scroll-lands-anchor-links-correctly"
     },
     {
@@ -781,6 +931,7 @@
       "detail": "Removed with all other scroll-triggered animations ahead of the redesign, so there is nothing left to test. Done in `1317868`",
       "state": "done",
       "doneIn": null,
+      "phase": "test",
       "id": "landing-page/scroll-progress-bar-and-thread"
     },
     {
@@ -792,6 +943,7 @@
       "detail": "Automated check: all 7 tabs, Login and Get Started go to the right place. The logo scrolls back to the top when you are already on `/` (fixed in \"Fix code review findings on the landing branch\"). `components/site/Navbar.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "test",
       "id": "landing-page/navbar-links-on-the-home-page"
     },
     {
@@ -803,6 +955,7 @@
       "detail": "Automated check: opens, closes with X, tapping a link closes it and lands on the section, no horizontal scroll anywhere on the page (fixed a 56px overflow from the sample-data labels). `components/site/Navbar.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "test",
       "id": "landing-page/mobile-menu-at-375px"
     },
     {
@@ -814,6 +967,7 @@
       "detail": "Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#product`. `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
+      "phase": "test",
       "id": "landing-page/hero-and-cta-buttons"
     },
     {
@@ -825,6 +979,7 @@
       "detail": "Filters for GPA, readiness score, résumé score and event activity, and a readiness and résumé score on each candidate, contradicted the decision that employers see strengths only. Now shows degree, year, skills, target role and stage filters, and each candidate's target role and skills. `components/landing/EmployerCRMSection.tsx` · Done in \"Keep student assessments away from employers\"",
       "state": "done",
       "doneIn": "Keep student assessments away from employers",
+      "phase": "test",
       "id": "landing-page/employer-crm-mockup-promised-scores-to"
     },
     {
@@ -836,6 +991,7 @@
       "detail": "No API op writes `profiles.role`. The role is set once at sign-up and every check reads it from the session, never from the request. Harness check: no role-writing op exists, a student calling `createEvent` gets 403, and `joinEventByCode` registers the account's real role whatever the browser sends. `lib/server/rpc.ts`, `lib/server/auth-api.ts` · Security · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/users-can-promote-themselves-to-event"
     },
     {
@@ -847,6 +1003,7 @@
       "detail": "No API op lets anyone write another person's registration or any analytics row. Registrations are only created for the caller (`joinEventByCode`, and `createEvent` for the owner); analytics rows only for the joining student. Harness check: joining on someone else's behalf gets 403. `lib/server/rpc.ts` · Security · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/manager-writes-are-not-scoped-to"
     },
     {
@@ -858,6 +1015,7 @@
       "detail": "No API op writes `checklist_items` from the browser. Items are only written by the server's default seed, and only for the event being created or, on backfill, for an event the caller is registered in. Harness check: a non-member loading a checklist seeds nothing. `lib/server/rpc.ts`, `lib/server/checklist-template.ts` · Security · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/any-manager-can-edit-any-checklist"
     },
     {
@@ -869,6 +1027,7 @@
       "detail": "The sidebar now always shows \"All events\" (`/dashboard/events`) for every role, next to the open event, so people can switch events or create and join another. `components/dashboard/DashboardShell.tsx` · Broken · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/no-way-back-to-the-event"
     },
     {
@@ -880,6 +1039,7 @@
       "detail": "`createEvent` seeds the default list for students, employers and the college, and events created before get it the first time a checklist is opened. After merging `main`, this uses `main`'s template and seeding (`lib/server/checklist-template.ts`), which fixed the same bug. Harness check: a new event gets 15 student, 13 employer and 10 college items; 8 simultaneous loads of an old event seed it exactly once; an event that already has items is left alone. `lib/server/rpc.ts`, `lib/server/checklist-template.ts` · Broken · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/new-events-get-no-checklist-items"
     },
     {
@@ -891,6 +1051,7 @@
       "detail": "Fixed by the seeding above. The Readiness tile now also takes its number from the checklist on the same page, so it counts auto-ticked items and changes as boxes are ticked. `components/dashboard/StudentDashboard.tsx`, `components/dashboard/Checklist.tsx` · Broken · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/readiness-is-always-0"
     },
     {
@@ -902,6 +1063,7 @@
       "detail": "Same fix as the seeding above. The item \"Get your AI resume score\" is now \"Check your resume score\", since the score is rule-based, and its auto-tick still matches old and new titles. `components/dashboard/Checklist.tsx` · Broken · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/checklist-is-empty-on-new-events"
     },
     {
@@ -913,6 +1075,7 @@
       "detail": "The event's owner now sees \"Edit event\" on the event console. It edits name, location, dates, description and status, including Live now and Ended. `CreateEventForm` became `EventForm`, which handles both create and edit. The server rejects a blank name and still only lets the owner save. Harness check: owner moves status to live then ended; another college and a student get 403. `components/events/EventForm.tsx`, `components/dashboard/EventConsole.tsx`, `lib/server/rpc.ts` · Dead button · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/no-way-to-edit-an-event"
     },
     {
@@ -924,6 +1087,7 @@
       "detail": "No longer a Firestore collection-group query. `listEventsForProfile` is a Postgres join on `event_registrations`, restricted to the caller. Harness check: a student sees every event they joined, and asking for someone else's list gets 403. `lib/server/rpc.ts` · Verify live · Done in \"Fix Phase 1 core loop: event nav, checklist seeding, event editing\"",
       "state": "done",
       "doneIn": "Fix Phase 1 core loop: event nav, checklist seeding, event editing",
+      "phase": "1",
       "id": "core-loop/joined-events-may-never-appear"
     },
     {
@@ -935,6 +1099,7 @@
       "detail": "Registered students (with emails), employers, scans, shortlists, analytics and event details were readable by every signed-in account. Now (merged with the same fix from `main`): everyone only sees events they belong to; a profile is only visible to someone who shares an event with it, and fellow students see no contact details; only the organiser and the event's college staff see every scan, shortlist and analytics row; employers' shortlist notes are hidden from students; scans, shortlists and messages only work between people in the same event, and both scan roles come from the accounts. Harness check: 50 access checks across members, other events and other colleges. `lib/server/rpc.ts`, `components/dashboard/EventConsole.tsx` · Security · Done in \"Scope event data to members and compute analytics live\"",
       "state": "done",
       "doneIn": "Scope event data to members and compute analytics live",
+      "phase": "1",
       "id": "core-loop/anyone-signed-in-could-read-any"
     },
     {
@@ -946,6 +1111,7 @@
       "detail": "The counters in `student_event_analytics` were created at zero and never updated, and the resume score there was always 0. Profile views, company scans, shortlists, messages received, resume score and engagement are now worked out from scans, shortlists, messages and the student profile each time they are read. Harness check: counts and engagement match the activity recorded, an inactive student stays at zero. `lib/server/rpc.ts`, `db/schema.sql` · Broken · Done in \"Scope event data to members and compute analytics live\"",
       "state": "done",
       "doneIn": "Scope event data to members and compute analytics live",
+      "phase": "1",
       "id": "core-loop/student-analytics-never-change"
     },
     {
@@ -957,6 +1123,7 @@
       "detail": "Every event has a student code and a different employer code, stored in `event_codes` (the code is the primary key, so no two codes are ever the same). Each only works for its own account type, and using the wrong one says which code to ask for. College accounts cannot join with a code. Existing events keep their old code as the student code and get a new employer code when the migration runs. Harness and browser check. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/separate-codes-for-students-and-employers"
     },
     {
@@ -968,6 +1135,7 @@
       "detail": "\"New code\" on each code makes a fresh one; the old one stops working at once and people already in the event stay in. Owner only. Harness check. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/organiser-can-replace-a-code"
     },
     {
@@ -979,6 +1147,7 @@
       "detail": "Every dashboard page shows the join form until they have joined an event, except the events page, which is where they enter it. Browser check: the profile page is gated, a wrong code is refused, the right one opens it. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/students-and-employers-need-a-code"
     },
     {
@@ -990,6 +1159,7 @@
       "detail": "The event dashboard has an Attendees table: name, student or employer, university or company, degree and year or sector and booth, email and when they joined, with filters and search. Owner only. Harness and browser check. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/organiser-sees-who-joined"
     },
     {
@@ -1001,6 +1171,7 @@
       "detail": "The first time a college account opens its dashboard it must pick Starter or Placement Pro. Pro goes to Stripe Checkout; choosing Pro does not unlock anything until Stripe confirms payment. A college that already pays is not asked. Harness and browser check. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/colleges-choose-a-plan-after-signing"
     },
     {
@@ -1012,6 +1183,7 @@
       "detail": "Site health (database response time, server errors in the last hour and day, scans in the last hour), events happening now with scans in the last 15 minutes and a warning when a live event goes quiet for 20 minutes, totals, and every college with its plan and every event's dates, location, both codes and activity. Refreshes every 30 seconds while visible. Anyone not listed in `ADMIN_EMAILS` sees \"Page not found\". Server errors (500s) are now saved to `app_errors` for this page. Harness and browser check. Done in \"Add separate student and employer codes, plan choice and owner dashboard\"",
       "state": "done",
       "doneIn": "Add separate student and employer codes, plan choice and owner dashboard",
+      "phase": "5",
       "id": "organiser-access/owner-dashboard-at-admin"
     },
     {
@@ -1023,6 +1195,7 @@
       "detail": "Decided to change the wording rather than add a limit: Starter now lists \"Unlimited events\", and \"Unlimited events\" is no longer sold as a Pro feature on the pricing page, the plan picker, the outcome report upsell or the pricing page description. `lib/billing.ts`, `components/dashboard/OutcomeReportCard.tsx`, `app/pricing/page.tsx` · Done in \"Say Starter includes unlimited events\"",
       "state": "done",
       "doneIn": "Say Starter includes unlimited events",
+      "phase": "5",
       "id": "organiser-access/starter-promised-one-live-event-but"
     },
     {
@@ -1034,6 +1207,7 @@
       "detail": "Checklist items were only ever seeded for the old demo event, so every new event showed \"0/0\" (and students saw a loading spinner). New events now get the default checklist from `lib/server/checklist-template.ts` (15 student, 13 company, 10 college items); events without one get it the first time it is opened. A unique index stops duplicates. `lib/server/rpc.ts`, `lib/server/checklist-template.ts`, `db/schema.sql`, `components/dashboard/Checklist.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "1",
       "id": "dashboard/new-events-had-no-checklist"
     },
     {
@@ -1045,6 +1219,7 @@
       "detail": "It only appeared on `/dashboard/events`, which no sidebar link opens. It now shows, with a copy button, on the college overview and on the event page. `components/events/JoinCode.tsx`, `components/dashboard/EventManagerDashboard.tsx`, `components/dashboard/EventConsole.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "1",
       "id": "dashboard/join-code-could-not-be-found"
     },
     {
@@ -1056,6 +1231,7 @@
       "detail": "The scan was recorded against a missing event (500). Scans without an event are now skipped on both sides. `lib/server/rpc.ts`, `components/scan/StudentScanView.tsx`, `components/scan/CompanyScanView.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "1",
       "id": "dashboard/opening-a-student-without-an-active"
     },
     {
@@ -1067,6 +1243,7 @@
       "detail": "Fields now stack below 640px and panel titles wrap. `components/dashboard/StudentProfileEditor.tsx`, `components/dashboard/widgets.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "1",
       "id": "dashboard/student-profile-page-scrolled-sideways-on"
     },
     {
@@ -1078,6 +1255,7 @@
       "detail": "Removed; there is no search feature behind it. `components/dashboard/DashboardShell.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/dashboard-search-box-did-nothing"
     },
     {
@@ -1089,6 +1267,7 @@
       "detail": "The score is rule-based (`lib/resume.ts`). Every \"AI\" label and sentence now says \"résumé score\" or \"rule-based\", and the student checklist item reads \"Check your resume score\". `components/dashboard/*`, `components/scan/StudentScanView.tsx`, `lib/resume.ts` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/ai-r-sum-score-claims"
     },
     {
@@ -1100,6 +1279,7 @@
       "detail": "It now shows the real status (Draft, Upcoming, Live now, Ended). `components/dashboard/EventManagerDashboard.tsx`, `components/dashboard/EventConsole.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/college-header-said-live-monitor-with"
     },
     {
@@ -1111,6 +1291,7 @@
       "detail": "Now \"No students have registered yet.\" or \"No students need attention right now.\", no emoji. Symbol icons (★, ✓) replaced with words or a proper icon. `components/dashboard/EventConsole.tsx`, `components/dashboard/StudentDashboard.tsx`, `components/landing/SpatialShowcaseSection.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/everyone-is-engaged-with-zero-students"
     },
     {
@@ -1122,6 +1303,7 @@
       "detail": "(\"Add STRIPE_SECRET_KEY and STRIPE_PRICE_PRO\"). It now tells the college to email the operator to upgrade. `app/api/checkout/route.ts` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/upgrade-to-placement-pro-showed-a"
     },
     {
@@ -1133,6 +1315,7 @@
       "detail": "All 39 outside code comments replaced, including \"—\" used for missing values (\"Booth —\" is now \"Booth not set\", blank in CSV exports). Raw \"qr\" in scan history now reads \"QR scan\". `app/dashboard/*`, `components/*`, `lib/report.ts`, `lib/resume.ts`, `lib/db.ts` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/em-dashes-in-visible-copy"
     },
     {
@@ -1144,6 +1327,7 @@
       "detail": "Unknown addresses now show the site navbar and footer with links home and to sign in. `app/not-found.tsx`, `components/site/NotFound.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
       "doneIn": "Fix the problems found in the site audit",
+      "phase": "2",
       "id": "dashboard/unbranded-404-page"
     },
     {
@@ -1155,6 +1339,7 @@
       "detail": "`npm run db:migrate` on 2026-10-06 added `events.timezone`, `student_scores` and `student_certificates` (main's own changes were already there). Additive; the live site kept working. `db/schema.sql` · Done on 2026-10-06, no commit (database change)",
       "state": "done",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/new-schema-applied-to-the-live"
     },
     {
@@ -1166,6 +1351,7 @@
       "detail": "`npm run db:migrate` on 2026-09-29, after merging main: 30 tables, including `event_sessions`, `session_bookings`, `saved_companies`, `applications`, `notifications`, `interview_invites`, `booth_queue` and `student_courses`. Additive only; the live site kept working throughout. `db/schema.sql` · Done on 2026-09-29, no commit (database change)",
       "state": "done",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/schema-applied-to-the-live-neon"
     },
     {
@@ -1177,6 +1363,7 @@
       "detail": "Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards. Done on 2026-09-29",
       "state": "done",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/tested-live-on-a-preview-version"
     },
     {
@@ -1188,6 +1375,7 @@
       "detail": "Overall readiness score with its weights shown, profile-complete percentage, six competency scores with the evidence behind each and links to fix them, personalised action plan, Fair-Ready badge. `lib/readiness.ts`, `components/dashboard/StudentReadiness.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/career-readiness-hub"
     },
     {
@@ -1199,6 +1387,7 @@
       "detail": "Up to 10 projects with link and description. `components/dashboard/StudentProfileEditor.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/career-profile-goal-target-roles-projects"
     },
     {
@@ -1210,6 +1399,7 @@
       "detail": "Workshops, mock interviews, company sessions, 1:1 recruiter slots, networking and talks. Booking locks the session row so two students cannot take the last place (tested with 12 students racing for 3 places). Cancelling promotes the longest-waiting student. `lib/server/rpc.ts`, `components/dashboard/StudentSchedule.tsx`, `components/dashboard/SessionManager.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/sessions-booking-and-waitlists"
     },
     {
@@ -1221,6 +1411,7 @@
       "detail": "Filter by type, live and finished states, waitlist position, clash warnings, booked sessions and saved companies by booth with \"Mark visited\". `components/dashboard/StudentSchedule.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/live-schedule-and-event-plan"
     },
     {
@@ -1232,6 +1423,7 @@
       "detail": "Engagement is computed live from scans, shortlists, sessions and messages, with the points shown. Other students appear by first name and last initial. `components/dashboard/StudentPassport.tsx`, `lib/engagement.ts` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/digital-passport-engagement-score-leaderboard"
     },
     {
@@ -1243,6 +1435,7 @@
       "detail": "Match percentage from skills and target roles, with the reason and \"Save to plan\". `lib/readiness.ts`, `components/dashboard/StudentDashboard.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/matched-companies"
     },
     {
@@ -1254,6 +1447,7 @@
       "detail": "Applied, interviewing, offer, accepted, not selected, withdrawn, with interview dates and notes. Private to the student. `components/dashboard/StudentApplications.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/application-tracker"
     },
     {
@@ -1265,6 +1459,7 @@
       "detail": "Save, interested, visited, follow-up and notes moved from localStorage to `saved_companies`. Existing browser copies move across the first time the student opens that company. `components/scan/CompanyScanView.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/saved-companies-in-the-database"
     },
     {
@@ -1276,6 +1471,7 @@
       "detail": "Only the old demo event had checklist items, so every student's checklist and readiness sat at zero. Every event now gets the default checklist, with new auto-tracked items for check-in, booking a prep session and logging applications. `db/schema.sql`, `components/dashboard/Checklist.tsx` · Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/new-events-had-an-empty-checklist"
     },
     {
@@ -1287,6 +1483,7 @@
       "detail": "\"AI resume analysis\" relabelled \"Résumé check · Rule-based\" (the score is not AI). Em dashes and emoji removed from dashboard copy. Dead header search box removed. Pill-shaped tab buttons squared off. Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/honest-labels-and-copy"
     },
     {
@@ -1298,6 +1495,7 @@
       "detail": "Production build driven by Playwright at 1440px and 375px against the real server code on Postgres 16: every student page loads with no console errors and no horizontal scroll, and booking, waitlisting, saving, applications, profile edits and host attendance all persist. Done in \"Complete the student dashboard against the landing page\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
+      "phase": "5",
       "id": "student-dashboard/automated-check"
     },
     {
@@ -1309,6 +1507,7 @@
       "detail": "Company proposes up to five times; the student picks one, which books the interview into their applications (updating an existing application for that role rather than duplicating it). Only students the company scanned or shortlisted can be invited, one open invite at a time. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/interview-invites-and-bookings"
     },
     {
@@ -1320,6 +1519,7 @@
       "detail": "Only while the event is live, up to 3 queues per student, re-joining goes to the back, the student's page checks for their turn every 20 seconds. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/booth-queues"
     },
     {
@@ -1331,6 +1531,7 @@
       "detail": "Interview invites and replies, a waitlist place opening up, and \"It's your turn\". The bell counts these and unread messages. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/notifications"
     },
     {
@@ -1342,6 +1543,7 @@
       "detail": "Every open role at the event, target-role matches first, internships marked, \"I applied\" adds it to applications. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/opportunities"
     },
     {
@@ -1353,6 +1555,7 @@
       "detail": "New session type, counted toward Communication. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/alumni-mentoring-sessions"
     },
     {
@@ -1364,6 +1567,7 @@
       "detail": "on the career profile, across every event the student joined. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
+      "phase": "5",
       "id": "student-dashboard/event-history-and-company-connections"
     },
     {
@@ -1375,6 +1579,7 @@
       "detail": "Coursera has no API for a learner to share their own courses (its learner API is only for Coursera for Business and Campus customers), so students paste a certificate link and the Worker reads the facts from Coursera's public verify page: course, issuer, completion date and skills. The name on the certificate must match the student's GradLink name, and a certificate can sit on one account only. Courses in progress are checked against Coursera's catalog and shown as \"Currently taking\". The student picks which ones employers see, and can add the course's skills to their profile in one click. Tested against live coursera.org pages. `lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`, `components/scan/VerifiedCourses.tsx` · Done in \"Verify Coursera certificates on the student profile\"",
       "state": "done",
       "doneIn": "Verify Coursera certificates on the student profile",
+      "phase": "5",
       "id": "student-dashboard/verified-coursera-certificates-and-courses-in"
     },
     {
@@ -1386,6 +1591,7 @@
       "detail": "A temporary Worker running this code on Cloudflare's network (deployed, tested, then deleted) read real certificates, the course catalog and issuer names from coursera.org in under a second each. It also runs in the local Workers runtime, the Cloudflare build succeeds, and a certificate page costs under 1 ms of CPU to parse. A Coursera outage shows \"Coursera didn't respond\", never \"no such course\". `lib/server/coursera.ts` · Done in \"Tell a Coursera outage apart from a missing course\"",
       "state": "done",
       "doneIn": "Tell a Coursera outage apart from a missing course",
+      "phase": "5",
       "id": "student-dashboard/coursera-check-from-cloudflare"
     },
     {
@@ -1397,6 +1603,7 @@
       "detail": "Neither site lets a user sign in to another app, so the student proves the account is theirs on the site itself: a one-time code in their LeetCode Summary, or a Codeforces submission to problem 4A that fails to compile (it doesn't touch their rating). Only then is the profile shown to anyone else, and a handle can be verified on one account only. Stats are read from the sites, never from the browser: LeetCode problems solved by difficulty, contest rating, top percentage and contests; Codeforces rating, rank, best rating and rated contests. The student can refresh them (at most every 10 minutes). Tested with fakes for every path and against the real sites' public data. `lib/server/coding.ts`, `components/dashboard/StudentScores.tsx`, `components/scan/VerifiedScores.tsx` · Done in \"Add event time zones, coding profiles and test scores\"",
       "state": "done",
       "doneIn": "Add event time zones, coding profiles and test scores",
+      "phase": "5",
       "id": "student-dashboard/verified-leetcode-and-codeforces-profiles"
     },
     {
@@ -1408,6 +1615,7 @@
       "detail": "A Credly badge link (AWS, Google Cloud, IBM, Cisco, Oracle, CompTIA and many more issue through Credly) is read from Credly's public Open Badges API: badge, issuer, issue and expiry dates, and whether it was revoked. It must belong to the student: the name on the badge page matches their GradLink name, or the badge was issued to their GradLink email (Credly publishes its hash). A revoked badge is refused and an expired one is marked. Any other certificate (NPTEL, Microsoft and so on) is shown as self-reported with the credential link the student gives. Up to 30, and the student picks which ones employers see. Tested with fakes for every path and against real Credly badges. `lib/server/credly.ts`, `components/dashboard/StudentCertificates.tsx`, `components/scan/VerifiedCertificates.tsx` · Done in \"Replace test scores with verified certificates\"",
       "state": "done",
       "doneIn": "Replace test scores with verified certificates",
+      "phase": "5",
       "id": "student-dashboard/certificates-replacing-test-scores"
     },
     {
@@ -1419,6 +1627,7 @@
       "detail": "Preview version `0ec7412c` (production untouched), with short-lived accounts on the live database: LeetCode found a real user and read their Summary, Codeforces found a real user and read their submissions, Credly read a real badge's name, issuer and earner, and a missing badge was reported as missing. Each answered in under 3 seconds. Event time zones and the new profile sections also worked there. All 14 checks passed; the accounts and event were deleted afterwards. Done on 2026-10-06",
       "state": "done",
       "doneIn": null,
+      "phase": "5",
       "id": "student-dashboard/leetcode-codeforces-and-credly-from-cloudflare"
     },
     {
@@ -1430,6 +1639,7 @@
       "detail": "Résumé score, readiness, analytics, engagement, leaderboard and other people's scans are refused by the API for employers. The employer's view of a student shows goals, projects, skills and links instead of a score and an improvement list. The hard-coded \"Checked in\" badge is gone. `lib/server/rpc.ts`, `components/scan/StudentScanView.tsx`, `components/dashboard/EventConsole.tsx` · Done in \"Keep student assessments away from employers\"",
       "state": "done",
       "doneIn": "Keep student assessments away from employers",
+      "phase": "5",
       "id": "student-dashboard/scores-and-engagement-are-student-and"
     },
     {
@@ -1441,6 +1651,7 @@
       "detail": "A company sees only its own decisions and notes. A student sees only who shortlisted them, without notes. Previously any account could read every company's \"not a fit\" and private notes. `lib/server/rpc.ts` · Done in \"Keep student assessments away from employers\"",
       "state": "done",
       "doneIn": "Keep student assessments away from employers",
+      "phase": "5",
       "id": "student-dashboard/shortlist-decisions-stay-with-their-owner"
     },
     {
@@ -1452,6 +1663,7 @@
       "detail": "Real filters replaced the decorative chips (which listed Readiness and Resume), the dead Export button became a CSV export, and bulk follow-up is limited to students that company scanned or shortlisted. `components/dashboard/CompanyCandidates.tsx` · Done in \"Keep student assessments away from employers\"",
       "state": "done",
       "doneIn": "Keep student assessments away from employers",
+      "phase": "5",
       "id": "student-dashboard/company-candidate-tools"
     },
     {
@@ -1463,6 +1675,7 @@
       "detail": "Main now shows a student's profile only to people who share an event with them. Coursera courses and coding profiles were still readable by any signed-in account; they now follow the same rule. `lib/server/rpc.ts` · Done in \"Show courses and scores only to people who share an event\"",
       "state": "done",
       "doneIn": "Show courses and scores only to people who share an event",
+      "phase": "5",
       "id": "student-dashboard/courses-and-scores-follow-the-profile"
     },
     {
@@ -1474,6 +1687,7 @@
       "detail": "Times used to follow each viewer's device, so a student whose phone was on another zone, or an organiser setting up from another city, saw different times for the same session. Events now store a time zone (picked on creation, defaulting to the organiser's), sessions are entered and shown in it, and the schedule says so when the viewer's device is on another zone. Older events without one ask the organiser to set it. Interview times name their zone. Tested with an organiser in New York and a student in London for an event in India: both see 10:00. `lib/format.ts`, `components/dashboard/SessionManager.tsx`, `components/ui/TimeZoneSelect.tsx` · Done in \"Add event time zones, coding profiles and test scores\"",
       "state": "done",
       "doneIn": "Add event time zones, coding profiles and test scores",
+      "phase": "5",
       "id": "student-dashboard/session-times-across-time-zones"
     },
     {
@@ -1485,6 +1699,7 @@
       "detail": "A 1 October event showed as 30 September in the Americas, because the date was read as midnight UTC in the viewer's zone. Event dates are now shown as calendar dates. `lib/format.ts` · Done in \"Add event time zones, coding profiles and test scores\"",
       "state": "done",
       "doneIn": "Add event time zones, coding profiles and test scores",
+      "phase": "5",
       "id": "student-dashboard/event-dates-shifted-a-day-west"
     },
     {
@@ -1496,6 +1711,7 @@
       "detail": "Attendee lists (with emails), scans, shortlists, analytics and events are now limited to people registered for that event. Whole-event views are limited to its staff (the owner, or a college account registered for it). `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/event-data-was-readable-by-any"
     },
     {
@@ -1507,6 +1723,7 @@
       "detail": "Any user could read any company's shortlists and notes. Notes are now visible to the company and event staff only; students see their status without notes. `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/private-shortlist-notes-leaked"
     },
     {
@@ -1518,6 +1735,7 @@
       "detail": "`resume_score` and `ai_feedback` are no longer writable from the browser. `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/students-could-set-their-own-r"
     },
     {
@@ -1529,6 +1747,7 @@
       "detail": "Only students edit student profiles, only companies edit company profiles and shortlist, scans record the account's real role, and messages need both people at the same event. `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/role-checks-on-writes"
     },
     {
@@ -1540,6 +1759,7 @@
       "detail": "Profile, website, logo, résumé and brochure links must be http(s). `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/unsafe-links-in-profiles"
     },
     {
@@ -1551,6 +1771,7 @@
       "detail": "Students now see other students without contact details. `lib/server/rpc.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/fellow-students-saw-each-other-s"
     },
     {
@@ -1562,6 +1783,7 @@
       "detail": "Résumés take .pdf, .doc, .docx; brochures .pdf; logos and avatars images only. The stored type comes from the extension, not the browser. `lib/server/files.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/uploads-accepted-any-file-type"
     },
     {
@@ -1573,6 +1795,7 @@
       "detail": "Added Content-Security-Policy, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy (camera for the scanner only) and COOP. Removed `X-Powered-By`. `next.config.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/no-security-headers"
     },
     {
@@ -1584,6 +1807,7 @@
       "detail": "The unused `components/ui/shader-lines.tsx` pulled three.js from a CDN; deleted. · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/third-party-script-loaded-at-runtime"
     },
     {
@@ -1595,6 +1819,7 @@
       "detail": "Now same-origin only, uses the account's own email, and returns to `APP_URL` instead of the request's Origin header. `app/api/checkout/route.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/checkout-trusted-request-data"
     },
     {
@@ -1606,6 +1831,7 @@
       "detail": "Per IP: 30 wrong passwords per 15 minutes (correct sign-ins never count), 50 sign-ups per hour, 10 reset emails per hour, 30 reset-link checks per 15 minutes. Limits are generous because a whole campus can share one Wi-Fi address. Counters live in Postgres with hashed IPs, because WAF rules cannot attach to a workers.dev address. `lib/server/rate-limit.ts` · Done in \"Rate-limit sign-in, sign-up and password reset per IP\"",
       "state": "done",
       "doneIn": "Rate-limit sign-in, sign-up and password reset per IP",
+      "phase": "3",
       "id": "security/no-per-ip-limit-on-the-auth"
     },
     {
@@ -1617,6 +1843,7 @@
       "detail": "Unknown emails now take the same hashing time. `lib/server/auth-api.ts` · Done in \"Lock down the data API, uploads and response headers\"",
       "state": "done",
       "doneIn": "Lock down the data API, uploads and response headers",
+      "phase": "3",
       "id": "security/sign-in-timing-revealed-which-emails-have"
     },
     {
@@ -1628,6 +1855,7 @@
       "detail": "The company is not registered yet, so the footer now reads \"© GradLink\". Put the registered name back once it exists. Done in \"Drop the unregistered company name from the footer\"",
       "state": "done",
       "doneIn": "Drop the unregistered company name from the footer",
+      "phase": "3",
       "id": "features-to-build/gradlink-technologies-llc-in-the-footer"
     },
     {
@@ -1639,6 +1867,7 @@
       "detail": "False, data is stored in Singapore. Replaced with \"Free for students and employers\". Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
       "doneIn": "Add Privacy Policy and Terms pages",
+      "phase": "3",
       "id": "features-to-build/uae-data-residency-in-the-cta"
     }
   ]
