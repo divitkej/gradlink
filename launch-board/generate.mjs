@@ -10,6 +10,7 @@
  *
  *   launch-board/README.md     the board as GitHub shows it
  *   launch-board/progress.svg  the summary card at the top of the README
+ *   launch-board/phases.svg    progress by phase
  *   launch-board/index.html    the interactive board (open it in a browser)
  *   launch-board/board.json    the same data for scripts
  *
@@ -48,6 +49,45 @@ export const STATES = {
 };
 const OPEN_ORDER = ["in_progress", "owner", "todo", "verify", "parked"];
 const STATE_ORDER = [...OPEN_ORDER, "done"];
+
+/* The project's phases, in the order the work happens. */
+export const PHASES = [
+  { key: "1", name: "Phase 1: Core loop", goal: "Create or join an event, open it, work the checklist, edit the event, with the access checks behind it." },
+  { key: "2", name: "Phase 2: Dead and misleading UI", goal: "Every visible button works, nothing claims what the app does not do." },
+  { key: "3", name: "Phase 3: Launch readiness", goal: "Hosting, domain, email, legal pages, honest claims and security before the public launch." },
+  { key: "4", name: "Phase 4: Polish and SEO", goal: "Search basics, confirmations, redirects and live updates." },
+  { key: "5", name: "Phase 5: Product build-out", goal: "Organiser access, the full student dashboard and the features the site promises." },
+  { key: "test", name: "Test pass", goal: "Features that should work, checked once on a real device or the live site." },
+];
+
+/**
+ * Which phase an item belongs to, most specific rule first:
+ *   1. a "· Phase N" tag on the item's status line
+ *   2. a section heading "Phase N: ..." or "Test pass"
+ *   3. the checklist (and section) it lives in
+ * A new checklist with no rule lands in Phase 5 until its items are tagged.
+ */
+function phaseOf(fileKey, section, body) {
+  const tag = body.match(/·\s*Phase ([1-5])\b/);
+  if (tag) return tag[1];
+  const sec = section.match(/^Phase ([1-5])\b/);
+  if (sec) return sec[1];
+  if (/^test pass/i.test(section)) return "test";
+  switch (fileKey) {
+    case "core-loop": return "1";
+    case "dashboard": return /^broken/i.test(section) ? "1" : "2";
+    case "audit-follow-ups": return "2";
+    case "landing-page": case "launch": case "security": return "3";
+    case "features-to-build": return /not built/i.test(section) ? "5" : "3";
+    default: return "5";
+  }
+}
+
+function phaseStatus(c, total) {
+  if (c.done === total) return "Done";
+  if (c.done > 0 || c.in_progress > 0) return "Ongoing";
+  return "Not started";
+}
 
 /* ---------------- parsing ---------------- */
 
@@ -103,6 +143,7 @@ function parseChecklist(file) {
     items.push({
       area: key, areaName: area, section: cur.section, line: cur.line,
       title: cleanTitle(cur.title), detail: body, state, doneIn, kind: "checkbox",
+      phase: phaseOf(key, cur.section, body),
     });
     cur = null;
   };
@@ -146,6 +187,7 @@ function parseChecklist(file) {
         area: key, areaName: area, section, line: lineNo,
         title: cleanTitle(isClaim ? `Confirm the claim ${first}` : `Build: ${first}`),
         detail, state: classify(detail, section), doneIn: null, kind: "table",
+        phase: phaseOf(key, section, detail),
       });
       return;
     }
@@ -290,6 +332,38 @@ ${legend}
 `;
 }
 
+function renderPhaseSvg(board) {
+  const { phases } = board;
+  const W = 860, rowH = 44, top = 64, H = top + phases.length * rowH + 20;
+  const bx = 400, bw = 300;
+  const tone = { Done: "#00C2A8", Ongoing: "#35D3FF", "Not started": "#FF6B6B" };
+  let rows = "";
+  phases.forEach((ph, i) => {
+    const y = top + i * rowH;
+    let x = bx, segs = "";
+    for (const s of ["done", ...OPEN_ORDER]) {
+      const n = ph.counts[s];
+      if (!n) continue;
+      const w = (n / ph.total) * bw;
+      segs += `<rect x="${x.toFixed(1)}" y="${y + 9}" width="${w.toFixed(1)}" height="12" fill="${STATES[s].color}"/>`;
+      x += w;
+    }
+    const st = ph.status;
+    rows += `<text x="40" y="${y + 20}" class="l">${esc(ph.name)}</text>`
+      + `<rect x="300" y="${y + 5}" width="84" height="20" rx="3" fill="none" stroke="${tone[st]}"/>`
+      + `<text x="342" y="${y + 19}" text-anchor="middle" class="c" fill="${tone[st]}" style="fill:${tone[st]}">${st}</text>`
+      + `<rect x="${bx}" y="${y + 9}" width="${bw}" height="12" rx="2" fill="#1A2A3C"/>${segs}`
+      + `<text x="${bx + bw + 14}" y="${y + 20}" class="n">${ph.counts.done}/${ph.total} done${ph.total - ph.counts.done ? `, ${ph.total - ph.counts.done} left` : ""}</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="GradLink progress by phase">
+<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:#E7F0F7}.l{font-size:13.5px;font-weight:600}.n{font-size:12px;fill:#8697AA;font-variant-numeric:tabular-nums}.c{font-size:11px;font-weight:700;letter-spacing:.04em}.h{font-size:18px;font-weight:700}</style>
+<rect width="${W}" height="${H}" rx="12" fill="#0C1826"/>
+<text x="40" y="40" class="h">Progress by phase</text>
+${rows}
+</svg>
+`;
+}
+
 function renderReadme(board) {
   const { totals, areas, items, updated, prsRead } = board;
   const L = [];
@@ -302,6 +376,40 @@ function renderReadme(board) {
   L.push("```mermaid", "pie showData", "  title Where everything stands");
   for (const s of STATE_ORDER) if (totals.counts[s]) L.push(`  "${STATES[s].label}" : ${totals.counts[s]}`);
   L.push("```", "");
+
+  L.push("## By phase", "");
+  L.push("![Progress by phase](phases.svg)", "");
+  L.push("| Phase | Status | Progress | Done | In progress | Left |", "|---|---|---|---|---|---|");
+  for (const ph of board.phases) {
+    const p = pct(ph.counts.done, ph.total);
+    L.push(`| [${ph.name}](#${ph.anchor}) | **${ph.status}** | \`${textBar(p)}\` ${p}% | ${ph.counts.done} | ${ph.counts.in_progress} | ${ph.total - ph.counts.done} |`);
+  }
+  L.push("");
+  for (const ph of board.phases) {
+    const mine = items.filter((i) => i.phase === ph.key);
+    const left = ph.total - ph.counts.done;
+    L.push(`### ${ph.name}`, "");
+    L.push(`${ph.goal}`, "");
+    L.push(`**${ph.status}.** ${ph.counts.done} of ${ph.total} done, ${ph.counts.in_progress} in progress, ${left} left.`, "");
+    const prog = mine.filter((i) => i.state === "in_progress");
+    if (prog.length) {
+      L.push("**Ongoing**", "");
+      prog.forEach((i) => L.push(`- [ ] ${i.title} · [PR #${i.pr ? i.pr.number : "?"}](${i.pr ? i.pr.url : srcUrl(i)}) · [source](${srcUrl(i)})`));
+      L.push("");
+    }
+    const open = mine.filter((i) => i.state !== "done" && i.state !== "in_progress");
+    if (open.length) {
+      L.push("**Left**", "");
+      open.forEach((i) => L.push(`- [ ] ${i.title} · ${STATES[i.state].label} · ${i.areaName} · [source](${srcUrl(i)})`));
+      L.push("");
+    }
+    const done = mine.filter((i) => i.state === "done");
+    if (done.length) {
+      L.push(`<details><summary>Done (${done.length})</summary>`, "");
+      done.forEach((i) => L.push(`- [x] ${i.title}`));
+      L.push("", "</details>", "");
+    }
+  }
 
   L.push("## By area", "");
   L.push("| Area | Progress | Done | Left | Checklist |", "|---|---|---|---|---|");
@@ -344,6 +452,7 @@ function renderReadme(board) {
   L.push("- **Source of truth:** every item lives in a file in [`docs/checklists/`](../docs/checklists/). Change the checkbox there, never here.");
   L.push("- **Done:** tick the box (`- [x]`) in the same commit as the fix. When that commit reaches `main`, the [Launch board workflow](../.github/workflows/launch-board.yml) rebuilds this folder and commits it.");
   L.push("- **In progress:** open a pull request that ticks the box. The item shows as in progress, with a link to the PR, until the PR merges. You can also write `board: <id>` in a PR's title or description (ids are listed under each item).");
+  L.push("- **Phases:** an item's phase comes from a `· Phase N` tag on its status line, then a `## Phase N: ...` section heading, then the checklist it lives in. A phase is Done when every item is done, Ongoing once anything in it is done or in progress, and Not started otherwise.");
   L.push("- **Needs the owner, Verify live, Parked:** read from the item's own words (\"Owner action\", \"Verify live\", \"Tracked\") or its section heading.");
   L.push("- **New items or checklists:** add a `- [ ] **Title.** details` line to any checklist, or a new `docs/checklists/<area>.md` file. The board picks it up on the next run.");
   L.push("- **Run it yourself:** `node launch-board/generate.mjs`. Set `GITHUB_TOKEN` to include open pull requests.", "");
@@ -355,7 +464,8 @@ function renderHtml(board) {
     repo: REPO, branch: BRANCH, updated: board.updated,
     states: STATES, stateOrder: STATE_ORDER, openOrder: OPEN_ORDER,
     areas: board.areas.map((a) => ({ key: a.key, name: a.name })),
-    items: board.items.map((i) => ({ id: i.id, area: i.area, section: i.section, line: i.line, title: i.title, detail: i.detail, state: i.state, doneIn: i.doneIn, pr: i.pr || null })),
+    phases: board.phases.map((p) => ({ key: p.key, name: p.name, goal: p.goal, status: p.status })),
+    items: board.items.map((i) => ({ id: i.id, area: i.area, phase: i.phase, section: i.section, line: i.line, title: i.title, detail: i.detail, state: i.state, doneIn: i.doneIn, pr: i.pr || null })),
   }).replace(/</g, "\\u003c");
   const tpl = readFileSync(join(HERE, "template.html"), "utf8");
   return tpl.replace("/*__BOARD_DATA__*/null", data);
@@ -396,14 +506,22 @@ async function main() {
     prsRead,
     totals: { total: items.length, done: c.done, open: items.length - c.done, percent: pct(c.done, items.length), counts: c },
     areas: areas.map((a) => ({ key: a.key, name: a.name, total: a.items.length, counts: counts(a.items) })),
+    phases: PHASES.map((p) => {
+      const list = items.filter((i) => i.phase === p.key);
+      const pc = counts(list);
+      const anchor = p.name.toLowerCase().replace(/[^a-z0-9 -]/g, "").replace(/ /g, "-");
+      return { ...p, anchor, total: list.length, counts: pc, status: phaseStatus(pc, list.length) };
+    }).filter((p) => p.total),
     items: sorted,
   };
 
   writeFileSync(join(HERE, "board.json"), JSON.stringify({
     updated: board.updated, totals: board.totals, areas: board.areas,
+    phases: board.phases.map(({ anchor, ...rest }) => rest),
     items: board.items.map(({ kind, ...rest }) => rest),
   }, null, 2) + "\n");
   writeFileSync(join(HERE, "progress.svg"), renderSvg(board));
+  writeFileSync(join(HERE, "phases.svg"), renderPhaseSvg(board));
   writeFileSync(join(HERE, "README.md"), renderReadme(board));
   writeFileSync(join(HERE, "index.html"), renderHtml(board));
   console.log(`[launch-board] ${board.totals.done}/${board.totals.total} done, ${c.in_progress} in progress, ${board.totals.open} left${prsRead ? "" : " (pull requests not read)"}`);

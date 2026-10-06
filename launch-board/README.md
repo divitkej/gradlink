@@ -18,6 +18,240 @@ pie showData
   "Done" : 99
 ```
 
+## By phase
+
+![Progress by phase](phases.svg)
+
+| Phase | Status | Progress | Done | In progress | Left |
+|---|---|---|---|---|---|
+| [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
+| [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `████████░░░░` 64% | 9 | 0 | 5 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 0 | 16 |
+| [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Ongoing** | `██░░░░░░░░░░` 20% | 1 | 0 | 4 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `█████████░░░` 79% | 38 | 0 | 10 |
+| [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
+
+### Phase 1: Core loop
+
+Create or join an event, open it, work the checklist, edit the event, with the access checks behind it.
+
+**Ongoing.** 15 of 16 done, 0 in progress, 1 left.
+
+**Left**
+
+- [ ] Live rules match the repo · Needs the owner · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)
+
+<details><summary>Done (15)</summary>
+
+- [x] Users can promote themselves to event manager
+- [x] Manager writes are not scoped to their own event
+- [x] Any manager can edit any checklist
+- [x] No way back to the event list
+- [x] New events get no checklist items
+- [x] Readiness is always 0%
+- [x] Checklist is empty on new events
+- [x] No way to edit an event
+- [x] Joined events may never appear
+- [x] Anyone signed in could read any event's people
+- [x] Student analytics never change
+- [x] New events had no checklist
+- [x] Join code could not be found after creating an event
+- [x] Opening a student without an active event caused a server error
+- [x] Student profile page scrolled sideways on phones (46px)
+
+</details>
+
+### Phase 2: Dead and misleading UI
+
+Every visible button works, nothing claims what the app does not do.
+
+**Ongoing.** 9 of 14 done, 0 in progress, 5 left.
+
+**Left**
+
+- [ ] Several Claude sessions deploy to the same Worker · Needs the owner · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)
+- [ ] "Start free" does nothing · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)
+- [ ] College sidebar has no Messages or Profile link · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)
+- [ ] Scan history is not linked anywhere · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28)
+- [ ] Pill shapes on labels and tabs · Parked by decision · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L41)
+
+<details><summary>Done (9)</summary>
+
+- [x] Navbar logo and section links fail on /pricing
+- [x] Colleges and Analytics go to the same section
+- [x] Dashboard search box did nothing
+- [x] "AI résumé score" claims
+- [x] College header said "Live Monitor" with a pulsing dot for events that had not started
+- [x] "Everyone is engaged 🎉" with zero students
+- [x] "Upgrade to Placement Pro" showed a developer message
+- [x] Em dashes in visible copy
+- [x] Unbranded 404 page
+
+</details>
+
+### Phase 3: Launch readiness
+
+Hosting, domain, email, legal pages, honest claims and security before the public launch.
+
+**Ongoing.** 30 of 46 done, 0 in progress, 16 left.
+
+**Left**
+
+- [ ] Cloudflare GitHub builds fail on every commit · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)
+- [ ] Old Vercel site still live · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)
+- [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
+- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
+- [ ] Set `APP_URL` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)
+- [ ] Run `npm run db:migrate` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)
+- [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)
+- [ ] Least-privilege database role · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L37)
+- [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)
+- [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L39)
+- [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L40)
+- [ ] Verify live · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L41)
+- [ ] Confirm the claim "Setup in 48 hours" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)
+- [ ] Confirm the claim "No contract lock-in" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)
+- [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
+- [ ] Promises features that are not built · Parked by decision · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)
+
+<details><summary>Done (30)</summary>
+
+- [x] Neon tables created
+- [x] Worker points at the real KV namespace
+- [x] Worker secrets set
+- [x] Deployed and tested live
+- [x] Vercel removed from the repo
+- [x] Privacy Policy page
+- [x] Terms and Conditions page
+- [x] "UAE data residency" claim removed
+- [x] Unregistered company name removed
+- [x] Favicon
+- [x] Social links go nowhere
+- [x] 20 footer column links go nowhere
+- [x] Invented results in the outcome funnel
+- [x] Real brand names used as customers
+- [x] Mockups show unlabelled sample data
+- [x] Employer CRM mockup buttons do nothing
+- [x] Event data was readable by any signed-in account
+- [x] Private shortlist notes leaked
+- [x] Students could set their own résumé score
+- [x] Role checks on writes
+- [x] Unsafe links in profiles
+- [x] Fellow students saw each other's emails
+- [x] Uploads accepted any file type
+- [x] No security headers
+- [x] Third-party script loaded at runtime
+- [x] Checkout trusted request data
+- [x] No per-IP limit on the auth endpoints
+- [x] Sign-in timing revealed which emails have accounts
+- [x] "GradLink Technologies LLC" in the footer
+- [x] "UAE data residency" in the CTA section
+
+</details>
+
+### Phase 4: Polish and SEO
+
+Search basics, confirmations, redirects and live updates.
+
+**Ongoing.** 1 of 5 done, 0 in progress, 4 left.
+
+**Left**
+
+- [ ] No message after Stripe checkout · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21)
+- [ ] Signed-in people can still open the sign-in page · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)
+- [ ] Signing in from a scanned QR loses the profile · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35)
+- [ ] New messages need a page reload · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40)
+
+<details><summary>Done (1)</summary>
+
+- [x] Add robots.txt and sitemap
+
+</details>
+
+### Phase 5: Product build-out
+
+Organiser access, the full student dashboard and the features the site promises.
+
+**Ongoing.** 38 of 48 done, 0 in progress, 10 left.
+
+**Left**
+
+- [ ] Run the migration before deploying this code · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)
+- [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)
+- [ ] Build: Interview counts for colleges · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L52)
+- [ ] Build: Offer tracking and placement rate · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)
+- [ ] Build: Event ROI score · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)
+- [ ] Build: Candidate stages "Contacted" and "Offer" · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
+- [ ] Build: Alumni accounts · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L56)
+- [ ] Build: Year-over-year comparison · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L57)
+- [ ] Put the branch live · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19)
+- [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)
+
+<details><summary>Done (38)</summary>
+
+- [x] Separate codes for students and employers
+- [x] Organiser can replace a code
+- [x] Students and employers need a code before using the dashboard
+- [x] Organiser sees who joined
+- [x] Colleges choose a plan after signing in
+- [x] Owner dashboard at `/admin`
+- [x] Starter promised one live event but nothing enforced it
+- [x] New schema applied to the live Neon database
+- [x] Schema applied to the live Neon database
+- [x] Tested live on a preview version
+- [x] Career Readiness Hub
+- [x] Career profile: goal, target roles, projects
+- [x] Sessions, booking and waitlists
+- [x] Live schedule and event plan
+- [x] Digital passport, engagement score, leaderboard
+- [x] Matched companies
+- [x] Application tracker
+- [x] Saved companies in the database
+- [x] New events had an empty checklist
+- [x] Honest labels and copy
+- [x] Automated check
+- [x] Interview invites and bookings
+- [x] Booth queues
+- [x] Notifications
+- [x] Opportunities
+- [x] Alumni mentoring sessions
+- [x] Event history and company connections
+- [x] Verified Coursera certificates and courses in progress
+- [x] Coursera check from Cloudflare
+- [x] Verified LeetCode and Codeforces profiles
+- [x] Certificates, replacing test scores
+- [x] LeetCode, Codeforces and Credly from Cloudflare
+- [x] Scores and engagement are student and college only
+- [x] Shortlist decisions stay with their owner
+- [x] Company candidate tools
+- [x] Courses and scores follow the profile's visibility
+- [x] Session times across time zones
+- [x] Event dates shifted a day west of London
+
+</details>
+
+### Test pass
+
+Features that should work, checked once on a real device or the live site.
+
+**Ongoing.** 6 of 8 done, 0 in progress, 2 left.
+
+**Left**
+
+- [ ] Opening hero on a low-end phone · Verify live · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L58)
+- [ ] Link preview card · Verify live · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)
+
+<details><summary>Done (6)</summary>
+
+- [x] Smooth scroll lands anchor links correctly
+- [x] Scroll progress bar and thread
+- [x] Navbar links on the home page
+- [x] Mobile menu at 375px
+- [x] Hero and CTA buttons
+- [x] Employer CRM mockup promised scores to employers
+
+</details>
+
 ## By area
 
 | Area | Progress | Done | Left | Checklist |
@@ -35,7 +269,7 @@ pie showData
 
 ## In progress
 
-Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
+Open pull requests were not read on this run (no GitHub token), so nothing shows as in progress.
 
 ## Left to do
 
@@ -63,11 +297,11 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ### To do (13)
 
-- [ ] **"Start free" does nothing** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)<br><sub>`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · id `audit-follow-ups/start-free-does-nothing`</sub>
+- [ ] **"Start free" does nothing** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)<br><sub>`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2 · id `audit-follow-ups/start-free-does-nothing`</sub>
 - [ ] **No message after Stripe checkout** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21)<br><sub>Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.… · id `audit-follow-ups/no-message-after-stripe-checkout`</sub>
-- [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
+- [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial · Phase 2 · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Scan history is not linked anywhere** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28)<br><sub>`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`,… · id `audit-follow-ups/scan-history-is-not-linked-anywhere`</sub>
-- [ ] **Signed-in people can still open the sign-in page** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)<br><sub>`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · id `audit-follow-ups/signed-in-people-can-still-open-the`</sub>
+- [ ] **Signed-in people can still open the sign-in page** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)<br><sub>`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4 · id `audit-follow-ups/signed-in-people-can-still-open-the`</sub>
 - [ ] **Signing in from a scanned QR loses the profile** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35)<br><sub>The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and… · id `audit-follow-ups/signing-in-from-a-scanned-qr`</sub>
 - [ ] **New messages need a page reload** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40)<br><sub>The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`,… · id `audit-follow-ups/new-messages-need-a-page-reload`</sub>
 - [ ] **Build: Interview counts for colleges** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L52)<br><sub>Where the site shows it: Analytics funnel, Hero dashboard, Product reveal, Journey step 04. Notes: Invites and bookings are built for students and companies; the college… · id `features-to-build/interview-counts-for-colleges`</sub>
@@ -235,6 +469,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - **Source of truth:** every item lives in a file in [`docs/checklists/`](../docs/checklists/). Change the checkbox there, never here.
 - **Done:** tick the box (`- [x]`) in the same commit as the fix. When that commit reaches `main`, the [Launch board workflow](../.github/workflows/launch-board.yml) rebuilds this folder and commits it.
 - **In progress:** open a pull request that ticks the box. The item shows as in progress, with a link to the PR, until the PR merges. You can also write `board: <id>` in a PR's title or description (ids are listed under each item).
+- **Phases:** an item's phase comes from a `· Phase N` tag on its status line, then a `## Phase N: ...` section heading, then the checklist it lives in. A phase is Done when every item is done, Ongoing once anything in it is done or in progress, and Not started otherwise.
 - **Needs the owner, Verify live, Parked:** read from the item's own words ("Owner action", "Verify live", "Tracked") or its section heading.
 - **New items or checklists:** add a `- [ ] **Title.** details` line to any checklist, or a new `docs/checklists/<area>.md` file. The board picks it up on the next run.
 - **Run it yourself:** `node launch-board/generate.mjs`. Set `GITHUB_TOKEN` to include open pull requests.

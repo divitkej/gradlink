@@ -86,6 +86,18 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.
 .tag{font:600 10.5px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:3px;white-space:nowrap;border:1px solid currentColor}
 code{font:12.5px var(--mono);background:var(--surface-2);padding:1px 4px;border-radius:3px}
 .empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.phases{display:flex;flex-direction:column}
+.ph{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.4fr) 104px minmax(0,1fr) 120px;gap:14px;align-items:center;padding:12px 10px;border-top:1px solid var(--line);border-radius:6px}
+.ph:first-child{border-top:0}
+.ph:hover{background:var(--surface-2)}
+.ph[aria-pressed="true"]{background:var(--accent-soft)}
+.ph .nm{font-weight:600;font-size:14px}
+.ph .gl{font-size:12.5px;color:var(--muted);margin-top:2px}
+.ph .n{font-size:12.5px;color:var(--muted);text-align:right}
+.ph .mini{height:8px}
+.pst{font:700 10.5px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:3px;border:1px solid currentColor;justify-self:start}
+.pst.s-done{color:var(--st-done)}.pst.s-ongoing{color:var(--st-in_progress)}.pst.s-not{color:var(--st-todo)}
+@media (max-width:760px){.ph{grid-template-columns:1fr auto}.ph .mini{grid-column:1/-1}.ph .n{grid-column:1/-1;text-align:left}}
 @media (max-width:900px){.summary{grid-template-columns:1fr;justify-items:start}.sev{width:100%}.areas{grid-template-columns:1fr 1fr}}
 @media (max-width:540px){.wrap{padding-inline:16px}.areas{grid-template-columns:1fr}.item{grid-template-columns:18px 1fr}.item .tag{grid-column:2;justify-self:start}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -103,11 +115,16 @@ code{font:12.5px var(--mono);background:var(--surface-2);padding:1px 4px;border-
   </div>
   <section class="panel"><div class="summary" id="summary"></div></section>
   <section class="panel">
+    <div class="panel-h"><h2>Phases</h2><span class="hint">Select a phase to show only its items</span></div>
+    <div class="phases" id="phases"></div>
+  </section>
+  <section class="panel">
     <div class="panel-h"><h2>Areas</h2><span class="hint">Select an area to show only its items</span></div>
     <div class="areas" id="areas"></div>
   </section>
   <div class="controls">
     <div class="seg" role="group" aria-label="Group items">
+      <button type="button" data-view="phase" id="v-phase">By phase</button>
       <button type="button" data-view="state" id="v-state">By status</button>
       <button type="button" data-view="area" id="v-area">By area</button>
     </div>
@@ -122,7 +139,8 @@ code{font:12.5px var(--mono);background:var(--surface-2);padding:1px 4px;border-
 var D=/*__BOARD_DATA__*/null;
 if(!D){document.getElementById("list").innerHTML='<div class="group empty">No data. Run node launch-board/generate.mjs.</div>';return}
 var AREA={};D.areas.forEach(function(a){AREA[a.key]=a.name});
-var ui={view:"state",q:"",hideDone:true,state:null,area:null};
+var PHASE={};D.phases.forEach(function(p){PHASE[p.key]=p});
+var ui={view:"phase",q:"",hideDone:true,state:null,area:null,phase:null};
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function md(s){return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>")}
 function col(s){return "var(--st-"+s+")"}
@@ -149,10 +167,20 @@ function areas(){
   });
   document.getElementById("areas").innerHTML=h;
 }
+function phases(){
+  var h="";
+  D.phases.forEach(function(p){
+    var list=D.items.filter(function(i){return i.phase===p.key}),c=cnt(list),left=list.length-c.done;
+    var cls=p.status==="Done"?"s-done":p.status==="Ongoing"?"s-ongoing":"s-not";
+    h+='<button type="button" class="ph" data-phase="'+esc(p.key)+'" aria-pressed="'+(ui.phase===p.key)+'"><span><span class="nm" style="display:block">'+esc(p.name)+'</span><span class="gl" style="display:block">'+esc(p.goal)+'</span></span><span class="pst '+cls+'">'+esc(p.status)+'</span>'+mini(list)+'<span class="n num">'+c.done+'/'+list.length+' done'+(c.in_progress?', '+c.in_progress+' ongoing':'')+(left?', '+left+' left':'')+'</span></button>';
+  });
+  document.getElementById("phases").innerHTML=h;
+}
 function item(i){
   var meta='<a href="'+src(i)+'" target="_blank" rel="noopener">'+esc(i.area)+'.md:'+i.line+'</a><span>id '+esc(i.id)+'</span>';
   if(i.pr)meta+='<a href="'+esc(i.pr.url)+'" target="_blank" rel="noopener">PR #'+i.pr.number+(i.pr.draft?' (draft)':'')+': '+esc(i.pr.title)+'</a>';
   if(i.doneIn)meta+='<span>Done in "'+esc(i.doneIn)+'"</span>';
+  if(PHASE[i.phase]&&ui.view!=="phase")meta+='<span>'+esc(PHASE[i.phase].name)+'</span>';
   return '<div class="item'+(i.state==="done"?' done':'')+'"><span class="dot" style="color:'+col(i.state)+'" aria-hidden="true"></span><div><div class="ti">'+md(i.title)+'</div><div class="te">'+md(i.detail)+'</div><div class="meta">'+meta+'</div></div><span class="tag" style="color:'+col(i.state)+'">'+esc(D.states[i.state].label)+'</span></div>';
 }
 function list(){
@@ -161,33 +189,38 @@ function list(){
     if(ui.hideDone&&i.state==="done"&&ui.state!=="done")return false;
     if(ui.state&&i.state!==ui.state)return false;
     if(ui.area&&i.area!==ui.area)return false;
+    if(ui.phase&&i.phase!==ui.phase)return false;
     if(q&&(i.title+" "+i.detail+" "+i.id+" "+AREA[i.area]).toLowerCase().indexOf(q)<0)return false;
     return true;
   });
-  var groups=ui.view==="state"
+  var groups=ui.view==="phase"
+    ?D.phases.map(function(p){return{name:p.name,status:p.status,all:D.items.filter(function(i){return i.phase===p.key}),items:f.filter(function(i){return i.phase===p.key})}})
+    :ui.view==="state"
     ?D.openOrder.concat(["done"]).map(function(s){return{name:D.states[s].label,all:D.items.filter(function(i){return i.state===s}),items:f.filter(function(i){return i.state===s})}})
     :D.areas.map(function(a){return{name:a.name,all:D.items.filter(function(i){return i.area===a.key}),items:f.filter(function(i){return i.area===a.key})}});
   var h="";
   groups.forEach(function(g){
     if(!g.items.length)return;
     var c=cnt(g.all);
-    h+='<section class="group"><div class="group-h"><h3>'+esc(g.name)+'</h3>'+(ui.view==="area"?mini(g.all)+'<span class="n num">'+c.done+'/'+g.all.length+' done</span>':'<span class="n num">'+g.items.length+'</span>')+'</div>';
+    h+='<section class="group"><div class="group-h"><h3>'+esc(g.name)+'</h3>'+(g.status?'<span class="pst '+(g.status==="Done"?"s-done":g.status==="Ongoing"?"s-ongoing":"s-not")+'">'+esc(g.status)+'</span>':'')+(ui.view!=="state"?mini(g.all)+'<span class="n num">'+c.done+'/'+g.all.length+' done</span>':'<span class="n num">'+g.items.length+'</span>')+'</div>';
     g.items.forEach(function(i){h+=item(i)});
     h+='</section>';
   });
   document.getElementById("list").innerHTML=h||'<div class="group empty">Nothing matches these filters.</div>';
-  var parts=[];if(ui.area)parts.push(AREA[ui.area]);if(ui.state)parts.push(D.states[ui.state].label);
+  var parts=[];if(ui.phase)parts.push(PHASE[ui.phase].name);if(ui.area)parts.push(AREA[ui.area]);if(ui.state)parts.push(D.states[ui.state].label);
   document.getElementById("af").innerHTML=parts.length?'Showing '+esc(parts.join(", "))+' <button type="button" class="clear" data-clear="1">Clear filters</button>':'';
+  document.getElementById("v-phase").setAttribute("aria-pressed",ui.view==="phase");
   document.getElementById("v-state").setAttribute("aria-pressed",ui.view==="state");
   document.getElementById("v-area").setAttribute("aria-pressed",ui.view==="area");
 }
-function all(){summary();areas();list()}
+function all(){summary();phases();areas();list()}
 document.addEventListener("click",function(e){
   var t=e.target.closest("button");if(!t)return;
   if(t.dataset.state){ui.state=ui.state===t.dataset.state?null:t.dataset.state;all();return}
+  if(t.dataset.phase){ui.phase=ui.phase===t.dataset.phase?null:t.dataset.phase;all();return}
   if(t.dataset.area){ui.area=ui.area===t.dataset.area?null:t.dataset.area;all();return}
   if(t.dataset.view){ui.view=t.dataset.view;list();return}
-  if(t.dataset.clear){ui.area=null;ui.state=null;all();return}
+  if(t.dataset.clear){ui.area=null;ui.state=null;ui.phase=null;all();return}
 });
 document.getElementById("q").addEventListener("input",function(e){ui.q=e.target.value;list()});
 document.getElementById("hide-done").addEventListener("change",function(e){ui.hideDone=e.target.checked;list()});
