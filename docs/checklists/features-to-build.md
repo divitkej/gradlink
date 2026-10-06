@@ -9,7 +9,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Student career profile: degree, graduation year, skills, résumé upload, LinkedIn, GitHub, portfolio, bio
 - Résumé score: rule-based (`lib/resume.ts`), scores skills, education, links, résumé, bio. Not AI.
 - Role checklists for before, during and after each event
-- Events with join codes, statuses and check-in
+- Events with separate student and employer codes, statuses and check-in
 - QR codes and two-way scanning, with notes
 - Company shortlists: shortlisted, priority, maybe, not a fit, with notes
 - Direct messages between students and companies

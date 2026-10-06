@@ -131,7 +131,7 @@ export default function OutcomeReportCard({
               </div>
               <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 14, maxWidth: 560 }}>
                 {PRO_FEATURES_BLURB} Placement Pro adds the per-student and per-employer breakdown,
-                CSV exports, unlimited events and year-over-year comparison.
+                CSV exports and year-over-year comparison.
               </p>
 
               {error && (

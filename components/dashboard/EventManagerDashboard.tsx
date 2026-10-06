@@ -6,10 +6,11 @@ import { Activity, ScanLine, Sparkles } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, LoadingBlock } from "./cards";
 import { Badge, Meter } from "@/components/ui/primitives";
 import Checklist from "./Checklist";
-import JoinCode from "@/components/events/JoinCode";
 import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
 import OutcomeReportCard from "./OutcomeReportCard";
+import AttendeesCard from "./AttendeesCard";
+import EventCodes from "@/components/events/EventCodes";
 import { useSession } from "@/lib/session";
 import { scanLabel,
   getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists,
@@ -66,10 +67,9 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
               {`${event?.title ?? "Career Fair"} · ${EVENT_STATUS_LABEL[event?.status ?? "upcoming"]}`}
             </Badge>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, color: "var(--text)", margin: "14px 0 6px" }}>{session?.org ?? "Career Center"}</h2>
-            <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity, and placement outcomes, connected to your event database.</p>
+            <p style={{ fontSize: 14.5, color: "var(--text-2)", maxWidth: 560 }}>Track readiness, live scans, employer activity and placement outcomes for this event.</p>
           </div>
           <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
-            {event?.join_code && <JoinCode code={event.join_code} labelled />}
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
           </div>
         </div>
@@ -81,6 +81,14 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
         </div>
       </SectionCard>
 
+      {event && (
+        <SectionCard title="Event codes" hint="Students and employers each need their own code to get in">
+          <EventCodes event={event} onChange={setEvent} />
+        </SectionCard>
+      )}
+
+      <AttendeesCard eventId={eventId} />
+
       {scans.length === 0 && (
         <SectionCard accent="rgba(255,255,255,0.25)" style={{ background: "rgba(255,255,255,0.05)" }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -90,7 +98,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <div>
               <div style={{ fontFamily: "var(--font-display)", fontSize: 15.5, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>No activity yet</div>
               <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55, maxWidth: 620 }}>
-                Your event is live. As students check in and companies scan QR codes at booths, live scans, readiness analytics, and engagement will appear here in real time.
+                As students check in and employers scan QR codes at booths, live scans, readiness analytics and engagement will appear here.
               </p>
             </div>
           </div>
@@ -151,7 +159,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
       <SectionCard title="Students needing attention" hint="Low or no engagement" accent="rgba(247,201,72,0.22)">
         <div id="students" />
         {needHelp.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "All students are engaged 🎉"}</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "No students need attention right now."}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {needHelp.map((a) => (
