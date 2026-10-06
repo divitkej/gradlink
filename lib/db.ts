@@ -637,7 +637,7 @@ export function deleteStudentCourse(id: string): Promise<boolean> {
   return safe("deleteStudentCourse", false, () => rpc<boolean>("deleteStudentCourse", id));
 }
 
-/* ---------------- Coding profiles and test scores ---------------- */
+/* ---------------- Coding profiles ---------------- */
 export type CodingSite = "leetcode" | "codeforces";
 
 export interface LeetCodeStats {
@@ -651,17 +651,12 @@ export interface CodeforcesStats {
 
 export interface StudentScoreRow {
   id: string;
-  kind: CodingSite | "test";
-  handle: string | null;
+  kind: CodingSite;
+  handle: string;
   verified_at: string | null;
   /** LeetCodeStats or CodeforcesStats for a verified profile, {} otherwise. */
   stats: Partial<LeetCodeStats & CodeforcesStats>;
   stats_at: string | null;
-  test_key: string | null;
-  test_name: string | null;
-  score: string | null;
-  /** YYYY-MM-DD */
-  taken_on: string | null;
   /** Only on the student's own list. */
   verify_code?: string | null;
   verify_started_at?: string | null;
@@ -685,10 +680,6 @@ export function refreshCodingProfile(id: string): Promise<ScoreResult> {
   return safe("refreshCodingProfile", { ok: false, error: "Couldn't refresh that profile. Please try again." }, () => rpc("refreshCodingProfile", id));
 }
 
-export function addTestScore(input: { testKey: string; testName?: string; score: string; takenOn?: string }): Promise<ScoreResult> {
-  return safe("addTestScore", { ok: false, error: "Couldn't save that score. Please try again." }, () => rpc("addTestScore", input));
-}
-
 export function listStudentScores(studentId: string): Promise<StudentScoreRow[]> {
   if (!studentId) return Promise.resolve([]);
   return safe("listStudentScores", [], () => rpc<StudentScoreRow[]>("listStudentScores", studentId));
@@ -700,6 +691,46 @@ export function setStudentScoreVisible(id: string, visible: boolean): Promise<bo
 
 export function deleteStudentScore(id: string): Promise<boolean> {
   return safe("deleteStudentScore", false, () => rpc<boolean>("deleteStudentScore", id));
+}
+
+/* ---------------- Certificates ---------------- */
+export interface StudentCertificateRow {
+  id: string;
+  /** "credly" when verified with Credly; null when self-reported. */
+  provider: "credly" | null;
+  credential_id: string | null;
+  name: string;
+  issuer: string | null;
+  /** YYYY-MM-DD */
+  issued_on: string | null;
+  expires_on: string | null;
+  credential_url: string | null;
+  verified_at: string | null;
+  /** Only on the student's own list. */
+  visible_to_employers?: boolean;
+}
+
+type CertificateResult = { ok: true; certificate: StudentCertificateRow } | { ok: false; error: string };
+
+export function addCredlyBadge(link: string): Promise<CertificateResult> {
+  return safe("addCredlyBadge", { ok: false, error: "Couldn't check that badge. Please try again." }, () => rpc("addCredlyBadge", link));
+}
+
+export function addCertificate(input: { name: string; issuer: string; issuedOn?: string; expiresOn?: string; credentialUrl?: string; credentialId?: string }): Promise<CertificateResult> {
+  return safe("addCertificate", { ok: false, error: "Couldn't save that certificate. Please try again." }, () => rpc("addCertificate", input));
+}
+
+export function listStudentCertificates(studentId: string): Promise<StudentCertificateRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentCertificates", [], () => rpc<StudentCertificateRow[]>("listStudentCertificates", studentId));
+}
+
+export function setStudentCertificateVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentCertificateVisible", false, () => rpc<boolean>("setStudentCertificateVisible", id, visible));
+}
+
+export function deleteStudentCertificate(id: string): Promise<boolean> {
+  return safe("deleteStudentCertificate", false, () => rpc<boolean>("deleteStudentCertificate", id));
 }
 
 /* ---------------- Engagement ---------------- */

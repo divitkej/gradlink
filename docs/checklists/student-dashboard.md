@@ -10,7 +10,7 @@ Status key as in `landing-page.md`.
 
 ## Before deploying
 
-- [ ] **Apply the new schema to the live Neon database.** `npm run db:migrate` adds `events.timezone` and the `student_scores` table. Additive; until then the live site keeps working as before.
+- [ ] **Apply the new schema to the live Neon database.** `npm run db:migrate` adds `events.timezone` and the `student_scores` and `student_certificates` tables. Additive; until then the live site keeps working as before.
   `db/schema.sql` · Verify live
 - [x] **Schema applied to the live Neon database.** `npm run db:migrate` on 2026-09-29, after merging main: 30 tables, including `event_sessions`, `session_bookings`, `saved_companies`, `applications`, `notifications`, `interview_invites`, `booth_queue` and `student_courses`. Additive only; the live site kept working throughout.
   `db/schema.sql` · Done on 2026-09-29, no commit (database change)
@@ -66,13 +66,13 @@ Status key as in `landing-page.md`.
 - [x] **Coursera check from Cloudflare.** A temporary Worker running this code on Cloudflare's network (deployed, tested, then deleted) read real certificates, the course catalog and issuer names from coursera.org in under a second each. It also runs in the local Workers runtime, the Cloudflare build succeeds, and a certificate page costs under 1 ms of CPU to parse. A Coursera outage shows "Coursera didn't respond", never "no such course".
   `lib/server/coursera.ts` · Done in "Tell a Coursera outage apart from a missing course"
 
-## Coding profiles and test scores
+## Coding profiles and certificates
 
 - [x] **Verified LeetCode and Codeforces profiles.** Neither site lets a user sign in to another app, so the student proves the account is theirs on the site itself: a one-time code in their LeetCode Summary, or a Codeforces submission to problem 4A that fails to compile (it doesn't touch their rating). Only then is the profile shown to anyone else, and a handle can be verified on one account only. Stats are read from the sites, never from the browser: LeetCode problems solved by difficulty, contest rating, top percentage and contests; Codeforces rating, rank, best rating and rated contests. The student can refresh them (at most every 10 minutes). Tested with fakes for every path and against the real sites' public data.
   `lib/server/coding.ts`, `components/dashboard/StudentScores.tsx`, `components/scan/VerifiedScores.tsx` · Done in "Add event time zones, coding profiles and test scores"
-- [x] **Test scores.** GRE, GMAT, TOEFL, IELTS, Duolingo, PTE, SAT, ACT, GATE, CAT or any other test, checked against each exam's real score range. None of these exams lets another site check a score, so employers see them marked "Self-reported".
-  `lib/scores.ts` · Done in "Add event time zones, coding profiles and test scores"
-- [ ] **LeetCode and Codeforces from Cloudflare.** Checked from a normal server so far. Confirm on a preview version that both sites answer requests from Cloudflare's network before going live.
+- [x] **Certificates, replacing test scores.** A Credly badge link (AWS, Google Cloud, IBM, Cisco, Oracle, CompTIA and many more issue through Credly) is read from Credly's public Open Badges API: badge, issuer, issue and expiry dates, and whether it was revoked. It must belong to the student: the name on the badge page matches their GradLink name, or the badge was issued to their GradLink email (Credly publishes its hash). A revoked badge is refused and an expired one is marked. Any other certificate (NPTEL, Microsoft and so on) is shown as self-reported with the credential link the student gives. Up to 30, and the student picks which ones employers see. Tested with fakes for every path and against real Credly badges.
+  `lib/server/credly.ts`, `components/dashboard/StudentCertificates.tsx`, `components/scan/VerifiedCertificates.tsx` · Done in "Replace test scores with verified certificates"
+- [ ] **LeetCode, Codeforces and Credly from Cloudflare.** Checked from a normal server so far. Confirm on a preview version that all three answer requests from Cloudflare's network before going live.
   Verify live
 
 ## Employer privacy
@@ -86,7 +86,7 @@ Colleges want their students hired, so employers see strengths, never assessment
 - [x] **Company candidate tools.** Real filters replaced the decorative chips (which listed Readiness and Resume), the dead Export button became a CSV export, and bulk follow-up is limited to students that company scanned or shortlisted.
   `components/dashboard/CompanyCandidates.tsx` · Done in "Keep student assessments away from employers"
 
-- [x] **Courses and scores follow the profile's visibility.** Main now shows a student's profile only to people who share an event with them. Coursera courses, coding profiles and test scores were still readable by any signed-in account; they now follow the same rule.
+- [x] **Courses and scores follow the profile's visibility.** Main now shows a student's profile only to people who share an event with them. Coursera courses and coding profiles were still readable by any signed-in account; they now follow the same rule.
   `lib/server/rpc.ts` · Done in "Show courses and scores only to people who share an event"
 
 ## Verify on the live site

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Trash2 } from "lucide-react";
 
 /* Reusable dashboard / scan primitives — all on the GradLink dark theme. */
 
@@ -251,5 +251,15 @@ export function Labeled({ label, children }: { label: string; children: ReactNod
       {label}
       {children}
     </label>
+  );
+}
+
+/** The square bin button that removes an item from a list. */
+export function RemoveButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={label} title="Remove"
+      style={{ width: 32, height: 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: "var(--text-2)", cursor: "pointer" }}>
+      <Trash2 size={14} />
+    </button>
   );
 }

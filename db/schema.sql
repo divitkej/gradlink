@@ -20,7 +20,9 @@
 --   * student_courses: Coursera certificates verified with Coursera, and
 --       courses in progress
 --   * student_scores: LeetCode and Codeforces profiles verified with those
---       sites, and self-reported test scores
+--       sites
+--   * student_certificates: Credly badges verified with Credly, and other
+--       certificates the student reports with a credential link
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
@@ -432,32 +434,48 @@ create table if not exists student_courses (
 create index if not exists student_courses_student_idx on student_courses (student_id, created_at desc);
 
 -- ---------------------------------------------------------- student scores --
--- Coding profiles and test scores a student adds to their profile.
---   * leetcode / codeforces: one per student. The row is pending (verify_code
---     or verify_started_at set, verified_at null) until the student proves
---     they own the handle; only verified rows are shown to anyone else, and a
---     handle can be verified on one account only. Stats are read from the site.
---   * test: an exam score (GRE, IELTS, ...) the student reports themselves.
+-- LeetCode and Codeforces profiles, one per site per student. The row is
+-- pending (verify_code or verify_started_at set, verified_at null) until
+-- the student proves they own the handle; only verified rows are shown to
+-- anyone else, and a handle can be verified on one account only. Stats are
+-- read from the site, never from the browser.
 create table if not exists student_scores (
   id                   text primary key default gen_random_uuid()::text,
   created_at           timestamptz not null default now(),
   student_id           text not null references profiles (id) on delete cascade,
-  kind                 text not null check (kind in ('leetcode', 'codeforces', 'test')),
-  handle               text,
+  kind                 text not null check (kind in ('leetcode', 'codeforces')),
+  handle               text not null,
   verify_code          text,
   verify_started_at    timestamptz,
   verified_at          timestamptz,
   stats                jsonb not null default '{}',
   stats_at             timestamptz,
-  test_key             text,
-  test_name            text,
-  score                text,
-  taken_on             text, -- YYYY-MM-DD; text so no time zone can shift the day
-  visible_to_employers boolean not null default true
+  visible_to_employers boolean not null default true,
+  unique (student_id, kind)
 );
-create index if not exists student_scores_student_idx on student_scores (student_id, created_at);
-create unique index if not exists student_scores_site_uniq on student_scores (student_id, kind) where kind <> 'test';
 create unique index if not exists student_scores_handle_uniq on student_scores (kind, lower(handle)) where verified_at is not null;
+
+-- ---------------------------------------------------- student certificates --
+-- Professional certificates on a student's profile. A "credly" row was read
+-- from Credly's public badge API (and the earner is this student); a row
+-- with no provider is the student's own report, shown as self-reported with
+-- the credential link they gave. One Credly badge belongs to one student.
+create table if not exists student_certificates (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  provider             text check (provider in ('credly')),
+  credential_id        text,
+  name                 text not null,
+  issuer               text,
+  issued_on            text, -- YYYY-MM-DD; text so no time zone can shift the day
+  expires_on           text,
+  credential_url       text,
+  verified_at          timestamptz,
+  visible_to_employers boolean not null default true,
+  unique (provider, credential_id)
+);
+create index if not exists student_certificates_student_idx on student_certificates (student_id, created_at);
 
 -- --------------------------------------------------------------- billing --
 -- Written ONLY by the Stripe webhook. The API exposes it read-only to its

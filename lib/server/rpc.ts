@@ -11,7 +11,8 @@ import {
 import {
   CodingError, leetcodeHandle, codeforcesHandle, fetchLeetCode, fetchCodeforces, codeforcesVerified, type CodingSite,
 } from "./coding";
-import { TEST_BY_KEY, scoreProblem, CODING_SITE_LABEL } from "../scores";
+import { CODING_SITE_LABEL } from "../scores";
+import { CredlyError, credlyBadgeId, fetchCredlyBadge, emailMatches } from "./credly";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -214,6 +215,12 @@ async function sharesEventWith(u: AuthUser, profileId: string, role: "student" |
 
 /** Typed by hand off a slide or poster, so 0/O and 1/I/L are left out. */
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const MAX_CERTIFICATES = 30;
+async function certificateCount(studentId: string): Promise<number> {
+  const [{ n }] = await db()`select count(*)::int as n from student_certificates where student_id = ${studentId}`;
+  return n as number;
+}
+
 function codingSite(v: unknown): CodingSite {
   if (v === "leetcode" || v === "codeforces") return v;
   throw new HttpError(400, "Unknown coding site");
@@ -1270,7 +1277,7 @@ export const ops: Record<string, Op> = {
       const [row] = await sql`
         insert into student_scores (student_id, kind, handle, verify_code, verify_started_at)
         values (${u.id}, ${kind}, ${profile.handle}, ${code}, now())
-        on conflict (student_id, kind) where kind <> 'test'
+        on conflict (student_id, kind)
         do update set handle = excluded.handle, verify_code = excluded.verify_code, verify_started_at = excluded.verify_started_at,
                       verified_at = null, stats = '{}', stats_at = null
         returning *
@@ -1319,7 +1326,7 @@ export const ops: Record<string, Op> = {
   /** Re-read a verified profile's stats, at most every 10 minutes. */
   async refreshCodingProfile(u, [id]) {
     const sql = db();
-    const [row] = await sql`select * from student_scores where id = ${s(id)} and student_id = ${u.id} and verified_at is not null and kind <> 'test'`;
+    const [row] = await sql`select * from student_scores where id = ${s(id)} and student_id = ${u.id} and verified_at is not null`;
     if (!row) return { ok: false, error: "That profile isn't on your account." };
     if (row.stats_at && Date.now() - new Date(row.stats_at as string).getTime() < 10 * 60e3) return { ok: true, score: row };
     const kind = codingSite(row.kind);
@@ -1336,40 +1343,17 @@ export const ops: Record<string, Op> = {
       throw err;
     }
   },
-  /** An exam score the student reports; employers see it marked as self-reported. */
-  async addTestScore(u, [input]) {
-    if (u.role !== "student") throw forbidden();
-    const i = (input ?? {}) as Row;
-    const test = TEST_BY_KEY.get(s(i.testKey));
-    if (!test) return { ok: false, error: "Pick a test." };
-    const name = test.key === "other" ? s(i.testName).trim().slice(0, 80) : test.label;
-    if (!name) return { ok: false, error: "Enter the test's name." };
-    const score = s(i.score).trim();
-    const problem = scoreProblem(test, score);
-    if (problem) return { ok: false, error: problem };
-    const takenOn = /^\d{4}-\d{2}-\d{2}$/.test(s(i.takenOn)) ? s(i.takenOn) : null;
-    if (takenOn && (takenOn > new Date().toISOString().slice(0, 10) || takenOn < "1990-01-01")) return { ok: false, error: "Enter the date you took the test." };
-    const sql = db();
-    const [{ n }] = await sql`select count(*)::int as n from student_scores where student_id = ${u.id} and kind = 'test'`;
-    if (n >= 10) return { ok: false, error: "You can add up to 10 test scores." };
-    const [row] = await sql`
-      insert into student_scores (student_id, kind, test_key, test_name, score, taken_on)
-      values (${u.id}, 'test', ${test.key}, ${name}, ${score}, ${takenOn})
-      returning *
-    `;
-    return { ok: true, score: row };
-  },
-  /** The student sees all of theirs; everyone else only verified profiles and tests the student shows. */
+  /** The student sees all of theirs, pending ones included; everyone else only verified profiles the student shows. */
   async listStudentScores(u, [studentId]) {
     const id = s(studentId);
     if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
     return u.id === id
-      ? db()`select * from student_scores where student_id = ${id} order by kind <> 'test' desc, kind, created_at`
+      ? db()`select * from student_scores where student_id = ${id} order by kind`
       : db()`
-          select id, kind, handle, verified_at, stats, stats_at, test_key, test_name, score, taken_on
+          select id, kind, handle, verified_at, stats, stats_at
           from student_scores
-          where student_id = ${id} and visible_to_employers and (kind = 'test' or verified_at is not null)
-          order by kind <> 'test' desc, kind, created_at
+          where student_id = ${id} and visible_to_employers and verified_at is not null
+          order by kind
         `;
   },
   async setStudentScoreVisible(u, [id, visible]) {
@@ -1378,6 +1362,100 @@ export const ops: Record<string, Op> = {
   },
   async deleteStudentScore(u, [id]) {
     const rows = await db()`delete from student_scores where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
+  },
+
+  /*
+    Certificates. A Credly badge is read from Credly and must belong to the
+    student (the name on it, or the email it was issued to). Anything else is
+    the student's own report and is shown as self-reported with its link.
+  */
+  async addCredlyBadge(u, [link]) {
+    if (u.role !== "student") throw forbidden();
+    const id = credlyBadgeId(s(link));
+    if (!id) return { ok: false, error: "That doesn't look like a Credly badge link. It looks like credly.com/badges/1a2b3c4d-..." };
+    try {
+      const sql = db();
+      const [taken] = await sql`select * from student_certificates where provider = 'credly' and credential_id = ${id}`;
+      if (taken) {
+        if (taken.student_id === u.id) return { ok: true, certificate: taken };
+        return { ok: false, error: "This badge is already on another GradLink account." };
+      }
+      if ((await certificateCount(u.id)) >= MAX_CERTIFICATES) return { ok: false, error: `You can add up to ${MAX_CERTIFICATES} certificates.` };
+      const badge = await fetchCredlyBadge(id);
+      if (!badge) return { ok: false, error: "Credly has no badge at that link. Check it and try again." };
+      const [me] = await sql`select full_name, email from profiles where id = ${u.id}`;
+      const myName = s(me?.full_name);
+      const mine = (badge.earnerName && namesMatch(badge.earnerName, myName)) || (await emailMatches(badge.emailHash, s(me?.email)));
+      if (!mine) {
+        return {
+          ok: false,
+          error: badge.earnerName
+            ? `The name on this badge (${badge.earnerName}) doesn't match your GradLink name (${myName}). Only your own badges can be added.`
+            : "Credly isn't showing who earned this badge, and it wasn't issued to your GradLink email. Make the badge public on Credly, then try again.",
+        };
+      }
+      const [row] = await sql`
+        insert into student_certificates (student_id, provider, credential_id, name, issuer, issued_on, expires_on, credential_url, verified_at)
+        values (${u.id}, 'credly', ${id}, ${badge.name.slice(0, 200)}, ${badge.issuer?.slice(0, 200) ?? null}, ${badge.issuedOn}, ${badge.expiresOn},
+                ${`https://www.credly.com/badges/${id}`}, now())
+        returning *
+      `;
+      return { ok: true, certificate: row };
+    } catch (err) {
+      if (err instanceof CredlyError) return { ok: false, error: err.message };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This badge is already on another GradLink account." };
+      throw err;
+    }
+  },
+  /** A certificate the student reports themselves; employers see it marked as self-reported. */
+  async addCertificate(u, [input]) {
+    if (u.role !== "student") throw forbidden();
+    const i = (input ?? {}) as Row;
+    const name = s(i.name).trim().slice(0, 200);
+    const issuer = s(i.issuer).trim().slice(0, 200);
+    if (!name) return { ok: false, error: "Enter the certificate's name." };
+    if (!issuer) return { ok: false, error: "Enter who issued it." };
+    const link = s(i.credentialUrl).trim();
+    if (credlyBadgeId(link)) return { ok: false, error: "That's a Credly badge. Paste it in the Credly box above so it shows as verified." };
+    if (/coursera\.org\//i.test(link)) return { ok: false, error: "That's a Coursera certificate. Add it under Coursera courses so it shows as verified." };
+    let credentialUrl: string | null = null;
+    try {
+      credentialUrl = urlOrNull(link);
+    } catch {
+      return { ok: false, error: "The credential link isn't a valid web address. Use a link that starts with https://" };
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const issuedOn = /^\d{4}-\d{2}-\d{2}$/.test(s(i.issuedOn)) ? s(i.issuedOn) : null;
+    if (issuedOn && (issuedOn > today || issuedOn < "1990-01-01")) return { ok: false, error: "Enter the date you earned it." };
+    const expiresOn = /^\d{4}-\d{2}-\d{2}$/.test(s(i.expiresOn)) ? s(i.expiresOn) : null;
+    if (expiresOn && issuedOn && expiresOn < issuedOn) return { ok: false, error: "The expiry date must be after the date you earned it." };
+    if ((await certificateCount(u.id)) >= MAX_CERTIFICATES) return { ok: false, error: `You can add up to ${MAX_CERTIFICATES} certificates.` };
+    const [row] = await db()`
+      insert into student_certificates (student_id, credential_id, name, issuer, issued_on, expires_on, credential_url)
+      values (${u.id}, ${s(i.credentialId).trim().slice(0, 120) || null}, ${name}, ${issuer}, ${issuedOn}, ${expiresOn}, ${credentialUrl})
+      returning *
+    `;
+    return { ok: true, certificate: row };
+  },
+  /** The student sees all of theirs; everyone else only the ones the student shows. */
+  async listStudentCertificates(u, [studentId]) {
+    const id = s(studentId);
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
+    return u.id === id
+      ? db()`select * from student_certificates where student_id = ${id} order by verified_at is null, issued_on desc nulls last, created_at desc`
+      : db()`
+          select id, provider, credential_id, name, issuer, issued_on, expires_on, credential_url, verified_at
+          from student_certificates where student_id = ${id} and visible_to_employers
+          order by verified_at is null, issued_on desc nulls last, created_at desc
+        `;
+  },
+  async setStudentCertificateVisible(u, [id, visible]) {
+    const rows = await db()`update student_certificates set visible_to_employers = ${Boolean(visible)} where id = ${s(id)} and student_id = ${u.id} returning id`;
+    return rows.length > 0;
+  },
+  async deleteStudentCertificate(u, [id]) {
+    const rows = await db()`delete from student_certificates where id = ${s(id)} and student_id = ${u.id} returning id`;
     return rows.length > 0;
   },
 

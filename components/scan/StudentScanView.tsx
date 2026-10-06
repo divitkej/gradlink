@@ -21,6 +21,7 @@ import { safeHttpUrl } from "@/lib/utils";
 import InterviewInvite from "./InterviewInvite";
 import VerifiedCourses from "./VerifiedCourses";
 import VerifiedScores from "./VerifiedScores";
+import VerifiedCertificates from "./VerifiedCertificates";
 
 export default function StudentScanView({ studentProfileId, eventId }: { studentProfileId: string; eventId: string }) {
   const { session, ready } = useSession();
@@ -224,6 +225,7 @@ function CompanyView({
       <CareerHighlights student={student} />
 
       {student.profile_id && <VerifiedCourses studentId={student.profile_id} />}
+      {student.profile_id && <VerifiedCertificates studentId={student.profile_id} />}
       {student.profile_id && <VerifiedScores studentId={student.profile_id} />}
 
       <SectionCard title="Decision">
@@ -326,6 +328,7 @@ function ManagerView({ student, analytics, scanHistory, companies }: { student: 
       )}
 
       {student.profile_id && <VerifiedCourses studentId={student.profile_id} />}
+      {student.profile_id && <VerifiedCertificates studentId={student.profile_id} />}
       {student.profile_id && <VerifiedScores studentId={student.profile_id} />}
 
       <SectionCard title="Event analytics">

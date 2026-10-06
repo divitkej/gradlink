@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, BookOpen, ExternalLink, Trash2 } from "lucide-react";
+import { BadgeCheck, BookOpen, ExternalLink } from "lucide-react";
 import { GlassPanel, PanelTitle } from "./widgets";
-import { SmallButton, fieldStyle } from "./cards";
+import { SmallButton, RemoveButton, fieldStyle } from "./cards";
 import {
   addCourseraCertificate, addCourseraCourse, listStudentCourses, setStudentCourseVisible, deleteStudentCourse,
   courseraVerifyUrl, courseraCourseUrl, type StudentCourseRow,
@@ -137,10 +137,7 @@ export default function StudentCourses({ profileId, skills, onAddSkills }: {
                   )}
                 </div>
               </div>
-              <button type="button" onClick={() => remove(c)} aria-label={`Remove ${c.course_name}`} title="Remove"
-                style={{ width: 32, height: 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", color: "var(--text-2)", cursor: "pointer" }}>
-                <Trash2 size={14} />
-              </button>
+              <RemoveButton label={`Remove ${c.course_name}`} onClick={() => remove(c)} />
             </div>
           ))}
         </div>

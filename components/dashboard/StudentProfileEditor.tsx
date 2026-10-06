@@ -11,6 +11,7 @@ import type { GLSession } from "@/lib/session";
 import GsapReveal from "@/components/anim/GsapReveal";
 import StudentCourses from "./StudentCourses";
 import StudentScores from "./StudentScores";
+import StudentCertificates from "./StudentCertificates";
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
   const id = useId();
@@ -227,6 +228,7 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       </div>
 
       <StudentCourses profileId={session.profileId} skills={splitList(skills)} onAddSkills={addSkills} />
+      <StudentCertificates profileId={session.profileId} />
       <StudentScores profileId={session.profileId} />
 
       {toast && (
