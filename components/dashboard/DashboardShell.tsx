@@ -6,22 +6,31 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2,
   MessageSquare, BarChart3, Users, Briefcase, ScanLine,
-  Bell, Menu, X, BookOpen, Network, LogOut, History,
+  Bell, Menu, X, BookOpen, Network, LogOut, History, CalendarRange,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useSession, ROLE_LABEL, type AppRole } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { useUnreadMessages } from "@/lib/notifications";
-import { Avatar } from "./cards";
+import { getPlanChoice } from "@/lib/billing";
+import EventGate from "@/components/events/EventGate";
+import { Avatar, LoadingBlock } from "./cards";
+import PlanPicker from "./PlanPicker";
 
 export type DashRole = AppRole;
 
 type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
 
-/** Nav depends on which event is open, so it is built per render. */
+const ALL_EVENTS = "/dashboard/events";
+
+/**
+ * Nav depends on which event is open, so it is built per render.
+ * "All events" is always there, so people can switch events or add another.
+ * With no event open, "Event" would point at the same page, so it is dropped.
+ */
 function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
-  const EV = eventId ? `/events/${eventId}` : "/dashboard/events";
-  return {
+  const EV = eventId ? `/events/${eventId}` : ALL_EVENTS;
+  const nav: Record<AppRole, NavItem[]> = {
   student: [
     { label: "Overview", href: "/dashboard/student", icon: LayoutDashboard },
     { label: "Event", href: EV, icon: CalendarDays },
@@ -56,6 +65,43 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Manual", href: "/dashboard/event-manager#manual", icon: BookOpen },
   ],
   };
+  const all: NavItem = { label: "All events", href: ALL_EVENTS, icon: CalendarRange };
+  for (const role of Object.keys(nav) as AppRole[]) {
+    const items = nav[role].filter((i) => eventId || i.label !== "Event");
+    const after = items.findIndex((i) => i.label === (eventId ? "Event" : "Overview"));
+    items.splice(after + 1, 0, all);
+    nav[role] = items;
+  }
+  return nav;
+}
+
+/**
+ * Whether this college still has to pick a plan. Remembered per account for
+ * the life of the tab, so moving between pages doesn't ask the server again.
+ */
+const planChecked = new Map<string, boolean>();
+
+function usePlanRequired(profileId: string | undefined, isManager: boolean) {
+  // Bumped whenever planChecked changes, so the derived value re-reads it.
+  const [, setVersion] = useState(0);
+  const needed = isManager && !!profileId;
+  const known = needed ? planChecked.get(profileId!) : false;
+
+  useEffect(() => {
+    if (!needed || planChecked.has(profileId!)) return;
+    let cancelled = false;
+    getPlanChoice().then(({ required }) => {
+      planChecked.set(profileId!, required);
+      if (!cancelled) setVersion((v) => v + 1);
+    });
+    return () => { cancelled = true; };
+  }, [needed, profileId]);
+
+  const done = () => {
+    if (profileId) planChecked.set(profileId, false);
+    setVersion((v) => v + 1);
+  };
+  return { required: known ?? null, done };
 }
 
 function roleHome(role: AppRole) {
@@ -77,6 +123,7 @@ export default function DashboardShell({
   const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
   const { count: unread } = useUnreadMessages(session?.profileId);
+  const plan = usePlanRequired(session?.profileId, session?.role === "event_manager");
 
   // Auth gate + role lock: must be signed in, and can only view your own role's pages.
   useEffect(() => {
@@ -97,6 +144,21 @@ export default function DashboardShell({
   }
 
   const activeRole: AppRole = session.role;
+
+  /**
+   * Colleges pick a plan before anything else. Students and employers must
+   * join an event with their code before any page opens, except the events
+   * page, which is where they enter it.
+   */
+  function content() {
+    if (activeRole === "event_manager") {
+      if (plan.required === null) return <LoadingBlock label="Loading your account…" />;
+      if (plan.required) return <PlanPicker onChosen={plan.done} />;
+      return children;
+    }
+    if (pathname === "/dashboard/events") return children;
+    return <EventGate>{() => children}</EventGate>;
+  }
   const nav = buildNav(eventId)[activeRole];
   const displayName = session.name || "Your account";
   const displayOrg = session.org || "";
@@ -212,7 +274,7 @@ export default function DashboardShell({
         </header>
 
         <main style={{ flex: 1, padding: "clamp(16px, 3vw, 32px)", maxWidth: 1280, width: "100%", margin: "0 auto" }}>
-          {children}
+          {content()}
         </main>
       </div>
 

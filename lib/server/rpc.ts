@@ -1,7 +1,10 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
+import { serverEnv } from "./env";
 import type { AuthUser } from "./session";
 import { CHECKLIST_TEMPLATE } from "./checklist-template";
+import { evaluateResume } from "../resume";
+import type { StudentRow } from "../db";
 
 /* ============================================================
    /api/rpc — every data operation the browser used to run directly
@@ -18,6 +21,9 @@ import { CHECKLIST_TEMPLATE } from "./checklist-template";
        college account registered for it);
      * shortlists and their private notes belong to the company that
        made them; the student sees their status, never the notes;
+     * join codes are only returned to the event's owner;
+     * a profile is visible to its owner, or to someone who shares an
+       event with it (fellow students see no contact details);
      * messages, checklist progress, memberships and subscriptions
        are visible to their owner only;
      * writes are owner-only, checked against the session's profile
@@ -163,6 +169,171 @@ function withoutNotes(rows: Row[]): Row[] {
   return rows.map((r) => ({ ...r, notes: null }));
 }
 
+/**
+ * Whether the caller shares an event with someone registered in `role`, and
+ * so may see their profile: as that event's owner, or registered for it.
+ */
+async function sharesEventWith(u: AuthUser, profileId: string, role: "student" | "company"): Promise<boolean> {
+  const rows = await db()`
+    select 1 from event_registrations t join events e on e.id = t.event_id
+    where t.profile_id = ${profileId} and t.role = ${role}
+      and (e.created_by = ${u.id}
+        or exists (select 1 from event_registrations me where me.event_id = t.event_id and me.profile_id = ${u.id}))
+    limit 1
+  `;
+  return rows.length > 0;
+}
+
+/**
+ * Join codes are the key to an event, so only its owner ever receives them,
+ * as `student_code` and `company_code`. The legacy `join_code` column is
+ * never sent; event_codes is the source of truth.
+ */
+async function forViewer(u: AuthUser, event: Row | undefined): Promise<Row | null> {
+  if (!event) return null;
+  const rest = { ...event };
+  delete rest.join_code;
+  if (event.created_by !== u.id) return rest;
+  return (await withCodes([rest]))[0];
+}
+
+async function withCodes(events: Row[]): Promise<Row[]> {
+  if (!events.length) return events;
+  const codes = await db()`select event_id, role, code from event_codes where event_id = any(${events.map((e) => e.id as string)}::text[])`;
+  const code = (id: unknown, role: string) => (codes.find((c) => c.event_id === id && c.role === role)?.code as string) ?? null;
+  return events.map((e) => ({ ...e, student_code: code(e.id, "student"), company_code: code(e.id, "company") }));
+}
+
+/** Which event, and which role, a typed code lets someone into. */
+async function resolveCode(code: string): Promise<{ event: Row; role: "student" | "company" } | null> {
+  const sql = db();
+  const rows = await sql`select e.*, k.role as code_role from event_codes k join events e on e.id = k.event_id where k.code = ${code}`;
+  if (rows[0]) {
+    const event = { ...rows[0] };
+    const role = event.code_role as "student" | "company";
+    delete event.code_role;
+    return { event, role };
+  }
+  // An event made by the previous release between migrating and deploying
+  // only has the old single code, which was always handed to students.
+  const legacy = await sql`select * from events where join_code = ${code}`;
+  return legacy[0] ? { event: legacy[0], role: "student" } : null;
+}
+
+/* ---------------- owner (admin) ---------------- */
+
+/** The site owner, named by email in the ADMIN_EMAILS secret. */
+function isAdmin(u: AuthUser): boolean {
+  const list = (serverEnv().ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return !!u.email && list.includes(u.email.toLowerCase());
+}
+
+/** Everything the owner dashboard shows, in one round of queries. */
+async function adminOverview() {
+  const sql = db();
+  const t0 = Date.now();
+  await sql`select 1`;
+  const dbLatencyMs = Date.now() - t0;
+
+  const [totals, colleges, events, errors, errorCounts] = await Promise.all([
+    sql`
+      select
+        (select count(*) from profiles where role = 'event_manager')::int as colleges,
+        (select count(*) from profiles where role = 'student')::int as students,
+        (select count(*) from profiles where role = 'company')::int as companies,
+        (select count(*) from profiles where created_at > now() - interval '7 days')::int as signups_7d,
+        (select count(*) from events)::int as events,
+        (select count(*) from events where status = 'live')::int as live_events,
+        (select count(*) from event_registrations where role <> 'event_manager')::int as registrations,
+        (select count(*) from scans)::int as scans,
+        (select count(*) from scans where created_at > now() - interval '1 hour')::int as scans_1h,
+        (select count(*) from messages where created_at > now() - interval '24 hours')::int as messages_24h
+    `,
+    sql`
+      select p.id, p.full_name, p.email, p.organization, p.created_at,
+             c.plan_choice, c.plan_selected_at,
+             sub.plan as sub_plan, sub.status as sub_status, sub.current_period_end
+      from profiles p
+      left join colleges c on c.profile_id = p.id
+      left join subscriptions sub on sub.profile_id = p.id
+      where p.role = 'event_manager'
+      order by p.created_at desc
+      limit 1000
+    `,
+    sql`
+      select e.id, e.title, e.status, e.location, e.start_date, e.end_date, e.created_at, e.created_by, e.host_org,
+        (select code from event_codes k where k.event_id = e.id and k.role = 'student') as student_code,
+        (select code from event_codes k where k.event_id = e.id and k.role = 'company') as company_code,
+        (select count(*) from event_registrations r where r.event_id = e.id and r.role = 'student')::int as students,
+        (select count(*) from event_registrations r where r.event_id = e.id and r.role = 'company')::int as companies,
+        (select count(*) from scans x where x.event_id = e.id)::int as scans,
+        (select count(*) from scans x where x.event_id = e.id and x.created_at > now() - interval '15 minutes')::int as scans_15m,
+        (select max(x.created_at) from scans x where x.event_id = e.id) as last_scan_at,
+        (select count(*) from shortlists l where l.event_id = e.id)::int as shortlists,
+        (select count(*) from messages m where m.event_id = e.id)::int as messages
+      from events e
+      order by e.created_at desc
+      limit 2000
+    `,
+    sql`select id, created_at, scope, message from app_errors order by created_at desc limit 50`,
+    sql`
+      select count(*) filter (where created_at > now() - interval '1 hour')::int as last_1h,
+             count(*) filter (where created_at > now() - interval '24 hours')::int as last_24h
+      from app_errors
+    `,
+  ]);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    health: { dbLatencyMs, errors1h: errorCounts[0]?.last_1h ?? 0, errors24h: errorCounts[0]?.last_24h ?? 0 },
+    totals: totals[0],
+    colleges,
+    events,
+    errors,
+  };
+}
+
+/* ---------------- analytics ---------------- */
+
+/**
+ * Per-student event stats, computed from what actually happened (scans,
+ * shortlists, messages) rather than stored counters that nothing updated.
+ *
+ * Engagement is 0 to 100: 15 per company that scanned the student, 10 per
+ * company the student scanned, 20 per shortlist and 10 per message sent.
+ */
+async function computeAnalytics(eventId: string, studentId?: string) {
+  const rows = await db().query(
+    `select ${STUDENT_COLS.replace(/(\w+)/g, "s.$1")}, r.profile_id as reg_profile_id, a.id as analytics_id,
+       (select count(*) from scans x where x.event_id = $1 and x.scanned_profile_id = r.profile_id)::int as profile_views,
+       (select count(distinct x.scanner_profile_id) from scans x where x.event_id = $1 and x.scanned_profile_id = r.profile_id and x.scanner_role = 'company')::int as company_scans,
+       (select count(distinct x.scanned_profile_id) from scans x where x.event_id = $1 and x.scanner_profile_id = r.profile_id and x.scanned_role = 'company')::int as companies_scanned,
+       (select count(*) from shortlists l where l.event_id = $1 and l.student_id = r.profile_id and l.status in ('shortlisted', 'priority'))::int as shortlists,
+       (select count(*) from messages m where m.event_id = $1 and m.receiver_profile_id = r.profile_id)::int as messages_received,
+       (select count(*) from messages m where m.event_id = $1 and m.sender_profile_id = r.profile_id)::int as messages_sent
+     from event_registrations r
+     left join students s on s.id = r.profile_id
+     left join student_event_analytics a on a.event_id = r.event_id and a.student_id = r.profile_id
+     where r.event_id = $1 and r.role = 'student' ${studentId ? "and r.profile_id = $2" : ""}`,
+    studentId ? [eventId, studentId] : [eventId],
+  );
+  return rows.map((r) => {
+    const n = (k: string) => Number(r[k]) || 0;
+    const engagement = n("company_scans") * 15 + n("companies_scanned") * 10 + n("shortlists") * 20 + n("messages_sent") * 10;
+    return {
+      id: (r.analytics_id as string) ?? `${eventId}:${r.reg_profile_id}`,
+      event_id: eventId,
+      student_id: r.reg_profile_id as string,
+      profile_views: n("profile_views"),
+      company_scans: n("company_scans"),
+      shortlists: n("shortlists"),
+      messages_received: n("messages_received"),
+      resume_score: r.id ? evaluateResume(r as unknown as StudentRow).score : 0,
+      engagement_score: Math.min(100, engagement),
+    };
+  });
+}
+
 /* ---------------- join codes ---------------- */
 
 /** Typed by hand off a slide or poster, so 0/O and 1/I/L are left out. */
@@ -183,8 +354,11 @@ export const ops: Record<string, Op> = {
   /* Students */
   /** Companies and colleges see the full profile; a fellow student sees no contact details. */
   async getStudentByProfile(u, [profileId]) {
-    const cols = u.role === "student" && profileId !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
-    const rows = await db().query(`select ${cols} from students where id = $1`, [s(profileId)]);
+    const id = s(profileId);
+    // Someone else's profile only when you share an event with them.
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
+    const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
@@ -203,8 +377,10 @@ export const ops: Record<string, Op> = {
   },
 
   /* Companies */
-  async getCompanyByProfile(_u, [profileId]) {
-    const rows = await db().query(`select ${COMPANY_COLS} from companies where id = $1`, [s(profileId)]);
+  async getCompanyByProfile(u, [profileId]) {
+    const id = s(profileId);
+    if (id !== u.id && !(await sharesEventWith(u, id, "company"))) return null;
+    const rows = await db().query(`select ${COMPANY_COLS} from companies where id = $1`, [id]);
     return rows[0] ?? null;
   },
   async updateCompanyProfile(u, [profileId, fields]) {
@@ -228,12 +404,21 @@ export const ops: Record<string, Op> = {
       if (u.role === "student") throw forbidden();
       await requireMember(u, eventId);
     }
-    const rows = await db()`select * from student_event_analytics where student_id = ${s(studentId)} and event_id = ${s(eventId)}`;
+    const rows = await computeAnalytics(s(eventId), s(studentId));
     return rows[0] ?? null;
   },
   async listAnalytics(u, [eventId]) {
     await requireStaff(u, eventId);
-    return db()`select * from student_event_analytics where event_id = ${s(eventId)}`;
+    return computeAnalytics(s(eventId));
+  },
+  /** Headcounts anyone in the event may see, without the people behind them. */
+  async getEventCounts(u, [eventId]) {
+    await requireMember(u, eventId);
+    const rows = await db()`
+      select count(*) filter (where role = 'student')::int as students, count(*) filter (where role = 'company')::int as companies
+      from event_registrations where event_id = ${s(eventId)}
+    `;
+    return rows[0] ?? { students: 0, companies: 0 };
   },
 
   /* Scans: append-only, and only for a scan you performed at an event you're in. */
@@ -244,12 +429,15 @@ export const ops: Record<string, Op> = {
     // nothing to record, so it is skipped rather than failing.
     if (!i.eventId) return false;
     await requireMember(u, i.eventId);
-    // The scanner's role is the account's real role, not whatever the browser sends.
+    // Both roles come from the accounts, not whatever the browser sends, and
+    // the scanned person must be registered for the same event, so the stats
+    // built from scans can be trusted.
     const rows = await db()`
       insert into scans (event_id, scanner_profile_id, scanned_profile_id, scanner_role, scanned_role, scan_context, notes)
-      select ${s(i.eventId)}, ${u.id}, ${s(i.scannedProfileId)}, ${u.role},
-             ${textOrNull(i.scannedRole, 50)}, ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
-      where exists (select 1 from profiles where id = ${s(i.scannedProfileId)})
+      select ${s(i.eventId)}, ${u.id}, r.profile_id, ${u.role}, r.role,
+             ${textOrNull(i.scanContext, 50) ?? "qr"}, ${textOrNull(i.notes)}
+      from event_registrations r
+      where r.event_id = ${s(i.eventId)} and r.profile_id = ${s(i.scannedProfileId)}
       returning id
     `;
     return rows.length > 0;
@@ -272,6 +460,11 @@ export const ops: Record<string, Op> = {
     if (u.role !== "company") throw forbidden();
     await requireMember(u, i.eventId);
     if (!SHORTLIST_STATUSES.includes(s(i.status))) throw new HttpError(400, "Unknown shortlist status.");
+    // Only students registered for this event can be shortlisted at it.
+    const student = await db()`
+      select 1 from event_registrations where event_id = ${s(i.eventId)} and profile_id = ${s(i.studentId)} and role = 'student'
+    `;
+    if (!student.length) throw forbidden();
     // created_at is kept across status changes, as before.
     await db()`
       insert into shortlists (event_id, company_id, student_id, status, notes)
@@ -377,30 +570,32 @@ export const ops: Record<string, Op> = {
   },
 
   /* Events */
-  /** Registered people and the owner only, since the row carries the join code. */
+  /** Registered people and the owner only; the codes only for the owner. */
   async getEvent(u, [eventId]) {
     const a = await eventAccess(u, eventId);
     if (!a.owner && !a.member) return null;
     const rows = await db()`select * from events where id = ${s(eventId)}`;
-    return rows[0] ?? null;
+    return forViewer(u, rows[0]);
   },
   async listEventsForManager(u, [managerProfileId]) {
     isMe(u, managerProfileId);
-    return db()`select * from events where created_by = ${u.id} order by created_at desc`;
+    const rows = await db()`select * from events where created_by = ${u.id} order by created_at desc`;
+    return Promise.all(rows.map((e) => forViewer(u, e)));
   },
   /** Your own memberships only, as the registrations collection-group rule allowed. */
   async listEventsForProfile(u, [profileId]) {
     isMe(u, profileId);
-    return db()`
+    const rows = await db()`
       select e.* from event_registrations r join events e on e.id = r.event_id
       where r.profile_id = ${u.id} order by e.start_date desc nulls last
     `;
+    return Promise.all(rows.map((e) => forViewer(u, e)));
   },
-  async getEventByCode(_u, [code]) {
+  async getEventByCode(u, [code]) {
     const c = s(code).trim().toUpperCase();
     if (!c) return null;
-    const rows = await db()`select * from events where join_code = ${c}`;
-    return rows[0] ?? null;
+    const found = await resolveCode(c);
+    return found ? forViewer(u, found.event) : null;
   },
   /** Any college can create an event; it is always owned by the caller. */
   async createEvent(u, [input]) {
@@ -416,14 +611,19 @@ export const ops: Record<string, Op> = {
     for (let attempt = 0; attempt < 5; attempt++) {
       const id = crypto.randomUUID();
       // Collisions at 31^6 are vanishingly rare; lengthen rather than loop forever.
-      const joinCode = randomCode(attempt < 4 ? 6 : 8);
+      const len = attempt < 4 ? 6 : 8;
+      const studentCode = randomCode(len);
+      let companyCode = randomCode(len);
+      while (companyCode === studentCode) companyCode = randomCode(len);
       try {
         const [rows] = await sql.transaction([
-          sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, join_code)
+          sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org)
               values (${id}, ${title}, ${s(i.description).trim() || null}, ${s(i.location).trim() || null},
                       ${s(i.startDate) || null}, ${s(i.endDate) || null}, ${status}, ${u.id},
-                      ${textOrNull(i.hostOrg, 300)}, ${joinCode})
+                      ${textOrNull(i.hostOrg, 300)})
               returning *`,
+          // One code for students and a different one for employers.
+          sql`insert into event_codes (code, event_id, role) values (${studentCode}, ${id}, 'student'), (${companyCode}, ${id}, 'company')`,
           // The organiser is registered into their own event so it appears in
           // their event list the same way a joined event does.
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
@@ -432,9 +632,9 @@ export const ops: Record<string, Op> = {
         // A failure here must not report the event as failed: the checklist is
         // also added the first time anyone opens it.
         await addDefaultChecklist(id).catch((err) => console.error("[rpc] default checklist", err));
-        return { ok: true, event: rows[0] };
+        return { ok: true, event: await forViewer(u, rows[0]) };
       } catch (err) {
-        if ((err as { code?: string }).code === "23505") continue; // join_code clash — retry
+        if ((err as { code?: string }).code === "23505") continue; // code clash — retry
         console.error("[rpc] createEvent", err);
         return { ok: false, error: "Couldn't create the event. Please try again." };
       }
@@ -451,6 +651,7 @@ export const ops: Record<string, Op> = {
     };
     const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined);
     if (!entries.length) return true;
+    if (f.title !== undefined && !s(f.title).trim()) throw new HttpError(400, "Give your event a name.");
     const sets = entries.map(([k], idx) => `${k} = $${idx + 3}`);
     const rows = await db().query(
       `update events set ${sets.join(", ")} where id = $1 and created_by = $2 returning id`,
@@ -459,28 +660,106 @@ export const ops: Record<string, Op> = {
     if (!rows.length) throw forbidden();
     return true;
   },
-  /** Join by short code. Idempotent — re-joining never resets check-in or analytics. */
+  /**
+   * Join by short code. Students need the event's student code and employers
+   * its employer code; organisers create events rather than join them.
+   * Idempotent — re-joining never resets check-in.
+   */
   async joinEventByCode(u, [code, profileId]) {
     isMe(u, profileId);
     const c = s(code).trim().toUpperCase();
     if (!c) return { ok: false, error: "Enter the event code your college gave you." };
-    const sql = db();
-    const rows = await sql`select * from events where join_code = ${c}`;
-    const event = rows[0];
-    if (!event) return { ok: false, error: "No event matches that code. Check it and try again." };
+    if (u.role === "event_manager") return { ok: false, error: "College accounts create events instead of joining them with a code." };
+    const found = await resolveCode(c);
+    if (!found) return { ok: false, error: "No event matches that code. Check it and try again." };
+    const { event, role } = found;
+    if (role !== u.role) {
+      return {
+        ok: false,
+        error: role === "company"
+          ? "That is the employer code for this event. Ask your college for the student code."
+          : "That is the student code for this event. Ask the college for the employer code.",
+      };
+    }
     if (event.status === "ended") return { ok: false, error: `${event.title} has already finished.` };
 
     // The registration role is the account's real role, not whatever the browser sends.
-    const queries = [
-      sql`insert into event_registrations (event_id, profile_id, role) values (${event.id}, ${u.id}, ${u.role})
-          on conflict (event_id, profile_id) do nothing`,
-    ];
-    if (u.role === "student") {
-      queries.push(sql`insert into student_event_analytics (event_id, student_id) values (${event.id}, ${u.id})
-                       on conflict (event_id, student_id) do nothing`);
+    await db()`insert into event_registrations (event_id, profile_id, role) values (${event.id}, ${u.id}, ${u.role})
+               on conflict (event_id, profile_id) do nothing`;
+    return { ok: true, event: await forViewer(u, event) };
+  },
+  /** Replace a leaked code. The old one stops working at once. Owner only. */
+  async regenerateEventCode(u, [eventId, role]) {
+    if (!(await eventAccess(u, eventId)).owner) throw forbidden();
+    if (role !== "student" && role !== "company") throw new HttpError(400, "Unknown code type.");
+    const sql = db();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = randomCode(attempt < 4 ? 6 : 8);
+      try {
+        await sql`insert into event_codes (code, event_id, role) values (${code}, ${s(eventId)}, ${role})
+                  on conflict (event_id, role) do update set code = excluded.code, created_at = now()`;
+        return code;
+      } catch (err) {
+        if ((err as { code?: string }).code === "23505") continue;
+        throw err;
+      }
     }
-    await sql.transaction(queries);
-    return { ok: true, event };
+    throw new HttpError(500, "Couldn't make a new code. Please try again.");
+  },
+  /** Everyone who joined the event, with the details they signed up with. Owner only. */
+  async listAttendees(u, [eventId]) {
+    if (!(await eventAccess(u, eventId)).owner) throw forbidden();
+    return db()`
+      select r.profile_id, r.role, r.created_at as joined_at, r.checked_in,
+             p.full_name, p.email, p.organization,
+             s.university, s.degree, s.graduation_year,
+             c.company_name, c.company, c.sector, c.booth_number
+      from event_registrations r
+      join profiles p on p.id = r.profile_id
+      left join students s on s.id = r.profile_id
+      left join companies c on c.id = r.profile_id
+      where r.event_id = ${s(eventId)} and r.role in ('student', 'company')
+      order by r.created_at desc
+    `;
+  },
+
+  /* Plan choice — asked once of every college after they sign in. */
+  async getPlanChoice(u) {
+    if (u.role !== "event_manager") return { required: false, choice: null };
+    const rows = await db()`
+      select c.plan_choice, c.plan_selected_at, sub.plan as sub_plan
+      from profiles p left join colleges c on c.profile_id = p.id left join subscriptions sub on sub.profile_id = p.id
+      where p.id = ${u.id}
+    `;
+    const r = rows[0] ?? {};
+    const chosen = !!r.plan_selected_at || r.sub_plan === "pro";
+    return { required: !chosen, choice: (r.plan_choice as string) ?? (r.sub_plan === "pro" ? "pro" : null) };
+  },
+  /** Records the choice only. Pro features still come from the Stripe webhook. */
+  async choosePlan(u, [plan]) {
+    if (u.role !== "event_manager") throw forbidden();
+    if (plan !== "free" && plan !== "pro") throw new HttpError(400, "Choose a plan.");
+    const sql = db();
+    const updated = await sql`
+      update colleges set plan_choice = ${plan}, plan_selected_at = now() where profile_id = ${u.id} returning id
+    `;
+    if (!updated.length) {
+      // Accounts imported without a college row get one now, keyed like sign-up does.
+      await sql`
+        insert into colleges (id, profile_id, full_name, email, institution, plan_choice, plan_selected_at)
+        values (${u.id}, ${u.id}, ${u.name}, ${u.email}, ${u.org || null}, ${plan}, now())
+      `;
+    }
+    return true;
+  },
+
+  /* Owner dashboard. Anyone else gets a plain 404, so the page doesn't advertise itself. */
+  async isAdmin(u) {
+    return isAdmin(u);
+  },
+  async adminOverview(u) {
+    if (!isAdmin(u)) throw new HttpError(404, "Not found.");
+    return adminOverview();
   },
 
   /* Billing — read-only, owner only. Only the Stripe webhook writes it. */

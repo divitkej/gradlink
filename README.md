@@ -86,7 +86,7 @@ into the build.
 | `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLink <SMTP_USER>`; required with Resend |
 | `APP_URL` | yes, before launch | Public origin (your custom domain, for example `https://your-domain.example`) used in password-reset links, upload URLs and the Stripe return URL. Falls back to the request origin when empty. Set in `wrangler.jsonc` `vars` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
-| `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Create the account right after setting it, so nobody else can register that email. Secret |
+| `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can open the owner dashboard at `/admin` and approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Sign up with the email right after setting it, so nobody else can register it. Secret |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
 
 Generate an `AUTH_SECRET`:
@@ -104,8 +104,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 
 The app only talks to Neon over HTTPS (`neon()` HTTP driver): one stateless
 request per query, no pooled sockets held by the Worker, so Neon's compute can
-scale to zero between visits. The only polling in the UI (the unread-messages
-badge) runs once a minute and only in a visible tab.
+scale to zero between visits. The only polling in the UI is the unread-messages
+badge (once a minute) and the owner dashboard at `/admin` (every 30 seconds),
+and both only run in a visible tab.
 
 ## Cloudflare
 

@@ -101,10 +101,13 @@ export default function Checklist({
   role,
   profileId,
   eventId,
+  onProgress,
 }: {
   role: AppRole;
   profileId: string;
   eventId: string;
+  /** Called with the completion percentage once loaded and after every change. */
+  onProgress?: (pct: number) => void;
 }) {
   const [items, setItems] = useState<ChecklistItemRow[]>([]);
   const [done, setDone] = useState<Record<string, boolean>>({});
@@ -162,6 +165,10 @@ export default function Checklist({
 
   const totalDone = items.filter((i) => done[i.id]).length;
   const pct = items.length ? Math.round((totalDone / items.length) * 100) : 0;
+
+  useEffect(() => {
+    if (!loading) onProgress?.(pct);
+  }, [loading, pct, onProgress]);
 
   return (
     <SectionCard

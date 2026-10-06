@@ -5,7 +5,7 @@ import { SectionCard, LoadingBlock } from "@/components/dashboard/cards";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import JoinEventForm from "./JoinEventForm";
-import CreateEventForm from "./CreateEventForm";
+import EventForm from "./EventForm";
 
 /**
  * Wraps any view that only makes sense inside an event.
@@ -35,11 +35,11 @@ export default function EventGate({
       right={<CalendarPlus size={18} color="var(--accent)" />}
     >
       <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 18, maxWidth: 620 }}>
-        An event is a career fair, placement drive or employer day. Once it exists you&apos;ll get a
-        join code to share. Students and employers use it to register, and everything they do at
-        the event reports back here.
+        An event is a career fair, placement drive or employer day. Once it exists you&apos;ll get two
+        codes: one for students and one for employers. Each person registers with their code, and
+        everything they do at the event reports back here.
       </p>
-      <CreateEventForm />
+      <EventForm />
     </SectionCard>
   ) : (
     <SectionCard
@@ -48,8 +48,9 @@ export default function EventGate({
       right={<Ticket size={18} color="var(--accent)" />}
     >
       <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 18, maxWidth: 620 }}>
-        Your college shares a short code for each career fair. Enter it here to register. Your QR,
-        checklist and the employer list all become available once you&apos;re in.
+        {session?.role === "company"
+          ? "The college running the fair gives employers their own code. Enter it here to register your company. Your QR, candidate list and checklist open once you're in."
+          : "Your college gives students a code for each career fair. Enter it here to register. Your QR, checklist and the employer list open once you're in."}
       </p>
       <JoinEventForm />
     </SectionCard>
