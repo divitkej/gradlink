@@ -37,8 +37,9 @@ export interface ServerEnv {
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICE_PRO?: string;
   /**
-   * Comma-separated emails allowed into the owner dashboard at /admin. Secret.
-   * Create the account with that email before setting this.
+   * Comma-separated emails allowed into the owner pages under /admin: the owner dashboard
+   * and college domain approvals. These emails also skip the sign-up email rules. Secret.
+   * Sign up with the email right after setting this, so nobody else can register it.
    */
   ADMIN_EMAILS?: string;
   /** Workers KV namespace holding résumés, brochures and logos. */

@@ -26,11 +26,13 @@ SMTP_PASS=<GMAIL_APP_PASSWORD>
 # RESEND_API_KEY=<RESEND_API_KEY>
 # EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
 
+# Owner pages under /admin: the owner dashboard and college domain approvals.
+# Comma-separated. These emails also skip the sign-up email rules, so set this
+# first, then sign up with the email straight away.
+ADMIN_EMAILS=<YOUR_EMAIL>
+
 # Optional — only needed to test the Placement Pro upgrade.
 STRIPE_SECRET_KEY=<STRIPE_SECRET_KEY>
 STRIPE_WEBHOOK_SECRET=<STRIPE_WEBHOOK_SECRET>
 STRIPE_PRICE_PRO=<STRIPE_PRICE_ID>
 
-# Optional. Comma-separated emails that can open the owner dashboard at /admin.
-# Sign up with that email first, so nobody else can register it.
-ADMIN_EMAILS=<YOUR_EMAIL>
