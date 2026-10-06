@@ -6,7 +6,7 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 28 / 32 done, 4 need a real device, the live database or the go-live step
+## Progress: 29 / 33 done, 4 need a real device, the live database or the go-live step
 
 ## Before deploying
 
@@ -85,6 +85,9 @@ Colleges want their students hired, so employers see strengths, never assessment
   `lib/server/rpc.ts` · Done in "Keep student assessments away from employers"
 - [x] **Company candidate tools.** Real filters replaced the decorative chips (which listed Readiness and Resume), the dead Export button became a CSV export, and bulk follow-up is limited to students that company scanned or shortlisted.
   `components/dashboard/CompanyCandidates.tsx` · Done in "Keep student assessments away from employers"
+
+- [x] **Courses and scores follow the profile's visibility.** Main now shows a student's profile only to people who share an event with them. Coursera courses, coding profiles and test scores were still readable by any signed-in account; they now follow the same rule.
+  `lib/server/rpc.ts` · Done in "Show courses and scores only to people who share an event"
 
 ## Verify on the live site
 

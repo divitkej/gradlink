@@ -1226,6 +1226,7 @@ export const ops: Record<string, Op> = {
   /** The student sees all of theirs; everyone else only what the student shows employers. */
   async listStudentCourses(u, [studentId]) {
     const id = s(studentId);
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
     return u.id === id
       ? db()`select * from student_courses where student_id = ${id} order by status, completed_at desc nulls last, created_at desc`
       : db()`
@@ -1361,6 +1362,7 @@ export const ops: Record<string, Op> = {
   /** The student sees all of theirs; everyone else only verified profiles and tests the student shows. */
   async listStudentScores(u, [studentId]) {
     const id = s(studentId);
+    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
     return u.id === id
       ? db()`select * from student_scores where student_id = ${id} order by kind <> 'test' desc, kind, created_at`
       : db()`
