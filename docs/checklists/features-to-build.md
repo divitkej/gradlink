@@ -7,7 +7,36 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 ## What exists today (for reference)
 
 - Student career profile: degree, graduation year, skills, résumé upload, LinkedIn, GitHub, portfolio, bio
-- Résumé score: rule-based (`lib/resume.ts`), scores skills, education, links, résumé, bio. Not AI.
+- Résumé score: rule-based (`lib/resume.ts`), scores skills, education, links, résumé, bio. Not AI, and labelled "Rule-based" everywhere it shows.
+- Career goal, target roles and projects on the student profile
+- Career Readiness Hub: overall readiness score, profile-complete percentage, six competencies (communication, technology, professionalism, teamwork, critical thinking, leadership) with the evidence behind each, a personalised action plan and the Fair-Ready badge (`lib/readiness.ts`, `components/dashboard/StudentReadiness.tsx`)
+- Event sessions: workshops, mock interviews, company sessions, 1:1 recruiter slots, networking, talks. Organisers and companies publish them from the event page, students book them, full sessions have a waitlist that promotes automatically, hosts mark attendance
+- Live event schedule and personal event plan (booked sessions plus saved companies by booth) at `/dashboard/student/schedule`
+- Digital event passport, live engagement score and engagement leaderboard at `/dashboard/student/passport` (`lib/engagement.ts`)
+- Company matching on skills and target roles, with save to plan
+- Student application tracker with interview dates and outcomes (applied, interviewing, offer, accepted) at `/dashboard/student/applications`
+- Saved companies, interest, booth visits and notes stored per event in the database (were localStorage)
+- Manager analytics computed live from real activity (were stored rows seeded to zero)
+- Interview invites: a company invites a student it met with up to five proposed times; the student picks one, which books it into their applications; either side is notified (`components/scan/InterviewInvite.tsx`, `components/dashboard/StudentApplications.tsx`)
+- Live booth queues: students join from their plan or a company's page (up to 3 at once) and see their place; the company calls the next student, who is told it is their turn (`components/dashboard/QueueControl.tsx`, `components/dashboard/CompanyQueue.tsx`)
+- In-app notifications for interview invites and replies, waitlist places and queue calls, behind the header bell (`/dashboard/notifications`)
+- Opportunities: every open role at the event, ranked for the student, with internships marked and one-click tracking (`/dashboard/student/opportunities`)
+- Alumni mentoring as a session type the college publishes and students book
+- Coursera courses on the career profile: certificate links verified with Coursera (course, issuer, completion date, skills; the name on the certificate must match the student), plus courses in progress; employers and the college see the ones the student chooses (`lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`)
+- Coding profiles and certificates on the career profile: LeetCode and Codeforces verified with each site after the student proves the account is theirs; Credly badges verified with Credly, other certificates marked self-reported with their credential link; employers see the ones the student chooses (`lib/server/coding.ts`, `lib/server/credly.ts`, `components/dashboard/StudentCertificates.tsx`)
+- Event time zones: session times are entered and shown in the event's zone on every device (`lib/format.ts`)
+- Event history and company connections on the career profile, across every event (`components/dashboard/StudentHistory.tsx`)
+- Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
+
+## Decision: employers see strengths, never assessments
+
+Colleges are the customer and want their students hired, so nothing an employer sees should count against a student. Enforced in the API (`lib/server/rpc.ts`), not only hidden in the UI:
+
+- Résumé score, readiness, competencies, engagement score, leaderboard and scan history are visible to the student and their college (the event's organiser) only.
+- Employers see the profile the student chose to share: degree, year, skills, target roles, career goal, projects, résumé and links.
+- A company sees only its own shortlist decisions and notes. A student sees only the companies that shortlisted them, never "maybe" or "not a fit", and never a company's notes.
+
+So these are not planned for employers: filtering or sorting by readiness, résumé score, GPA or event activity. The landing page Employer CRM mockup was changed to match.
 - Role checklists for before, during and after each event
 - Events with separate student and employer codes, statuses and check-in
 - QR codes and two-way scanning, with notes
@@ -20,24 +49,11 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 
 | Feature | Where the site shows it | Notes |
 |---|---|---|
-| Interview tracking (invites, bookings) | Analytics funnel, Employer CRM pipeline and actions ("Invite to Interview"), Hero dashboard, Product reveal, Journey step 03 and 04, Platform tab "Employer CRM" | No interview table or status |
-| Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | No offers table |
+| Interview counts for colleges | Analytics funnel, Hero dashboard, Product reveal, Journey step 04 | Invites and bookings are built for students and companies; the college dashboard and outcome report do not count them yet |
+| Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
-| Competency readiness breakdown (communication, technology, and so on) | Readiness section bars, Hero dashboard panel | Only the résumé score exists |
-| Overall readiness score and profile-complete percentage | Readiness rings, Platform tab "Career Readiness Hub" | Checklist progress exists, a single score does not |
-| Mock interviews | Readiness actions, Hero schedule, Platform tab, Journey step 01, Why GradLink card | |
-| Workshops and sessions | Hero schedule, Product reveal schedule, Live Event passport, Analytics activity chart, Journey step 02 | |
-| Live event schedule | Hero dashboard, Product reveal | |
-| Digital event passport | Live Event section, Platform tab "Live Event Mode", Journey step 02 | Scans exist, a passport view does not |
-| Engagement leaderboard | Live Event section | `engagement_score` exists, no ranked view |
-| Booth queues and waitlists, 1:1 recruiter slots | Platform tab "Live Event Mode", Journey step 02 | |
-| Company matching ("Matched companies") | Hero dashboard | |
-| Candidate filters (degree, graduation year, GPA, skills, readiness, résumé score, activity, stage) | Employer CRM filter chips | Check which filters the company dashboard supports; GPA is not stored |
-| Candidate stages "Contacted", "Interview", "Offer" | Employer CRM pipeline, Platform tab CRM mini | Real stages are shortlisted, priority, maybe, not a fit |
-| Bulk messages | Why GradLink card "Helps employers follow up faster" | Only one-to-one messages |
-| CSV export for companies | Not shown any more (the mockup's "Export CSV" was removed) | Only the college outcome report exports CSV |
-| Applications | Journey step 03 | |
-| Alumni mentoring, internships | Why GradLink card "Useful all year round" | |
+| Candidate stages "Contacted" and "Offer" | Employer CRM pipeline, Platform tab CRM mini | "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies |
+| Alumni accounts | Why GradLink card "Useful all year round" | Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves |
 | Year-over-year comparison | Pricing (Placement Pro) | |
 
 ## Removed from the footer until they exist

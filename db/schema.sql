@@ -4,7 +4,8 @@
 -- Apply with:   npm run db:migrate        (reads DATABASE_URL from .dev.vars)
 -- or paste into the Neon console's SQL Editor.
 --
--- Idempotent: every statement is `if not exists`, so re-running is safe.
+-- Idempotent: every statement is `if not exists` (or guarded the same way),
+-- so re-running is safe.
 --
 -- Table and column names match the original Supabase schema (and the snake_case
 -- fields the Firestore layer carried over), so the app's row types are
@@ -12,6 +13,16 @@
 --   * events.join_code / host_org       — the multi-event model
 --   * subscriptions                     — Stripe entitlement (was Firestore-only)
 --   * auth_credentials / password_reset_tokens — replaces Supabase/Firebase Auth
+--   * event_sessions, session_bookings, saved_companies, applications:
+--       the student readiness hub, schedule, passport and application tracker
+--   * notifications, interview_invites, booth_queue: alerts, interview
+--       invites and live booth queues
+--   * student_courses: Coursera certificates verified with Coursera, and
+--       courses in progress
+--   * student_scores: LeetCode and Codeforces profiles verified with those
+--       sites
+--   * student_certificates: Credly badges verified with Credly, and other
+--       certificates the student reports with a credential link
 --
 -- Central invariant, carried over from the Firebase layer: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
@@ -176,8 +187,12 @@ create table if not exists events (
   host_org     text,
   -- Legacy single join code. Codes now live in event_codes; this column is
   -- kept so events created before the split still resolve (as student codes).
-  join_code    text unique
+  join_code    text unique,
+  -- IANA zone the event runs in (e.g. Asia/Kolkata). Session times are
+  -- entered and shown in it; null for events made before it was stored.
+  timezone     text
 );
+alter table events add column if not exists timezone text;
 create index if not exists events_created_by_idx on events (created_by, created_at desc);
 
 -- Each event has one code for students and a different one for employers.
@@ -324,6 +339,205 @@ create table if not exists checklist_progress (
   completed_at       timestamptz,
   unique (profile_id, checklist_item_id)
 );
+
+-- ------------------------------------------------ student career profile --
+-- Career goal, target roles and projects feed the readiness hub and company
+-- matching. projects is a small JSON array of {title, url, description}.
+alter table students add column if not exists career_goal text;
+alter table students add column if not exists target_roles text[] not null default '{}';
+alter table students add column if not exists projects jsonb not null default '[]';
+
+-- ------------------------------------------------------- event sessions --
+-- Workshops, mock interviews, company sessions, 1:1 recruiter slots and the
+-- like. Created by the event's organiser, or by a company registered for the
+-- event (company sessions, recruiter slots and mock interviews only).
+-- capacity null means unlimited.
+create table if not exists event_sessions (
+  id               text primary key default gen_random_uuid()::text,
+  created_at       timestamptz not null default now(),
+  event_id         text not null references events (id) on delete cascade,
+  host_profile_id  text references profiles (id) on delete set null,
+  kind             text not null,
+  title            text not null,
+  description      text,
+  location         text,
+  starts_at        timestamptz not null,
+  ends_at          timestamptz,
+  capacity         integer check (capacity is null or capacity > 0)
+);
+create index if not exists event_sessions_event_idx on event_sessions (event_id, starts_at);
+
+-- One row per student per session. A booking past capacity is waitlisted and
+-- promoted in created_at order when a place frees up. The host marks
+-- attendance, which is what the digital passport and engagement score count.
+create table if not exists session_bookings (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  session_id  text not null references event_sessions (id) on delete cascade,
+  profile_id  text not null references profiles (id) on delete cascade,
+  status      text not null check (status in ('booked', 'waitlisted', 'attended', 'cancelled')),
+  unique (session_id, profile_id)
+);
+create index if not exists session_bookings_profile_idx on session_bookings (profile_id);
+create index if not exists session_bookings_session_idx on session_bookings (session_id, status, created_at);
+
+-- A student's plan for the companies at an event. Replaces the per-browser
+-- localStorage copy, so it syncs across devices.
+create table if not exists saved_companies (
+  student_id  text not null references profiles (id) on delete cascade,
+  event_id    text not null references events (id) on delete cascade,
+  company_id  text not null references profiles (id) on delete cascade,
+  saved       boolean not null default false,
+  interested  boolean not null default false,
+  visited     boolean not null default false,
+  follow_up   boolean not null default false,
+  note        text,
+  updated_at  timestamptz not null default now(),
+  primary key (student_id, event_id, company_id)
+);
+
+-- Applications a student is tracking, with interview date and outcome.
+-- company_id is set when the company is on GradLink, company_name always.
+create table if not exists applications (
+  id            text primary key default gen_random_uuid()::text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  student_id    text not null references profiles (id) on delete cascade,
+  event_id      text references events (id) on delete set null,
+  company_id    text references profiles (id) on delete set null,
+  company_name  text not null,
+  role_title    text not null,
+  status        text not null default 'applied' check (status in ('applied', 'interviewing', 'offer', 'accepted', 'rejected', 'withdrawn')),
+  interview_at  timestamptz,
+  notes         text
+);
+create index if not exists applications_student_idx on applications (student_id, updated_at desc);
+
+-- Alumni mentoring joined the session types after the table was first created,
+-- so the check is replaced rather than relying on create table.
+alter table event_sessions drop constraint if exists event_sessions_kind_check;
+alter table event_sessions add constraint event_sessions_kind_check
+  check (kind in ('workshop', 'mock_interview', 'company_session', 'recruiter_slot', 'networking', 'talk', 'mentoring'));
+
+-- ---------------------------------------------------------- notifications --
+-- In-app alerts: an interview invite, a waitlist place opening up, your turn
+-- in a booth queue. Written only by the server.
+create table if not exists notifications (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  profile_id  text not null references profiles (id) on delete cascade,
+  kind        text not null,
+  title       text not null,
+  body        text,
+  href        text,
+  read_at     timestamptz
+);
+create index if not exists notifications_profile_idx on notifications (profile_id, created_at desc);
+create index if not exists notifications_unread_idx on notifications (profile_id) where read_at is null;
+
+-- ------------------------------------------------------ interview invites --
+-- A company invites a student it met at an event, with up to five proposed
+-- times. Accepting books the chosen time into the student's applications.
+create table if not exists interview_invites (
+  id              text primary key default gen_random_uuid()::text,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+  event_id        text references events (id) on delete set null,
+  company_id      text not null references profiles (id) on delete cascade,
+  student_id      text not null references profiles (id) on delete cascade,
+  role_title      text not null,
+  message         text,
+  location        text,
+  proposed_times  timestamptz[] not null default '{}',
+  status          text not null default 'pending' check (status in ('pending', 'accepted', 'declined', 'cancelled')),
+  chosen_time     timestamptz,
+  application_id  text references applications (id) on delete set null
+);
+create index if not exists interview_invites_student_idx on interview_invites (student_id, created_at desc);
+create index if not exists interview_invites_company_idx on interview_invites (company_id, event_id);
+
+-- ------------------------------------------------------------ booth queues --
+-- A live queue at each company's booth. One row per student per booth;
+-- re-joining after being seen or leaving puts the student at the back.
+create table if not exists booth_queue (
+  id          text primary key default gen_random_uuid()::text,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  event_id    text not null references events (id) on delete cascade,
+  company_id  text not null references profiles (id) on delete cascade,
+  student_id  text not null references profiles (id) on delete cascade,
+  status      text not null default 'waiting' check (status in ('waiting', 'called', 'seen', 'left')),
+  called_at   timestamptz,
+  unique (event_id, company_id, student_id)
+);
+create index if not exists booth_queue_booth_idx on booth_queue (event_id, company_id, status, created_at);
+
+-- --------------------------------------------------------- student courses --
+-- Online courses on a student's profile. A "certificate" row was verified
+-- against the provider's public verify page (the learner name matched the
+-- student); an "in_progress" row is a real course the student says they are
+-- taking. One certificate can belong to one student only.
+create table if not exists student_courses (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  provider             text not null default 'coursera',
+  status               text not null check (status in ('certificate', 'in_progress')),
+  certificate_code     text,
+  course_id            text,
+  course_slug          text,
+  course_name          text not null,
+  partner_name         text,
+  completed_at         timestamptz,
+  skills               text[] not null default '{}',
+  visible_to_employers boolean not null default true,
+  unique (provider, certificate_code)
+);
+create index if not exists student_courses_student_idx on student_courses (student_id, created_at desc);
+
+-- ---------------------------------------------------------- student scores --
+-- LeetCode and Codeforces profiles, one per site per student. The row is
+-- pending (verify_code or verify_started_at set, verified_at null) until
+-- the student proves they own the handle; only verified rows are shown to
+-- anyone else, and a handle can be verified on one account only. Stats are
+-- read from the site, never from the browser.
+create table if not exists student_scores (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  kind                 text not null check (kind in ('leetcode', 'codeforces')),
+  handle               text not null,
+  verify_code          text,
+  verify_started_at    timestamptz,
+  verified_at          timestamptz,
+  stats                jsonb not null default '{}',
+  stats_at             timestamptz,
+  visible_to_employers boolean not null default true,
+  unique (student_id, kind)
+);
+create unique index if not exists student_scores_handle_uniq on student_scores (kind, lower(handle)) where verified_at is not null;
+
+-- ---------------------------------------------------- student certificates --
+-- Professional certificates on a student's profile. A "credly" row was read
+-- from Credly's public badge API (and the earner is this student); a row
+-- with no provider is the student's own report, shown as self-reported with
+-- the credential link they gave. One Credly badge belongs to one student.
+create table if not exists student_certificates (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  student_id           text not null references profiles (id) on delete cascade,
+  provider             text check (provider in ('credly')),
+  credential_id        text,
+  name                 text not null,
+  issuer               text,
+  issued_on            text, -- YYYY-MM-DD; text so no time zone can shift the day
+  expires_on           text,
+  credential_url       text,
+  verified_at          timestamptz,
+  visible_to_employers boolean not null default true,
+  unique (provider, credential_id)
+);
+create index if not exists student_certificates_student_idx on student_certificates (student_id, created_at);
 
 -- --------------------------------------------------------------- billing --
 -- Written ONLY by the Stripe webhook. The API exposes it read-only to its

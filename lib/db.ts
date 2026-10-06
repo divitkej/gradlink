@@ -1,6 +1,7 @@
 "use client";
 
 import { rpc, api } from "./api-client";
+import type { EngagementCounts } from "./engagement";
 
 /* ============================================================
    GradLink event-platform data access layer.
@@ -40,6 +41,15 @@ export interface StudentRow {
   bio: string | null;
   resume_score: number | null;
   ai_feedback: AIFeedback | string | null;
+  career_goal?: string | null;
+  target_roles?: string[] | null;
+  projects?: StudentProject[] | null;
+}
+
+export interface StudentProject {
+  title: string;
+  url?: string;
+  description?: string;
 }
 
 export interface CompanyRow {
@@ -127,6 +137,97 @@ export interface ChecklistProgressRow {
   completed: boolean;
   completed_at: string | null;
 }
+
+export type SessionKind = "workshop" | "mock_interview" | "company_session" | "recruiter_slot" | "networking" | "talk" | "mentoring";
+export type BookingStatus = "booked" | "waitlisted" | "attended" | "cancelled";
+
+export const SESSION_KIND_LABEL: Record<SessionKind, string> = {
+  workshop: "Workshop",
+  mock_interview: "Mock interview",
+  company_session: "Company session",
+  recruiter_slot: "1:1 recruiter slot",
+  networking: "Networking",
+  talk: "Talk",
+  mentoring: "Alumni mentoring",
+};
+
+export interface SessionRow {
+  id: string;
+  created_at: string;
+  event_id: string;
+  host_profile_id: string | null;
+  kind: SessionKind;
+  title: string;
+  description: string | null;
+  location: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  capacity: number | null;
+  host_name: string | null;
+  host_org: string | null;
+  host_role: string | null;
+  booked_count: number;
+  waitlist_count: number;
+  /** The signed-in user's booking, if any (never "cancelled"). */
+  my_status: BookingStatus | null;
+  my_waitlist_position: number | null;
+  /** The event's IANA time zone; times are shown in it. Null for older events. */
+  event_timezone: string | null;
+}
+
+export interface SessionBookingRow {
+  profile_id: string;
+  status: BookingStatus;
+  created_at: string;
+  full_name: string;
+  university: string | null;
+  degree: string | null;
+}
+
+export interface SavedCompanyRow {
+  student_id: string;
+  event_id: string;
+  company_id: string;
+  saved: boolean;
+  interested: boolean;
+  visited: boolean;
+  follow_up: boolean;
+  note: string | null;
+  updated_at: string;
+}
+
+export type ApplicationStatus = "applied" | "interviewing" | "offer" | "accepted" | "rejected" | "withdrawn";
+
+export const APPLICATION_STATUS_LABEL: Record<ApplicationStatus, string> = {
+  applied: "Applied",
+  interviewing: "Interviewing",
+  offer: "Offer",
+  accepted: "Accepted",
+  rejected: "Not selected",
+  withdrawn: "Withdrawn",
+};
+
+export interface ApplicationRow {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  student_id: string;
+  event_id: string | null;
+  company_id: string | null;
+  company_name: string;
+  role_title: string;
+  status: ApplicationStatus;
+  interview_at: string | null;
+  notes: string | null;
+}
+
+export interface StudentInsights {
+  total: number;
+  leaderboard: { rank: number; name: string; score: number; isMe: boolean }[];
+  me: { rank: number; score: number; counts: EngagementCounts } | null;
+}
+
+type Result<K extends string, T> = { ok: true } & { [key in K]: T } | { ok: false; error: string };
 
 function log(scope: string, error: unknown) {
   if (error) console.warn(`[gradlink/db] ${scope}:`, error);
@@ -245,6 +346,11 @@ export function sendMessage(input: {
   return safe("sendMessage", false, () => rpc<boolean>("sendMessage", input));
 }
 
+/** Send one follow-up to several scanned or shortlisted candidates (companies only). */
+export function sendBulkMessage(eventId: string, studentIds: string[], message: string): Promise<{ ok: true; sent: number; skipped: number } | { ok: false; error: string }> {
+  return safe("sendBulkMessage", { ok: false, error: "Couldn't send. Please try again." }, () => rpc("sendBulkMessage", eventId, studentIds, message));
+}
+
 export function listMessagesForProfile(profileId: string, eventId: string): Promise<MessageRow[]> {
   if (!profileId) return Promise.resolve([]);
   return safe("listMessagesForProfile", [], () => rpc<MessageRow[]>("listMessagesForProfile", profileId, eventId));
@@ -279,6 +385,357 @@ export function getChecklistProgress(profileId: string): Promise<Record<string, 
 export function setChecklistProgress(itemId: string, profileId: string, completed: boolean): Promise<boolean> {
   if (!profileId || !itemId) return Promise.resolve(false);
   return safe("setChecklistProgress", false, () => rpc<boolean>("setChecklistProgress", itemId, profileId, completed));
+}
+
+/* ---------------- Sessions ---------------- */
+export function listSessions(eventId: string): Promise<SessionRow[]> {
+  return safe("listSessions", [], () => rpc<SessionRow[]>("listSessions", eventId));
+}
+
+export function createSession(input: {
+  eventId: string;
+  kind: SessionKind;
+  title: string;
+  description?: string;
+  location?: string;
+  startsAt: string;
+  endsAt?: string | null;
+  capacity?: number | null;
+}): Promise<Result<"session", SessionRow>> {
+  return safe("createSession", { ok: false, error: "Couldn't add the session. Please try again." }, () => rpc("createSession", input));
+}
+
+export function deleteSession(sessionId: string): Promise<boolean> {
+  return safe("deleteSession", false, () => rpc<boolean>("deleteSession", sessionId));
+}
+
+export function bookSession(sessionId: string): Promise<Result<"status", BookingStatus>> {
+  return safe("bookSession", { ok: false, error: "Couldn't book that session. Please try again." }, () => rpc("bookSession", sessionId));
+}
+
+export function cancelBooking(sessionId: string): Promise<boolean> {
+  return safe("cancelBooking", false, () => rpc<boolean>("cancelBooking", sessionId));
+}
+
+export function listSessionBookings(sessionId: string): Promise<SessionBookingRow[]> {
+  return safe("listSessionBookings", [], () => rpc<SessionBookingRow[]>("listSessionBookings", sessionId));
+}
+
+export function markAttendance(sessionId: string, profileId: string, attended: boolean): Promise<boolean> {
+  return safe("markAttendance", false, () => rpc<boolean>("markAttendance", sessionId, profileId, attended));
+}
+
+/* ---------------- Saved companies ---------------- */
+export function listSavedCompanies(eventId: string): Promise<SavedCompanyRow[]> {
+  return safe("listSavedCompanies", [], () => rpc<SavedCompanyRow[]>("listSavedCompanies", eventId));
+}
+
+export function saveCompany(
+  eventId: string,
+  companyId: string,
+  fields: Partial<Pick<SavedCompanyRow, "saved" | "interested" | "visited" | "follow_up" | "note">>,
+): Promise<Result<"saved", SavedCompanyRow>> {
+  return safe("saveCompany", { ok: false, error: "Couldn't save that. Please try again." }, () => rpc("saveCompany", eventId, companyId, fields));
+}
+
+/* ---------------- Applications ---------------- */
+export function listApplications(): Promise<ApplicationRow[]> {
+  return safe("listApplications", [], () => rpc<ApplicationRow[]>("listApplications"));
+}
+
+export function saveApplication(input: {
+  id?: string;
+  eventId?: string | null;
+  companyId?: string | null;
+  companyName: string;
+  roleTitle: string;
+  status: ApplicationStatus;
+  interviewAt?: string | null;
+  notes?: string | null;
+}): Promise<Result<"application", ApplicationRow>> {
+  return safe("saveApplication", { ok: false, error: "Couldn't save the application. Please try again." }, () => rpc("saveApplication", input));
+}
+
+export function deleteApplication(id: string): Promise<boolean> {
+  return safe("deleteApplication", false, () => rpc<boolean>("deleteApplication", id));
+}
+
+/* ---------------- Notifications ---------------- */
+export interface NotificationRow {
+  id: string;
+  created_at: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  read_at: string | null;
+}
+
+export function listNotifications(): Promise<NotificationRow[]> {
+  return safe("listNotifications", [], () => rpc<NotificationRow[]>("listNotifications"));
+}
+
+export function getUnreadNotificationCount(): Promise<number> {
+  return safe("getUnreadNotificationCount", 0, () => rpc<number>("getUnreadNotificationCount"));
+}
+
+export function markNotificationsRead(): Promise<number> {
+  return safe("markNotificationsRead", 0, () => rpc<number>("markNotificationsRead"));
+}
+
+/* ---------------- Interview invites ---------------- */
+export type InviteStatus = "pending" | "accepted" | "declined" | "cancelled";
+
+export interface InterviewInviteRow {
+  id: string;
+  created_at: string;
+  event_id: string | null;
+  company_id: string;
+  student_id: string;
+  role_title: string;
+  message: string | null;
+  location: string | null;
+  proposed_times: string[];
+  status: InviteStatus;
+  chosen_time: string | null;
+  application_id: string | null;
+  /** Present on the student's list. */
+  company_name?: string;
+  booth_number?: string | null;
+  /** Present on the company's list. */
+  student_name?: string;
+}
+
+export function sendInterviewInvite(input: {
+  eventId: string;
+  studentId: string;
+  roleTitle: string;
+  message?: string;
+  location?: string;
+  proposedTimes: string[];
+}): Promise<Result<"invite", InterviewInviteRow>> {
+  return safe("sendInterviewInvite", { ok: false, error: "Couldn't send the invite. Please try again." }, () => rpc("sendInterviewInvite", input));
+}
+
+export function listInterviewInvitesForStudent(): Promise<InterviewInviteRow[]> {
+  return safe("listInterviewInvitesForStudent", [], () => rpc<InterviewInviteRow[]>("listInterviewInvitesForStudent"));
+}
+
+export function listInterviewInvitesForCompany(eventId: string): Promise<InterviewInviteRow[]> {
+  return safe("listInterviewInvitesForCompany", [], () => rpc<InterviewInviteRow[]>("listInterviewInvitesForCompany", eventId));
+}
+
+export function respondInterviewInvite(inviteId: string, accept: boolean, chosenTime?: string | null): Promise<{ ok: true; application?: ApplicationRow } | { ok: false; error: string }> {
+  return safe("respondInterviewInvite", { ok: false, error: "Couldn't send your reply. Please try again." }, () => rpc("respondInterviewInvite", inviteId, accept, chosenTime ?? null));
+}
+
+export function cancelInterviewInvite(inviteId: string): Promise<boolean> {
+  return safe("cancelInterviewInvite", false, () => rpc<boolean>("cancelInterviewInvite", inviteId));
+}
+
+/* ---------------- Booth queues ---------------- */
+export interface MyQueueRow {
+  company_id: string;
+  status: "waiting" | "called";
+  created_at: string;
+  called_at: string | null;
+  company_name: string;
+  booth_number: string | null;
+  position: number | null;
+}
+
+export interface BoothQueueRow {
+  student_id: string;
+  status: "waiting" | "called";
+  created_at: string;
+  called_at: string | null;
+  full_name: string;
+  degree: string | null;
+  graduation_year: number | null;
+  target_roles: string[] | null;
+  skills: string[] | null;
+}
+
+export function joinQueue(eventId: string, companyId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  return safe("joinQueue", { ok: false, error: "Couldn't join the queue. Please try again." }, () => rpc("joinQueue", eventId, companyId));
+}
+
+export function leaveQueue(eventId: string, companyId: string): Promise<boolean> {
+  return safe("leaveQueue", false, () => rpc<boolean>("leaveQueue", eventId, companyId));
+}
+
+export function listMyQueues(eventId: string): Promise<MyQueueRow[]> {
+  return safe("listMyQueues", [], () => rpc<MyQueueRow[]>("listMyQueues", eventId));
+}
+
+export function listBoothQueue(eventId: string): Promise<BoothQueueRow[]> {
+  return safe("listBoothQueue", [], () => rpc<BoothQueueRow[]>("listBoothQueue", eventId));
+}
+
+export function callNextInQueue(eventId: string): Promise<string | null> {
+  return safe("callNextInQueue", null, () => rpc<string | null>("callNextInQueue", eventId));
+}
+
+export function markQueueEntry(eventId: string, studentId: string, status: "seen" | "left"): Promise<boolean> {
+  return safe("markQueueEntry", false, () => rpc<boolean>("markQueueEntry", eventId, studentId, status));
+}
+
+/* ---------------- Student history ---------------- */
+export interface StudentHistory {
+  events: {
+    id: string; title: string; start_date: string | null; status: string; location: string | null;
+    recruiter_scans: number; booths_visited: number; sessions_attended: number; shortlists: number;
+  }[];
+  connections: {
+    company_id: string; name: string; sector: string | null; visited: boolean; scanned_you: boolean;
+    messaged: boolean; shortlisted: boolean; interview: boolean; last_at: string;
+  }[];
+}
+
+export function getStudentHistory(): Promise<StudentHistory | null> {
+  return safe("getStudentHistory", null, () => rpc<StudentHistory>("getStudentHistory"));
+}
+
+/* ---------------- Online courses ---------------- */
+export interface StudentCourseRow {
+  id: string;
+  created_at?: string;
+  provider: "coursera";
+  status: "certificate" | "in_progress";
+  certificate_code: string | null;
+  course_slug: string | null;
+  course_name: string;
+  partner_name: string | null;
+  completed_at: string | null;
+  skills: string[];
+  /** Only on the student's own list. */
+  visible_to_employers?: boolean;
+}
+
+/** Coursera's public page for a certificate, where anyone can check it. */
+export const courseraVerifyUrl = (code: string) => `https://www.coursera.org/account/accomplishments/verify/${encodeURIComponent(code)}`;
+export const courseraCourseUrl = (slug: string) => `https://www.coursera.org/learn/${encodeURIComponent(slug)}`;
+
+export function addCourseraCertificate(link: string): Promise<{ ok: true; course: StudentCourseRow; newSkills: string[] } | { ok: false; error: string }> {
+  return safe("addCourseraCertificate", { ok: false, error: "Couldn't check that certificate. Please try again." }, () => rpc("addCourseraCertificate", link));
+}
+
+export function addCourseraCourse(link: string): Promise<{ ok: true; course: StudentCourseRow } | { ok: false; error: string }> {
+  return safe("addCourseraCourse", { ok: false, error: "Couldn't add that course. Please try again." }, () => rpc("addCourseraCourse", link));
+}
+
+export function listStudentCourses(studentId: string): Promise<StudentCourseRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentCourses", [], () => rpc<StudentCourseRow[]>("listStudentCourses", studentId));
+}
+
+export function setStudentCourseVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentCourseVisible", false, () => rpc<boolean>("setStudentCourseVisible", id, visible));
+}
+
+export function deleteStudentCourse(id: string): Promise<boolean> {
+  return safe("deleteStudentCourse", false, () => rpc<boolean>("deleteStudentCourse", id));
+}
+
+/* ---------------- Coding profiles ---------------- */
+export type CodingSite = "leetcode" | "codeforces";
+
+export interface LeetCodeStats {
+  solved: number; easy: number; medium: number; hard: number;
+  contestRating: number | null; contestsAttended: number; topPercent: number | null;
+}
+
+export interface CodeforcesStats {
+  rating: number | null; maxRating: number | null; rank: string | null; maxRank: string | null; contests: number;
+}
+
+export interface StudentScoreRow {
+  id: string;
+  kind: CodingSite;
+  handle: string;
+  verified_at: string | null;
+  /** LeetCodeStats or CodeforcesStats for a verified profile, {} otherwise. */
+  stats: Partial<LeetCodeStats & CodeforcesStats>;
+  stats_at: string | null;
+  /** Only on the student's own list. */
+  verify_code?: string | null;
+  verify_started_at?: string | null;
+  visible_to_employers?: boolean;
+}
+
+export const codingProfileUrl = (site: CodingSite, handle: string) =>
+  site === "leetcode" ? `https://leetcode.com/u/${encodeURIComponent(handle)}/` : `https://codeforces.com/profile/${encodeURIComponent(handle)}`;
+
+type ScoreResult = { ok: true; score: StudentScoreRow } | { ok: false; error: string };
+
+export function startCodingProfile(site: CodingSite, handle: string): Promise<ScoreResult> {
+  return safe("startCodingProfile", { ok: false, error: "Couldn't check that profile. Please try again." }, () => rpc("startCodingProfile", site, handle));
+}
+
+export function verifyCodingProfile(site: CodingSite): Promise<ScoreResult> {
+  return safe("verifyCodingProfile", { ok: false, error: "Couldn't check that profile. Please try again." }, () => rpc("verifyCodingProfile", site));
+}
+
+export function refreshCodingProfile(id: string): Promise<ScoreResult> {
+  return safe("refreshCodingProfile", { ok: false, error: "Couldn't refresh that profile. Please try again." }, () => rpc("refreshCodingProfile", id));
+}
+
+export function listStudentScores(studentId: string): Promise<StudentScoreRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentScores", [], () => rpc<StudentScoreRow[]>("listStudentScores", studentId));
+}
+
+export function setStudentScoreVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentScoreVisible", false, () => rpc<boolean>("setStudentScoreVisible", id, visible));
+}
+
+export function deleteStudentScore(id: string): Promise<boolean> {
+  return safe("deleteStudentScore", false, () => rpc<boolean>("deleteStudentScore", id));
+}
+
+/* ---------------- Certificates ---------------- */
+export interface StudentCertificateRow {
+  id: string;
+  /** "credly" when verified with Credly; null when self-reported. */
+  provider: "credly" | null;
+  credential_id: string | null;
+  name: string;
+  issuer: string | null;
+  /** YYYY-MM-DD */
+  issued_on: string | null;
+  expires_on: string | null;
+  credential_url: string | null;
+  verified_at: string | null;
+  /** Only on the student's own list. */
+  visible_to_employers?: boolean;
+}
+
+type CertificateResult = { ok: true; certificate: StudentCertificateRow } | { ok: false; error: string };
+
+export function addCredlyBadge(link: string): Promise<CertificateResult> {
+  return safe("addCredlyBadge", { ok: false, error: "Couldn't check that badge. Please try again." }, () => rpc("addCredlyBadge", link));
+}
+
+export function addCertificate(input: { name: string; issuer: string; issuedOn?: string; expiresOn?: string; credentialUrl?: string; credentialId?: string }): Promise<CertificateResult> {
+  return safe("addCertificate", { ok: false, error: "Couldn't save that certificate. Please try again." }, () => rpc("addCertificate", input));
+}
+
+export function listStudentCertificates(studentId: string): Promise<StudentCertificateRow[]> {
+  if (!studentId) return Promise.resolve([]);
+  return safe("listStudentCertificates", [], () => rpc<StudentCertificateRow[]>("listStudentCertificates", studentId));
+}
+
+export function setStudentCertificateVisible(id: string, visible: boolean): Promise<boolean> {
+  return safe("setStudentCertificateVisible", false, () => rpc<boolean>("setStudentCertificateVisible", id, visible));
+}
+
+export function deleteStudentCertificate(id: string): Promise<boolean> {
+  return safe("deleteStudentCertificate", false, () => rpc<boolean>("deleteStudentCertificate", id));
+}
+
+/* ---------------- Engagement ---------------- */
+export function getStudentEventInsights(eventId: string): Promise<StudentInsights | null> {
+  return safe("getStudentEventInsights", null, () => rpc<StudentInsights>("getStudentEventInsights", eventId));
 }
 
 /* ---------------- Files ---------------- */

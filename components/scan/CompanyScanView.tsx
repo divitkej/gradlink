@@ -12,26 +12,36 @@ import { Button } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, sendMessage, recordScan,
-  getStudentByProfile,
-  type CompanyRow, type ScanRow, type ShortlistRow,
+  getStudentByProfile, listSavedCompanies, saveCompany, listMyQueues, getEvent,
+  type CompanyRow, type ScanRow, type ShortlistRow, type SavedCompanyRow, type MyQueueRow,
 } from "@/lib/db";
+import QueueControl from "@/components/dashboard/QueueControl";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 type Saves = { saved: boolean; interested: boolean; visited: boolean; followUp: boolean; note: string };
 const empty: Saves = { saved: false, interested: false, visited: false, followUp: false, note: "" };
 
-function loadSaves(studentId: string, companyId: string): Saves {
+const fromRow = (r: SavedCompanyRow): Saves => ({
+  saved: r.saved, interested: r.interested, visited: r.visited, followUp: r.follow_up, note: r.note ?? "",
+});
+const toRow = (s: Saves) => ({ saved: s.saved, interested: s.interested, visited: s.visited, follow_up: s.followUp, note: s.note || null });
+
+/**
+ * Saves used to live in this browser's localStorage. The first time a student
+ * opens a company here, a browser copy is moved into their account for this
+ * event and the local copy removed.
+ */
+function takeLegacySaves(studentId: string, companyId: string): Saves | null {
   try {
-    const all = JSON.parse(localStorage.getItem(`gradlink.saves.${studentId}`) || "{}");
-    return { ...empty, ...(all[companyId] || {}) };
-  } catch { return empty; }
-}
-function persistSaves(studentId: string, companyId: string, s: Saves) {
-  try {
-    const all = JSON.parse(localStorage.getItem(`gradlink.saves.${studentId}`) || "{}");
-    all[companyId] = s;
-    localStorage.setItem(`gradlink.saves.${studentId}`, JSON.stringify(all));
-  } catch { /* ignore */ }
+    const key = `gradlink.saves.${studentId}`;
+    const all = JSON.parse(localStorage.getItem(key) || "{}");
+    if (!all[companyId]) return null;
+    const legacy = { ...empty, ...all[companyId] } as Saves;
+    delete all[companyId];
+    if (Object.keys(all).length) localStorage.setItem(key, JSON.stringify(all));
+    else localStorage.removeItem(key);
+    return legacy;
+  } catch { return null; }
 }
 
 export default function CompanyScanView({ companyProfileId, eventId }: { companyProfileId: string; eventId: string }) {
@@ -44,6 +54,8 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
   const [topSkills, setTopSkills] = useState<string[]>([]);
   const [saves, setSaves] = useState<Saves>(empty);
+  const [queue, setQueue] = useState<MyQueueRow | undefined>(undefined);
+  const [live, setLive] = useState(false);
   const [msg, setMsg] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const scanned = useRef(false);
@@ -60,7 +72,15 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
       setCompany(c);
 
       if (viewer === "student" && session) {
-        setSaves(loadSaves(session.profileId, companyProfileId));
+        const row = (await listSavedCompanies(eventId)).find((r) => r.company_id === companyProfileId);
+        const legacy = row ? null : takeLegacySaves(session.profileId, companyProfileId);
+        if (legacy) saveCompany(eventId, companyProfileId, toRow(legacy));
+        const [queues, ev] = await Promise.all([listMyQueues(eventId), getEvent(eventId)]);
+        if (!cancelled) {
+          setSaves(row ? fromRow(row) : legacy ?? empty);
+          setQueue(queues.find((q) => q.company_id === companyProfileId));
+          setLive(ev?.status === "live");
+        }
       } else if (viewer === "event_manager") {
         const inbound = await getScans({ eventId, scannedProfileId: companyProfileId });
         const sl = await listShortlistsForCompany(companyProfileId, eventId);
@@ -88,11 +108,23 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
     }
   }, [viewer, session, company, companyProfileId, eventId]);
 
-  function toggle(key: keyof Saves, label: string) {
+  async function toggle(key: keyof Saves, label: string) {
     if (!session) return;
+    const prev = saves;
     const next = { ...saves, [key]: !saves[key] } as Saves;
-    setSaves(next); persistSaves(session.profileId, companyProfileId, next);
+    setSaves(next);
+    const res = await saveCompany(eventId, companyProfileId, toRow(next));
+    if (!res.ok) { setSaves(prev); flash("Couldn't save, try again"); return; }
     flash(next[key] ? label : `${label} removed`);
+  }
+
+  // Notes save once typing pauses, not on every keystroke.
+  const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  function editNote(v: string) {
+    const next = { ...saves, note: v };
+    setSaves(next);
+    if (noteTimer.current) clearTimeout(noteTimer.current);
+    noteTimer.current = setTimeout(() => { saveCompany(eventId, companyProfileId, { note: v || null }); }, 600);
   }
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center" }}><LoadingBlock /></div>;
@@ -116,7 +148,11 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
                 await sendMessage({ eventId, senderProfileId: session!.profileId, receiverProfileId: companyProfileId, message: msg.trim() });
                 setMsg(""); flash("Message sent");
               }}
-              onNote={(v) => { const next = { ...saves, note: v }; setSaves(next); persistSaves(session!.profileId, companyProfileId, next); }}
+              onNote={editNote}
+              queueSlot={
+                <QueueControl eventId={eventId} companyId={companyProfileId} queue={queue} live={live}
+                  onChange={async () => setQueue((await listMyQueues(eventId)).find((q) => q.company_id === companyProfileId))} />
+              }
             />
           )}
           {viewer === "event_manager" && <ManagerCompanyView company={company} scans={scans} shortlists={shortlists} topSkills={topSkills} />}
@@ -152,10 +188,11 @@ function CompanyHeader({ company }: { company: CompanyRow }) {
 }
 
 function StudentView({
-  company, saves, msg, setMsg, onToggle, onSend, onNote,
+  company, saves, msg, setMsg, onToggle, onSend, onNote, queueSlot,
 }: {
   company: CompanyRow; saves: Saves; msg: string; setMsg: (v: string) => void;
   onToggle: (k: keyof Saves, label: string) => void; onSend: () => void; onNote: (v: string) => void;
+  queueSlot: React.ReactNode;
 }) {
   return (
     <>
@@ -176,7 +213,7 @@ function StudentView({
         <SectionCard title="Skills they're looking for"><TagRow items={company.skills_wanted} tone="teal" /></SectionCard>
       ) : null}
 
-      <SectionCard title="Your actions">
+      <SectionCard title="Your actions" right={queueSlot}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Toggle on={saves.saved} onClick={() => onToggle("saved", "Saved company")} icon={<Bookmark size={15} />} label="Save company" />
           <Toggle on={saves.interested} onClick={() => onToggle("interested", "Marked interested")} icon={<Heart size={15} />} label="Interested" />

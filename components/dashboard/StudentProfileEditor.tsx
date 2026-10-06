@@ -1,20 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { GlassPanel, PanelTitle } from "./widgets";
 import { Badge, Button } from "@/components/ui/primitives";
 import { Avatar, ScoreRing, LoadingBlock, FlagPill } from "./cards";
-import { Check, FileText, Link as LinkIcon, Save, UploadCloud, Loader2 } from "lucide-react";
-import { getStudentByProfile, updateStudentProfile, uploadPublicFile, type StudentRow } from "@/lib/db";
+import { Check, FileText, Link as LinkIcon, Save, UploadCloud, Loader2, Plus, Trash2 } from "lucide-react";
+import { getStudentByProfile, updateStudentProfile, uploadPublicFile, type StudentRow, type StudentProject } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
 import type { GLSession } from "@/lib/session";
 import GsapReveal from "@/components/anim/GsapReveal";
+import StudentCourses from "./StudentCourses";
+import StudentScores from "./StudentScores";
+import StudentCertificates from "./StudentCertificates";
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+  const id = useId();
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <label style={{ fontSize: 12, color: "var(--text-2)" }}>{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+      <label htmlFor={id} style={{ fontSize: 12, color: "var(--text-2)" }}>{label}</label>
+      <input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
         style={{ height: 42, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none" }} />
     </div>
   );
@@ -36,6 +40,9 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
+  const [careerGoal, setCareerGoal] = useState("");
+  const [targetRoles, setTargetRoles] = useState("");
+  const [projects, setProjects] = useState<StudentProject[]>([]);
 
   function flash(t: string) { setToast(t); setTimeout(() => setToast(null), 2600); }
 
@@ -54,10 +61,28 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       setPortfolioUrl(m?.portfolio_url ?? "");
       setLinkedinUrl(m?.linkedin_url ?? "");
       setGithubUrl(m?.github_url ?? "");
+      setCareerGoal(m?.career_goal ?? "");
+      setTargetRoles((m?.target_roles ?? []).join(", "));
+      setProjects(m?.projects ?? []);
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [session.profileId, session.org]);
+
+  const cleanProjects = projects
+    .map((p) => ({ title: p.title.trim(), url: (p.url ?? "").trim(), description: (p.description ?? "").trim() }))
+    .filter((p) => p.title);
+  const splitList = (v: string) => v.split(",").map((s) => s.trim()).filter(Boolean);
+
+  /** Skills from a verified course: added to the form and saved straight away. */
+  async function addSkills(extra: string[]) {
+    const current = splitList(skills);
+    const have = new Set(current.map((x) => x.toLowerCase()));
+    const merged = [...current, ...extra.filter((x) => !have.has(x.toLowerCase()))];
+    setSkills(merged.join(", "));
+    const ok = await updateStudentProfile(session.profileId, { skills: merged });
+    flash(ok ? `${merged.length - current.length} skills added to your profile` : "Couldn't save, try again");
+  }
 
   const preview: Partial<StudentRow> = {
     full_name: session.name, email: "x@y.z",
@@ -96,6 +121,9 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
       portfolio_url: portfolioUrl || null,
       linkedin_url: linkedinUrl || null,
       github_url: githubUrl || null,
+      career_goal: careerGoal.trim() || null,
+      target_roles: splitList(targetRoles),
+      projects: cleanProjects,
     });
     setSaving(false);
     flash(ok ? "Profile saved. Checklist updated." : "Couldn't save, try again");
@@ -153,21 +181,32 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
           </div>
           <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 12, color: "var(--text-2)" }}>Skills (comma-separated)</label>
-              <input value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Marketing, Analytics, Python"
+              <label htmlFor="sp-skills" style={{ fontSize: 12, color: "var(--text-2)" }}>Skills (comma-separated)</label>
+              <input id="sp-skills" value={skills} onChange={(e) => setSkills(e.target.value)} placeholder="Marketing, Analytics, Python"
                 style={{ height: 42, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none" }} />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <label style={{ fontSize: 12, color: "var(--text-2)" }}>Bio</label>
-              <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="A short summary of who you are and what you're looking for. Mention internships, projects, and measurable wins."
+              <label htmlFor="sp-targetRoles" style={{ fontSize: 12, color: "var(--text-2)" }}>Target roles (comma-separated)</label>
+              <input id="sp-targetRoles" value={targetRoles} onChange={(e) => setTargetRoles(e.target.value)} placeholder="Business Analyst, Product Intern"
+                style={{ height: 42, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label htmlFor="sp-careerGoal" style={{ fontSize: 12, color: "var(--text-2)" }}>Career goal</label>
+              <input id="sp-careerGoal" value={careerGoal} onChange={(e) => setCareerGoal(e.target.value)} maxLength={500} placeholder="Join a fintech team as an analyst after graduating"
+                style={{ height: 42, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label htmlFor="sp-bio" style={{ fontSize: 12, color: "var(--text-2)" }}>Bio</label>
+              <textarea id="sp-bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="A short summary of who you are and what you're looking for. Mention internships, projects, and measurable wins."
                 style={{ resize: "vertical", padding: "10px 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none", fontFamily: "var(--font-body)" }} />
             </div>
+            <ProjectsEditor projects={projects} onChange={setProjects} />
             <div><Button variant="primary" onClick={save} icon={<Save size={15} />}>{saving ? "Saving…" : "Save profile"}</Button></div>
           </div>
         </GlassPanel>
 
         <GlassPanel>
-          <PanelTitle hint="Rule-based">Resume analysis</PanelTitle>
+          <PanelTitle hint="Rule-based check">Résumé check</PanelTitle>
           <p style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.5, marginBottom: 14 }}>{evalr.summary}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--accent-2)" }}>Strengths</div>
@@ -188,12 +227,57 @@ export default function StudentProfileEditor({ session }: { session: GLSession }
         </GlassPanel>
       </div>
 
+      <StudentCourses profileId={session.profileId} skills={splitList(skills)} onAddSkills={addSkills} />
+      <StudentCertificates profileId={session.profileId} />
+      <StudentScores profileId={session.profileId} />
+
       {toast && (
         <div style={{ position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)", zIndex: 50, display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface-elev)", border: "1px solid var(--border-strong)", borderRadius: "var(--r-full)", padding: "10px 18px", color: "var(--text)", fontSize: 13.5, fontWeight: 600, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
           <Check size={15} color="var(--accent-2)" /> {toast}
         </div>
       )}
-      <style>{`@media (max-width: 900px) { .dash-2col { grid-template-columns: 1fr !important; } } @media (max-width: 640px) { .sp-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style>{`
+        @media (max-width: 900px) { .dash-2col { grid-template-columns: minmax(0, 1fr) !important; } }
+        @media (max-width: 640px) { .sp-grid { grid-template-columns: minmax(0, 1fr) !important; } }
+      `}</style>
     </GsapReveal>
+  );
+}
+
+const inputStyle: React.CSSProperties = {
+  height: 40, padding: "0 12px", fontSize: 13.5, color: "var(--text)", background: "rgba(255,255,255,0.04)",
+  border: "1px solid var(--border)", borderRadius: "var(--r-md)", outline: "none", width: "100%",
+};
+
+function ProjectsEditor({ projects, onChange }: { projects: StudentProject[]; onChange: (p: StudentProject[]) => void }) {
+  const update = (i: number, patch: Partial<StudentProject>) => onChange(projects.map((p, j) => (j === i ? { ...p, ...patch } : p)));
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <label style={{ fontSize: 12, color: "var(--text-2)" }}>Projects</label>
+        <span style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{projects.length} of 10 · mention the team and the result</span>
+      </div>
+      {projects.map((p, i) => (
+        <div key={i} style={{ display: "flex", flexDirection: "column", gap: 8, padding: 12, background: "rgba(255,255,255,0.02)", border: "1px solid var(--border)", borderRadius: "var(--r-md)" }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input aria-label={`Project ${i + 1} title`} value={p.title} maxLength={120} onChange={(e) => update(i, { title: e.target.value })} placeholder="Project title" style={inputStyle} />
+            <button type="button" onClick={() => onChange(projects.filter((_, j) => j !== i))} aria-label={`Remove project ${i + 1}`} title="Remove project"
+              style={{ flexShrink: 0, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", color: "var(--text-2)", cursor: "pointer" }}>
+              <Trash2 size={15} />
+            </button>
+          </div>
+          <input aria-label={`Project ${i + 1} link`} value={p.url ?? ""} maxLength={500} onChange={(e) => update(i, { url: e.target.value })} placeholder="Link (GitHub, demo, case study)" style={inputStyle} />
+          <textarea aria-label={`Project ${i + 1} description`} value={p.description ?? ""} maxLength={1000} rows={2} onChange={(e) => update(i, { description: e.target.value })}
+            placeholder="What you built, who you worked with, and what changed because of it"
+            style={{ ...inputStyle, height: "auto", padding: "10px 12px", resize: "vertical", fontFamily: "var(--font-body)" }} />
+        </div>
+      ))}
+      {projects.length < 10 && (
+        <button type="button" onClick={() => onChange([...projects, { title: "", url: "", description: "" }])}
+          style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, color: "var(--text)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "9px 14px", cursor: "pointer" }}>
+          <Plus size={14} /> Add a project
+        </button>
+      )}
+    </div>
   );
 }

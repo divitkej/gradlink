@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
-  Star, HelpCircle, Bookmark, ScanLine, Search, Pencil,
+  Star, HelpCircle, Bookmark, ScanLine, Search, CalendarClock, Pencil,
 } from "lucide-react";
 import { SectionCard, StatTile, FlagPill, Avatar, TagRow, LoadingBlock } from "./cards";
 import { Badge } from "@/components/ui/primitives";
@@ -12,6 +12,7 @@ import QRCard from "./QRCard";
 import Checklist from "./Checklist";
 import { EVENT_STATUS_LABEL } from "@/lib/events";
 import ManualSection from "./ManualSection";
+import SessionManager from "./SessionManager";
 import EventForm from "@/components/events/EventForm";
 import { useSession, type AppRole } from "@/lib/session";
 import {
@@ -20,9 +21,11 @@ import {
   type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ShortlistRow,
 } from "@/lib/db";
 import { evaluateResume, scoreTone } from "@/lib/resume";
+import { matchCompanies } from "@/lib/readiness";
+import { fmtEventDate } from "@/lib/format";
 import GsapReveal from "@/components/anim/GsapReveal";
 
-type Tab = "overview" | "people" | "qr" | "checklist" | "manual";
+type Tab = "overview" | "people" | "sessions" | "qr" | "checklist" | "manual";
 
 export default function EventConsole({ eventId }: { eventId: string }) {
   const { session, ready } = useSession();
@@ -68,6 +71,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ size?: number }>; hide?: boolean }[] = [
     { key: "overview", label: "Overview", icon: LayoutGrid },
     { key: "people", label: role === "student" ? "Companies" : role === "company" ? "Students" : "People", icon: Users },
+    { key: "sessions", label: "Sessions", icon: CalendarClock, hide: role === "student" },
     { key: "qr", label: "My QR", icon: QrCode, hide: role === "event_manager" },
     { key: "checklist", label: "Checklist", icon: ListChecks },
     { key: "manual", label: "Manual", icon: BookOpen },
@@ -85,7 +89,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
           const Icon = t.icon; const on = tab === t.key;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-md)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
               <Icon size={15} /> {t.label}
             </button>
           );
@@ -105,6 +109,10 @@ export default function EventConsole({ eventId }: { eventId: string }) {
                 caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${role}-qr`}
               />
             </SectionCard>
+          )}
+          {tab === "sessions" && role !== "student" && (
+            <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId}
+              timezone={event?.timezone ?? null} onTimezoneChange={(tz) => setEvent((e) => (e ? { ...e, timezone: tz } : e))} />
           )}
           {tab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
           {tab === "manual" && <ManualSection defaultRole={role} />}
@@ -145,7 +153,7 @@ function EventHeader({
           </h1>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, color: "var(--text-muted)" }}>
             {event?.location && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><MapPin size={14} /> {event.location}</span>}
-            {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {new Date(event.start_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>}
+            {event?.start_date && <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><CalendarDays size={14} /> {fmtEventDate(event.start_date)}</span>}
           </div>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -174,26 +182,18 @@ function EventHeader({
 
 function Overview({ role, me, students, companies, analytics, eventId }: { role: AppRole; me: StudentRow | CompanyRow | null; students: StudentRow[]; companies: CompanyRow[]; analytics: AnalyticsRow[]; eventId: string }) {
   if (role === "student") {
-    const mySkills = ((me as StudentRow)?.skills ?? []).map((s) => s.toLowerCase());
-    const ranked = companies
-      .map((c) => {
-        const wanted = [...(c.skills_wanted ?? []), ...(c.hiring_roles ?? [])].map((x) => x.toLowerCase());
-        const overlap = mySkills.filter((s) => wanted.some((w) => w.includes(s) || s.includes(w))).length;
-        return { c, overlap };
-      })
-      .sort((a, b) => b.overlap - a.overlap)
-      .slice(0, 4);
+    const ranked = matchCompanies((me as StudentRow) ?? {}, companies).slice(0, 4);
     return (
-      <SectionCard title="Companies to visit first" hint="Matched to your skills">
+      <SectionCard title="Companies to visit first" hint="Matched to your skills and target roles">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {ranked.map(({ c, overlap }) => (
+          {ranked.map(({ company: c, score }) => (
             <Link key={c.id} href={`/scan/company/${c.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
               <Avatar name={c.company_name ?? c.company ?? "C"} size={38} tone="var(--accent-2)" />
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{c.company_name ?? c.company}</span>
                 <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>Booth {c.booth_number} · {c.sector}</span>
               </span>
-              {overlap > 0 ? <FlagPill label={`${overlap} match`} tone="teal" /> : <FlagPill label="Explore" tone="muted" />}
+              {score ? <FlagPill label={`${score}% match`} tone="teal" /> : <FlagPill label="Explore" tone="muted" />}
             </Link>
           ))}
         </div>
@@ -322,7 +322,6 @@ function People({
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
           {filtered.map((s) => {
             const status = slMap.get(s.profile_id ?? "");
-            const score = evaluateResume(s).score;
             return (
               <div key={s.id} style={{ padding: "12px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -330,8 +329,8 @@ function People({
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>{s.full_name}</div>
                     <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{[s.degree, s.graduation_year, s.university].filter(Boolean).join(" · ")}</div>
+                    {s.target_roles?.length ? <div style={{ fontSize: 11.5, color: "var(--text-2)", marginTop: 2 }}>Looking for {s.target_roles.slice(0, 2).join(", ")}</div> : null}
                   </div>
-                  <FlagPill label={`Resume ${score}`} tone={score >= 70 ? "teal" : score >= 50 ? "cyan" : "amber"} />
                 </div>
                 {s.skills?.length ? <div style={{ marginTop: 10 }}><TagRow items={s.skills.slice(0, 6)} /></div> : null}
                 <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap", alignItems: "center" }}>
@@ -389,7 +388,7 @@ function FilterBar({ q, setQ, placeholder, chips, active, setActive, chipLabel }
           const on = active === c;
           return (
             <button key={c} onClick={() => setActive(c)}
-              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-full)", cursor: "pointer", color: on ? "var(--accent)" : "var(--text-2)", background: on ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
+              style={{ fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: "var(--r-sm)", cursor: "pointer", color: on ? "var(--accent)" : "var(--text-2)", background: on ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.03)", border: `1px solid ${on ? "var(--border-strong)" : "var(--border)"}` }}>
               {chipLabel ? chipLabel(c) : c === "all" ? "All" : c}
             </button>
           );

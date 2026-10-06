@@ -159,7 +159,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
       <SectionCard title="Students needing attention" hint="Low or no engagement" accent="rgba(247,201,72,0.22)">
         <div id="students" />
         {needHelp.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "No students need attention right now."}</p>
+          <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{students.length === 0 ? "No students have registered yet." : "No student is below an engagement score of 40."}</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {needHelp.map((a) => (
