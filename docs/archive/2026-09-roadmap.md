@@ -1,3 +1,5 @@
+> **Archived.** Written against the Firebase build in September 2026 and superseded by `docs/checklists/` and the generated board in `launch-board/`. Kept for history only.
+
 # GradLink Feature Roadmap and Test Plan
 
 Every feature in the codebase, grouped by where the user meets it, in the order a real user walks through the product. Each item has a test to run and a status based on reading the code as of commit `cb381b7`.

@@ -1,0 +1,68 @@
+# Rebuilds launch-board/ from docs/checklists/ and commits it to main.
+#
+# Runs when a checklist changes on main, when a pull request opens, changes or
+# closes (a PR that ticks an item shows it as in progress), every 6 hours as a
+# catch-up, and on demand from the Actions tab.
+#
+# pull_request_target is used so the job runs with main's code and a token
+# that can push. It never checks out or runs code from the pull request: it
+# only reads PR titles, descriptions and changed checklist lines through the API.
+name: Launch board
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/checklists/**"
+      - "launch-board/generate.mjs"
+      - "launch-board/template.html"
+      - ".github/workflows/launch-board.yml"
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize, ready_for_review, converted_to_draft, closed]
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: launch-board
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build the board
+        run: node launch-board/generate.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet -- launch-board; then
+            echo "Board unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add launch-board
+          git commit -m "Update launch board [skip ci]"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          echo "Could not push the board after 3 attempts." >&2
+          exit 1
