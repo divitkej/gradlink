@@ -8,6 +8,7 @@ none of it is imported, executed, or deployed.
 | `2026-06-handoff.md` | Session handoff notes from the original build | Superseded by the code itself and `/README.md` |
 | `2026-06-product-review.md` | Full product/architecture audit, June 2026 | Findings still useful as a roadmap; the state it describes is stale |
 | `2026-06-supabase-security-plan.md` | Staged plan to fix Postgres RLS | Obsolete — access control now lives in the Worker (`lib/server/rpc.ts`), not RLS |
+| `2026-09-roadmap.md` | First feature roadmap and test plan, written against the Firebase build | Superseded by `docs/checklists/` and the generated board in `launch-board/`; open items it found are in `docs/checklists/audit-follow-ups.md` |
 | `supabase-legacy/` | Old Postgres schema, RLS migration, SMTP scripts, email templates | GradLink ran on Supabase until July 2026 |
 | `firebase-legacy/` | `firestore.rules`, `storage.rules`, indexes, `firebase.json`, the Supabase→Firestore import | GradLink ran on Firebase until the move to Neon + Cloudflare Workers; the access rules were ported to `lib/server/rpc.ts` |
 
