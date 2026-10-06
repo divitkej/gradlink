@@ -29,7 +29,9 @@ export interface EventRow {
   created_by: string | null;
   /** Denormalised so lists can show the host without a second read. */
   host_org?: string | null;
-  join_code?: string | null;
+  /** Only present for the event's owner. Students join with one, employers with the other. */
+  student_code?: string | null;
+  company_code?: string | null;
   created_at?: string | null;
   /** IANA zone session times are entered and shown in. Null for older events. */
   timezone?: string | null;
@@ -155,5 +157,43 @@ export async function joinEventByCode(
   } catch (e) {
     log("joinEventByCode", e);
     return { ok: false, error: "Couldn't join that event. Please try again." };
+  }
+}
+
+/** Swap a code for a fresh one; the old code stops working. Owner only. */
+export async function regenerateEventCode(eventId: string, role: "student" | "company"): Promise<string | null> {
+  try {
+    return await rpc<string>("regenerateEventCode", eventId, role);
+  } catch (e) {
+    log("regenerateEventCode", e);
+    return null;
+  }
+}
+
+export interface AttendeeRow {
+  profile_id: string;
+  role: "student" | "company";
+  joined_at: string;
+  checked_in: boolean;
+  full_name: string;
+  email: string;
+  organization: string | null;
+  university: string | null;
+  degree: string | null;
+  graduation_year: number | null;
+  company_name: string | null;
+  company: string | null;
+  sector: string | null;
+  booth_number: string | null;
+}
+
+/** Everyone who joined with a code, newest first. Owner only. */
+export async function listAttendees(eventId: string): Promise<AttendeeRow[]> {
+  if (!eventId) return [];
+  try {
+    return await rpc<AttendeeRow[]>("listAttendees", eventId);
+  } catch (e) {
+    log("listAttendees", e);
+    return [];
   }
 }

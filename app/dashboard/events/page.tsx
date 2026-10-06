@@ -12,7 +12,7 @@ import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import { EVENT_STATUS_LABEL, type EventRow } from "@/lib/events";
 import EventForm from "@/components/events/EventForm";
-import JoinCode from "@/components/events/JoinCode";
+import EventCodes from "@/components/events/EventCodes";
 import JoinEventForm from "@/components/events/JoinEventForm";
 import { fmtEventDate } from "@/lib/format";
 
@@ -22,7 +22,6 @@ function statusTone(status: EventRow["status"]) {
   return "cyan" as const;
 }
 
-/** The join code is the thing a college actually shares, so make it copyable. */
 function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean; onOpen: () => void }) {
   const date = fmtEventDate(event.start_date);
   return (
@@ -63,9 +62,10 @@ function EventCard({ event, active, onOpen }: { event: EventRow; active: boolean
             )}
           </div>
         </div>
-
-        {event.join_code && <JoinCode code={event.join_code} />}
       </div>
+
+      {/* Only the owner receives codes, so this only shows on events they created. */}
+      {(event.student_code || event.company_code) && <EventCodes event={event} />}
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <Link
@@ -113,7 +113,7 @@ export default function EventsPage() {
             </h2>
             <p style={{ fontSize: 14, color: "var(--text-muted)" }}>
               {isManager
-                ? "Create an event, then share its join code with students and employers."
+                ? "Create an event, then share the student code with students and the employer code with employers."
                 : "Events you've joined. Add another with the code your college gave you."}
             </p>
           </div>
