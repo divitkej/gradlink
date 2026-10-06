@@ -269,7 +269,7 @@ Features that should work, checked once on a real device or the live site.
 
 ## In progress
 
-Open pull requests were not read on this run (no GitHub token), so nothing shows as in progress.
+Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
 
 ## Left to do
 
