@@ -4,14 +4,14 @@
 
 ![Launch progress](progress.svg)
 
-**99 of 137 done (72%).** 0 in progress, 38 left. Checklists last changed 2026-10-06.
+**99 of 138 done (72%).** 0 in progress, 39 left. Checklists last changed 2026-10-06.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "Needs the owner" : 19
+  "Needs the owner" : 20
   "To do" : 13
   "Verify live" : 4
   "Parked by decision" : 2
@@ -26,7 +26,7 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `████████░░░░` 64% | 9 | 0 | 5 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 0 | 16 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 64% | 30 | 0 | 17 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Ongoing** | `██░░░░░░░░░░` 20% | 1 | 0 | 4 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `█████████░░░` 79% | 38 | 0 | 10 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
@@ -93,7 +93,7 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 30 of 46 done, 0 in progress, 16 left.
+**Ongoing.** 30 of 47 done, 0 in progress, 17 left.
 
 **Left**
 
@@ -101,6 +101,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [ ] Old Vercel site still live · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)
 - [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
 - [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
+- [ ] Remove the test accounts · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)
 - [ ] Set `APP_URL` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)
 - [ ] Run `npm run db:migrate` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)
 - [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)
@@ -256,7 +257,7 @@ Features that should work, checked once on a real device or the live site.
 
 | Area | Progress | Done | Left | Checklist |
 |---|---|---|---|---|
-| Launch | `█████████░░░` 71% | 10 | 4 | [launch.md](../docs/checklists/launch.md) |
+| Launch | `████████░░░░` 67% | 10 | 5 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `███████████░` 92% | 11 | 1 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `█████████░░░` 78% | 7 | 2 | [organiser-access.md](../docs/checklists/organiser-access.md) |
@@ -265,20 +266,21 @@ Features that should work, checked once on a real device or the live site.
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `███████░░░░░` 60% | 12 | 8 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 18% | 2 | 9 | [features-to-build.md](../docs/checklists/features-to-build.md) |
-| **All** | `█████████░░░` **72%** | **99** | **38** | |
+| **All** | `█████████░░░` **72%** | **99** | **39** | |
 
 ## In progress
 
-Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
+Open pull requests were not read on this run (no GitHub token), so nothing shows as in progress.
 
 ## Left to do
 
-### Needs the owner (19)
+### Needs the owner (20)
 
 - [ ] **Cloudflare GitHub builds fail on every commit** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm… · id `launch/cloudflare-github-builds-fail-on-every`</sub>
 - [ ] **Old Vercel site still live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)<br><sub>`https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it). Owner action · id `launch/old-vercel-site-still-live`</sub>
 - [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
+- [ ] **Remove the test accounts** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)<br><sub>`admin1@example.com`, `student1@example.com`, `college1@example.com` and `employer1@example.com` share one known password and exist only for the test pass. Delete them, and take… · id `launch/remove-the-test-accounts`</sub>
 - [ ] **Live rules match the repo** · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)<br><sub>Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under… · id `core-loop/live-rules-match-the-repo`</sub>
 - [ ] **Run the migration before deploying this code** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)<br><sub>`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to… · id `organiser-access/run-the-migration-before-deploying-this`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>

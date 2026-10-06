@@ -4,7 +4,7 @@ Scope: hosting, database, email, domain and the legal pages needed before GradLi
 
 Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Neon Free, region `aws-ap-southeast-1`).
 
-## Progress: 10 / 14 done
+## Progress: 10 / 15 done
 
 ## Hosting and database
 
@@ -29,6 +29,9 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   Owner action, then `wrangler.jsonc`
 - [ ] **Account email: confirm email and password reset.** Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link. Sending through `divitkej@gmail.com` is paused by decision, so no sender is configured: accounts are confirmed on creation and "Forgot password" says it is not set up. To turn it on, pick a sender (a dedicated Gmail with an app password as `SMTP_USER` + `SMTP_PASS`, or Resend once the domain exists), then add it to the Privacy Policy's list of services.
   Done in "Send account email through Gmail and require email confirmation" · Paused in "Pause account email from the personal Gmail"
+
+- [ ] **Remove the test accounts.** `admin1@example.com`, `student1@example.com`, `college1@example.com` and `employer1@example.com` share one known password and exist only for the test pass. Delete them, and take `admin1@example.com` out of `ADMIN_EMAILS`, before the public launch. They are created by `npm run db:seed-test-users` (`scripts/seed-test-users.mjs`).
+  `scripts/seed-test-users.mjs` · Owner action
 
 ## Legal and claims
 
