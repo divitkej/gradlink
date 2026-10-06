@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarPlus, AlertCircle, Loader2 } from "lucide-react";
-import { createEvent, type EventStatus } from "@/lib/events";
+import { CalendarPlus, AlertCircle, Loader2, Save } from "lucide-react";
+import { createEvent, updateEvent, type EventRow, type EventStatus } from "@/lib/events";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
 import TimeZoneSelect, { useLocalZone } from "@/components/ui/TimeZoneSelect";
@@ -32,19 +32,41 @@ function Field({
   );
 }
 
-/** Colleges create their own events. The join code is generated server-side. */
-export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: string) => void }) {
+/** Stored dates come back as ISO timestamps; a date input wants YYYY-MM-DD. */
+function toDateInput(iso: string | null | undefined) {
+  return iso ? iso.slice(0, 10) : "";
+}
+
+/**
+ * Create an event, or edit one when `event` is passed.
+ *
+ * Colleges create their own events and the join code is generated
+ * server-side. Only the event's owner can save an edit; the server
+ * checks that, so the form doesn't have to.
+ */
+export default function EventForm({
+  event,
+  onCreated,
+  onSaved,
+  onCancel,
+}: {
+  event?: EventRow;
+  onCreated?: (eventId: string) => void;
+  onSaved?: (event: EventRow) => void;
+  onCancel?: () => void;
+}) {
   const { session, selectEvent } = useSession();
   const { refresh } = useActiveEvent();
+  const editing = !!event;
 
-  const [title, setTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<EventStatus>("upcoming");
-  // The organiser's own zone until they pick another.
-  const [picked, setPicked] = useState<string | null>(null);
+  const [title, setTitle] = useState(event?.title ?? "");
+  const [location, setLocation] = useState(event?.location ?? "");
+  const [startDate, setStartDate] = useState(toDateInput(event?.start_date));
+  const [endDate, setEndDate] = useState(toDateInput(event?.end_date));
+  const [description, setDescription] = useState(event?.description ?? "");
+  const [status, setStatus] = useState<EventStatus>(event?.status ?? "upcoming");
+  // The event's saved zone when editing, otherwise the organiser's own zone until they pick another.
+  const [picked, setPicked] = useState<string | null>(event?.timezone ?? null);
   const localZone = useLocalZone();
   const timezone = picked ?? localZone;
   const [busy, setBusy] = useState(false);
@@ -60,6 +82,27 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
     }
 
     setBusy(true);
+    if (event) {
+      const fields = {
+        title: title.trim(),
+        location: location.trim() || null,
+        start_date: startDate || null,
+        end_date: endDate || null,
+        description: description.trim() || null,
+        status,
+        ...(timezone ? { timezone } : {}),
+      };
+      const ok = await updateEvent(event.id, fields);
+      setBusy(false);
+      if (!ok) {
+        setError("Couldn't save your changes. Please try again.");
+        return;
+      }
+      refresh();
+      onSaved?.({ ...event, ...fields });
+      return;
+    }
+
     const res = await createEvent({
       title, location, startDate, endDate, description, status, timezone: timezone || undefined,
       createdBy: session.profileId,
@@ -94,9 +137,10 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
               borderRadius: "var(--r-md)", outline: "none", colorScheme: "dark",
             }}
           >
-            <option value="draft">Draft (not visible yet)</option>
+            <option value="draft">Draft</option>
             <option value="upcoming">Upcoming</option>
             <option value="live">Live now</option>
+            {editing && <option value="ended">Ended</option>}
           </select>
         </div>
       </div>
@@ -144,22 +188,38 @@ export default function CreateEventForm({ onCreated }: { onCreated?: (eventId: s
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={busy || !title.trim()}
-        style={{
-          alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 8,
-          height: 46, padding: "0 22px", borderRadius: "var(--r-md)",
-          fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14.5,
-          border: "none", color: "#0A0A0A",
-          background: "linear-gradient(100deg, var(--accent), var(--accent-2))",
-          cursor: busy || !title.trim() ? "default" : "pointer",
-          opacity: busy || !title.trim() ? 0.6 : 1,
-        }}
-      >
-        {busy ? <Loader2 size={15} className="gl-spin" /> : <CalendarPlus size={16} />}
-        {busy ? "Creating…" : "Create event"}
-      </button>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <button
+          type="submit"
+          disabled={busy || !title.trim()}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            height: 46, padding: "0 22px", borderRadius: "var(--r-md)",
+            fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14.5,
+            border: "none", color: "#0A0A0A",
+            background: "linear-gradient(100deg, var(--accent), var(--accent-2))",
+            cursor: busy || !title.trim() ? "default" : "pointer",
+            opacity: busy || !title.trim() ? 0.6 : 1,
+          }}
+        >
+          {busy ? <Loader2 size={15} className="gl-spin" /> : editing ? <Save size={16} /> : <CalendarPlus size={16} />}
+          {busy ? (editing ? "Saving…" : "Creating…") : editing ? "Save changes" : "Create event"}
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            style={{
+              height: 46, padding: "0 18px", borderRadius: "var(--r-md)", cursor: busy ? "default" : "pointer",
+              fontSize: 14, fontWeight: 600, color: "var(--text-2)",
+              background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)",
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
 
       <style>{`
         .gl-spin { animation: gl-spin 0.9s linear infinite; }
