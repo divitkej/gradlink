@@ -16,7 +16,7 @@ Status key as in `landing-page.md`.
   `db/schema.sql` · Done on 2026-09-29, no commit (database change)
 - [x] **Tested live on a preview version.** Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards.
   Done on 2026-09-29
-- [ ] **Put the branch live.** Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote version `1efa9168` with `wrangler versions deploy`).
+- [ ] **Put the branch live.** Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since).
   Verify live
 
 ## Built
