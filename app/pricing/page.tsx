@@ -5,7 +5,7 @@ import PricingSection from "@/components/PricingSection";
 export const metadata = {
   title: "Pricing · GradLink",
   description:
-    "GradLink is free for students and employers. Colleges upgrade to Placement Pro for outcome reporting, exports and unlimited events.",
+    "GradLink is free for students and employers. Colleges upgrade to Placement Pro for outcome reporting and exports.",
 };
 
 export default function PricingPage() {

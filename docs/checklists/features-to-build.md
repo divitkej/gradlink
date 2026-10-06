@@ -38,7 +38,7 @@ Colleges are the customer and want their students hired, so nothing an employer 
 
 So these are not planned for employers: filtering or sorting by readiness, résumé score, GPA or event activity. The landing page Employer CRM mockup was changed to match.
 - Role checklists for before, during and after each event
-- Events with join codes, statuses and check-in
+- Events with separate student and employer codes, statuses and check-in
 - QR codes and two-way scanning, with notes
 - Company shortlists: shortlisted, priority, maybe, not a fit, with notes
 - Direct messages between students and companies
