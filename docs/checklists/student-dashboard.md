@@ -6,12 +6,12 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 29 / 33 done, 4 need a real device, the live database or the go-live step
+## Progress: 31 / 33 done, 2 need a real device or the go-live step
 
 ## Before deploying
 
-- [ ] **Apply the new schema to the live Neon database.** `npm run db:migrate` adds `events.timezone` and the `student_scores` and `student_certificates` tables. Additive; until then the live site keeps working as before.
-  `db/schema.sql` · Verify live
+- [x] **New schema applied to the live Neon database.** `npm run db:migrate` on 2026-10-06 added `events.timezone`, `student_scores` and `student_certificates` (main's own changes were already there). Additive; the live site kept working.
+  `db/schema.sql` · Done on 2026-10-06, no commit (database change)
 - [x] **Schema applied to the live Neon database.** `npm run db:migrate` on 2026-09-29, after merging main: 30 tables, including `event_sessions`, `session_bookings`, `saved_companies`, `applications`, `notifications`, `interview_invites`, `booth_queue` and `student_courses`. Additive only; the live site kept working throughout.
   `db/schema.sql` · Done on 2026-09-29, no commit (database change)
 - [x] **Tested live on a preview version.** Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards.
@@ -72,8 +72,8 @@ Status key as in `landing-page.md`.
   `lib/server/coding.ts`, `components/dashboard/StudentScores.tsx`, `components/scan/VerifiedScores.tsx` · Done in "Add event time zones, coding profiles and test scores"
 - [x] **Certificates, replacing test scores.** A Credly badge link (AWS, Google Cloud, IBM, Cisco, Oracle, CompTIA and many more issue through Credly) is read from Credly's public Open Badges API: badge, issuer, issue and expiry dates, and whether it was revoked. It must belong to the student: the name on the badge page matches their GradLink name, or the badge was issued to their GradLink email (Credly publishes its hash). A revoked badge is refused and an expired one is marked. Any other certificate (NPTEL, Microsoft and so on) is shown as self-reported with the credential link the student gives. Up to 30, and the student picks which ones employers see. Tested with fakes for every path and against real Credly badges.
   `lib/server/credly.ts`, `components/dashboard/StudentCertificates.tsx`, `components/scan/VerifiedCertificates.tsx` · Done in "Replace test scores with verified certificates"
-- [ ] **LeetCode, Codeforces and Credly from Cloudflare.** Checked from a normal server so far. Confirm on a preview version that all three answer requests from Cloudflare's network before going live.
-  Verify live
+- [x] **LeetCode, Codeforces and Credly from Cloudflare.** Preview version `0ec7412c` (production untouched), with short-lived accounts on the live database: LeetCode found a real user and read their Summary, Codeforces found a real user and read their submissions, Credly read a real badge's name, issuer and earner, and a missing badge was reported as missing. Each answered in under 3 seconds. Event time zones and the new profile sections also worked there. All 14 checks passed; the accounts and event were deleted afterwards.
+  Done on 2026-10-06
 
 ## Employer privacy
 
