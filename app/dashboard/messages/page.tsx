@@ -10,6 +10,13 @@ import { useActiveEvent } from "@/lib/use-active-event";
 import { listMessagesForProfile, getProfileNames, sendMessage, markMessagesRead, type MessageRow } from "@/lib/db";
 import { notifyMessagesRead } from "@/lib/notifications";
 
+/**
+ * How often an open inbox checks for new messages. Only while the tab is
+ * visible, like the unread badge (lib/notifications.ts), so a background tab
+ * does not keep Neon from scaling to zero.
+ */
+const POLL_MS = 15_000;
+
 export default function MessagesPage() {
   const { session, ready } = useSession();
   const { eventId } = useActiveEvent();
@@ -23,6 +30,11 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  // Optimistic messages whose send has not succeeded yet. Kept on screen
+  // across reloads until the server copy replaces them.
+  const pendingRef = useRef(new Set<string>());
+  // Reloads the inbox; set by the effect below while an inbox is open.
+  const reloadRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const f = () => setMobile(window.innerWidth < 760);
@@ -31,20 +43,47 @@ export default function MessagesPage() {
     return () => window.removeEventListener("resize", f);
   }, []);
 
+  // Load the inbox, then keep it current so an open conversation shows replies
+  // without a page reload.
   useEffect(() => {
     if (!ready || !me || !eventId) return;
     let cancelled = false;
-    (async () => {
-      setLoading(true);
+    let seq = 0;
+    let known: Record<string, { name: string; role: string; org: string }> = {};
+    const load = async (initial: boolean) => {
+      // Numbered, so a slow response cannot overwrite a newer one.
+      const mine = ++seq;
+      if (initial) setLoading(true);
       const m = await listMessagesForProfile(me, eventId);
       const ids = m.flatMap((x) => [x.sender_profile_id, x.receiver_profile_id]).filter(Boolean) as string[];
-      const resolved = await getProfileNames(ids);
-      if (cancelled) return;
-      setNames(resolved);
-      setMsgs(m);
+      // Names only change when someone new writes, so reloads usually skip this.
+      if (initial || ids.some((id) => !known[id])) {
+        const resolved = await getProfileNames(ids);
+        if (initial || Object.keys(resolved).length > 0) known = resolved;
+      }
+      if (cancelled || mine !== seq) return;
+      setNames(known);
+      setMsgs((prev) => {
+        // A failed reload comes back empty. Messages are never deleted, so an
+        // empty reload after a full inbox means "try again", not "clear it".
+        if (!initial && m.length === 0 && prev.length > 0) return prev;
+        return [...m, ...prev.filter((x) => pendingRef.current.has(x.id) && x.event_id === eventId)];
+      });
       setLoading(false);
-    })();
-    return () => { cancelled = true; };
+    };
+    load(true);
+    reloadRef.current = () => { load(false); };
+    const onFocus = () => load(false);
+    window.addEventListener("focus", onFocus);
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible") load(false);
+    }, POLL_MS);
+    return () => {
+      cancelled = true;
+      reloadRef.current = () => {};
+      window.removeEventListener("focus", onFocus);
+      window.clearInterval(interval);
+    };
   }, [ready, me, eventId]);
 
   const convs = useMemo(() => {
@@ -92,10 +131,17 @@ export default function MessagesPage() {
       created_at: new Date().toISOString(),
       event_id: eventId, sender_profile_id: me, receiver_profile_id: active.id, message: text, read_at: null,
     };
+    pendingRef.current.add(temp.id);
     setMsgs((p) => [...p, temp]);
     setReply("");
-    await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
+    const ok = await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
     setSending(false);
+    // Saved: swap the optimistic copy for the server's. A failed send stays
+    // on screen, as before.
+    if (ok) {
+      pendingRef.current.delete(temp.id);
+      reloadRef.current();
+    }
   }
 
   const showList = !mobile || !active;

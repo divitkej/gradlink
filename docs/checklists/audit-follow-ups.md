@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 5 / 7 done
+## Progress: 6 / 7 done
 
 ## Pricing
 
@@ -37,5 +37,5 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Messages
 
-- [ ] **New messages need a page reload.** The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded.
-  `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4
+- [x] **New messages need a page reload.** The messages page now reloads the inbox every 15 seconds while the tab is visible and on window focus, so an open conversation shows replies without a reload. Hidden tabs do not poll, as with the unread badge.
+  `app/dashboard/messages/page.tsx` · Phase 4 · Done in "Show new messages in an open conversation without a reload"
