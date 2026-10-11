@@ -643,6 +643,20 @@ export const ops: Record<string, Op> = {
     await requireStaff(u, eventId);
     return db()`select * from shortlists where event_id = ${s(eventId)}`;
   },
+  /**
+   * Interview invites companies sent at an event, for its staff. Counts only:
+   * invites a company withdrew are left out, and "booked" means the student
+   * picked a time.
+   */
+  async getInterviewCounts(u, [eventId]) {
+    await requireStaff(u, eventId);
+    const [r] = await db()`
+      select count(*) filter (where status <> 'cancelled')::int as invited,
+             count(*) filter (where status = 'accepted')::int as booked
+      from interview_invites where event_id = ${s(eventId)}
+    `;
+    return { invited: Number(r?.invited ?? 0), booked: Number(r?.booked ?? 0) };
+  },
 
   /* Messages — only the two participants can read a conversation. */
   async sendMessage(u, [input]) {

@@ -7,7 +7,7 @@ import { SectionCard } from "./cards";
 import { Badge, Button } from "@/components/ui/primitives";
 import { buildReport, downloadReportCsv, type OutcomeReport } from "@/lib/report";
 import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib/billing";
-import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow } from "@/lib/db";
+import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, InterviewCounts } from "@/lib/db";
 
 /**
  * The post-event outcome report — GradLink's paid feature.
@@ -16,13 +16,14 @@ import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow } from "@/
  * having) but the full tables and the export are behind Placement Pro.
  */
 export default function OutcomeReportCard({
-  event, students, companies, scans, shortlists, profileId, email, organization,
+  event, students, companies, scans, shortlists, interviews, profileId, email, organization,
 }: {
   event: EventRow | null;
   students: StudentRow[];
   companies: CompanyRow[];
   scans: ScanRow[];
   shortlists: ShortlistRow[];
+  interviews: InterviewCounts;
   profileId: string;
   email?: string;
   organization?: string;
@@ -40,7 +41,7 @@ export default function OutcomeReportCard({
     return () => { cancelled = true; };
   }, [profileId]);
 
-  const report: OutcomeReport = buildReport({ event, students, companies, scans, shortlists });
+  const report: OutcomeReport = buildReport({ event, students, companies, scans, shortlists, interviews });
 
   async function upgrade() {
     setError(null);
@@ -93,7 +94,8 @@ export default function OutcomeReportCard({
             <Sparkles size={15} color="var(--accent-2)" style={{ flexShrink: 0, marginTop: 2 }} />
             <span>
               {report.resumeReady} of {report.studentsRegistered} students are resume-ready, {report.totalScans} scans
-              recorded across {report.employers} employers, and {report.shortlists} shortlists created.
+              recorded across {report.employers} employers, {report.shortlists} shortlists created, and{" "}
+              {report.interviewInvites} interview invites sent ({report.interviewsBooked} booked).
               Export the full breakdown: every student, every employer, every outcome.
             </span>
           </p>
