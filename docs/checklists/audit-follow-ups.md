@@ -12,14 +12,14 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 2 / 7 done
+## Progress: 3 / 7 done
 
 ## Pricing
 
 - [x] **"Start free" does nothing.** The Starter button on `/pricing` now sends people to `/sign-up`.
   `components/PricingSection.tsx` · Phase 2 · Done in "Send the pricing Start free button to sign-up"
-- [ ] **No message after Stripe checkout.** Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.
-  `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4
+- [x] **No message after Stripe checkout.** `/dashboard/event-manager?upgraded=1` now confirms the checkout and says Pro switches on once Stripe confirms the payment; `/pricing?canceled=1` says the checkout was cancelled and nothing was charged.
+  `components/dashboard/UpgradedNotice.tsx`, `app/dashboard/event-manager/page.tsx`, `components/PricingSection.tsx` · Phase 4 · Done in "Confirm Stripe checkout results on the dashboard and pricing page"
 
 ## Navigation
 
