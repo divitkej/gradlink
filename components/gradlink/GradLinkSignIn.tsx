@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -8,7 +8,7 @@ import AuthShell from "./AuthShell";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import { signIn, sendReset, resendVerification } from "@/lib/auth";
-import { setSession } from "@/lib/session";
+import { setSession, useSession } from "@/lib/session";
 
 function roleHome(role: "student" | "company" | "event_manager") {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -41,6 +41,7 @@ function Field({
 
 export default function GradLinkSignIn() {
   const router = useRouter();
+  const { session, ready } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -50,6 +51,11 @@ export default function GradLinkSignIn() {
   // True after a correct password on an account whose email isn't confirmed.
   const [unverified, setUnverified] = useState(false);
   const [resendBusy, setResendBusy] = useState(false);
+
+  // Anyone already signed in, or who just signed in below, goes to their dashboard.
+  useEffect(() => {
+    if (ready && session) router.replace(roleHome(session.role));
+  }, [ready, session, router]);
 
   async function handleResend() {
     setResendBusy(true);
@@ -104,7 +110,6 @@ export default function GradLinkSignIn() {
       activeEventId: null,
     });
     setBusy(false);
-    router.push(roleHome(profile.role));
   }
 
   return (
