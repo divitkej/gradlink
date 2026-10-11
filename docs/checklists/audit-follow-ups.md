@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 1 / 7 done
+## Progress: 2 / 7 done
 
 ## Pricing
 
@@ -23,10 +23,10 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Navigation
 
-- [ ] **College sidebar has no Messages or Profile link.** Students and companies get both. Colleges can only reach Messages through the header bell.
-  `components/dashboard/DashboardShell.tsx` · Partial · Phase 2
-- [ ] **Scan history is not linked anywhere.** `/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address.
-  `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2
+- [ ] **College sidebar has no Messages or Profile link.** Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing for colleges yet (it only says there is no profile to edit), so a link would lead to an empty page. Decide what a college profile should hold, or drop this half.
+  `components/dashboard/DashboardShell.tsx`, `app/dashboard/profile/page.tsx` · Partial · Phase 2
+- [x] **Scan history is not linked anywhere.** Every role's sidebar now has "Scan History" (`/dashboard/scans`) under Scanner.
+  `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Phase 2 · Done in "Add Messages and Scan History to the dashboard sidebar"
 
 ## Sign in
 
