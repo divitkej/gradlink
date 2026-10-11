@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 4 / 7 done
+## Progress: 5 / 7 done
 
 ## Pricing
 
@@ -32,8 +32,8 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 - [x] **Signed-in people can still open the sign-in page.** `/sign-in` now sends anyone already signed in to their dashboard.
   `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in "Send signed-in people from the sign-in page to their dashboard"
-- [ ] **Signing in from a scanned QR loses the profile.** The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it.
-  `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4
+- [x] **Signing in from a scanned QR loses the profile.** The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed.
+  `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in "Return to the scanned profile after signing in from a QR"
 
 ## Messages
 

@@ -14,6 +14,17 @@ function roleHome(role: "student" | "company" | "event_manager") {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
 }
 
+/**
+ * Where to go after sign-in when the link asked for it, e.g. a scanned QR
+ * profile (components/scan/ViewerGate.tsx). Only paths on this site count,
+ * so the parameter cannot send anyone to another domain.
+ */
+function returnPath(): string | null {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) return null;
+  return next;
+}
+
 function Field({
   id, label, type, placeholder, icon, value, onChange, autoComplete,
 }: {
@@ -52,9 +63,10 @@ export default function GradLinkSignIn() {
   const [unverified, setUnverified] = useState(false);
   const [resendBusy, setResendBusy] = useState(false);
 
-  // Anyone already signed in, or who just signed in below, goes to their dashboard.
+  // Anyone already signed in, or who just signed in below, goes back to the
+  // page that sent them here, or else to their dashboard.
   useEffect(() => {
-    if (ready && session) router.replace(roleHome(session.role));
+    if (ready && session) router.replace(returnPath() ?? roleHome(session.role));
   }, [ready, session, router]);
 
   async function handleResend() {
