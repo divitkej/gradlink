@@ -15,7 +15,10 @@ export default function PricingSection() {
 
   async function onCta(plan: Plan) {
     setError(null);
-    if (plan.id === "free") return;
+    if (plan.id === "free") {
+      window.location.assign("/sign-up");
+      return;
+    }
 
     if (!ready) return;
     if (!session) {

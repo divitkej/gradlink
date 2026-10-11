@@ -12,12 +12,12 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 0 / 7 done
+## Progress: 1 / 7 done
 
 ## Pricing
 
-- [ ] **"Start free" does nothing.** `onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`.
-  `components/PricingSection.tsx` · Dead button · Phase 2
+- [x] **"Start free" does nothing.** The Starter button on `/pricing` now sends people to `/sign-up`.
+  `components/PricingSection.tsx` · Phase 2 · Done in "Send the pricing Start free button to sign-up"
 - [ ] **No message after Stripe checkout.** Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.
   `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4
 
