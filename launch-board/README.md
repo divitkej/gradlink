@@ -4,15 +4,16 @@
 
 ![Launch progress](progress.svg)
 
-**99 of 137 done (72%).** 0 in progress, 38 left. Checklists last changed 2026-10-06.
+**99 of 137 done (72%).** 6 in progress, 38 left. Checklists last changed 2026-10-06.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
+  "In progress" : 6
   "Needs the owner" : 19
-  "To do" : 13
+  "To do" : 7
   "Verify live" : 4
   "Parked by decision" : 2
   "Done" : 99
@@ -25,9 +26,9 @@ pie showData
 | Phase | Status | Progress | Done | In progress | Left |
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
-| [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `████████░░░░` 64% | 9 | 0 | 5 |
+| [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `████████░░░░` 64% | 9 | 2 | 5 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 0 | 16 |
-| [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Ongoing** | `██░░░░░░░░░░` 20% | 1 | 0 | 4 |
+| [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Ongoing** | `██░░░░░░░░░░` 20% | 1 | 4 | 4 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `█████████░░░` 79% | 38 | 0 | 10 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
@@ -65,14 +66,17 @@ Create or join an event, open it, work the checklist, edit the event, with the a
 
 Every visible button works, nothing claims what the app does not do.
 
-**Ongoing.** 9 of 14 done, 0 in progress, 5 left.
+**Ongoing.** 9 of 14 done, 2 in progress, 5 left.
+
+**Ongoing**
+
+- [ ] "Start free" does nothing · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)
+- [ ] Scan history is not linked anywhere · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28)
 
 **Left**
 
 - [ ] Several Claude sessions deploy to the same Worker · Needs the owner · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)
-- [ ] "Start free" does nothing · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)
 - [ ] College sidebar has no Messages or Profile link · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)
-- [ ] Scan history is not linked anywhere · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28)
 - [ ] Pill shapes on labels and tabs · Parked by decision · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L41)
 
 <details><summary>Done (9)</summary>
@@ -153,14 +157,14 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 
 Search basics, confirmations, redirects and live updates.
 
-**Ongoing.** 1 of 5 done, 0 in progress, 4 left.
+**Ongoing.** 1 of 5 done, 4 in progress, 4 left.
 
-**Left**
+**Ongoing**
 
-- [ ] No message after Stripe checkout · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21)
-- [ ] Signed-in people can still open the sign-in page · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)
-- [ ] Signing in from a scanned QR loses the profile · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35)
-- [ ] New messages need a page reload · To do · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40)
+- [ ] No message after Stripe checkout · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21)
+- [ ] Signed-in people can still open the sign-in page · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)
+- [ ] Signing in from a scanned QR loses the profile · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35)
+- [ ] New messages need a page reload · [PR #14](https://github.com/divitkej/gradlink/pull/14) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40)
 
 <details><summary>Done (1)</summary>
 
@@ -269,7 +273,12 @@ Features that should work, checked once on a real device or the live site.
 
 ## In progress
 
-Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
+- [ ] **"Start free" does nothing** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2 · id `audit-follow-ups/start-free-does-nothing`</sub>
+- [ ] **No message after Stripe checkout** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.… · id `audit-follow-ups/no-message-after-stripe-checkout`</sub>
+- [ ] **Scan history is not linked anywhere** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`,… · id `audit-follow-ups/scan-history-is-not-linked-anywhere`</sub>
+- [ ] **Signed-in people can still open the sign-in page** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4 · id `audit-follow-ups/signed-in-people-can-still-open-the`</sub>
+- [ ] **Signing in from a scanned QR loses the profile** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and… · id `audit-follow-ups/signing-in-from-a-scanned-qr`</sub>
+- [ ] **New messages need a page reload** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`,… · id `audit-follow-ups/new-messages-need-a-page-reload`</sub>
 
 ## Left to do
 
@@ -295,15 +304,9 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
 
-### To do (13)
+### To do (7)
 
-- [ ] **"Start free" does nothing** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19)<br><sub>`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2 · id `audit-follow-ups/start-free-does-nothing`</sub>
-- [ ] **No message after Stripe checkout** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21)<br><sub>Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.… · id `audit-follow-ups/no-message-after-stripe-checkout`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial · Phase 2 · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
-- [ ] **Scan history is not linked anywhere** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28)<br><sub>`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`,… · id `audit-follow-ups/scan-history-is-not-linked-anywhere`</sub>
-- [ ] **Signed-in people can still open the sign-in page** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33)<br><sub>`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4 · id `audit-follow-ups/signed-in-people-can-still-open-the`</sub>
-- [ ] **Signing in from a scanned QR loses the profile** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35)<br><sub>The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and… · id `audit-follow-ups/signing-in-from-a-scanned-qr`</sub>
-- [ ] **New messages need a page reload** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40)<br><sub>The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`,… · id `audit-follow-ups/new-messages-need-a-page-reload`</sub>
 - [ ] **Build: Interview counts for colleges** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L52)<br><sub>Where the site shows it: Analytics funnel, Hero dashboard, Product reveal, Journey step 04. Notes: Invites and bookings are built for students and companies; the college… · id `features-to-build/interview-counts-for-colleges`</sub>
 - [ ] **Build: Offer tracking and placement rate** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)<br><sub>Where the site shows it: Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04. Notes: Students log offers in the application tracker (private to them).… · id `features-to-build/offer-tracking-and-placement-rate`</sub>
 - [ ] **Build: Event ROI score** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)<br><sub>Where the site shows it: Analytics stats. Notes: No formula or data · id `features-to-build/event-roi-score`</sub>
