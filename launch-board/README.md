@@ -4,15 +4,15 @@
 
 ![Launch progress](progress.svg)
 
-**99 of 137 done (72%).** 6 in progress, 38 left. Checklists last changed 2026-10-06.
+**99 of 137 done (72%).** 8 in progress, 38 left. Checklists last changed 2026-10-06.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "In progress" : 6
-  "Needs the owner" : 19
+  "In progress" : 8
+  "Needs the owner" : 17
   "To do" : 7
   "Verify live" : 4
   "Parked by decision" : 2
@@ -27,9 +27,9 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `████████░░░░` 64% | 9 | 2 | 5 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 0 | 16 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 1 | 16 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Ongoing** | `██░░░░░░░░░░` 20% | 1 | 4 | 4 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `█████████░░░` 79% | 38 | 0 | 10 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `█████████░░░` 79% | 38 | 1 | 10 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -97,7 +97,11 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 30 of 46 done, 0 in progress, 16 left.
+**Ongoing.** 30 of 46 done, 1 in progress, 16 left.
+
+**Ongoing**
+
+- [ ] Run `npm run db:migrate` · [PR #15](https://github.com/divitkej/gradlink/pull/15) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)
 
 **Left**
 
@@ -106,7 +110,6 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
 - [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
 - [ ] Set `APP_URL` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)
-- [ ] Run `npm run db:migrate` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)
 - [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)
 - [ ] Least-privilege database role · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L37)
 - [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)
@@ -176,11 +179,14 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 38 of 48 done, 0 in progress, 10 left.
+**Ongoing.** 38 of 48 done, 1 in progress, 10 left.
+
+**Ongoing**
+
+- [ ] Run the migration before deploying this code · [PR #15](https://github.com/divitkej/gradlink/pull/15) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)
 
 **Left**
 
-- [ ] Run the migration before deploying this code · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)
 - [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)
 - [ ] Build: Interview counts for colleges · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L52)
 - [ ] Build: Offer tracking and placement rate · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)
@@ -273,27 +279,27 @@ Features that should work, checked once on a real device or the live site.
 
 ## In progress
 
+- [ ] **Run the migration before deploying this code** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28) · [PR #15](https://github.com/divitkej/gradlink/pull/15)<br><sub>`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to… · id `organiser-access/run-the-migration-before-deploying-this`</sub>
 - [ ] **"Start free" does nothing** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L19) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2 · id `audit-follow-ups/start-free-does-nothing`</sub>
 - [ ] **No message after Stripe checkout** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L21) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.… · id `audit-follow-ups/no-message-after-stripe-checkout`</sub>
 - [ ] **Scan history is not linked anywhere** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L28) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`,… · id `audit-follow-ups/scan-history-is-not-linked-anywhere`</sub>
 - [ ] **Signed-in people can still open the sign-in page** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L33) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4 · id `audit-follow-ups/signed-in-people-can-still-open-the`</sub>
 - [ ] **Signing in from a scanned QR loses the profile** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L35) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and… · id `audit-follow-ups/signing-in-from-a-scanned-qr`</sub>
 - [ ] **New messages need a page reload** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L40) · [PR #14](https://github.com/divitkej/gradlink/pull/14)<br><sub>The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`,… · id `audit-follow-ups/new-messages-need-a-page-reload`</sub>
+- [ ] **Run `npm run db:migrate`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35) · [PR #15](https://github.com/divitkej/gradlink/pull/15)<br><sub>against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. · id `security/run-npm-run-db-migrate`</sub>
 
 ## Left to do
 
-### Needs the owner (19)
+### Needs the owner (17)
 
 - [ ] **Cloudflare GitHub builds fail on every commit** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm… · id `launch/cloudflare-github-builds-fail-on-every`</sub>
 - [ ] **Old Vercel site still live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)<br><sub>`https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it). Owner action · id `launch/old-vercel-site-still-live`</sub>
 - [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Live rules match the repo** · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)<br><sub>Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under… · id `core-loop/live-rules-match-the-repo`</sub>
-- [ ] **Run the migration before deploying this code** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)<br><sub>`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to… · id `organiser-access/run-the-migration-before-deploying-this`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
 - [ ] **Set `APP_URL`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)<br><sub>in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it. · id `security/set-app-url`</sub>
-- [ ] **Run `npm run db:migrate`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)<br><sub>against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. · id `security/run-npm-run-db-migrate`</sub>
 - [ ] **Optional, after the custom domain is connected** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)<br><sub>add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address. · id `security/optional-after-the-custom-domain-is`</sub>
 - [ ] **Least-privilege database role** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L37)<br><sub>In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run… · id `security/least-privilege-database-role`</sub>
 - [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)<br><sub>Confirm Neon's restore window covers at least 7 days. · id `security/backups`</sub>

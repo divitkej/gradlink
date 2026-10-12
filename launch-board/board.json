@@ -6,8 +6,8 @@
     "open": 38,
     "percent": 72,
     "counts": {
-      "in_progress": 6,
-      "owner": 19,
+      "in_progress": 8,
+      "owner": 17,
       "todo": 7,
       "verify": 4,
       "parked": 2,
@@ -59,8 +59,8 @@
       "name": "Organiser access",
       "total": 9,
       "counts": {
-        "in_progress": 0,
-        "owner": 2,
+        "in_progress": 1,
+        "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 0,
@@ -111,8 +111,8 @@
       "name": "Security",
       "total": 20,
       "counts": {
-        "in_progress": 0,
-        "owner": 8,
+        "in_progress": 1,
+        "owner": 7,
         "todo": 0,
         "verify": 0,
         "parked": 0,
@@ -170,8 +170,8 @@
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
       "total": 46,
       "counts": {
-        "in_progress": 0,
-        "owner": 15,
+        "in_progress": 1,
+        "owner": 14,
         "todo": 0,
         "verify": 0,
         "parked": 1,
@@ -200,8 +200,8 @@
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
       "total": 48,
       "counts": {
-        "in_progress": 0,
-        "owner": 2,
+        "in_progress": 1,
+        "owner": 1,
         "todo": 6,
         "verify": 2,
         "parked": 0,
@@ -226,6 +226,24 @@
     }
   ],
   "items": [
+    {
+      "area": "organiser-access",
+      "areaName": "Organiser access",
+      "section": "Owner actions before deploying",
+      "line": 28,
+      "title": "Run the migration before deploying this code",
+      "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "5",
+      "id": "organiser-access/run-the-migration-before-deploying-this",
+      "pr": {
+        "number": 15,
+        "title": "Record production database checks in the checklists",
+        "url": "https://github.com/divitkej/gradlink/pull/15",
+        "draft": false
+      }
+    },
     {
       "area": "audit-follow-ups",
       "areaName": "Audit follow-ups",
@@ -335,6 +353,24 @@
       }
     },
     {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 35,
+      "title": "Run `npm run db:migrate`",
+      "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/run-npm-run-db-migrate",
+      "pr": {
+        "number": 15,
+        "title": "Record production database checks in the checklists",
+        "url": "https://github.com/divitkej/gradlink/pull/15",
+        "draft": false
+      }
+    },
+    {
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
@@ -398,18 +434,6 @@
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 28,
-      "title": "Run the migration before deploying this code",
-      "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "5",
-      "id": "organiser-access/run-the-migration-before-deploying-this"
-    },
-    {
-      "area": "organiser-access",
-      "areaName": "Organiser access",
-      "section": "Owner actions before deploying",
       "line": 29,
       "title": "Set `ADMIN_EMAILS`, then sign up with that email straight away",
       "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.",
@@ -441,18 +465,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/set-app-url"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 35,
-      "title": "Run `npm run db:migrate`",
-      "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/run-npm-run-db-migrate"
     },
     {
       "area": "security",
