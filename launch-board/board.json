@@ -6,9 +6,9 @@
     "open": 38,
     "percent": 72,
     "counts": {
-      "in_progress": 0,
+      "in_progress": 6,
       "owner": 19,
-      "todo": 13,
+      "todo": 7,
       "verify": 4,
       "parked": 2,
       "done": 99
@@ -85,9 +85,9 @@
       "name": "Audit follow-ups",
       "total": 7,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 6,
         "owner": 0,
-        "todo": 7,
+        "todo": 1,
         "verify": 0,
         "parked": 0,
         "done": 0
@@ -155,9 +155,9 @@
       "goal": "Every visible button works, nothing claims what the app does not do.",
       "total": 14,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 2,
         "owner": 1,
-        "todo": 3,
+        "todo": 1,
         "verify": 0,
         "parked": 1,
         "done": 9
@@ -185,9 +185,9 @@
       "goal": "Search basics, confirmations, redirects and live updates.",
       "total": 5,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 4,
         "owner": 0,
-        "todo": 4,
+        "todo": 0,
         "verify": 0,
         "parked": 0,
         "done": 1
@@ -226,6 +226,114 @@
     }
   ],
   "items": [
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Pricing",
+      "line": 19,
+      "title": "\"Start free\" does nothing",
+      "detail": "`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "2",
+      "id": "audit-follow-ups/start-free-does-nothing",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Pricing",
+      "line": 21,
+      "title": "No message after Stripe checkout",
+      "detail": "Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way. `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "4",
+      "id": "audit-follow-ups/no-message-after-stripe-checkout",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Navigation",
+      "line": 28,
+      "title": "Scan history is not linked anywhere",
+      "detail": "`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "2",
+      "id": "audit-follow-ups/scan-history-is-not-linked-anywhere",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Sign in",
+      "line": 33,
+      "title": "Signed-in people can still open the sign-in page",
+      "detail": "`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "4",
+      "id": "audit-follow-ups/signed-in-people-can-still-open-the",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Sign in",
+      "line": 35,
+      "title": "Signing in from a scanned QR loses the profile",
+      "detail": "The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "4",
+      "id": "audit-follow-ups/signing-in-from-a-scanned-qr",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Messages",
+      "line": 40,
+      "title": "New messages need a page reload",
+      "detail": "The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "4",
+      "id": "audit-follow-ups/new-messages-need-a-page-reload",
+      "pr": {
+        "number": 14,
+        "title": "Fix six audit follow-ups and count interview invites for colleges",
+        "url": "https://github.com/divitkej/gradlink/pull/14",
+        "draft": false
+      }
+    },
     {
       "area": "launch",
       "areaName": "Launch",
@@ -457,30 +565,6 @@
     {
       "area": "audit-follow-ups",
       "areaName": "Audit follow-ups",
-      "section": "Pricing",
-      "line": 19,
-      "title": "\"Start free\" does nothing",
-      "detail": "`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "2",
-      "id": "audit-follow-ups/start-free-does-nothing"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Pricing",
-      "line": 21,
-      "title": "No message after Stripe checkout",
-      "detail": "Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way. `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/no-message-after-stripe-checkout"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
       "section": "Navigation",
       "line": 26,
       "title": "College sidebar has no Messages or Profile link",
@@ -489,54 +573,6 @@
       "doneIn": null,
       "phase": "2",
       "id": "audit-follow-ups/college-sidebar-has-no-messages-or"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Navigation",
-      "line": 28,
-      "title": "Scan history is not linked anywhere",
-      "detail": "`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "2",
-      "id": "audit-follow-ups/scan-history-is-not-linked-anywhere"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Sign in",
-      "line": 33,
-      "title": "Signed-in people can still open the sign-in page",
-      "detail": "`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/signed-in-people-can-still-open-the"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Sign in",
-      "line": 35,
-      "title": "Signing in from a scanned QR loses the profile",
-      "detail": "The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/signing-in-from-a-scanned-qr"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Messages",
-      "line": 40,
-      "title": "New messages need a page reload",
-      "detail": "The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/new-messages-need-a-page-reload"
     },
     {
       "area": "features-to-build",
