@@ -21,6 +21,7 @@ export default function MessagesPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -34,17 +35,28 @@ export default function MessagesPage() {
   useEffect(() => {
     if (!ready || !me || !eventId) return;
     let cancelled = false;
-    (async () => {
-      setLoading(true);
+    const load = async (first: boolean) => {
+      if (first) setLoading(true);
       const m = await listMessagesForProfile(me, eventId);
       const ids = m.flatMap((x) => [x.sender_profile_id, x.receiver_profile_id]).filter(Boolean) as string[];
       const resolved = await getProfileNames(ids);
       if (cancelled) return;
       setNames(resolved);
-      setMsgs(m);
-      setLoading(false);
-    })();
-    return () => { cancelled = true; };
+      // Keep a message that is still sending until the server has it.
+      setMsgs((prev) => [
+        ...m,
+        ...prev.filter((x) => x.id.startsWith("temp-") && !m.some((r) =>
+          r.sender_profile_id === x.sender_profile_id && r.receiver_profile_id === x.receiver_profile_id && r.message === x.message)),
+      ]);
+      if (first) setLoading(false);
+    };
+    load(true);
+    // New messages arrive without a reload. Hidden tabs don't poll, so Neon
+    // can still scale to zero when nobody is looking.
+    const refresh = () => { if (document.visibilityState === "visible") load(false); };
+    const interval = window.setInterval(refresh, 15_000);
+    window.addEventListener("focus", refresh);
+    return () => { cancelled = true; window.clearInterval(interval); window.removeEventListener("focus", refresh); };
   }, [ready, me, eventId]);
 
   const convs = useMemo(() => {
@@ -87,6 +99,7 @@ export default function MessagesPage() {
     const text = reply.trim();
     if (!text || !active || !me || !eventId) return;
     setSending(true);
+    setSendError(null);
     const temp: MessageRow = {
       id: "temp-" + Math.random().toString(36).slice(2),
       created_at: new Date().toISOString(),
@@ -94,8 +107,14 @@ export default function MessagesPage() {
     };
     setMsgs((p) => [...p, temp]);
     setReply("");
-    await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
+    const ok = await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
     setSending(false);
+    if (!ok) {
+      // Take the unsent message back out of the thread and give the text back.
+      setMsgs((p) => p.filter((m) => m.id !== temp.id));
+      setReply(text);
+      setSendError("Message not sent. Check your connection and try again.");
+    }
   }
 
   const showList = !mobile || !active;
@@ -168,6 +187,9 @@ export default function MessagesPage() {
                   <div ref={bottomRef} />
                 </div>
 
+                {sendError && (
+                  <div role="alert" style={{ padding: "8px 14px", borderTop: "1px solid var(--border)", fontSize: 12.5, color: "var(--danger)" }}>{sendError}</div>
+                )}
                 <div style={{ padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", gap: 8, alignItems: "flex-end" }}>
                   <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={1} placeholder={`Message ${active.name.split(" ")[0]}…`}
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}

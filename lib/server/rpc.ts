@@ -603,11 +603,15 @@ export const ops: Record<string, Op> = {
       select 1 from event_registrations where event_id = ${s(i.eventId)} and profile_id = ${s(i.studentId)} and role = 'student'
     `;
     if (!student.length) throw forbidden();
-    // created_at is kept across status changes, as before.
+    // created_at is kept across status changes, as before. A call without
+    // `notes` (pre-shortlisting from the event console) only changes the
+    // status, so it cannot wipe a note the recruiter wrote earlier.
+    const keepNotes = i.notes === undefined;
     await db()`
       insert into shortlists (event_id, company_id, student_id, status, notes)
       values (${s(i.eventId)}, ${u.id}, ${s(i.studentId)}, ${s(i.status)}, ${textOrNull(i.notes)})
-      on conflict (event_id, company_id, student_id) do update set status = excluded.status, notes = excluded.notes
+      on conflict (event_id, company_id, student_id) do update set status = excluded.status,
+        notes = case when ${keepNotes}::boolean then shortlists.notes else excluded.notes end
     `;
     return true;
   },
@@ -1091,6 +1095,24 @@ export const ops: Record<string, Op> = {
       [u.id, s(eventId), s(companyId), ...entries.map(([k, v]) => allowed[k](v))],
     );
     return { ok: true, saved: rows[0] };
+  },
+
+  /**
+   * Students at this event who told the company they are interested or want
+   * a follow-up. Those two marks are what a student sends the company; Save,
+   * Visited and the student's own note stay private to the student.
+   */
+  async listStudentInterest(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    await requireMember(u, eventId);
+    return db()`
+      select sc.student_id, sc.interested, sc.follow_up, sc.updated_at, st.full_name, st.degree, st.university
+      from saved_companies sc
+      join event_registrations r on r.event_id = sc.event_id and r.profile_id = sc.student_id and r.role = 'student'
+      join students st on st.id = sc.student_id
+      where sc.event_id = ${s(eventId)} and sc.company_id = ${u.id} and (sc.interested or sc.follow_up)
+      order by sc.follow_up desc, sc.updated_at desc
+    `;
   },
 
   /* Applications: tracked by the student, private to them. */

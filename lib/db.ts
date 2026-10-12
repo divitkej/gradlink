@@ -430,6 +430,21 @@ export function listSavedCompanies(eventId: string): Promise<SavedCompanyRow[]> 
   return safe("listSavedCompanies", [], () => rpc<SavedCompanyRow[]>("listSavedCompanies", eventId));
 }
 
+export interface StudentInterestRow {
+  student_id: string;
+  interested: boolean;
+  follow_up: boolean;
+  updated_at: string;
+  full_name: string;
+  degree: string | null;
+  university: string | null;
+}
+
+/** Students who marked the signed-in company Interested or asked it for a follow-up. */
+export function listStudentInterest(eventId: string): Promise<StudentInterestRow[]> {
+  return safe("listStudentInterest", [], () => rpc<StudentInterestRow[]>("listStudentInterest", eventId));
+}
+
 export function saveCompany(
   eventId: string,
   companyId: string,

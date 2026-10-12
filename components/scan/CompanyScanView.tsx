@@ -220,6 +220,9 @@ function StudentView({
           <Toggle on={saves.visited} onClick={() => onToggle("visited", "Booth visited")} icon={<CheckCircle2 size={15} />} label="Visited booth" />
           <Toggle on={saves.followUp} onClick={() => onToggle("followUp", "Follow-up requested")} icon={<Send size={15} />} label="Request follow-up" />
         </div>
+        <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5, marginTop: 10 }}>
+          Interested and Request follow-up are shown to this company. Save, Visited and your note stay private to you.
+        </p>
         <div style={{ marginTop: 14 }}>
           <label style={{ fontSize: 12, color: "var(--text-2)", display: "block", marginBottom: 6 }}>Personal note</label>
           <textarea value={saves.note} onChange={(e) => onNote(e.target.value)} rows={2} placeholder="Who I spoke to, what to follow up on…"
