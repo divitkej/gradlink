@@ -1289,7 +1289,7 @@
       "section": "Sign in",
       "line": 35,
       "title": "Signing in from a scanned QR loses the profile",
-      "detail": "The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in \"Return to the scanned profile after signing in from a QR\"",
+      "detail": "The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx`, `components/gradlink/SignUpForm.tsx` · Phase 4 · Done in \"Return to the scanned profile after signing in from a QR\" · Signing up from the gate returns there too, in \"Return to the scanned profile after signing up from a QR\"",
       "state": "done",
       "doneIn": "Return to the scanned profile after signing in from a QR",
       "phase": "4",
