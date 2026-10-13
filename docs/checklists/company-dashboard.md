@@ -41,6 +41,9 @@ Status key as in `landing-page.md`.
 - [x] **Student saves lived only in the browser (Q5, first half).** Saves are stored in `saved_companies`, and old browser saves move there on first visit.
   `components/scan/CompanyScanView.tsx` · Fixed on main before this checklist, confirmed in the browser run
 
+- [x] **The company page reset itself and over-counted booth visits.** A student's view of a company reloaded whenever the session refreshed (it watched the whole session object), resetting their saves and note; and the college's "Students who scanned this booth" counted scans, so a student who scanned twice counted twice. The page now reloads only for a different person, and the figure counts students.
+  `components/scan/CompanyScanView.tsx` · Done in "Stop the company page resetting and count booth visitors once"
+
 ## Owner decisions
 
 - [x] **Companies could see every registered student's email before scanning them.** By owner decision, a company now gets a student's email only after it has scanned that student. Before that, profiles, the event's student list and the candidate CSV leave the email out. College staff still see it.
