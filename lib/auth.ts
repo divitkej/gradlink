@@ -7,7 +7,7 @@ import type { AppRole } from "./session";
    Authentication — email + password, handled by the Worker
    (/api/auth/* → lib/server/auth-api.ts) against Neon.
 
-   Replaces Firebase Auth. The signed-in state is an HttpOnly session
+   The signed-in state is an HttpOnly session
    cookie the browser can't read or forge; lib/session.ts keeps a
    localStorage copy of the profile purely so the UI paints instantly.
    ============================================================ */

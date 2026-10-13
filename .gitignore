@@ -42,9 +42,6 @@ yarn-error.log*
 cloudflare-env.d.ts
 
 
-# migration secrets — the real (unscrubbed) data export and any service account key
-/migration/.private/
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts

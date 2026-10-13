@@ -3,7 +3,7 @@ import { HttpError } from "./http";
 import type { AuthUser } from "./session";
 
 /* ============================================================
-   Résumés, brochures and logos — Firebase Storage → Workers KV.
+   Résumés, brochures and logos, stored in Workers KV.
 
    KV is part of the Workers Free plan with no extra product to enable
    (1 GB stored, 1,000 writes/day, 100,000 reads/day), which is ample

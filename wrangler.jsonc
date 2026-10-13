@@ -26,7 +26,7 @@
     "binding": "ASSETS"
   },
 
-  // Résumés, brochures and logos (replaces Firebase Storage).
+  // Résumés, brochures and logos.
   // Namespace "UPLOADS" in the GradLink Cloudflare account.
   "kv_namespaces": [
     {

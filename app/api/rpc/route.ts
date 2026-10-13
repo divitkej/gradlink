@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     op = typeof body?.op === "string" ? body.op : "";
     if (!Object.hasOwn(ops, op)) throw new HttpError(404, "Unknown operation.");
 
-    // Every operation requires a signed-in account, as every Firestore rule did.
+    // Every operation requires a signed-in account.
     const user = await currentUser(request);
     if (!user) throw new HttpError(401, "Please sign in again.");
 

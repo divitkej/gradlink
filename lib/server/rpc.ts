@@ -16,11 +16,11 @@ import { CODING_SITE_LABEL } from "../scores";
 import { CredlyError, credlyBadgeId, fetchCredlyBadge, emailMatches } from "./credly";
 
 /* ============================================================
-   /api/rpc — every data operation the browser used to run directly
-   against Firestore, now run in the Worker against Neon.
+   /api/rpc: every data operation the browser asks for, run in the
+   Worker against Neon.
 
    Each op keeps the name and argument list of the lib/db.ts /
-   lib/events.ts function that calls it, so no component changed.
+   lib/events.ts function that calls it.
 
    Authorization:
      * every op requires a signed-in user;
@@ -133,8 +133,8 @@ const PEER_STUDENT_COLS = `id, profile_id, created_at, full_name, university, de
 
 
 /**
- * Upsert the caller's own role row with only whitelisted columns — the
- * equivalent of Firestore's `setDoc(..., { merge: true })`.
+ * Upsert the caller's own role row with only whitelisted columns, leaving
+ * every other column as it is.
  */
 async function upsertRoleRow(table: "students" | "companies", fields: Record<string, (v: unknown) => unknown>, id: string, input: unknown) {
   const entries = Object.entries((input ?? {}) as Row).filter(([k, v]) => k in fields && v !== undefined);

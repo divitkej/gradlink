@@ -8,8 +8,7 @@ import type { AppRole } from "../session";
 
    The cookie carries the profile id and a session version. Every API
    request re-reads the version (one primary-key lookup), so a password
-   reset or sign-out-everywhere takes effect immediately — the same
-   guarantee Firebase gave by revoking refresh tokens.
+   reset or sign-out-everywhere takes effect immediately.
    ============================================================ */
 
 export const SESSION_COOKIE = "gl_session";
