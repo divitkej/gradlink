@@ -6,9 +6,7 @@ import type { EngagementCounts } from "./engagement";
 /* ============================================================
    GradLink event-platform data access layer.
 
-   Every function keeps the name, arguments and return shape it had
-   on Firestore, so no component changed in the move to Neon. Each
-   one is now a call to the Worker (/api/rpc → lib/server/rpc.ts),
+   Each function is a call to the Worker (/api/rpc → lib/server/rpc.ts),
    which runs the query against Neon Postgres and checks that the
    caller owns the row or belongs to the event it is about.
 
@@ -770,7 +768,7 @@ export function getStudentEventInsights(eventId: string): Promise<StudentInsight
 
 /**
  * Upload a résumé/brochure/logo to Workers KV (via /api/files) and return its
- * URL. Readable by any signed-in user, as with Firebase Storage.
+ * URL. Readable by any signed-in user.
  */
 export async function uploadPublicFile(folder: string, profileId: string, file: File): Promise<string | null> {
   if (!profileId) return null;

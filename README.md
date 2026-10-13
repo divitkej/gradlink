@@ -26,7 +26,7 @@ no always-on database compute.
 | Database | Neon Postgres — schema in `db/schema.sql` |
 | Server runtime | Cloudflare Workers, Next.js via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) |
 | Auth | Email + password in `lib/server/auth-api.ts`; HttpOnly signed session cookie |
-| Authorization | Per-operation checks in `lib/server/rpc.ts` (ported from the old `firestore.rules`) |
+| Authorization | Per-operation checks in `lib/server/rpc.ts` |
 | File uploads | Workers KV namespace `UPLOADS` (`lib/server/files.ts`) |
 | Account email (confirm email, password reset) | Gmail over SMTP from the Worker (`lib/server/smtp.ts`), no domain needed; Resend once there is a domain (`lib/server/mail.ts`) |
 | Payments | Stripe Checkout + webhook (`app/api/checkout`, `app/api/stripe/webhook`) |
@@ -100,7 +100,6 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 1. Create a project on the Free plan at <https://console.neon.tech>.
 2. Copy the **pooled** connection string into `DATABASE_URL`.
 3. `npm run db:migrate` applies `db/schema.sql`.
-4. To bring existing data across, see `migration/README.md`.
 
 The app only talks to Neon over HTTPS (`neon()` HTTP driver): one stateless
 request per query, no pooled sockets held by the Worker, so Neon's compute can
@@ -128,9 +127,11 @@ npm run deploy      # opennextjs-cloudflare build && deploy → https://gradlink
 npm run upload      # same build, uploaded as a preview version without going live
 ```
 
-The old Vercel project (`gradlink-theta.vercel.app`) no longer builds the app.
-`vercel.json` makes it skip the build and redirect every path to the Worker
-(temporary 307, so it can be switched to permanent once the move is settled).
+If the Worker is connected to this repo in the Cloudflare dashboard (Workers,
+gradlink, Settings, Build), its build command must be
+`npx opennextjs-cloudflare build` and its deploy command
+`npx opennextjs-cloudflare deploy`. Plain `next build` and `wrangler deploy`
+fail, because the Worker is the OpenNext output in `.open-next/`.
 
 Stripe webhook endpoint: `https://<your-worker-url>/api/stripe/webhook`
 (events: `checkout.session.completed`, `customer.subscription.updated`,
@@ -154,8 +155,7 @@ messages            checklist_items ── checklist_progress
 subscriptions       orders              qr_codes (legacy, preserved)
 ```
 
-Ids are `text`: Supabase-era rows have UUIDs, Firebase-era rows keep their
-Firebase ids, so QR codes and links survive the migration.
+Ids are `text` holding UUIDs; printed QR codes and `/scan/...` links carry them.
 
 All browser data access goes through `lib/db.ts`, `lib/events.ts` and
 `lib/billing.ts`, which call `/api/rpc`. Auth goes through `lib/auth.ts`.
@@ -171,11 +171,6 @@ staff; shortlist notes stay with the company that wrote them; messages are
 readable only by their two participants; `subscriptions` is readable by its
 owner and writable only by the Stripe webhook, so a paid plan can't be forged
 from the browser. Open items are tracked in `docs/checklists/security.md`.
-
-## History
-
-GradLink ran on Supabase until July 2026, then briefly on Firebase. Both are
-archived under `docs/archive/`; neither is used at runtime.
 
 ## Contributors
 

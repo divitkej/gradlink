@@ -11,7 +11,6 @@
 | `checklists/audit-follow-ups.md` | Problems from the first site audit that are still open and not tracked elsewhere |
 | `checklists/features-to-build.md` | Features the site shows that the app does not have yet, plus claims to confirm |
 | `brand/` | Sources for the share images and icons. See `brand/README.md`. |
-| `archive/` | Historical material. Nothing here is wired into the app. See `archive/README.md`. |
 
 The launch board in [`../launch-board/`](../launch-board/) is generated from these checklists and rebuilds itself when they change on `main`.
 

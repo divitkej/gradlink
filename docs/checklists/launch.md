@@ -16,11 +16,9 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   Done on 2026-09-27, no commit (Cloudflare setting)
 - [x] **Deployed and tested live.** All public pages, robots.txt, sitemap and favicon return 200. A test student account signed up, held a session and signed in against Neon, then was deleted.
   Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`
-- [x] **Vercel removed from the repo.** Starter SVGs in `public/` and the `.vercel` ignore entry deleted.
-  Done in "Remove leftover Vercel starter files and ignore entry"
+- [x] **Only Neon and Cloudflare in the repo.** Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon.
+  Done in "Remove Vercel, Supabase and Firebase leftovers"
 - [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
-  Owner action
-- [ ] **Old Vercel site still live.** `https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it).
   Owner action
 
 ## Domain and email

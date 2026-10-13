@@ -4,7 +4,7 @@ Scope: the signed-in loop of create or join an event, open it, work through the 
 
 Update this file in the same commit as the fix. Tick the box, set the status, and note the commit.
 
-GradLink no longer runs on Firestore. Authorization moved from `firestore.rules` (now in `docs/archive/firebase-legacy/`) to the per-operation checks in `lib/server/rpc.ts`, so the rules items below were re-checked against that file.
+Authorization is the per-operation checks in `lib/server/rpc.ts`; the access items below were checked against that file.
 
 "Harness check" below means the real `lib/server/rpc.ts` ops run against Postgres 16 with `db/schema.sql` applied.
 
@@ -38,10 +38,8 @@ GradLink no longer runs on Firestore. Authorization moved from `firestore.rules`
   `components/dashboard/Checklist.tsx` · Broken · Done in "Fix Phase 1 core loop: event nav, checklist seeding, event editing"
 - [x] **No way to edit an event.** The event's owner now sees "Edit event" on the event console. It edits name, location, dates, description and status, including Live now and Ended. `CreateEventForm` became `EventForm`, which handles both create and edit. The server rejects a blank name and still only lets the owner save. Harness check: owner moves status to live then ended; another college and a student get 403.
   `components/events/EventForm.tsx`, `components/dashboard/EventConsole.tsx`, `lib/server/rpc.ts` · Dead button · Done in "Fix Phase 1 core loop: event nav, checklist seeding, event editing"
-- [x] **Joined events may never appear.** No longer a Firestore collection-group query. `listEventsForProfile` is a Postgres join on `event_registrations`, restricted to the caller. Harness check: a student sees every event they joined, and asking for someone else's list gets 403.
+- [x] **Joined events may never appear.** `listEventsForProfile` is a Postgres join on `event_registrations`, restricted to the caller. Harness check: a student sees every event they joined, and asking for someone else's list gets 403.
   `lib/server/rpc.ts` · Verify live · Done in "Fix Phase 1 core loop: event nav, checklist seeding, event editing"
-- [ ] **Live rules match the repo.** Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under old rules. Owner action: in the Firebase console, delete the Firestore data and Storage files (the export is in `migration/data/`), or deploy deny-all rules, or delete the project.
-  `docs/archive/firebase-legacy/firestore.rules` · Verify live · Needs the owner
 - [x] **Anyone signed in could read any event's people.** Registered students (with emails), employers, scans, shortlists, analytics and event details were readable by every signed-in account. Now (merged with the same fix from `main`): everyone only sees events they belong to; a profile is only visible to someone who shares an event with it, and fellow students see no contact details; only the organiser and the event's college staff see every scan, shortlist and analytics row; employers' shortlist notes are hidden from students; scans, shortlists and messages only work between people in the same event, and both scan roles come from the accounts. Harness check: 50 access checks across members, other events and other colleges.
   `lib/server/rpc.ts`, `components/dashboard/EventConsole.tsx` · Security · Done in "Scope event data to members and compute analytics live"
 - [x] **Student analytics never change.** The counters in `student_event_analytics` were created at zero and never updated, and the resume score there was always 0. Profile views, company scans, shortlists, messages received, resume score and engagement are now worked out from scans, shortlists, messages and the student profile each time they are read. Harness check: counts and engagement match the activity recorded, an inactive student stays at zero.

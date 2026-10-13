@@ -9,12 +9,10 @@ import { checkSignUpEmail, collegeDomainRequest, studentDomainFromSample, type S
 import type { AppRole } from "../session";
 
 /* ============================================================
-   /api/auth/* — replaces Firebase Auth (email + password).
+   /api/auth/*: email + password accounts, stored in Neon.
 
-   Same user flows as before: sign up, sign in, sign out, forgot
-   password → emailed link → /reset-password, and change password
-   while signed in. Error messages match the ones lib/auth.ts used
-   to derive from Firebase error codes.
+   Flows: sign up, sign in, sign out, forgot password → emailed
+   link → /reset-password, and change password while signed in.
 
    Email confirmation: whenever the server can send email, a new
    account gets a link to /verify-email and cannot sign in until it
@@ -30,7 +28,7 @@ const RESET_TTL_MINUTES = 60;
 const RESETS_PER_HOUR = 3;
 const VERIFY_TTL_HOURS = 24;
 const VERIFY_EMAILS_PER_HOUR = 3;
-/** Password changes without a reset link need a recent sign-in, as Firebase required. */
+/** Password changes without a reset link need a recent sign-in. */
 const RECENT_LOGIN_MS = 15 * 60 * 1000;
 
 const MSG = {
@@ -120,7 +118,7 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   const id = crypto.randomUUID();
   const hash = await hashPassword(body.password);
 
-  // Role rows are keyed by the profile id, exactly as the Firestore docs were.
+  // Role rows are keyed by the profile id.
   const roleRow =
     role === "student"
       ? sql`insert into students (id, profile_id, full_name, email, university) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`
