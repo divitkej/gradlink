@@ -1,8 +1,8 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 150,
-    "done": 122,
+    "total": 151,
+    "done": 123,
     "open": 28,
     "percent": 81,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 122
+      "done": 123
     }
   },
   "areas": [
@@ -109,14 +109,14 @@
     {
       "key": "security",
       "name": "Security",
-      "total": 21,
+      "total": 22,
       "counts": {
         "in_progress": 0,
         "owner": 7,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 14
+        "done": 15
       }
     },
     {
@@ -181,14 +181,14 @@
       "key": "3",
       "name": "Phase 3: Launch readiness",
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
-      "total": 46,
+      "total": 47,
       "counts": {
         "in_progress": 0,
         "owner": 13,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 32
+        "done": 33
       },
       "status": "Ongoing"
     },
@@ -281,7 +281,7 @@
       "section": "Owner actions before deploying",
       "line": 30,
       "title": "Set `ADMIN_EMAILS`, then sign up with that email straight away",
-      "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.",
+      "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages. While account email is off, only the first owner address can be registered this way; any other address in ADMIN_EMAILS can only register once email confirmation is on.",
       "state": "owner",
       "doneIn": null,
       "phase": "5",
@@ -315,7 +315,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 35,
+      "line": 36,
       "title": "Set `APP_URL`",
       "detail": "in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.",
       "state": "owner",
@@ -327,7 +327,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 37,
+      "line": 38,
       "title": "Optional, after the custom domain is connected",
       "detail": "add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.",
       "state": "owner",
@@ -339,7 +339,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 38,
+      "line": 39,
       "title": "Least-privilege database role",
       "detail": "In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.",
       "state": "owner",
@@ -351,7 +351,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 39,
+      "line": 40,
       "title": "Backups",
       "detail": "Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise it in the Neon project settings; the Neon plan sets the maximum. Owner action",
       "state": "owner",
@@ -363,7 +363,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 40,
+      "line": 41,
       "title": "Secrets",
       "detail": "Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.",
       "state": "owner",
@@ -375,7 +375,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 41,
+      "line": 42,
       "title": "Account verification",
       "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). Still open: confirming the email itself needs a sender (see `launch.md`, account email), and a college whose domain is still pending can already create events.",
       "state": "owner",
@@ -387,7 +387,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 42,
+      "line": 43,
       "title": "Verify live",
       "detail": "after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.",
       "state": "owner",
@@ -1838,8 +1838,20 @@
     {
       "area": "security",
       "areaName": "Security",
+      "section": "Fixed in code",
+      "line": 22,
+      "title": "Anyone could claim an unregistered owner address",
+      "detail": "While account email is off, sign-up confirms an account at once, and ADMIN_EMAILS addresses skip the email rules, so whoever registered an owner address first got the owner pages. Now only the first owner address can be claimed that way; once an owner account exists, any other ADMIN_EMAILS address must wait until sign-up email confirmation is on. The first one still has to be claimed by the owner straight after setting ADMIN_EMAILS (see `organiser-access.md`). `lib/server/auth-api.ts`, `lib/server/college-domains.ts` · Done in \"Stop unregistered owner addresses being claimed while email is off\"",
+      "state": "done",
+      "doneIn": "Stop unregistered owner addresses being claimed while email is off",
+      "phase": "3",
+      "id": "security/anyone-could-claim-an-unregistered-owner"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 36,
+      "line": 37,
       "title": "Run `npm run db:migrate`",
       "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)",
       "state": "done",
