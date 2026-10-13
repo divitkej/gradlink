@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**126 of 154 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
+**127 of 155 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -15,7 +15,7 @@ pie showData
   "To do" : 5
   "Verify live" : 5
   "Parked by decision" : 2
-  "Done" : 126
+  "Done" : 127
 ```
 
 ## By phase
@@ -28,7 +28,7 @@ pie showData
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `█████████░░░` 79% | 11 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 71% | 35 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 6 | 0 | 0 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 85% | 53 | 0 | 9 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 86% | 54 | 0 | 9 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -169,7 +169,7 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 53 of 62 done, 0 in progress, 9 left.
+**Ongoing.** 54 of 63 done, 0 in progress, 9 left.
 
 **Left**
 
@@ -181,9 +181,9 @@ Organiser access, the full student dashboard and the features the site promises.
 - [ ] Build: Year-over-year comparison · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L57)
 - [ ] Put the branch live · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19)
 - [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)
-- [ ] Put the fixes live · Verify live · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L50)
+- [ ] Put the fixes live · Verify live · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L53)
 
-<details><summary>Done (53)</summary>
+<details><summary>Done (54)</summary>
 
 - [x] Separate codes for students and employers
 - [x] Organiser can replace a code
@@ -236,6 +236,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [x] New messages needed a reload (G3)
 - [x] A failed send stayed on screen as if delivered (G4)
 - [x] Student saves lived only in the browser (Q5, first half)
+- [x] The company page reset itself and over-counted booth visits
 - [x] Companies could see every registered student's email before scanning them
 - [x] Opening a student's page counted as a scan
 
@@ -276,8 +277,8 @@ Features that should work, checked once on a real device or the live site.
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 71% | 17 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
-| Company dashboard | `███████████░` 93% | 14 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **82%** | **126** | **28** | |
+| Company dashboard | `███████████░` 94% | 15 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
+| **All** | `██████████░░` **82%** | **127** | **28** | |
 
 ## In progress
 
@@ -318,7 +319,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Link preview card** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)<br><sub>Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in "Replace the G logo with a graduation cap");… · id `landing-page/link-preview-card`</sub>
 - [ ] **Put the branch live** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19)<br><sub>Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions… · id `student-dashboard/put-the-branch-live`</sub>
 - [ ] **Two-account run on real phones** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)<br><sub>Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live · id `student-dashboard/two-account-run-on-real-phones`</sub>
-- [ ] **Put the fixes live** · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L50)<br><sub>Merge the PR into main, then deploy from main. Verify live · id `company-dashboard/put-the-fixes-live`</sub>
+- [ ] **Put the fixes live** · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L53)<br><sub>Merge the PR into main, then deploy from main. Verify live · id `company-dashboard/put-the-fixes-live`</sub>
 
 ### Parked by decision (2)
 
@@ -484,7 +485,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 </details>
 
-<details><summary><b>Company dashboard</b>: 14 done</summary>
+<details><summary><b>Company dashboard</b>: 15 done</summary>
 
 - [x] Pre-shortlisting from the event console deleted the recruiter's note <sub>Done in "Fix the company-side problems found in the live test"</sub>
 - [x] A note typed while the student page was still loading could be wiped <sub>Done in "Fix the company-side problems found in the live test"</sub>
@@ -498,6 +499,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] New messages needed a reload (G3) <sub>Done in "Fix the company-side problems found in the live test"</sub>
 - [x] A failed send stayed on screen as if delivered (G4) <sub>Done in "Fix the company-side problems found in the live test"</sub>
 - [x] Student saves lived only in the browser (Q5, first half)
+- [x] The company page reset itself and over-counted booth visits <sub>Done in "Stop the company page resetting and count booth visitors once"</sub>
 - [x] Companies could see every registered student's email before scanning them <sub>Done in "Show companies a student's email only after scanning them"</sub>
 - [x] Opening a student's page counted as a scan <sub>Done in "Count a scan only when the QR's scan key comes with it"</sub>
 

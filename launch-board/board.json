@@ -1,8 +1,8 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 154,
-    "done": 126,
+    "total": 155,
+    "done": 127,
     "open": 28,
     "percent": 82,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 126
+      "done": 127
     }
   },
   "areas": [
@@ -135,14 +135,14 @@
     {
       "key": "company-dashboard",
       "name": "Company dashboard",
-      "total": 15,
+      "total": 16,
       "counts": {
         "in_progress": 0,
         "owner": 0,
         "todo": 0,
         "verify": 1,
         "parked": 0,
-        "done": 14
+        "done": 15
       }
     }
   ],
@@ -211,14 +211,14 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 62,
+      "total": 63,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 5,
         "verify": 3,
         "parked": 0,
-        "done": 53
+        "done": 54
       },
       "status": "Ongoing"
     },
@@ -543,7 +543,7 @@
       "area": "company-dashboard",
       "areaName": "Company dashboard",
       "section": "Owner decisions",
-      "line": 50,
+      "line": 53,
       "title": "Put the fixes live",
       "detail": "Merge the PR into main, then deploy from main. Verify live",
       "state": "verify",
@@ -2066,8 +2066,20 @@
     {
       "area": "company-dashboard",
       "areaName": "Company dashboard",
+      "section": "Partial",
+      "line": 44,
+      "title": "The company page reset itself and over-counted booth visits",
+      "detail": "A student's view of a company reloaded whenever the session refreshed (it watched the whole session object), resetting their saves and note; and the college's \"Students who scanned this booth\" counted scans, so a student who scanned twice counted twice. The page now reloads only for a different person, and the figure counts students. `components/scan/CompanyScanView.tsx` · Done in \"Stop the company page resetting and count booth visitors once\"",
+      "state": "done",
+      "doneIn": "Stop the company page resetting and count booth visitors once",
+      "phase": "5",
+      "id": "company-dashboard/the-company-page-reset-itself-and"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
       "section": "Owner decisions",
-      "line": 46,
+      "line": 49,
       "title": "Companies could see every registered student's email before scanning them",
       "detail": "By owner decision, a company now gets a student's email only after it has scanned that student. Before that, profiles, the event's student list and the candidate CSV leave the email out. College staff still see it. `lib/server/rpc.ts`, `lib/db.ts`, `components/dashboard/CompanyCandidates.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in \"Show companies a student's email only after scanning them\"",
       "state": "done",
@@ -2079,7 +2091,7 @@
       "area": "company-dashboard",
       "areaName": "Company dashboard",
       "section": "Owner decisions",
-      "line": 48,
+      "line": 51,
       "title": "Opening a student's page counted as a scan",
       "detail": "In-app links (\"View\", the scanner's attendee list) open the same page a QR scan opens, and that page recorded a scan, so a company could click through every student to get their emails, and a college viewing a student checked them in. A QR now carries the person's scan key (`&k=`, derived from `AUTH_SECRET`), and the server only records a scan with the right key. Opening a profile from the app is a view. `lib/server/session.ts`, `lib/server/rpc.ts`, `components/dashboard/QRCard.tsx`, `components/scan/StudentScanView.tsx`, `components/scan/CompanyScanView.tsx` · Done in \"Count a scan only when the QR's scan key comes with it\"",
       "state": "done",
