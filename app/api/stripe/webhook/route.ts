@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const iso = (unixSeconds: number | null | undefined) =>
     typeof unixSeconds === "number" ? new Date(unixSeconds * 1000).toISOString() : null;
 
-  /** Upsert only the fields given, like the old Firestore `set(..., { merge: true })`. */
+  /** Upsert only the fields given, leaving the other columns as they are. */
   async function writeSubscription(profileId: string, data: Record<string, string | null>) {
     const cols = Object.keys(data);
     await db().query(

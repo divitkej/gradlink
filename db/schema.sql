@@ -7,12 +7,12 @@
 -- Idempotent: every statement is `if not exists` (or guarded the same way),
 -- so re-running is safe.
 --
--- Table and column names match the original Supabase schema (and the snake_case
--- fields the Firestore layer carried over), so the app's row types are
--- unchanged. What's new compared with Supabase:
---   * events.join_code / host_org       — the multi-event model
---   * subscriptions                     — Stripe entitlement (was Firestore-only)
---   * auth_credentials / password_reset_tokens — replaces Supabase/Firebase Auth
+-- Tables:
+--   * profiles, students, companies, colleges: accounts and their role rows
+--   * events (join_code, host_org) and everything keyed by an event
+--   * subscriptions: Stripe entitlement
+--   * auth_credentials, password_reset_tokens, email_verification_tokens:
+--       email + password sign-in
 --   * event_sessions, session_bookings, saved_companies, applications:
 --       the student readiness hub, schedule, passport and application tracker
 --   * notifications, interview_invites, booth_queue: alerts, interview
@@ -24,14 +24,12 @@
 --   * student_certificates: Credly badges verified with Credly, and other
 --       certificates the student reports with a credential link
 --
--- Central invariant, carried over from the Firebase layer: a signed-in user's
+-- Central invariant: a signed-in user's
 -- id IS their profile id, and role rows (students/companies/colleges) are keyed
 -- by that same id. Every ownership check is a direct id comparison.
 --
--- Ids are `text`, not `uuid`: rows carried over from Supabase have UUIDs, but
--- anything created while GradLink ran on Firebase has a Firebase Auth uid or a
--- Firestore auto-id. Keeping every id verbatim means printed QR codes and
--- shared /scan/... links keep working after the move. New rows get UUIDs.
+-- Ids are `text` holding UUIDs (gen_random_uuid()), which printed QR codes and
+-- shared /scan/... links carry.
 --
 -- Access control lives in the API (lib/server/rpc.ts), not in RLS: the browser
 -- never talks to Postgres, only the Worker does, using one server-side role.
@@ -49,11 +47,11 @@ create table if not exists profiles (
 );
 create index if not exists profiles_email_lower_idx on profiles (lower(email));
 
--- One sign-in identity per profile. password_hash is null for accounts that
--- were imported without a portable hash — those users set one via
--- "Forgot password". Bumping session_version signs out every device.
--- failed_attempts/locked_until throttle password guessing (Firebase Auth did
--- this for us) and cap how much CPU a guessing loop can burn on hashing.
+-- One sign-in identity per profile. A null password_hash means the account
+-- has no password yet and must set one via "Forgot password". Bumping
+-- session_version signs out every device. failed_attempts/locked_until
+-- throttle password guessing and cap how much CPU a guessing loop can burn
+-- on hashing.
 create table if not exists auth_credentials (
   profile_id       text primary key references profiles (id) on delete cascade,
   email_lower      text not null unique,
@@ -272,9 +270,8 @@ create table if not exists shortlists (
 );
 create index if not exists shortlists_student_idx on shortlists (event_id, student_id);
 
--- Historical counters from the Supabase and Firebase eras. Nothing writes
--- here any more: lib/server/rpc.ts computes each student's stats from scans,
--- shortlists and messages when they are read. Kept so imported rows survive.
+-- Stored per-event counters. Nothing writes here: lib/server/rpc.ts computes
+-- each student's stats from scans, shortlists and messages when they are read.
 create table if not exists student_event_analytics (
   id                 text primary key default gen_random_uuid()::text,
   created_at         timestamptz not null default now(),
@@ -289,8 +286,7 @@ create table if not exists student_event_analytics (
   unique (event_id, student_id)
 );
 
--- Kept from the Supabase schema. The app renders QR codes from ids today, so
--- nothing writes here, but the historical rows are preserved.
+-- The app renders QR codes from ids today, so nothing writes here.
 create table if not exists qr_codes (
   id                text primary key default gen_random_uuid()::text,
   created_at        timestamptz not null default now(),
@@ -552,8 +548,7 @@ create table if not exists subscriptions (
   updated_at              timestamptz not null default now()
 );
 
--- Present in the Supabase schema for one-off purchases; empty in the export
--- and not read by the app yet. Server-written only, like subscriptions.
+-- For one-off purchases; not read by the app yet. Server-written only, like subscriptions.
 create table if not exists orders (
   id          text primary key default gen_random_uuid()::text,
   created_at  timestamptz not null default now(),

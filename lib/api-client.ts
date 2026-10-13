@@ -3,9 +3,8 @@
 /* ============================================================
    Browser → Worker transport.
 
-   lib/db.ts, lib/events.ts and lib/billing.ts used to call Firestore
-   directly from the browser. They now call the Worker, which talks to
-   Neon. The session is an HttpOnly cookie, so nothing here handles a
+   lib/db.ts, lib/events.ts and lib/billing.ts call the Worker through
+   this, and the Worker talks to Neon. The session is an HttpOnly cookie, so nothing here handles a
    token — `credentials: "same-origin"` is all it takes.
    ============================================================ */
 
