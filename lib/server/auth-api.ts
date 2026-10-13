@@ -5,7 +5,7 @@ import { currentUser, sessionCookie, clearedSessionCookie } from "./session";
 import { HttpError, json } from "./http";
 import { emailEnabled, sendEmail } from "./mail";
 import { LIMITS, assertUnderLimit, recordHit, takeHit } from "./rate-limit";
-import { checkSignUpEmail, collegeDomainRequest, studentDomainFromSample, type SignUpRole } from "./college-domains";
+import { adminAccountExists, checkSignUpEmail, collegeDomainRequest, isAdminEmail, studentDomainFromSample, type SignUpRole } from "./college-domains";
 import type { AppRole } from "../session";
 
 /* ============================================================
@@ -35,6 +35,7 @@ const MSG = {
   badLogin: "Incorrect email or password.",
   locked: "Too many attempts. Please wait a moment and try again.",
   exists: "An account with this email already exists. Please sign in instead.",
+  ownerAddress: "This address can only be registered once account email is switched on. Contact the site owner.",
   badEmail: "That email address doesn't look right.",
   weak: "That password is too weak. Use at least 8 characters.",
   noPassword:
@@ -107,6 +108,14 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   if (!validEmail(email)) throw new HttpError(400, MSG.badEmail);
   if (!validPassword(body.password)) throw new HttpError(400, MSG.weak);
   await checkSignUpEmail(role, email);
+  // With email switched off nobody proves they own the address they sign up
+  // with. For an ADMIN_EMAILS address that would hand over the owner pages,
+  // so only the first one can be claimed that way (the owner, right after
+  // setting ADMIN_EMAILS). Once an owner account exists, any other owner
+  // address waits until sign-up email confirmation is on.
+  if (!emailEnabled() && isAdminEmail(email) && (await adminAccountExists())) {
+    throw new HttpError(403, MSG.ownerAddress);
+  }
   // Colleges say what their students' emails look like; that domain is what gets approved.
   const studentDomain = role === "college" ? studentDomainFromSample(str(body.studentEmail, 320)) : null;
 
