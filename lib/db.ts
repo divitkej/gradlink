@@ -336,6 +336,18 @@ export function listShortlists(eventId: string): Promise<ShortlistRow[]> {
   return safe("listShortlists", [], () => rpc<ShortlistRow[]>("listShortlists", eventId));
 }
 
+export interface InterviewCounts {
+  /** Interview invites companies sent at the event, not counting withdrawn ones. */
+  invited: number;
+  /** Invites where the student picked a time. */
+  booked: number;
+}
+
+/** Interview invite counts for an event's staff (the college). */
+export function getInterviewCounts(eventId: string): Promise<InterviewCounts> {
+  return safe("getInterviewCounts", { invited: 0, booked: 0 }, () => rpc<InterviewCounts>("getInterviewCounts", eventId));
+}
+
 /* ---------------- Messages ---------------- */
 export function sendMessage(input: {
   eventId: string;

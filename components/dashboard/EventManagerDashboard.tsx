@@ -13,8 +13,8 @@ import AttendeesCard from "./AttendeesCard";
 import EventCodes from "@/components/events/EventCodes";
 import { useSession } from "@/lib/session";
 import { scanLabel,
-  getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists,
-  type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow,
+  getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists, getInterviewCounts,
+  type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow, type InterviewCounts,
 } from "@/lib/db";
 import { scoreTone } from "@/lib/resume";
 
@@ -26,6 +26,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
   const [analytics, setAnalytics] = useState<AnalyticsRow[]>([]);
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
+  const [interviews, setInterviews] = useState<InterviewCounts>({ invited: 0, booked: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,12 +34,12 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [ev, st, co, an, sc, sl] = await Promise.all([
+      const [ev, st, co, an, sc, sl, iv] = await Promise.all([
         getEvent(eventId), getRegisteredStudents(eventId), getRegisteredCompanies(eventId),
-        listAnalytics(eventId), getScans({ eventId }), listShortlists(eventId),
+        listAnalytics(eventId), getScans({ eventId }), listShortlists(eventId), getInterviewCounts(eventId),
       ]);
       if (cancelled) return;
-      setEvent(ev); setStudents(st); setCompanies(co); setAnalytics(an); setScans(sc); setShortlists(sl);
+      setEvent(ev); setStudents(st); setCompanies(co); setAnalytics(an); setScans(sc); setShortlists(sl); setInterviews(iv);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -73,11 +74,13 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
           </div>
         </div>
-        <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 20 }}>
+        <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 20 }}>
           <StatTile label="Registered students" value={students.length} />
           <StatTile label="Companies" value={companies.length} accent />
           <StatTile label="Total scans" value={scans.length} accent />
           <StatTile label="Shortlists" value={shortlists.length} />
+          <StatTile label="Interview invites" value={interviews.invited} accent />
+          <StatTile label="Interviews booked" value={interviews.booked} />
         </div>
       </SectionCard>
 
@@ -184,6 +187,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             companies={companies}
             scans={scans}
             shortlists={shortlists}
+            interviews={interviews}
             profileId={session.profileId}
             organization={session.org}
           />

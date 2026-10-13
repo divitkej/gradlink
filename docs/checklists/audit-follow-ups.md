@@ -12,30 +12,30 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 0 / 7 done
+## Progress: 6 / 7 done
 
 ## Pricing
 
-- [ ] **"Start free" does nothing.** `onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`.
-  `components/PricingSection.tsx` · Dead button · Phase 2
-- [ ] **No message after Stripe checkout.** Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way.
-  `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4
+- [x] **"Start free" does nothing.** The Starter button on `/pricing` now sends people to `/sign-up`.
+  `components/PricingSection.tsx` · Phase 2 · Done in "Send the pricing Start free button to sign-up"
+- [x] **No message after Stripe checkout.** `/dashboard/event-manager?upgraded=1` now confirms the checkout and says Pro switches on once Stripe confirms the payment; `/pricing?canceled=1` says the checkout was cancelled and nothing was charged.
+  `components/dashboard/UpgradedNotice.tsx`, `app/dashboard/event-manager/page.tsx`, `components/PricingSection.tsx` · Phase 4 · Done in "Confirm Stripe checkout results on the dashboard and pricing page"
 
 ## Navigation
 
-- [ ] **College sidebar has no Messages or Profile link.** Students and companies get both. Colleges can only reach Messages through the header bell.
-  `components/dashboard/DashboardShell.tsx` · Partial · Phase 2
-- [ ] **Scan history is not linked anywhere.** `/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address.
-  `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2
+- [ ] **College sidebar has no Messages or Profile link.** Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing for colleges yet (it only says there is no profile to edit), so a link would lead to an empty page. Decide what a college profile should hold, or drop this half.
+  `components/dashboard/DashboardShell.tsx`, `app/dashboard/profile/page.tsx` · Partial · Phase 2
+- [x] **Scan history is not linked anywhere.** Every role's sidebar now has "Scan History" (`/dashboard/scans`) under Scanner.
+  `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Phase 2 · Done in "Add Messages and Scan History to the dashboard sidebar"
 
 ## Sign in
 
-- [ ] **Signed-in people can still open the sign-in page.** `/sign-in` shows the form instead of sending them to their dashboard.
-  `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4
-- [ ] **Signing in from a scanned QR loses the profile.** The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it.
-  `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4
+- [x] **Signed-in people can still open the sign-in page.** `/sign-in` now sends anyone already signed in to their dashboard.
+  `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in "Send signed-in people from the sign-in page to their dashboard"
+- [x] **Signing in from a scanned QR loses the profile.** The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed.
+  `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in "Return to the scanned profile after signing in from a QR"
 
 ## Messages
 
-- [ ] **New messages need a page reload.** The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded.
-  `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4
+- [x] **New messages need a page reload.** The messages page now reloads the inbox every 15 seconds while the tab is visible and on window focus, so an open conversation shows replies without a reload. Hidden tabs do not poll, as with the unread badge.
+  `app/dashboard/messages/page.tsx` · Phase 4 · Done in "Show new messages in an open conversation without a reload"

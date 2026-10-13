@@ -1,6 +1,6 @@
 "use client";
 
-import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow } from "./db";
+import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow, InterviewCounts } from "./db";
 import { evaluateResume } from "./resume";
 import { downloadCsv, slugify } from "./csv";
 import { fmtEventDate } from "./format";
@@ -46,6 +46,10 @@ export interface OutcomeReport {
   totalScans: number;
   shortlists: number;
   uniqueStudentsShortlisted: number;
+  /** Interview invites companies sent at the event, not counting withdrawn ones. */
+  interviewInvites: number;
+  /** Invites where the student picked a time. */
+  interviewsBooked: number;
 
   avgResumeScore: number;
   resumeReady: number;
@@ -77,6 +81,7 @@ export function buildReport(input: {
   scans: ScanRow[];
   shortlists: ShortlistRow[];
   analytics?: AnalyticsRow[];
+  interviews?: InterviewCounts;
 }): OutcomeReport {
   const { event, students, companies, scans, shortlists } = input;
 
@@ -168,6 +173,8 @@ export function buildReport(input: {
     totalScans: scans.length,
     shortlists: shortlists.filter(positive).length,
     uniqueStudentsShortlisted,
+    interviewInvites: input.interviews?.invited ?? 0,
+    interviewsBooked: input.interviews?.booked ?? 0,
 
     avgResumeScore,
     resumeReady,
@@ -202,6 +209,8 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
     ["Shortlists", r.shortlists],
     ["Students shortlisted", r.uniqueStudentsShortlisted],
     ["Shortlist rate (%)", r.shortlistRate],
+    ["Interview invites", r.interviewInvites],
+    ["Interviews booked", r.interviewsBooked],
     ["Average resume score", r.avgResumeScore],
     ["Resume-ready (70+)", r.resumeReady],
     ["Students with a resume", r.withResume],
