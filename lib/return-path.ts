@@ -25,3 +25,14 @@ export function returnPath(): string | null {
   if (path.startsWith("//") || new URL(path, window.location.origin).origin !== window.location.origin) return null;
   return path;
 }
+
+/**
+ * `href` with this page's (validated) `?next=` carried along, so moving
+ * between sign-in and sign-up keeps the way back to a scanned profile.
+ */
+export function carryNext(href: string): string {
+  const next = returnPath();
+  if (!next) return href;
+  return `${href}${href.includes("?") ? "&" : "?"}next=${encodeURIComponent(next)}`;
+}
+

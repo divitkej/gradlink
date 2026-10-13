@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { GraduationCap, Building2, Briefcase, ArrowRight } from "lucide-react";
 import Logo from "@/components/Logo";
+import CarryNextLink from "./CarryNextLink";
 
 const roles = [
   {
@@ -61,7 +61,7 @@ export default function RoleSelect() {
         {roles.map((r) => {
           const Icon = r.icon;
           return (
-            <Link
+            <CarryNextLink
               key={r.href}
               href={r.href}
               className="role-card"
@@ -102,16 +102,16 @@ export default function RoleSelect() {
               <span style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: "auto", fontSize: 14, fontWeight: 600, color: r.accent }}>
                 Continue <ArrowRight size={16} />
               </span>
-            </Link>
+            </CarryNextLink>
           );
         })}
       </div>
 
       <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 28 }}>
         Already have an account?{" "}
-        <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
+        <CarryNextLink href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Sign in
-        </Link>
+        </CarryNextLink>
       </p>
 
       <style>{`
