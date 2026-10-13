@@ -1,8 +1,8 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 153,
-    "done": 125,
+    "total": 154,
+    "done": 126,
     "open": 28,
     "percent": 82,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 125
+      "done": 126
     }
   },
   "areas": [
@@ -83,14 +83,14 @@
     {
       "key": "audit-follow-ups",
       "name": "Audit follow-ups",
-      "total": 7,
+      "total": 8,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 6
+        "done": 7
       }
     },
     {
@@ -196,14 +196,14 @@
       "key": "4",
       "name": "Phase 4: Polish and SEO",
       "goal": "Search basics, confirmations, redirects and live updates.",
-      "total": 5,
+      "total": 6,
       "counts": {
         "in_progress": 0,
         "owner": 0,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 5
+        "done": 6
       },
       "status": "Done"
     },
@@ -1306,6 +1306,18 @@
       "doneIn": "Show new messages in an open conversation without a reload",
       "phase": "4",
       "id": "audit-follow-ups/new-messages-need-a-page-reload"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Messages",
+      "line": 42,
+      "title": "The unread badge could not be cleared from Messages",
+      "detail": "The badge counts unread messages at every event, but the inbox shows only the open one, so a message at another event kept the badge on with no way to reach it. The inbox now lists other events with unread messages and switches to one in a tap. `app/dashboard/messages/page.tsx`, `lib/server/rpc.ts` · Phase 4 · Done in \"Show unread messages at other events in the inbox\"",
+      "state": "done",
+      "doneIn": "Show unread messages at other events in the inbox",
+      "phase": "4",
+      "id": "audit-follow-ups/the-unread-badge-could-not-be"
     },
     {
       "area": "student-dashboard",

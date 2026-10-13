@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**125 of 153 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
+**126 of 154 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -15,7 +15,7 @@ pie showData
   "To do" : 5
   "Verify live" : 5
   "Parked by decision" : 2
-  "Done" : 125
+  "Done" : 126
 ```
 
 ## By phase
@@ -27,7 +27,7 @@ pie showData
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `█████████░░░` 79% | 11 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 71% | 35 | 0 | 14 |
-| [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 5 | 0 | 0 |
+| [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 6 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 85% | 53 | 0 | 9 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
@@ -152,15 +152,16 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 
 Search basics, confirmations, redirects and live updates.
 
-**Done.** 5 of 5 done, 0 in progress, 0 left.
+**Done.** 6 of 6 done, 0 in progress, 0 left.
 
-<details><summary>Done (5)</summary>
+<details><summary>Done (6)</summary>
 
 - [x] Add robots.txt and sitemap
 - [x] No message after Stripe checkout
 - [x] Signed-in people can still open the sign-in page
 - [x] Signing in from a scanned QR loses the profile
 - [x] New messages need a page reload
+- [x] The unread badge could not be cleared from Messages
 
 </details>
 
@@ -271,12 +272,12 @@ Features that should work, checked once on a real device or the live site.
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 89% | 8 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `██████████░░` 85% | 11 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
-| Audit follow-ups | `██████████░░` 86% | 6 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
+| Audit follow-ups | `███████████░` 88% | 7 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 71% | 17 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `███████████░` 93% | 14 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **82%** | **125** | **28** | |
+| **All** | `██████████░░` **82%** | **126** | **28** | |
 
 ## In progress
 
@@ -406,7 +407,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 </details>
 
-<details><summary><b>Audit follow-ups</b>: 6 done</summary>
+<details><summary><b>Audit follow-ups</b>: 7 done</summary>
 
 - [x] "Start free" does nothing <sub>Done in "Send the pricing Start free button to sign-up"</sub>
 - [x] No message after Stripe checkout <sub>Done in "Confirm Stripe checkout results on the dashboard and pricing page"</sub>
@@ -414,6 +415,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] Signed-in people can still open the sign-in page <sub>Done in "Send signed-in people from the sign-in page to their dashboard"</sub>
 - [x] Signing in from a scanned QR loses the profile <sub>Done in "Return to the scanned profile after signing in from a QR"</sub>
 - [x] New messages need a page reload <sub>Done in "Show new messages in an open conversation without a reload"</sub>
+- [x] The unread badge could not be cleared from Messages <sub>Done in "Show unread messages at other events in the inbox"</sub>
 
 </details>
 
