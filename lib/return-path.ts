@@ -4,7 +4,8 @@
  *
  * The value is resolved the way the browser would resolve it and must stay on
  * this site. Checking the raw string is not enough: browsers drop tabs and
- * newlines, so "/\t/evil.com" becomes "//evil.com", another site.
+ * newlines, so "/\t/evil.com" becomes "//evil.com", another site, and dot
+ * segments collapse, so "/.//evil.com" does too.
  */
 export function returnPath(): string | null {
   if (typeof window === "undefined") return null;
@@ -17,5 +18,10 @@ export function returnPath(): string | null {
     return null;
   }
   if (url.origin !== window.location.origin) return null;
-  return url.pathname + url.search + url.hash;
+  // Resolving also collapses dot segments, so "/.//evil.com" comes out as
+  // "//evil.com". The router resolves the returned string again, so check
+  // that string too: it must not start with "//" and must stay on this site.
+  const path = url.pathname + url.search + url.hash;
+  if (path.startsWith("//") || new URL(path, window.location.origin).origin !== window.location.origin) return null;
+  return path;
 }
