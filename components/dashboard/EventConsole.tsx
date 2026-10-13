@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
@@ -26,12 +26,25 @@ import { fmtEventDate } from "@/lib/format";
 import GsapReveal from "@/components/anim/GsapReveal";
 
 type Tab = "overview" | "people" | "sessions" | "qr" | "checklist" | "manual";
+const TABS: Tab[] = ["overview", "people", "sessions", "qr", "checklist", "manual"];
+
+/** The URL hash, so links such as the sidebar's `/events/<id>#people` open that tab. */
+function subscribeHash(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
+}
+const readHash = () => window.location.hash.slice(1);
+const noHash = () => "";
 
 export default function EventConsole({ eventId }: { eventId: string }) {
   const { session, ready } = useSession();
   const role = (session?.role ?? "student") as AppRole;
 
-  const [tab, setTab] = useState<Tab>("overview");
+  // A tab the person clicks wins until the hash changes again.
+  const hash = useSyncExternalStore(subscribeHash, readHash, noHash);
+  const [picked, setPicked] = useState<{ tab: Tab; hash: string } | null>(null);
+  const tab: Tab = picked && picked.hash === hash ? picked.tab : TABS.includes(hash as Tab) ? (hash as Tab) : "overview";
+  const setTab = (t: Tab) => setPicked({ tab: t, hash });
   const [event, setEvent] = useState<EventRow | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
@@ -76,6 +89,8 @@ export default function EventConsole({ eventId }: { eventId: string }) {
     { key: "checklist", label: "Checklist", icon: ListChecks },
     { key: "manual", label: "Manual", icon: BookOpen },
   ];
+  // A hash can name a tab this role does not have; fall back to the overview.
+  const shownTab: Tab = tabs.some((t) => t.key === tab && !t.hide) ? tab : "overview";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -86,7 +101,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {tabs.filter((t) => !t.hide).map((t) => {
-          const Icon = t.icon; const on = tab === t.key;
+          const Icon = t.icon; const on = shownTab === t.key;
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
               style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, padding: "8px 15px", borderRadius: "var(--r-md)", cursor: "pointer", color: on ? "#0A0A0A" : "var(--text-2)", background: on ? "linear-gradient(100deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)", border: `1px solid ${on ? "transparent" : "var(--border)"}`, transition: "all 0.18s" }}>
@@ -100,9 +115,9 @@ export default function EventConsole({ eventId }: { eventId: string }) {
         <LoadingBlock />
       ) : (
         <GsapReveal key={tab} style={{ display: "block" }}>
-          {tab === "overview" && <Overview role={role} me={me} students={students} companies={companies} analytics={analytics} eventId={eventId} />}
-          {tab === "people" && <People role={role} students={students} companies={companies} shortlists={shortlists} eventId={eventId} myId={session.profileId} onShortlist={setShortlists} />}
-          {tab === "qr" && role !== "event_manager" && (
+          {shownTab === "overview" && <Overview role={role} me={me} students={students} companies={companies} analytics={analytics} eventId={eventId} />}
+          {shownTab === "people" && <People role={role} students={students} companies={companies} shortlists={shortlists} eventId={eventId} myId={session.profileId} onShortlist={setShortlists} />}
+          {shownTab === "qr" && role !== "event_manager" && (
             <SectionCard title="My event QR" accent="var(--border-strong)">
               <QRCard
                 payload={role === "student" ? `/scan/student/${session.profileId}?eventId=${eventId}` : `/scan/company/${session.profileId}?eventId=${eventId}`}
@@ -110,12 +125,12 @@ export default function EventConsole({ eventId }: { eventId: string }) {
               />
             </SectionCard>
           )}
-          {tab === "sessions" && role !== "student" && (
+          {shownTab === "sessions" && role !== "student" && (
             <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId}
               timezone={event?.timezone ?? null} onTimezoneChange={(tz) => setEvent((e) => (e ? { ...e, timezone: tz } : e))} />
           )}
-          {tab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
-          {tab === "manual" && <ManualSection defaultRole={role} />}
+          {shownTab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
+          {shownTab === "manual" && <ManualSection defaultRole={role} />}
         </GsapReveal>
       )}
     </div>

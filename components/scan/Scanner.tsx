@@ -26,6 +26,7 @@ export default function Scanner() {
 
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
+  const [peopleLoaded, setPeopleLoaded] = useState(false);
   const [manual, setManual] = useState("");
   const [camOn, setCamOn] = useState(false);
   const [camErr, setCamErr] = useState<string | null>(null);
@@ -35,10 +36,16 @@ export default function Scanner() {
 
   useEffect(() => {
     if (!viewer || !eventId) return;
+    let cancelled = false;
     (async () => {
-      if (viewer === "company" || viewer === "event_manager") setStudents(await getRegisteredStudents(eventId));
-      if (viewer === "student" || viewer === "event_manager") setCompanies(await getRegisteredCompanies(eventId));
+      const [st, co] = await Promise.all([
+        viewer === "company" || viewer === "event_manager" ? getRegisteredStudents(eventId) : Promise.resolve([]),
+        viewer === "student" || viewer === "event_manager" ? getRegisteredCompanies(eventId) : Promise.resolve([]),
+      ]);
+      if (cancelled) return;
+      setStudents(st); setCompanies(co); setPeopleLoaded(true);
     })();
+    return () => { cancelled = true; };
   }, [viewer, eventId]);
 
   function go(path: string) {
@@ -195,8 +202,10 @@ export default function Scanner() {
         </SectionCard>
 
         <SectionCard title={peopleTitle} hint={`${people.length} at this event`}>
-          {people.length === 0 ? (
+          {!peopleLoaded ? (
             <LoadingBlock label="Loading attendees…" />
+          ) : people.length === 0 ? (
+            <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55 }}>Nobody to show here yet. People appear as soon as they join the event.</p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {people.map((p) => (

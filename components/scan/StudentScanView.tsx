@@ -109,17 +109,21 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
               setNote={(v) => { touched.current.note = true; setNote(v); }} setMsg={setMsg}
               onStatus={async (st) => {
                 touched.current.status = true;
+                const before = status;
                 setStatus(st);
-                await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: st, notes: note });
+                const ok = await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: st, notes: note });
+                if (!ok) { setStatus(before); flash("Couldn't save, try again"); return; }
                 flash(st === "rejected" ? "Marked as not a fit" : st === "maybe" ? "Marked as maybe" : "Shortlisted");
               }}
               onSaveNote={async () => {
-                await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: status ?? "maybe", notes: note });
-                flash("Note saved");
+                const ok = await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: status ?? "maybe", notes: note });
+                flash(ok ? "Note saved" : "Couldn't save, try again");
               }}
               onSend={async () => {
                 if (!msg.trim()) return;
-                await sendMessage({ eventId, senderProfileId: session!.profileId, receiverProfileId: studentProfileId, message: msg.trim() });
+                const ok = await sendMessage({ eventId, senderProfileId: session!.profileId, receiverProfileId: studentProfileId, message: msg.trim() });
+                // A failed send keeps the text so it can be sent again.
+                if (!ok) { flash("Couldn't send, try again"); return; }
                 setMsg(""); flash("Message sent");
               }}
             />

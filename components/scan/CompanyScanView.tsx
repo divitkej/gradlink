@@ -145,7 +145,9 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
               onToggle={toggle}
               onSend={async () => {
                 if (!msg.trim()) return;
-                await sendMessage({ eventId, senderProfileId: session!.profileId, receiverProfileId: companyProfileId, message: msg.trim() });
+                const ok = await sendMessage({ eventId, senderProfileId: session!.profileId, receiverProfileId: companyProfileId, message: msg.trim() });
+                // A failed send keeps the text so it can be sent again.
+                if (!ok) { flash("Couldn't send, try again"); return; }
                 setMsg(""); flash("Message sent");
               }}
               onNote={editNote}

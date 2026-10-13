@@ -58,7 +58,9 @@ function CompanyOverview({ eventId }: { eventId: string }) {
     return () => { cancelled = true; };
   }, [profileId, eventId]);
 
-  const scannedCount = students.length;
+  // `students` also holds students only pre-shortlisted from the event console,
+  // so count the distinct students this company actually scanned.
+  const scannedCount = new Set(scans.map((s) => s.scanned_profile_id).filter(Boolean)).size;
   const shortlisted = shortlists.filter((s) => s.status === "shortlisted" || s.status === "priority").length;
   const priority = shortlists.filter((s) => s.status === "priority").length;
   const maybe = shortlists.filter((s) => s.status === "maybe").length;
