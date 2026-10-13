@@ -15,7 +15,8 @@ import { rpc } from "./api-client";
    owner, so a plan cannot be forged from the browser.
    ============================================================ */
 
-export type PlanId = "free" | "pro";
+import type { PlanId, SubscriptionRow } from "./entitlement";
+export { isPro, type PlanId, type SubscriptionRow } from "./entitlement";
 
 export interface Plan {
   id: PlanId;
@@ -71,14 +72,6 @@ export const PLANS: Plan[] = [
 export const PRO_FEATURES_BLURB =
   "The outcome report turns your fair into something you can put in front of a dean: who attended, who engaged, which employers pulled the most interest, and how many students were shortlisted.";
 
-export interface SubscriptionRow {
-  plan: PlanId;
-  status: "active" | "past_due" | "canceled" | "incomplete";
-  stripe_customer_id?: string | null;
-  stripe_subscription_id?: string | null;
-  current_period_end?: string | null;
-  updated_at?: string | null;
-}
 
 export const FREE_SUBSCRIPTION: SubscriptionRow = { plan: "free", status: "active" };
 
@@ -94,21 +87,6 @@ export async function getSubscription(profileId: string): Promise<SubscriptionRo
   }
 }
 
-/**
- * Whether a subscription currently grants paid features.
- * An expired period counts as lapsed even if Stripe hasn't sent the
- * cancellation webhook yet.
- */
-export function isPro(sub: SubscriptionRow | null | undefined): boolean {
-  if (!sub) return false;
-  if (sub.plan !== "pro") return false;
-  if (sub.status !== "active" && sub.status !== "past_due") return false;
-  if (sub.current_period_end) {
-    const end = Date.parse(sub.current_period_end);
-    if (Number.isFinite(end) && end < Date.now()) return false;
-  }
-  return true;
-}
 
 /** Kick off Stripe Checkout. Returns an error string, or redirects the browser. */
 export async function startCheckout(input: {
