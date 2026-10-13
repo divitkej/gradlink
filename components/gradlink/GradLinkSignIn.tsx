@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
 import AuthShell from "./AuthShell";
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/primitives";
 import { signIn, sendReset, resendVerification } from "@/lib/auth";
 import { setSession, useSession } from "@/lib/session";
 import { returnPath } from "@/lib/return-path";
+import CarryNextLink from "./CarryNextLink";
 
 function roleHome(role: "student" | "company" | "event_manager") {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -180,7 +180,7 @@ export default function GradLinkSignIn() {
 
         <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 16 }}>
           New to GradLink?{" "}
-          <Link href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Create an account</Link>
+          <CarryNextLink href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Create an account</CarryNextLink>
         </p>
 
         <style>{`

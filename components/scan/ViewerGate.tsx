@@ -9,6 +9,8 @@ import type { AppRole } from "@/lib/session";
 
 const SIGN_IN_STYLE: React.CSSProperties = { flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" };
 
+const SIGN_UP_STYLE: React.CSSProperties = { flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "var(--text)", background: "var(--glass)", border: "1px solid var(--border)", textDecoration: "none" };
+
 /** Sign-in link that brings the person back to this exact page (with its ?eventId). */
 function SignInLink() {
   const pathname = usePathname();
@@ -17,6 +19,18 @@ function SignInLink() {
   return (
     <Link href={`/sign-in?next=${encodeURIComponent(here)}`} style={SIGN_IN_STYLE}>
       <LogIn size={17} /> Sign in
+    </Link>
+  );
+}
+
+/** Sign-up link that, like SignInLink, brings the person back to this page. */
+function SignUpLink() {
+  const pathname = usePathname();
+  const query = useSearchParams().toString();
+  const here = query ? `${pathname}?${query}` : pathname;
+  return (
+    <Link href={`/sign-up?next=${encodeURIComponent(here)}`} style={SIGN_UP_STYLE}>
+      <UserPlus size={17} /> Sign up
     </Link>
   );
 }
@@ -38,9 +52,9 @@ export default function ViewerGate({ hint }: { onPick?: (r: AppRole) => void; hi
         <Suspense fallback={<Link href="/sign-in" style={SIGN_IN_STYLE}><LogIn size={17} /> Sign in</Link>}>
           <SignInLink />
         </Suspense>
-        <Link href="/sign-up" style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "var(--text)", background: "var(--glass)", border: "1px solid var(--border)", textDecoration: "none" }}>
-          <UserPlus size={17} /> Sign up
-        </Link>
+        <Suspense fallback={<Link href="/sign-up" style={SIGN_UP_STYLE}><UserPlus size={17} /> Sign up</Link>}>
+          <SignUpLink />
+        </Suspense>
       </div>
     </div>
   );

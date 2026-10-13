@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, User, Building2, GraduationCap, Briefcase, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import type { ComponentType } from "react";
@@ -10,6 +9,8 @@ import { Button } from "@/components/ui/primitives";
 import PasswordChecklist, { passwordIsStrong } from "./PasswordChecklist";
 import { signUpUser, resendVerification, type Role } from "@/lib/auth";
 import { setSession, type AppRole } from "@/lib/session";
+import { returnPath } from "@/lib/return-path";
+import CarryNextLink from "./CarryNextLink";
 
 function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
@@ -126,7 +127,8 @@ export default function SignUpForm({ role }: { role: Role }) {
         activeEventId: null,
       });
       setDone(true);
-      router.push(roleHome(appRole));
+      // Back to the page that sent them here (e.g. a scanned QR), else the dashboard.
+      router.push(returnPath() ?? roleHome(appRole));
     } else {
       setSubmitting(false);
       setError(res.error || "Something went wrong. Please try again.");
@@ -158,7 +160,7 @@ export default function SignUpForm({ role }: { role: Role }) {
           </button>
           <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 18 }}>
             Already confirmed?{" "}
-            <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
+            <CarryNextLink href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</CarryNextLink>
           </p>
           <style>{`.gl-link:hover { text-decoration: underline; }`}</style>
         </div>
@@ -237,7 +239,7 @@ export default function SignUpForm({ role }: { role: Role }) {
 
       <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 18 }}>
         Already have an account?{" "}
-        <Link href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</Link>
+        <CarryNextLink href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Sign in</CarryNextLink>
       </p>
 
       <style>{`
