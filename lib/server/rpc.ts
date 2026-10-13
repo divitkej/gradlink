@@ -236,17 +236,15 @@ async function withCodes(events: Row[]): Promise<Row[]> {
 /** Which event, and which role, a typed code lets someone into. */
 async function resolveCode(code: string): Promise<{ event: Row; role: "student" | "company" } | null> {
   const sql = db();
+  // Only event_codes counts. `npm run db:migrate` copies any legacy
+  // events.join_code in as the student code, and a code replaced in the event
+  // console must stop working, so the legacy column is never looked up.
   const rows = await sql`select e.*, k.role as code_role from event_codes k join events e on e.id = k.event_id where k.code = ${code}`;
-  if (rows[0]) {
-    const event = { ...rows[0] };
-    const role = event.code_role as "student" | "company";
-    delete event.code_role;
-    return { event, role };
-  }
-  // An event made by the previous release between migrating and deploying
-  // only has the old single code, which was always handed to students.
-  const legacy = await sql`select * from events where join_code = ${code}`;
-  return legacy[0] ? { event: legacy[0], role: "student" } : null;
+  if (!rows[0]) return null;
+  const event = { ...rows[0] };
+  const role = event.code_role as "student" | "company";
+  delete event.code_role;
+  return { event, role };
 }
 
 /* ---------------- owner (admin) ---------------- */

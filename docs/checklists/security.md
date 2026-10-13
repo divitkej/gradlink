@@ -18,6 +18,7 @@ Update this file in the same commit as the fix.
 - [x] **Checkout trusted request data.** Now same-origin only, uses the account's own email, and returns to `APP_URL` instead of the request's Origin header. `app/api/checkout/route.ts` · Done in "Lock down the data API, uploads and response headers"
 - [x] **No per-IP limit on the auth endpoints.** Per IP: 30 wrong passwords per 15 minutes (correct sign-ins never count), 50 sign-ups per hour, 10 reset emails per hour, 30 reset-link checks per 15 minutes. Limits are generous because a whole campus can share one Wi-Fi address. Counters live in Postgres with hashed IPs, because WAF rules cannot attach to a workers.dev address. `lib/server/rate-limit.ts` · Done in "Rate-limit sign-in, sign-up and password reset per IP"
 - [x] **Sign-in timing revealed which emails have accounts.** Unknown emails now take the same hashing time. `lib/server/auth-api.ts` · Done in "Lock down the data API, uploads and response headers"
+- [x] **A replaced student code kept working on older events.** Events from before student and employer codes were split also kept the old code in `events.join_code`, and joining fell back to that column, so pressing "New code" in the event console did not revoke it. Joining now only reads `event_codes` (`npm run db:migrate` already copies any old code there). `lib/server/rpc.ts`, `db/schema.sql` · Done in "Make a replaced join code stop working on older events"
 
 ## Already sound (checked, no change needed)
 
