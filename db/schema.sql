@@ -183,8 +183,8 @@ create table if not exists events (
   status       text not null default 'upcoming' check (status in ('draft', 'upcoming', 'live', 'ended')),
   created_by   text references profiles (id) on delete set null,
   host_org     text,
-  -- Legacy single join code. Codes now live in event_codes; this column is
-  -- kept so events created before the split still resolve (as student codes).
+  -- Legacy single join code, no longer read. Codes live in event_codes, and
+  -- the insert below copies any value here into it as the student code.
   join_code    text unique,
   -- IANA zone the event runs in (e.g. Asia/Kolkata). Session times are
   -- entered and shown in it; null for events made before it was stored.
