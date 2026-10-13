@@ -34,7 +34,7 @@ Status key as in `landing-page.md`.
 - [x] **Matched companies.** Match percentage from skills and target roles, with the reason and "Save to plan".
   `lib/readiness.ts`, `components/dashboard/StudentDashboard.tsx` · Done in "Complete the student dashboard against the landing page"
 - [x] **Application tracker.** Applied, interviewing, offer, accepted, not selected, withdrawn, with interview dates and notes. Private to the student.
-  `components/dashboard/StudentApplications.tsx` · Done in "Complete the student dashboard against the landing page"
+  `components/dashboard/StudentApplications.tsx` · Done in "Complete the student dashboard against the landing page" · Editing an application while another event is open no longer moves it to that event, in "Keep an edited application at the event it was logged at"
 - [x] **Saved companies in the database.** Save, interested, visited, follow-up and notes moved from localStorage to `saved_companies`. Existing browser copies move across the first time the student opens that company.
   `components/scan/CompanyScanView.tsx` · Done in "Complete the student dashboard against the landing page"
 - [x] **New events had an empty checklist.** Only the old demo event had checklist items, so every student's checklist and readiness sat at zero. Every event now gets the default checklist, with new auto-tracked items for check-in, booking a prep session and logging applications.
