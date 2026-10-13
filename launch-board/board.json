@@ -1,17 +1,17 @@
 {
-  "updated": "2026-10-06",
+  "updated": "2026-10-13",
   "totals": {
-    "total": 137,
-    "done": 99,
-    "open": 38,
-    "percent": 72,
+    "total": 136,
+    "done": 107,
+    "open": 29,
+    "percent": 79,
     "counts": {
-      "in_progress": 8,
-      "owner": 17,
-      "todo": 7,
+      "in_progress": 0,
+      "owner": 18,
+      "todo": 5,
       "verify": 4,
       "parked": 2,
-      "done": 99
+      "done": 107
     }
   },
   "areas": [
@@ -59,12 +59,12 @@
       "name": "Organiser access",
       "total": 9,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 7
+        "done": 8
       }
     },
     {
@@ -85,12 +85,12 @@
       "name": "Audit follow-ups",
       "total": 7,
       "counts": {
-        "in_progress": 6,
-        "owner": 0,
-        "todo": 1,
+        "in_progress": 0,
+        "owner": 1,
+        "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 0
+        "done": 6
       }
     },
     {
@@ -111,22 +111,22 @@
       "name": "Security",
       "total": 20,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 7,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 12
+        "done": 13
       }
     },
     {
       "key": "features-to-build",
       "name": "Features to build",
-      "total": 11,
+      "total": 10,
       "counts": {
         "in_progress": 0,
         "owner": 3,
-        "todo": 6,
+        "todo": 5,
         "verify": 0,
         "parked": 0,
         "done": 2
@@ -155,12 +155,12 @@
       "goal": "Every visible button works, nothing claims what the app does not do.",
       "total": 14,
       "counts": {
-        "in_progress": 2,
-        "owner": 1,
-        "todo": 1,
+        "in_progress": 0,
+        "owner": 2,
+        "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 9
+        "done": 11
       },
       "status": "Ongoing"
     },
@@ -170,12 +170,12 @@
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
       "total": 46,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 14,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 30
+        "done": 31
       },
       "status": "Ongoing"
     },
@@ -185,27 +185,27 @@
       "goal": "Search basics, confirmations, redirects and live updates.",
       "total": 5,
       "counts": {
-        "in_progress": 4,
+        "in_progress": 0,
         "owner": 0,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 1
+        "done": 5
       },
-      "status": "Ongoing"
+      "status": "Done"
     },
     {
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 48,
+      "total": 47,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 1,
-        "todo": 6,
+        "todo": 5,
         "verify": 2,
         "parked": 0,
-        "done": 38
+        "done": 39
       },
       "status": "Ongoing"
     },
@@ -226,150 +226,6 @@
     }
   ],
   "items": [
-    {
-      "area": "organiser-access",
-      "areaName": "Organiser access",
-      "section": "Owner actions before deploying",
-      "line": 28,
-      "title": "Run the migration before deploying this code",
-      "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "5",
-      "id": "organiser-access/run-the-migration-before-deploying-this",
-      "pr": {
-        "number": 15,
-        "title": "Record production database checks in the checklists",
-        "url": "https://github.com/divitkej/gradlink/pull/15",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Pricing",
-      "line": 19,
-      "title": "\"Start free\" does nothing",
-      "detail": "`onCta` returns straight away for the free plan, so the Starter button on `/pricing` has no effect. Send it to `/sign-up`. `components/PricingSection.tsx` · Dead button · Phase 2",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "2",
-      "id": "audit-follow-ups/start-free-does-nothing",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Pricing",
-      "line": 21,
-      "title": "No message after Stripe checkout",
-      "detail": "Checkout returns to `/dashboard/event-manager?upgraded=1` or `/pricing?canceled=1`, but neither page reads the parameter, so the college gets no confirmation either way. `app/api/checkout/route.ts`, `components/PricingSection.tsx`, `components/dashboard/EventManagerDashboard.tsx` · Partial · Phase 4",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/no-message-after-stripe-checkout",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Navigation",
-      "line": 28,
-      "title": "Scan history is not linked anywhere",
-      "detail": "`/dashboard/scans` exists but no sidebar or page links to it, so it is only reachable by typing the address. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Partial · Phase 2",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "2",
-      "id": "audit-follow-ups/scan-history-is-not-linked-anywhere",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Sign in",
-      "line": 33,
-      "title": "Signed-in people can still open the sign-in page",
-      "detail": "`/sign-in` shows the form instead of sending them to their dashboard. `app/sign-in/page.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/signed-in-people-can-still-open-the",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Sign in",
-      "line": 35,
-      "title": "Signing in from a scanned QR loses the profile",
-      "detail": "The sign-in gate on a scanned profile links to plain `/sign-in`, and sign-in always goes to the dashboard, so the person has to scan again. Pass the scanned address through and return to it. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Partial · Phase 4",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/signing-in-from-a-scanned-qr",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Messages",
-      "line": 40,
-      "title": "New messages need a page reload",
-      "detail": "The messages page loads the inbox once. The unread badge polls, but an open conversation does not show a reply until the page is reloaded. `app/dashboard/messages/page.tsx`, `lib/notifications.ts` · Partial · Phase 4",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "4",
-      "id": "audit-follow-ups/new-messages-need-a-page-reload",
-      "pr": {
-        "number": 14,
-        "title": "Fix six audit follow-ups and count interview invites for colleges",
-        "url": "https://github.com/divitkej/gradlink/pull/14",
-        "draft": false
-      }
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 35,
-      "title": "Run `npm run db:migrate`",
-      "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/run-npm-run-db-migrate",
-      "pr": {
-        "number": 15,
-        "title": "Record production database checks in the checklists",
-        "url": "https://github.com/divitkej/gradlink/pull/15",
-        "draft": false
-      }
-    },
     {
       "area": "launch",
       "areaName": "Launch",
@@ -434,7 +290,7 @@
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 29,
+      "line": 30,
       "title": "Set `ADMIN_EMAILS`, then sign up with that email straight away",
       "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.",
       "state": "owner",
@@ -453,6 +309,18 @@
       "doneIn": null,
       "phase": "2",
       "id": "dashboard/several-claude-sessions-deploy-to-the"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Navigation",
+      "line": 26,
+      "title": "College sidebar has no Messages or Profile link",
+      "detail": "Messages is now in the college sidebar (\"Add Messages and Scan History to the dashboard sidebar\"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing for colleges yet (it only says there is no profile to edit), so a link would lead to an empty page. Decide what a college profile should hold, or drop this half. `components/dashboard/DashboardShell.tsx`, `app/dashboard/profile/page.tsx` · Partial · Phase 2",
+      "state": "owner",
+      "doneIn": null,
+      "phase": "2",
+      "id": "audit-follow-ups/college-sidebar-has-no-messages-or"
     },
     {
       "area": "security",
@@ -496,7 +364,7 @@
       "section": "Needs doing outside the code (before launch)",
       "line": 38,
       "title": "Backups",
-      "detail": "Confirm Neon's restore window covers at least 7 days.",
+      "detail": "Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise it in the Neon project settings; the Neon plan sets the maximum. Owner action",
       "state": "owner",
       "doneIn": null,
       "phase": "3",
@@ -573,30 +441,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "features-to-build/dedicated-onboarding"
-    },
-    {
-      "area": "audit-follow-ups",
-      "areaName": "Audit follow-ups",
-      "section": "Navigation",
-      "line": 26,
-      "title": "College sidebar has no Messages or Profile link",
-      "detail": "Students and companies get both. Colleges can only reach Messages through the header bell. `components/dashboard/DashboardShell.tsx` · Partial · Phase 2",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "2",
-      "id": "audit-follow-ups/college-sidebar-has-no-messages-or"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 52,
-      "title": "Build: Interview counts for colleges",
-      "detail": "Where the site shows it: Analytics funnel, Hero dashboard, Product reveal, Journey step 04. Notes: Invites and bookings are built for students and companies; the college dashboard and outcome report do not count them yet",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/interview-counts-for-colleges"
     },
     {
       "area": "features-to-build",
@@ -1238,7 +1082,19 @@
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 30,
+      "line": 28,
+      "title": "Run the migration before deploying this code",
+      "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once. Checked on production Neon on 2026-10-12: `event_codes`, `app_errors` and the `colleges.plan_choice` and `plan_selected_at` columns exist, and no event is missing its codes. No commit (database change)",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "organiser-access/run-the-migration-before-deploying-this"
+    },
+    {
+      "area": "organiser-access",
+      "areaName": "Organiser access",
+      "section": "Owner actions before deploying",
+      "line": 31,
       "title": "Starter promised one live event but nothing enforced it",
       "detail": "Decided to change the wording rather than add a limit: Starter now lists \"Unlimited events\", and \"Unlimited events\" is no longer sold as a Pro feature on the pricing page, the plan picker, the outcome report upsell or the pricing page description. `lib/billing.ts`, `components/dashboard/OutcomeReportCard.tsx`, `app/pricing/page.tsx` · Done in \"Say Starter includes unlimited events\"",
       "state": "done",
@@ -1377,6 +1233,78 @@
       "doneIn": "Fix the problems found in the site audit",
       "phase": "2",
       "id": "dashboard/unbranded-404-page"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Pricing",
+      "line": 19,
+      "title": "\"Start free\" does nothing",
+      "detail": "The Starter button on `/pricing` now sends people to `/sign-up`. `components/PricingSection.tsx` · Phase 2 · Done in \"Send the pricing Start free button to sign-up\"",
+      "state": "done",
+      "doneIn": "Send the pricing Start free button to sign-up",
+      "phase": "2",
+      "id": "audit-follow-ups/start-free-does-nothing"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Pricing",
+      "line": 21,
+      "title": "No message after Stripe checkout",
+      "detail": "`/dashboard/event-manager?upgraded=1` now confirms the checkout and says Pro switches on once Stripe confirms the payment; `/pricing?canceled=1` says the checkout was cancelled and nothing was charged. `components/dashboard/UpgradedNotice.tsx`, `app/dashboard/event-manager/page.tsx`, `components/PricingSection.tsx` · Phase 4 · Done in \"Confirm Stripe checkout results on the dashboard and pricing page\"",
+      "state": "done",
+      "doneIn": "Confirm Stripe checkout results on the dashboard and pricing page",
+      "phase": "4",
+      "id": "audit-follow-ups/no-message-after-stripe-checkout"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Navigation",
+      "line": 28,
+      "title": "Scan history is not linked anywhere",
+      "detail": "Every role's sidebar now has \"Scan History\" (`/dashboard/scans`) under Scanner. `components/dashboard/DashboardShell.tsx`, `app/dashboard/scans/page.tsx` · Phase 2 · Done in \"Add Messages and Scan History to the dashboard sidebar\"",
+      "state": "done",
+      "doneIn": "Add Messages and Scan History to the dashboard sidebar",
+      "phase": "2",
+      "id": "audit-follow-ups/scan-history-is-not-linked-anywhere"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Sign in",
+      "line": 33,
+      "title": "Signed-in people can still open the sign-in page",
+      "detail": "`/sign-in` now sends anyone already signed in to their dashboard. `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in \"Send signed-in people from the sign-in page to their dashboard\"",
+      "state": "done",
+      "doneIn": "Send signed-in people from the sign-in page to their dashboard",
+      "phase": "4",
+      "id": "audit-follow-ups/signed-in-people-can-still-open-the"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Sign in",
+      "line": 35,
+      "title": "Signing in from a scanned QR loses the profile",
+      "detail": "The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed. `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in \"Return to the scanned profile after signing in from a QR\"",
+      "state": "done",
+      "doneIn": "Return to the scanned profile after signing in from a QR",
+      "phase": "4",
+      "id": "audit-follow-ups/signing-in-from-a-scanned-qr"
+    },
+    {
+      "area": "audit-follow-ups",
+      "areaName": "Audit follow-ups",
+      "section": "Messages",
+      "line": 40,
+      "title": "New messages need a page reload",
+      "detail": "The messages page now reloads the inbox every 15 seconds while the tab is visible and on window focus, so an open conversation shows replies without a reload. Hidden tabs do not poll, as with the unread badge. `app/dashboard/messages/page.tsx` · Phase 4 · Done in \"Show new messages in an open conversation without a reload\"",
+      "state": "done",
+      "doneIn": "Show new messages in an open conversation without a reload",
+      "phase": "4",
+      "id": "audit-follow-ups/new-messages-need-a-page-reload"
     },
     {
       "area": "student-dashboard",
@@ -1893,6 +1821,18 @@
       "doneIn": "Lock down the data API, uploads and response headers",
       "phase": "3",
       "id": "security/sign-in-timing-revealed-which-emails-have"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 35,
+      "title": "Run `npm run db:migrate`",
+      "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)",
+      "state": "done",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/run-npm-run-db-migrate"
     },
     {
       "area": "features-to-build",

@@ -32,10 +32,10 @@ Update this file in the same commit as the fix.
 ## Needs doing outside the code (before launch)
 
 - [ ] **Set `APP_URL`** in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.
-- [ ] **Run `npm run db:migrate`** against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning.
+- [x] **Run `npm run db:migrate`** against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)
 - [ ] **Optional, after the custom domain is connected:** add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.
 - [ ] **Least-privilege database role.** In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.
-- [ ] **Backups.** Confirm Neon's restore window covers at least 7 days.
+- [ ] **Backups.** Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise it in the Neon project settings; the Neon plan sets the maximum. Owner action
 - [ ] **Secrets.** Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.
 - [ ] **Account verification.** Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in "Restrict sign-up to campus and company email domains"). Still open: confirming the email itself needs a sender (see `launch.md`, account email), and a college whose domain is still pending can already create events.
 - [ ] **Verify live:** after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.

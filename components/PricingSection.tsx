@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
 import { PLANS, startCheckout, type Plan } from "@/lib/billing";
 import { useSession } from "@/lib/session";
+
+/** Stripe Checkout sends a cancelled checkout back here with ?canceled=1 (app/api/checkout). */
+function CanceledNotice() {
+  if (useSearchParams().get("canceled") !== "1") return null;
+  return (
+    <div role="status" style={{ maxWidth: 520, margin: "0 auto 24px", fontSize: 13, color: "var(--text-2)", background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "11px 14px", textAlign: "center" }}>
+      Checkout was cancelled, so you have not been charged. You can upgrade whenever you are ready.
+    </div>
+  );
+}
 
 export default function PricingSection() {
   const { session, ready } = useSession();
@@ -15,7 +26,10 @@ export default function PricingSection() {
 
   async function onCta(plan: Plan) {
     setError(null);
-    if (plan.id === "free") return;
+    if (plan.id === "free") {
+      window.location.assign("/sign-up");
+      return;
+    }
 
     if (!ready) return;
     if (!session) {
@@ -49,6 +63,11 @@ export default function PricingSection() {
           Run your whole career fair on the free plan. Upgrade when you need to prove what it achieved.
         </p>
       </div>
+
+      {/* useSearchParams needs a Suspense boundary so the rest of /pricing still prerenders. */}
+      <Suspense fallback={null}>
+        <CanceledNotice />
+      </Suspense>
 
       {error && (
         <div style={{ maxWidth: 520, margin: "0 auto 24px", fontSize: 13, color: "var(--danger)", background: "rgba(255,107,107,0.08)", border: "1px solid rgba(255,107,107,0.25)", borderRadius: "var(--r-sm)", padding: "11px 14px", textAlign: "center" }}>

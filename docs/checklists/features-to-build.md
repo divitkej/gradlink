@@ -27,6 +27,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Event time zones: session times are entered and shown in the event's zone on every device (`lib/format.ts`)
 - Event history and company connections on the career profile, across every event (`components/dashboard/StudentHistory.tsx`)
 - Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
+- Interview counts for colleges: interview invites sent at the event (not counting ones the company withdrew) and interviews booked, on the college dashboard and in the outcome report and its CSV (`getInterviewCounts` in `lib/server/rpc.ts`, `components/dashboard/EventManagerDashboard.tsx`, `lib/report.ts`). Done in "Count interview invites and bookings for colleges"
 
 ## Decision: employers see strengths, never assessments
 
@@ -49,7 +50,6 @@ So these are not planned for employers: filtering or sorting by readiness, résu
 
 | Feature | Where the site shows it | Notes |
 |---|---|---|
-| Interview counts for colleges | Analytics funnel, Hero dashboard, Product reveal, Journey step 04 | Invites and bookings are built for students and companies; the college dashboard and outcome report do not count them yet |
 | Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
 | Candidate stages "Contacted" and "Offer" | Employer CRM pipeline, Platform tab CRM mini | "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies |
