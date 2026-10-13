@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   CalendarDays, MapPin, QrCode, ListChecks, BookOpen, Users, LayoutGrid,
@@ -28,23 +29,19 @@ import GsapReveal from "@/components/anim/GsapReveal";
 type Tab = "overview" | "people" | "sessions" | "qr" | "checklist" | "manual";
 const TABS: Tab[] = ["overview", "people", "sessions", "qr", "checklist", "manual"];
 
-/** The URL hash, so links such as the sidebar's `/events/<id>#people` open that tab. */
-function subscribeHash(onChange: () => void) {
-  window.addEventListener("hashchange", onChange);
-  return () => window.removeEventListener("hashchange", onChange);
-}
-const readHash = () => window.location.hash.slice(1);
-const noHash = () => "";
 
 export default function EventConsole({ eventId }: { eventId: string }) {
   const { session, ready } = useSession();
   const role = (session?.role ?? "student") as AppRole;
 
-  // A tab the person clicks wins until the hash changes again.
-  const hash = useSyncExternalStore(subscribeHash, readHash, noHash);
-  const [picked, setPicked] = useState<{ tab: Tab; hash: string } | null>(null);
-  const tab: Tab = picked && picked.hash === hash ? picked.tab : TABS.includes(hash as Tab) ? (hash as Tab) : "overview";
-  const setTab = (t: Tab) => setPicked({ tab: t, hash });
+  // The open tab lives in the URL (?tab=people), so links such as the
+  // sidebar's Pre-shortlist open it, even from this same page. Clicking a tab
+  // updates the URL with replaceState, which Next keeps in sync without a
+  // round trip to the server.
+  const pathname = usePathname();
+  const wanted = useSearchParams().get("tab");
+  const tab: Tab = TABS.includes(wanted as Tab) ? (wanted as Tab) : "overview";
+  const setTab = (t: Tab) => window.history.replaceState(null, "", t === "overview" ? pathname : `${pathname}?tab=${t}`);
   const [event, setEvent] = useState<EventRow | null>(null);
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
@@ -89,7 +86,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
     { key: "checklist", label: "Checklist", icon: ListChecks },
     { key: "manual", label: "Manual", icon: BookOpen },
   ];
-  // A hash can name a tab this role does not have; fall back to the overview.
+  // The URL can name a tab this role does not have; fall back to the overview.
   const shownTab: Tab = tabs.some((t) => t.key === tab && !t.hide) ? tab : "overview";
 
   return (

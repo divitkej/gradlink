@@ -56,7 +56,7 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Scanner", href: "/scan", icon: ScanLine },
     { label: "Scan History", href: "/dashboard/scans", icon: History },
     { label: "Candidates", href: "/dashboard/company#students", icon: Users },
-    { label: "Pre-shortlist", href: `${EV}#people`, icon: ListChecks },
+    { label: "Pre-shortlist", href: eventId ? `${EV}?tab=people` : ALL_EVENTS, icon: ListChecks },
     { label: "Pipeline", href: "/dashboard/company#pipeline", icon: Network },
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Manual", href: "/dashboard/company#manual", icon: BookOpen },
