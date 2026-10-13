@@ -12,7 +12,7 @@ import { scanLabel, getScans, getProfileNames, type ScanRow } from "@/lib/db";
 
 export default function ScansPage() {
   const { session, ready } = useSession();
-  const { eventId } = useActiveEvent();
+  const { eventId, status: eventStatus } = useActiveEvent();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [names, setNames] = useState<Record<string, { name: string; role: string; org: string }>>({});
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,8 @@ export default function ScansPage() {
     <DashboardShell title="Scan History">
       <GlassPanel style={{ padding: 0, overflow: "hidden" }}>
         <div style={{ padding: "18px 22px 14px" }}><PanelTitle hint={`${scans.length} scans`}>Your scan history</PanelTitle></div>
-        {loading ? (
+        {/* With no event yet there is nothing to load, so show the empty state. */}
+        {loading && eventStatus !== "none" ? (
           <LoadingBlock label="Loading scans…" />
         ) : scans.length === 0 ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "34px 24px 42px", textAlign: "center" }}>

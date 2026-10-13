@@ -19,7 +19,7 @@ const POLL_MS = 15_000;
 
 export default function MessagesPage() {
   const { session, ready } = useSession();
-  const { eventId } = useActiveEvent();
+  const { eventId, status: eventStatus } = useActiveEvent();
   const me = session?.profileId ?? "";
 
   const [msgs, setMsgs] = useState<MessageRow[]>([]);
@@ -36,6 +36,8 @@ export default function MessagesPage() {
   const pendingRef = useRef(new Set<string>());
   // Reloads the inbox; set by the effect below while an inbox is open.
   const reloadRef = useRef<() => void>(() => {});
+  // The conversation on screen now, for a send that fails after the user moved on.
+  const openRef = useRef<string | null>(null);
 
   useEffect(() => {
     const f = () => setMobile(window.innerWidth < 760);
@@ -109,6 +111,7 @@ export default function MessagesPage() {
 
   // Mark the open conversation as read (clears the unread badge in the sidebar).
   const activeOpenId = active?.id;
+  useEffect(() => { openRef.current = activeOpenId ?? null; }, [activeOpenId]);
   useEffect(() => {
     if (!activeOpenId || !me) return;
     const hasUnread = msgs.some((m) => m.sender_profile_id === activeOpenId && m.receiver_profile_id === me && !m.read_at);
@@ -125,25 +128,31 @@ export default function MessagesPage() {
 
   async function send() {
     const text = reply.trim();
-    if (!text || !active || !me || !eventId) return;
+    if (sending || !text || !active || !me || !eventId) return;
+    const to = active;
     setSending(true);
     setSendError(null);
     const temp: MessageRow = {
       id: "temp-" + Math.random().toString(36).slice(2),
       created_at: new Date().toISOString(),
-      event_id: eventId, sender_profile_id: me, receiver_profile_id: active.id, message: text, read_at: null,
+      event_id: eventId, sender_profile_id: me, receiver_profile_id: to.id, message: text, read_at: null,
     };
     pendingRef.current.add(temp.id);
     setMsgs((p) => [...p, temp]);
     setReply("");
-    const ok = await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
+    const ok = await sendMessage({ eventId, senderProfileId: me, receiverProfileId: to.id, message: text });
     setSending(false);
     pendingRef.current.delete(temp.id);
     if (!ok) {
-      // Take the unsent message back out of the thread and give the text back.
+      // Take the unsent message back out of the thread and give the text back,
+      // but never over a newer draft or into another person's conversation.
       setMsgs((p) => p.filter((m) => m.id !== temp.id));
-      setReply(text);
-      setSendError("Message not sent. Check your connection and try again.");
+      if (openRef.current === to.id) {
+        setReply((cur) => (cur.trim() ? cur : text));
+        setSendError("Message not sent. Check your connection and try again.");
+      } else {
+        setSendError(`Your message to ${to.name} was not sent: "${text}"`);
+      }
       return;
     }
     // Saved: swap the optimistic copy for the server's.
@@ -155,7 +164,8 @@ export default function MessagesPage() {
 
   return (
     <DashboardShell title="Messages">
-      {loading ? (
+      {/* With no event yet there is nothing to load, so show the empty state. */}
+      {loading && eventStatus !== "none" ? (
         <GlassPanel><LoadingBlock label="Loading messages…" /></GlassPanel>
       ) : convs.length === 0 ? (
         <GlassPanel>
