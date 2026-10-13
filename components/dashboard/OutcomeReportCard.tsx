@@ -109,8 +109,9 @@ export default function OutcomeReportCard({
                   ))}</tr>
                 </thead>
                 <tbody>
-                  {report.employerTable.slice(0, 5).map((e) => (
-                    <tr key={e.name}>
+                  {/* Company names can repeat ("Unnamed company"), so the position keeps keys unique. */}
+                  {report.employerTable.slice(0, 5).map((e, i) => (
+                    <tr key={`${i}-${e.name}`}>
                       <td style={{ padding: "9px 10px", fontSize: 13, fontWeight: 600, color: "var(--text)", borderTop: "1px solid var(--border)" }}>{e.name}</td>
                       <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.studentScans}</td>
                       <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent-2)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.shortlisted}</td>
