@@ -64,10 +64,10 @@ const sections: LegalSection[] = [
         <p>GradLink exists to connect students with employers and colleges, so most of what you add is shared with other people who use it:</p>
         <ul>
           <li>
-            <strong>Visible to other signed-in GradLink users:</strong> profiles (including a student’s résumé and links), company
+            <strong>Visible to other signed-in GradLink users:</strong> profiles (including a student’s résumé and links; a company sees a student’s email only after scanning them), company
             profiles, events and who is registered for them, scans, shortlist statuses and the notes attached to them.
           </li>
-          <li><strong>Visible only to the people involved:</strong> messages (the sender and the recipient).</li>
+          <li><strong>Visible only to the people involved:</strong> messages (the sender and the recipient), and a student marking a company Interested or asking it for a follow-up (that student and that company).</li>
           <li><strong>Visible only to you:</strong> your checklist progress, your list of joined events and your billing details.</li>
         </ul>
         <p>Nothing is visible to people who are not signed in, and we do not publish your profile to search engines.</p>

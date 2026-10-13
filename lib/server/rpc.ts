@@ -383,9 +383,21 @@ async function companyMetStudent(companyId: string, studentId: string, eventId: 
  * Stored assessments on a student row are for the student and colleges only.
  * Everyone else gets the profile without them.
  */
-function studentView(u: AuthUser, row: Row): Row {
+function studentView(u: AuthUser, row: Row, scanned?: Set<string>): Row {
   if (u.id === row.id || u.role === "event_manager") return row;
-  return { ...row, resume_score: null, ai_feedback: null };
+  // A company gets a student's email only once it has scanned that student.
+  const email = u.role === "company" && !scanned?.has(row.id as string) ? null : row.email;
+  return { ...row, email, resume_score: null, ai_feedback: null };
+}
+
+/** The students out of `ids` that this company has scanned at any event. */
+async function scannedByCompany(u: AuthUser, ids: string[]): Promise<Set<string>> {
+  if (u.role !== "company" || !ids.length) return new Set();
+  const rows = await db()`
+    select distinct scanned_profile_id from scans
+    where scanner_profile_id = ${u.id} and scanned_profile_id = any(${ids}::text[])
+  `;
+  return new Set(rows.map((r) => r.scanned_profile_id as string));
 }
 
 /** The session's event organiser or its host may manage it. */
@@ -464,7 +476,8 @@ export const ops: Record<string, Op> = {
   /* Students */
   /**
    * Companies and colleges see the full profile, without stored assessments for
-   * companies; a fellow student sees no contact details.
+   * companies, and companies see the email only after scanning the student;
+   * a fellow student sees no contact details.
    */
   async getStudentByProfile(u, [profileId]) {
     const id = s(profileId);
@@ -472,7 +485,7 @@ export const ops: Record<string, Op> = {
     if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
     const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
     const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
-    return rows[0] ? studentView(u, rows[0]) : null;
+    return rows[0] ? studentView(u, rows[0], await scannedByCompany(u, [id])) : null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
     isMe(u, profileId);
@@ -487,7 +500,8 @@ export const ops: Record<string, Op> = {
        where r.event_id = $1 and r.role = 'student'`,
       [s(eventId)],
     );
-    return rows.map((r) => studentView(u, r));
+    const scanned = await scannedByCompany(u, rows.map((r) => r.id as string));
+    return rows.map((r) => studentView(u, r, scanned));
   },
 
   /* Companies */
@@ -603,11 +617,15 @@ export const ops: Record<string, Op> = {
       select 1 from event_registrations where event_id = ${s(i.eventId)} and profile_id = ${s(i.studentId)} and role = 'student'
     `;
     if (!student.length) throw forbidden();
-    // created_at is kept across status changes, as before.
+    // created_at is kept across status changes, as before. A call without
+    // `notes` (pre-shortlisting from the event console) only changes the
+    // status, so it cannot wipe a note the recruiter wrote earlier.
+    const keepNotes = i.notes === undefined;
     await db()`
       insert into shortlists (event_id, company_id, student_id, status, notes)
       values (${s(i.eventId)}, ${u.id}, ${s(i.studentId)}, ${s(i.status)}, ${textOrNull(i.notes)})
-      on conflict (event_id, company_id, student_id) do update set status = excluded.status, notes = excluded.notes
+      on conflict (event_id, company_id, student_id) do update set status = excluded.status,
+        notes = case when ${keepNotes}::boolean then shortlists.notes else excluded.notes end
     `;
     return true;
   },
@@ -1105,6 +1123,24 @@ export const ops: Record<string, Op> = {
       [u.id, s(eventId), s(companyId), ...entries.map(([k, v]) => allowed[k](v))],
     );
     return { ok: true, saved: rows[0] };
+  },
+
+  /**
+   * Students at this event who told the company they are interested or want
+   * a follow-up. Those two marks are what a student sends the company; Save,
+   * Visited and the student's own note stay private to the student.
+   */
+  async listStudentInterest(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    await requireMember(u, eventId);
+    return db()`
+      select sc.student_id, sc.interested, sc.follow_up, sc.updated_at, st.full_name, st.degree, st.university
+      from saved_companies sc
+      join event_registrations r on r.event_id = sc.event_id and r.profile_id = sc.student_id and r.role = 'student'
+      join students st on st.id = sc.student_id
+      where sc.event_id = ${s(eventId)} and sc.company_id = ${u.id} and (sc.interested or sc.follow_up)
+      order by sc.follow_up desc, sc.updated_at desc
+    `;
   },
 
   /* Applications: tracked by the student, private to them. */

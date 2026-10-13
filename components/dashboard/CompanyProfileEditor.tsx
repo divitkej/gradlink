@@ -142,8 +142,8 @@ export default function CompanyProfileEditor({ session }: { session: GLSession }
           <Field label="Company name" value={companyName} onChange={setCompanyName} placeholder="Your company" />
           <Field label="Booth number" value={booth} onChange={setBooth} placeholder="B12" />
           <Field label="Sector" value={sector} onChange={setSector} placeholder="Technology" />
-          <Field label="Industry" value={industry} onChange={setIndustry} placeholder="Ride-hailing & Delivery" />
-          <Field label="Website" value={website} onChange={setWebsite} placeholder="https://careem.com" />
+          <Field label="Industry" value={industry} onChange={setIndustry} placeholder="Software and IT services" />
+          <Field label="Website" value={website} onChange={setWebsite} placeholder="https://yourcompany.com" />
           <Field label="Logo URL (optional)" value={logoUrl} onChange={setLogoUrl} placeholder="https://…/logo.png" />
         </div>
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>

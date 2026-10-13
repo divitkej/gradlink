@@ -28,6 +28,7 @@ export default function MessagesPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   // Optimistic messages whose send has not succeeded yet. Kept on screen
@@ -126,6 +127,7 @@ export default function MessagesPage() {
     const text = reply.trim();
     if (!text || !active || !me || !eventId) return;
     setSending(true);
+    setSendError(null);
     const temp: MessageRow = {
       id: "temp-" + Math.random().toString(36).slice(2),
       created_at: new Date().toISOString(),
@@ -136,12 +138,16 @@ export default function MessagesPage() {
     setReply("");
     const ok = await sendMessage({ eventId, senderProfileId: me, receiverProfileId: active.id, message: text });
     setSending(false);
-    // Saved: swap the optimistic copy for the server's. A failed send stays
-    // on screen, as before.
-    if (ok) {
-      pendingRef.current.delete(temp.id);
-      reloadRef.current();
+    pendingRef.current.delete(temp.id);
+    if (!ok) {
+      // Take the unsent message back out of the thread and give the text back.
+      setMsgs((p) => p.filter((m) => m.id !== temp.id));
+      setReply(text);
+      setSendError("Message not sent. Check your connection and try again.");
+      return;
     }
+    // Saved: swap the optimistic copy for the server's.
+    reloadRef.current();
   }
 
   const showList = !mobile || !active;
@@ -214,6 +220,9 @@ export default function MessagesPage() {
                   <div ref={bottomRef} />
                 </div>
 
+                {sendError && (
+                  <div role="alert" style={{ padding: "8px 14px", borderTop: "1px solid var(--border)", fontSize: 12.5, color: "var(--danger)" }}>{sendError}</div>
+                )}
                 <div style={{ padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", gap: 8, alignItems: "flex-end" }}>
                   <textarea value={reply} onChange={(e) => setReply(e.target.value)} rows={1} placeholder={`Message ${active.name.split(" ")[0]}…`}
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}

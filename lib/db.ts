@@ -29,7 +29,8 @@ export interface StudentRow {
   id: string;
   profile_id: string | null;
   full_name: string;
-  email: string;
+  /** Null for a company that has not scanned this student yet. */
+  email: string | null;
   university: string | null;
   degree: string | null;
   graduation_year: number | null;
@@ -440,6 +441,21 @@ export function markAttendance(sessionId: string, profileId: string, attended: b
 /* ---------------- Saved companies ---------------- */
 export function listSavedCompanies(eventId: string): Promise<SavedCompanyRow[]> {
   return safe("listSavedCompanies", [], () => rpc<SavedCompanyRow[]>("listSavedCompanies", eventId));
+}
+
+export interface StudentInterestRow {
+  student_id: string;
+  interested: boolean;
+  follow_up: boolean;
+  updated_at: string;
+  full_name: string;
+  degree: string | null;
+  university: string | null;
+}
+
+/** Students who marked the signed-in company Interested or asked it for a follow-up. */
+export function listStudentInterest(eventId: string): Promise<StudentInterestRow[]> {
+  return safe("listStudentInterest", [], () => rpc<StudentInterestRow[]>("listStudentInterest", eventId));
 }
 
 export function saveCompany(

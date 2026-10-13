@@ -38,6 +38,7 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
   // local action state
   const [status, setStatus] = useState<ShortlistRow["status"] | null>(null);
   const [note, setNote] = useState("");
+  const touched = useRef({ status: false, note: false });
   const [msg, setMsg] = useState("");
   const [toast, setToast] = useState<string | null>(null);
 
@@ -58,7 +59,12 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
       if (viewer === "company" && session) {
         const sl = await getShortlist(session.profileId, studentProfileId, eventId);
         const hist = await getScans({ eventId, scannerProfileId: session.profileId, scannedProfileId: studentProfileId });
-        if (!cancelled) { setShortlist(sl); setStatus(sl?.status ?? null); setNote(sl?.notes ?? ""); setScanHistory(hist); }
+        if (!cancelled) {
+          setShortlist(sl); setScanHistory(hist);
+          // Don't overwrite a decision or note the recruiter made while this was loading.
+          if (!touched.current.status) setStatus(sl?.status ?? null);
+          if (!touched.current.note) setNote(sl?.notes ?? "");
+        }
       } else if (viewer === "event_manager") {
         const hist = await getScans({ eventId, scannedProfileId: studentProfileId });
         const comps = await getRegisteredCompanies(eventId);
@@ -67,7 +73,10 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
       if (!cancelled) setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [viewer, studentProfileId, eventId, session]);
+    // Keyed on the profile id, not the session object: a refreshed session is a
+    // new object and would reload (and reset) the page mid-edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewer, studentProfileId, eventId, session?.profileId]);
 
   // record the scan once for company / manager viewers
   useEffect(() => {
@@ -97,8 +106,9 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
             <CompanyView
               inviteSlot={<InterviewInvite eventId={eventId} companyId={session!.profileId} studentId={studentProfileId} firstName={student.full_name.split(" ")[0]} />}
               student={student} status={status} note={note} msg={msg} scanHistory={scanHistory}
-              setNote={setNote} setMsg={setMsg}
+              setNote={(v) => { touched.current.note = true; setNote(v); }} setMsg={setMsg}
               onStatus={async (st) => {
+                touched.current.status = true;
                 setStatus(st);
                 await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: st, notes: note });
                 flash(st === "rejected" ? "Marked as not a fit" : st === "maybe" ? "Marked as maybe" : "Shortlisted");

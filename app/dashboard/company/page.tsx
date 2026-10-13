@@ -19,6 +19,7 @@ import {
 } from "@/lib/db";
 import CompanyCandidates from "@/components/dashboard/CompanyCandidates";
 import CompanyQueue from "@/components/dashboard/CompanyQueue";
+import CompanyInterest from "@/components/dashboard/CompanyInterest";
 import { EVENT_STATUS_LABEL } from "@/lib/events";
 
 function CompanyOverview({ eventId }: { eventId: string }) {
@@ -110,6 +111,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <CompanyQueue eventId={eventId} live={isLive} />
+            <CompanyInterest eventId={eventId} />
             <GlassPanel id="pipeline">
               <PanelTitle>Candidate pipeline</PanelTitle>
               {hasPipeline ? <Pipeline stages={pipeline} /> : <p style={{ fontSize: 13, color: "var(--text-muted)" }}>Your pipeline fills up as you scan and shortlist students.</p>}
@@ -121,7 +123,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
                   <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{eventTitle}</span>
                   {event?.status && <Badge tone={isLive ? "amber" : "muted"} pulse={isLive}>{EVENT_STATUS_LABEL[event.status]}</Badge>}
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "not set"} · {me?.hiring_roles?.length ?? 0} roles posted</div>
+                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Booth {me?.booth_number ?? "not set"} · {me?.hiring_roles?.length ?? 0} {me?.hiring_roles?.length === 1 ? "role" : "roles"} posted</div>
               </div>
               <div style={{ marginTop: 12 }}>
                 <Link href={`/events/${eventId}`} style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)", textDecoration: "none" }}>Open event console →</Link>

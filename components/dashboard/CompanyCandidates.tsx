@@ -107,7 +107,7 @@ export default function CompanyCandidates({
         const sl = slBy.get(s.profile_id ?? "");
         const scanned = firstScan.get(s.profile_id ?? "");
         return [
-          s.full_name, s.email, s.degree ?? "", s.university ?? "", s.graduation_year ?? "", (s.skills ?? []).join("; "),
+          s.full_name, s.email ?? "", s.degree ?? "", s.university ?? "", s.graduation_year ?? "", (s.skills ?? []).join("; "),
           (s.target_roles ?? []).join("; "),
           [sl ? STAGE_LABEL[sl.status] : STAGE_LABEL.undecided, inviteLabel(inviteBy.get(s.profile_id ?? ""))].filter(Boolean).join(", "),
           sl?.notes ?? "",

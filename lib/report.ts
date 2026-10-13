@@ -140,7 +140,7 @@ export function buildReport(input: {
       const shortlistCount = mine.filter(positive).length;
       return {
         name: s.full_name,
-        email: s.email,
+        email: s.email ?? "",
         degree: s.degree ?? "",
         university: s.university ?? "",
         graduationYear: s.graduation_year ? String(s.graduation_year) : "",
