@@ -133,6 +133,12 @@ gradlink, Settings, Build), its build command must be
 `npx opennextjs-cloudflare deploy`. Plain `next build` and `wrangler deploy`
 fail, because the Worker is the OpenNext output in `.open-next/`.
 
+PR branches get a Preview instead of going live: on the Previews Base tab the
+build command is `npx opennextjs-cloudflare build` and the preview command
+`npx wrangler preview`. The `previews` block in `wrangler.jsonc` points them at
+an empty KV namespace and sets no production secrets, so pages load but sign-in
+and data do not.
+
 Stripe webhook endpoint: `https://<your-worker-url>/api/stripe/webhook`
 (events: `checkout.session.completed`, `customer.subscription.updated`,
 `customer.subscription.deleted`).

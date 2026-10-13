@@ -44,6 +44,23 @@
     "APP_URL": ""
   },
 
+  // Settings for PR branch Previews (`npx wrangler preview`, run by Cloudflare
+  // Workers Builds for every branch except main). Previews get their own empty
+  // KV namespace and no production secrets, so a branch can never read or
+  // write live data: pages load, but sign-in and data need DATABASE_URL and
+  // AUTH_SECRET, which are deliberately not set for Previews.
+  "previews": {
+    "vars": {
+      "APP_URL": ""
+    },
+    "kv_namespaces": [
+      {
+        "binding": "UPLOADS",
+        "id": "02de6917f0d34d63864f6ccabf4dffa6"
+      }
+    ]
+  },
+
   "observability": {
     "enabled": true
   }

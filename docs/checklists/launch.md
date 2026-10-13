@@ -18,8 +18,8 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`
 - [x] **Only Neon and Cloudflare in the repo.** Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon.
   Done in "Remove Vercel, Supabase and Firebase leftovers"
-- [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
-  Owner action
+- [x] **Cloudflare GitHub builds fail on PR branches.** Builds of `main` deploy the live site. PR branches failed twice over: the Previews Base build command was `npm run build`, which never creates the `.open-next/` Worker, and `npx wrangler preview` refuses to run without a `previews` block in `wrangler.jsonc`. Previews Base now builds with `npx opennextjs-cloudflare build`, and `wrangler.jsonc` gives Previews their own empty KV namespace (`UPLOADS_PREVIEW`) and no production secrets, so a branch cannot touch live data.
+  Done in "Fix Cloudflare preview builds for PR branches"
 
 ## Domain and email
 
