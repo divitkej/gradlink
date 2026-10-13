@@ -4,19 +4,18 @@
 
 ![Launch progress](progress.svg)
 
-**105 of 136 done (77%).** 2 in progress, 31 left. Checklists last changed 2026-10-11.
+**107 of 136 done (79%).** 0 in progress, 29 left. Checklists last changed 2026-10-13.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "In progress" : 2
   "Needs the owner" : 18
   "To do" : 5
   "Verify live" : 4
   "Parked by decision" : 2
-  "Done" : 105
+  "Done" : 107
 ```
 
 ## By phase
@@ -27,9 +26,9 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `█████████░░░` 79% | 11 | 0 | 3 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 65% | 30 | 1 | 16 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 67% | 31 | 0 | 15 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 5 | 0 | 0 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 81% | 38 | 1 | 9 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 83% | 39 | 0 | 8 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -94,11 +93,7 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 30 of 46 done, 1 in progress, 16 left.
-
-**Ongoing**
-
-- [ ] Run `npm run db:migrate` · [PR #15](https://github.com/divitkej/gradlink/pull/15) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35)
+**Ongoing.** 31 of 46 done, 0 in progress, 15 left.
 
 **Left**
 
@@ -118,7 +113,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
 - [ ] Promises features that are not built · Parked by decision · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)
 
-<details><summary>Done (30)</summary>
+<details><summary>Done (31)</summary>
 
 - [x] Neon tables created
 - [x] Worker points at the real KV namespace
@@ -148,6 +143,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [x] Checkout trusted request data
 - [x] No per-IP limit on the auth endpoints
 - [x] Sign-in timing revealed which emails have accounts
+- [x] Run `npm run db:migrate`
 - [x] "GradLink Technologies LLC" in the footer
 - [x] "UAE data residency" in the CTA section
 
@@ -173,15 +169,11 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 38 of 47 done, 1 in progress, 9 left.
-
-**Ongoing**
-
-- [ ] Run the migration before deploying this code · [PR #15](https://github.com/divitkej/gradlink/pull/15) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28)
+**Ongoing.** 39 of 47 done, 0 in progress, 8 left.
 
 **Left**
 
-- [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)
+- [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)
 - [ ] Build: Offer tracking and placement rate · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)
 - [ ] Build: Event ROI score · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)
 - [ ] Build: Candidate stages "Contacted" and "Offer" · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
@@ -190,7 +182,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [ ] Put the branch live · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19)
 - [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)
 
-<details><summary>Done (38)</summary>
+<details><summary>Done (39)</summary>
 
 - [x] Separate codes for students and employers
 - [x] Organiser can replace a code
@@ -198,6 +190,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [x] Organiser sees who joined
 - [x] Colleges choose a plan after signing in
 - [x] Owner dashboard at `/admin`
+- [x] Run the migration before deploying this code
 - [x] Starter promised one live event but nothing enforced it
 - [x] New schema applied to the live Neon database
 - [x] Schema applied to the live Neon database
@@ -262,18 +255,17 @@ Features that should work, checked once on a real device or the live site.
 | Launch | `█████████░░░` 71% | 10 | 4 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `███████████░` 92% | 11 | 1 | [core-loop.md](../docs/checklists/core-loop.md) |
-| Organiser access | `█████████░░░` 78% | 7 | 2 | [organiser-access.md](../docs/checklists/organiser-access.md) |
+| Organiser access | `███████████░` 89% | 8 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `██████████░░` 85% | 11 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `██████████░░` 86% | 6 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
-| Security | `███████░░░░░` 60% | 12 | 8 | [security.md](../docs/checklists/security.md) |
+| Security | `████████░░░░` 65% | 13 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
-| **All** | `█████████░░░` **77%** | **105** | **31** | |
+| **All** | `█████████░░░` **79%** | **107** | **29** | |
 
 ## In progress
 
-- [ ] **Run the migration before deploying this code** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L28) · [PR #15](https://github.com/divitkej/gradlink/pull/15)<br><sub>`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to… · id `organiser-access/run-the-migration-before-deploying-this`</sub>
-- [ ] **Run `npm run db:migrate`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L35) · [PR #15](https://github.com/divitkej/gradlink/pull/15)<br><sub>against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. · id `security/run-npm-run-db-migrate`</sub>
+Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
 
 ## Left to do
 
@@ -284,13 +276,13 @@ Features that should work, checked once on a real device or the live site.
 - [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Live rules match the repo** · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)<br><sub>Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under… · id `core-loop/live-rules-match-the-repo`</sub>
-- [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L29)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
+- [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Set `APP_URL`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)<br><sub>in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it. · id `security/set-app-url`</sub>
 - [ ] **Optional, after the custom domain is connected** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)<br><sub>add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address. · id `security/optional-after-the-custom-domain-is`</sub>
 - [ ] **Least-privilege database role** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L37)<br><sub>In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run… · id `security/least-privilege-database-role`</sub>
-- [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)<br><sub>Confirm Neon's restore window covers at least 7 days. · id `security/backups`</sub>
+- [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)<br><sub>Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise… · id `security/backups`</sub>
 - [ ] **Secrets** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L39)<br><sub>Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production. · id `security/secrets`</sub>
 - [ ] **Account verification** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L40)<br><sub>Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that… · id `security/account-verification`</sub>
 - [ ] **Verify live** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L41)<br><sub>after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone. · id `security/verify-live`</sub>
@@ -371,7 +363,7 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Organiser access</b>: 7 done</summary>
+<details><summary><b>Organiser access</b>: 8 done</summary>
 
 - [x] Separate codes for students and employers <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Organiser can replace a code <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
@@ -379,6 +371,7 @@ Features that should work, checked once on a real device or the live site.
 - [x] Organiser sees who joined <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Colleges choose a plan after signing in <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Owner dashboard at `/admin` <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
+- [x] Run the migration before deploying this code
 - [x] Starter promised one live event but nothing enforced it <sub>Done in "Say Starter includes unlimited events"</sub>
 
 </details>
@@ -446,7 +439,7 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Security</b>: 12 done</summary>
+<details><summary><b>Security</b>: 13 done</summary>
 
 - [x] Event data was readable by any signed-in account <sub>Done in "Lock down the data API, uploads and response headers"</sub>
 - [x] Private shortlist notes leaked <sub>Done in "Lock down the data API, uploads and response headers"</sub>
@@ -460,6 +453,7 @@ Features that should work, checked once on a real device or the live site.
 - [x] Checkout trusted request data <sub>Done in "Lock down the data API, uploads and response headers"</sub>
 - [x] No per-IP limit on the auth endpoints <sub>Done in "Rate-limit sign-in, sign-up and password reset per IP"</sub>
 - [x] Sign-in timing revealed which emails have accounts <sub>Done in "Lock down the data API, uploads and response headers"</sub>
+- [x] Run `npm run db:migrate`
 
 </details>
 
