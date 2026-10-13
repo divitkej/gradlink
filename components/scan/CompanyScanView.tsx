@@ -62,6 +62,9 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
 
   function flash(t: string) { setToast(t); setTimeout(() => setToast(null), 2200); }
 
+  // Keyed on the profile id, not the session object: a refreshed session is a
+  // new object and would reload the page, resetting saves and the note.
+  const myProfileId = session?.profileId;
   useEffect(() => {
     if (!viewer || !companyProfileId) return;
     let cancelled = false;
@@ -71,9 +74,9 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
       if (cancelled) return;
       setCompany(c);
 
-      if (viewer === "student" && session) {
+      if (viewer === "student" && myProfileId) {
         const row = (await listSavedCompanies(eventId)).find((r) => r.company_id === companyProfileId);
-        const legacy = row ? null : takeLegacySaves(session.profileId, companyProfileId);
+        const legacy = row ? null : takeLegacySaves(myProfileId, companyProfileId);
         if (legacy) saveCompany(eventId, companyProfileId, toRow(legacy));
         const [queues, ev] = await Promise.all([listMyQueues(eventId), getEvent(eventId)]);
         if (!cancelled) {
@@ -97,7 +100,7 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
       if (!cancelled) setLoading(false);
     })();
     return () => { cancelled = true; };
-  }, [viewer, companyProfileId, eventId, session]);
+  }, [viewer, companyProfileId, eventId, myProfileId]);
 
   // record student→company scan once
   useEffect(() => {
@@ -273,7 +276,8 @@ function Toggle({ on, onClick, icon, label }: { on: boolean; onClick: () => void
 }
 
 function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company: CompanyRow; scans: ScanRow[]; shortlists: ShortlistRow[]; topSkills: string[] }) {
-  const studentScans = scans.filter((s) => s.scanner_role === "student").length;
+  // People, not scan rows: a student who scans twice is one student.
+  const studentScans = new Set(scans.filter((s) => s.scanner_role === "student").map((s) => s.scanner_profile_id)).size;
   const totalInbound = scans.length;
   const shortlisted = shortlists.filter((s) => s.status === "shortlisted" || s.status === "priority").length;
   const maybes = shortlists.filter((s) => s.status === "maybe").length;
@@ -283,7 +287,7 @@ function ManagerCompanyView({ company, scans, shortlists, topSkills }: { company
     <>
       <SectionCard title="Company analytics">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }} className="mgr-stats">
-          <StatTile label="Student scans" value={studentScans} accent />
+          <StatTile label="Students who scanned" value={studentScans} accent />
           <StatTile label="Total interactions" value={totalInbound} />
           <StatTile label="Shortlisted" value={shortlisted} accent />
           <StatTile label="Maybe" value={maybes} />

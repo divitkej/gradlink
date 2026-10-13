@@ -6,7 +6,7 @@ Started from the company items on the RoadMap#1 launch board (C1 to C7, Q4, Q5, 
 
 Status key as in `landing-page.md`.
 
-## Progress: 13 / 14 done
+## Progress: 14 / 15 done
 
 ## Broken
 
@@ -40,6 +40,9 @@ Status key as in `landing-page.md`.
   `app/dashboard/messages/page.tsx` · Done in "Fix the company-side problems found in the live test"
 - [x] **Student saves lived only in the browser (Q5, first half).** Saves are stored in `saved_companies`, and old browser saves move there on first visit.
   `components/scan/CompanyScanView.tsx` · Fixed on main before this checklist, confirmed in the browser run
+
+- [x] **The company page reset itself and over-counted booth visits.** A student's view of a company reloaded whenever the session refreshed (it watched the whole session object), resetting their saves and note; and the college's "Students who scanned this booth" counted scans, so a student who scanned twice counted twice. The page now reloads only for a different person, and the figure counts students.
+  `components/scan/CompanyScanView.tsx` · Done in "Stop the company page resetting and count booth visitors once"
 
 ## Owner decisions
 
