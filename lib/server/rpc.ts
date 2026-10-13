@@ -724,6 +724,16 @@ export const ops: Record<string, Op> = {
       order by created_at desc
     `;
   },
+  /** Unread messages per event, for the inbox, which shows one event at a time. */
+  async getUnreadMessagesByEvent(u) {
+    return db()`
+      select m.event_id, e.title, count(*)::int as unread
+      from messages m join events e on e.id = m.event_id
+      where m.receiver_profile_id = ${u.id} and m.read_at is null
+      group by m.event_id, e.title
+      order by max(m.created_at) desc
+    `;
+  },
   async getUnreadMessageCount(u, [profileId]) {
     isMe(u, profileId);
     const rows = await db()`select count(*)::int as n from messages where receiver_profile_id = ${u.id} and read_at is null`;
