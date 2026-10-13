@@ -7,7 +7,7 @@ import { Avatar, LoadingBlock } from "@/components/dashboard/cards";
 import { MessageSquare, Send, ArrowLeft } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { useActiveEvent } from "@/lib/use-active-event";
-import { listMessagesForProfile, getProfileNames, sendMessage, markMessagesRead, type MessageRow } from "@/lib/db";
+import { listMessagesForProfile, getProfileNames, sendMessage, markMessagesRead, getUnreadMessagesByEvent, type MessageRow, type UnreadByEvent } from "@/lib/db";
 import { notifyMessagesRead } from "@/lib/notifications";
 
 /**
@@ -19,7 +19,7 @@ const POLL_MS = 15_000;
 
 export default function MessagesPage() {
   const { session, ready } = useSession();
-  const { eventId, status: eventStatus } = useActiveEvent();
+  const { eventId, status: eventStatus, selectEvent } = useActiveEvent();
   const me = session?.profileId ?? "";
 
   const [msgs, setMsgs] = useState<MessageRow[]>([]);
@@ -29,6 +29,9 @@ export default function MessagesPage() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  // Unread messages at events other than the open one. The header badge counts
+  // every event, so this says where the rest are and switches to them.
+  const [elsewhere, setElsewhere] = useState<UnreadByEvent[]>([]);
   const [mobile, setMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   // Optimistic messages whose send has not succeeded yet. Kept on screen
@@ -60,7 +63,7 @@ export default function MessagesPage() {
       // Numbered, so a slow response cannot overwrite a newer one.
       const mine = ++seq;
       if (initial) setLoading(true);
-      const m = await listMessagesForProfile(me, eventId);
+      const [m, byEvent] = await Promise.all([listMessagesForProfile(me, eventId), getUnreadMessagesByEvent()]);
       const ids = m.flatMap((x) => [x.sender_profile_id, x.receiver_profile_id]).filter(Boolean) as string[];
       // Names only change when someone new writes, so reloads usually skip this.
       if (initial || ids.some((id) => !known[id])) {
@@ -68,6 +71,7 @@ export default function MessagesPage() {
         if (initial || Object.keys(resolved).length > 0) known = resolved;
       }
       if (cancelled || mine !== seq) return;
+      setElsewhere(byEvent.filter((e) => e.event_id !== eventId));
       setNames(known);
       setMsgs((prev) => {
         // A failed reload comes back empty. Messages are never deleted, so an
@@ -170,6 +174,17 @@ export default function MessagesPage() {
 
   return (
     <DashboardShell title="Messages">
+      {elsewhere.length > 0 && (
+        <div role="status" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-2)", padding: "10px 14px", marginBottom: 14, border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", background: "rgba(255,255,255,0.03)" }}>
+          <span>Unread messages at other events:</span>
+          {elsewhere.map((e) => (
+            <button key={e.event_id} type="button" onClick={() => selectEvent(e.event_id)}
+              style={{ fontSize: 12.5, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "3px 10px", cursor: "pointer" }}>
+              {e.title} ({e.unread})
+            </button>
+          ))}
+        </div>
+      )}
       {/* With no event yet there is nothing to load, so show the empty state. */}
       {loading && eventStatus !== "none" ? (
         <GlassPanel><LoadingBlock label="Loading messages…" /></GlassPanel>

@@ -375,6 +375,13 @@ export function listMessagesForProfile(profileId: string, eventId: string): Prom
 }
 
 /** Count messages addressed to this profile that haven't been read yet. */
+export interface UnreadByEvent { event_id: string; title: string; unread: number }
+
+/** Unread messages per event (the header badge counts them all). */
+export function getUnreadMessagesByEvent(): Promise<UnreadByEvent[]> {
+  return safe("getUnreadMessagesByEvent", [], () => rpc<UnreadByEvent[]>("getUnreadMessagesByEvent"));
+}
+
 export function getUnreadMessageCount(profileId: string): Promise<number> {
   if (!profileId) return Promise.resolve(0);
   return safe("getUnreadMessageCount", 0, () => rpc<number>("getUnreadMessageCount", profileId));

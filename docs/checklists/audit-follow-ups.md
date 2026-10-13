@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 6 / 7 done
+## Progress: 7 / 8 done
 
 ## Pricing
 
@@ -39,3 +39,5 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 - [x] **New messages need a page reload.** The messages page now reloads the inbox every 15 seconds while the tab is visible and on window focus, so an open conversation shows replies without a reload. Hidden tabs do not poll, as with the unread badge.
   `app/dashboard/messages/page.tsx` · Phase 4 · Done in "Show new messages in an open conversation without a reload"
+- [x] **The unread badge could not be cleared from Messages.** The badge counts unread messages at every event, but the inbox shows only the open one, so a message at another event kept the badge on with no way to reach it. The inbox now lists other events with unread messages and switches to one in a tap.
+  `app/dashboard/messages/page.tsx`, `lib/server/rpc.ts` · Phase 4 · Done in "Show unread messages at other events in the inbox"
