@@ -74,6 +74,16 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
   return crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
 
+/** HMAC-SHA256 of `input`, URL-safe base64. */
+export async function hmacSha256(input: string, secret: string): Promise<string> {
+  return toB64url(await crypto.subtle.sign("HMAC", await hmacKey(secret), enc.encode(input)));
+}
+
+/** Constant-time comparison of two strings. */
+export function sameString(a: string, b: string): boolean {
+  return equal(enc.encode(a), enc.encode(b));
+}
+
 /** Compact HS256 JWT. Claims are validated by the caller. */
 export async function signToken(payload: Record<string, unknown>, secret: string): Promise<string> {
   const header = toB64url(enc.encode(JSON.stringify({ alg: "HS256", typ: "JWT" })));

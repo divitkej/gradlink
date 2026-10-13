@@ -23,7 +23,7 @@ import VerifiedCourses from "./VerifiedCourses";
 import VerifiedScores from "./VerifiedScores";
 import VerifiedCertificates from "./VerifiedCertificates";
 
-export default function StudentScanView({ studentProfileId, eventId }: { studentProfileId: string; eventId: string }) {
+export default function StudentScanView({ studentProfileId, eventId, scanKey }: { studentProfileId: string; eventId: string; scanKey?: string | null }) {
   const { session, ready } = useSession();
   const viewer = session?.role ?? null;
 
@@ -78,17 +78,18 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewer, studentProfileId, eventId, session?.profileId]);
 
-  // record the scan once for company / manager viewers
+  // Record the scan once for company / manager viewers. Only a scanned QR
+  // carries the key; opening the profile from a link in the app is a view.
   useEffect(() => {
-    if (!viewer || !session || !student || !eventId || scanned.current) return;
+    if (!viewer || !session || !student || !eventId || !scanKey || scanned.current) return;
     if (viewer === "company" || viewer === "event_manager") {
       scanned.current = true;
       recordScan({
         eventId, scannerProfileId: session.profileId, scannedProfileId: studentProfileId,
-        scannerRole: viewer, scannedRole: "student", scanContext: "qr",
+        scannerRole: viewer, scannedRole: "student", scanContext: "qr", scanKey,
       });
     }
-  }, [viewer, session, student, studentProfileId, eventId]);
+  }, [viewer, session, student, studentProfileId, eventId, scanKey]);
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center" }}><LoadingBlock /></div>;
   if (!viewer) return <ViewerGate onPick={() => {}} hint="Choose your role to view this student profile the right way." />;

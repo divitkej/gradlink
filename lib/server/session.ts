@@ -1,6 +1,6 @@
 import { db } from "./sql";
 import { serverEnv } from "./env";
-import { signToken, verifyToken } from "./crypto";
+import { hmacSha256, sameString, signToken, verifyToken } from "./crypto";
 import type { AppRole } from "../session";
 
 /* ============================================================
@@ -38,6 +38,21 @@ function secret(): string {
   const s = serverEnv().AUTH_SECRET;
   if (!s || s.length < 32) throw new ConfigError("AUTH_SECRET is missing or shorter than 32 characters");
   return s;
+}
+
+/**
+ * The key printed in a person's own QR code (`&k=`). A scan only counts when
+ * it carries the scanned person's key, which proves the scanner saw their QR:
+ * opening a profile from a link inside the app has no key and is just a view.
+ * Derived from AUTH_SECRET, so it needs no storage; rotating the secret
+ * changes every key, and QR codes shown in the app pick up the new one.
+ */
+export async function scanKey(profileId: string): Promise<string> {
+  return (await hmacSha256(`scan-key:v1:${profileId}`, secret())).slice(0, 16);
+}
+
+export async function isScanKey(profileId: string, key: unknown): Promise<boolean> {
+  return typeof key === "string" && key.length > 0 && sameString(key, await scanKey(profileId));
 }
 
 function readCookie(request: Request, name: string): string | null {

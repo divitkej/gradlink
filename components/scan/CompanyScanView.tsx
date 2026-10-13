@@ -44,7 +44,7 @@ function takeLegacySaves(studentId: string, companyId: string): Saves | null {
   } catch { return null; }
 }
 
-export default function CompanyScanView({ companyProfileId, eventId }: { companyProfileId: string; eventId: string }) {
+export default function CompanyScanView({ companyProfileId, eventId, scanKey }: { companyProfileId: string; eventId: string; scanKey?: string | null }) {
   const { session, ready } = useSession();
   const viewer = session?.role ?? null;
 
@@ -99,14 +99,15 @@ export default function CompanyScanView({ companyProfileId, eventId }: { company
     return () => { cancelled = true; };
   }, [viewer, companyProfileId, eventId, session]);
 
-  // record student→company scan once
+  // Record the student→company scan once. Only a scanned QR carries the key;
+  // opening the company from a link in the app is a view.
   useEffect(() => {
-    if (!viewer || !session || !company || !eventId || scanned.current) return;
+    if (!viewer || !session || !company || !eventId || !scanKey || scanned.current) return;
     if (viewer === "student") {
       scanned.current = true;
-      recordScan({ eventId, scannerProfileId: session.profileId, scannedProfileId: companyProfileId, scannerRole: "student", scannedRole: "company", scanContext: "qr" });
+      recordScan({ eventId, scannerProfileId: session.profileId, scannedProfileId: companyProfileId, scannerRole: "student", scannedRole: "company", scanContext: "qr", scanKey });
     }
-  }, [viewer, session, company, companyProfileId, eventId]);
+  }, [viewer, session, company, companyProfileId, eventId, scanKey]);
 
   async function toggle(key: keyof Saves, label: string) {
     if (!session) return;

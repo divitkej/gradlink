@@ -1,15 +1,18 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHydrated } from "@/lib/use-hydrated";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, Share2, Check, QrCode as QrIcon } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
+import { getMyScanKey } from "@/lib/db";
 
 /**
- * Real, scannable QR code for a profile at an event.
+ * Real, scannable QR code for the signed-in person at an event.
  * `payload` is a relative route (e.g. /scan/student/<id>?eventId=<id>);
- * the full origin is prefixed at runtime so the QR works on any device.
+ * the full origin is prefixed at runtime so the QR works on any device, and
+ * the person's scan key is added (`&k=`) so a scan of it counts as a scan.
+ * Only ever pass the signed-in person's own route.
  */
 export default function QRCard({
   payload,
@@ -27,14 +30,27 @@ export default function QRCard({
   const ref = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const hydrated = useHydrated();
+  // undefined while loading, null if it could not be loaded.
+  const [key, setKey] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    getMyScanKey().then((k) => { if (!cancelled) setKey(k); });
+    return () => { cancelled = true; };
+  }, []);
 
   // The QR has to encode an absolute URL so it resolves on the scanning phone,
   // but window.location is only readable after hydration.
-  const url = hydrated && !payload.startsWith("http")
-    ? window.location.origin + payload
-    : payload;
+  const withKey = key ? `${payload}${payload.includes("?") ? "&" : "?"}k=${encodeURIComponent(key)}` : payload;
+  const url = hydrated && !withKey.startsWith("http")
+    ? window.location.origin + withKey
+    : withKey;
+  // Without its key a scan of this QR would not count, so it is not shown,
+  // downloaded or shared until the key has loaded.
+  const ready = Boolean(key);
 
   function download() {
+    if (!ready) return;
     const canvas = ref.current?.querySelector("canvas");
     if (!canvas) return;
     const link = document.createElement("a");
@@ -44,6 +60,7 @@ export default function QRCard({
   }
 
   async function share() {
+    if (!ready) return;
     try {
       if (navigator.share) {
         await navigator.share({ title: "GradLink", text: caption, url });
@@ -72,7 +89,13 @@ export default function QRCard({
             position: "relative",
           }}
         >
-          <QRCodeCanvas value={url} size={132} level="M" marginSize={1} bgColor="#ffffff" fgColor="#080808" />
+          {ready ? (
+            <QRCodeCanvas value={url} size={132} level="M" marginSize={1} bgColor="#ffffff" fgColor="#080808" />
+          ) : (
+            <div style={{ width: 132, height: 132, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontSize: 11.5, lineHeight: 1.4, color: "#555" }}>
+              {key === null ? "Couldn't load your QR. Reload the page." : "Loading…"}
+            </div>
+          )}
         </div>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: accent, marginBottom: 6 }}>

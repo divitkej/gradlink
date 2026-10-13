@@ -6,7 +6,7 @@ Started from the company items on the RoadMap#1 launch board (C1 to C7, Q4, Q5, 
 
 Status key as in `landing-page.md`.
 
-## Progress: 13 / 14 done
+## Progress: 14 / 15 done
 
 ## Broken
 
@@ -45,5 +45,7 @@ Status key as in `landing-page.md`.
 
 - [x] **Companies could see every registered student's email before scanning them.** By owner decision, a company now gets a student's email only after it has scanned that student. Before that, profiles, the event's student list and the candidate CSV leave the email out. College staff still see it.
   `lib/server/rpc.ts`, `lib/db.ts`, `components/dashboard/CompanyCandidates.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in "Show companies a student's email only after scanning them"
+- [x] **Opening a student's page counted as a scan.** In-app links ("View", the scanner's attendee list) open the same page a QR scan opens, and that page recorded a scan, so a company could click through every student to get their emails, and a college viewing a student checked them in. A QR now carries the person's scan key (`&k=`, derived from `AUTH_SECRET`), and the server only records a scan with the right key. Opening a profile from the app is a view.
+  `lib/server/session.ts`, `lib/server/rpc.ts`, `components/dashboard/QRCard.tsx`, `components/scan/StudentScanView.tsx`, `components/scan/CompanyScanView.tsx` · Done in "Count a scan only when the QR's scan key comes with it"
 - [ ] **Put the fixes live.** Merge the PR into main, then deploy from main.
   Verify live
