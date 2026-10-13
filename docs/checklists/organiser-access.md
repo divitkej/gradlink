@@ -6,7 +6,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Harness check" means the real `lib/server/rpc.ts` ops run against Postgres 16 with `db/schema.sql` applied. "Browser check" means the real app driven in Chromium against that database.
 
-## Progress: 7 / 9 done, 2 need the owner
+## Progress: 8 / 9 done, 1 needs the owner
 
 ## Built
 
@@ -25,7 +25,8 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 ## Owner actions before deploying
 
-- [ ] **Run the migration before deploying this code.** `npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.
+- [x] **Run the migration before deploying this code.** `npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once.
+  Checked on production Neon on 2026-10-12: `event_codes`, `app_errors` and the `colleges.plan_choice` and `plan_selected_at` columns exist, and no event is missing its codes. No commit (database change)
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away.** `npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages.
 - [x] **Starter promised one live event but nothing enforced it.** Decided to change the wording rather than add a limit: Starter now lists "Unlimited events", and "Unlimited events" is no longer sold as a Pro feature on the pricing page, the plan picker, the outcome report upsell or the pricing page description.
   `lib/billing.ts`, `components/dashboard/OutcomeReportCard.tsx`, `app/pricing/page.tsx` · Done in "Say Starter includes unlimited events"
