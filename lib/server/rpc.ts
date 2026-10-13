@@ -383,9 +383,21 @@ async function companyMetStudent(companyId: string, studentId: string, eventId: 
  * Stored assessments on a student row are for the student and colleges only.
  * Everyone else gets the profile without them.
  */
-function studentView(u: AuthUser, row: Row): Row {
+function studentView(u: AuthUser, row: Row, scanned?: Set<string>): Row {
   if (u.id === row.id || u.role === "event_manager") return row;
-  return { ...row, resume_score: null, ai_feedback: null };
+  // A company gets a student's email only once it has scanned that student.
+  const email = u.role === "company" && !scanned?.has(row.id as string) ? null : row.email;
+  return { ...row, email, resume_score: null, ai_feedback: null };
+}
+
+/** The students out of `ids` that this company has scanned at any event. */
+async function scannedByCompany(u: AuthUser, ids: string[]): Promise<Set<string>> {
+  if (u.role !== "company" || !ids.length) return new Set();
+  const rows = await db()`
+    select distinct scanned_profile_id from scans
+    where scanner_profile_id = ${u.id} and scanned_profile_id = any(${ids}::text[])
+  `;
+  return new Set(rows.map((r) => r.scanned_profile_id as string));
 }
 
 /** The session's event organiser or its host may manage it. */
@@ -464,7 +476,8 @@ export const ops: Record<string, Op> = {
   /* Students */
   /**
    * Companies and colleges see the full profile, without stored assessments for
-   * companies; a fellow student sees no contact details.
+   * companies, and companies see the email only after scanning the student;
+   * a fellow student sees no contact details.
    */
   async getStudentByProfile(u, [profileId]) {
     const id = s(profileId);
@@ -472,7 +485,7 @@ export const ops: Record<string, Op> = {
     if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
     const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
     const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
-    return rows[0] ? studentView(u, rows[0]) : null;
+    return rows[0] ? studentView(u, rows[0], await scannedByCompany(u, [id])) : null;
   },
   async updateStudentProfile(u, [profileId, fields]) {
     isMe(u, profileId);
@@ -487,7 +500,8 @@ export const ops: Record<string, Op> = {
        where r.event_id = $1 and r.role = 'student'`,
       [s(eventId)],
     );
-    return rows.map((r) => studentView(u, r));
+    const scanned = await scannedByCompany(u, rows.map((r) => r.id as string));
+    return rows.map((r) => studentView(u, r, scanned));
   },
 
   /* Companies */

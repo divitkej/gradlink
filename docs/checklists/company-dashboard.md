@@ -6,7 +6,7 @@ Started from the company items on the RoadMap#1 launch board (C1 to C7, Q4, Q5, 
 
 Status key as in `landing-page.md`.
 
-## Progress: 12 / 14 done
+## Progress: 13 / 14 done
 
 ## Broken
 
@@ -43,7 +43,7 @@ Status key as in `landing-page.md`.
 
 ## Owner decisions
 
-- [ ] **Companies can see every registered student's email before scanning them.** `getRegisteredStudents` returns email to any company at the event. Decide whether email should only be visible after a scan or a reply.
-  Owner decision
+- [x] **Companies could see every registered student's email before scanning them.** By owner decision, a company now gets a student's email only after it has scanned that student. Before that, profiles, the event's student list and the candidate CSV leave the email out. College staff still see it.
+  `lib/server/rpc.ts`, `lib/db.ts`, `components/dashboard/CompanyCandidates.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in "Show companies a student's email only after scanning them"
 - [ ] **Put the fixes live.** Merge the PR into main, then deploy from main.
   Verify live

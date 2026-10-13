@@ -29,7 +29,8 @@ export interface StudentRow {
   id: string;
   profile_id: string | null;
   full_name: string;
-  email: string;
+  /** Null for a company that has not scanned this student yet. */
+  email: string | null;
   university: string | null;
   degree: string | null;
   graduation_year: number | null;
