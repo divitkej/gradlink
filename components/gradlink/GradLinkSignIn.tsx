@@ -9,20 +9,10 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import { signIn, sendReset, resendVerification } from "@/lib/auth";
 import { setSession, useSession } from "@/lib/session";
+import { returnPath } from "@/lib/return-path";
 
 function roleHome(role: "student" | "company" | "event_manager") {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
-}
-
-/**
- * Where to go after sign-in when the link asked for it, e.g. a scanned QR
- * profile (components/scan/ViewerGate.tsx). Only paths on this site count,
- * so the parameter cannot send anyone to another domain.
- */
-function returnPath(): string | null {
-  const next = new URLSearchParams(window.location.search).get("next");
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) return null;
-  return next;
 }
 
 function Field({
