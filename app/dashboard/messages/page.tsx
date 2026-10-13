@@ -38,6 +38,9 @@ export default function MessagesPage() {
   const reloadRef = useRef<() => void>(() => {});
   // The conversation on screen now, for a send that fails after the user moved on.
   const openRef = useRef<string | null>(null);
+  // The draft in the box now, for the same reason.
+  const replyRef = useRef("");
+  useEffect(() => { replyRef.current = reply; }, [reply]);
 
   useEffect(() => {
     const f = () => setMobile(window.innerWidth < 760);
@@ -147,8 +150,11 @@ export default function MessagesPage() {
       // Take the unsent message back out of the thread and give the text back,
       // but never over a newer draft or into another person's conversation.
       setMsgs((p) => p.filter((m) => m.id !== temp.id));
-      if (openRef.current === to.id) {
-        setReply((cur) => (cur.trim() ? cur : text));
+      // The text goes back in the box only if this conversation is open and
+      // the box is still empty; otherwise the error repeats it.
+      const restore = openRef.current === to.id && !replyRef.current.trim();
+      if (restore) {
+        setReply(text);
         setSendError("Message not sent. Check your connection and try again.");
       } else {
         setSendError(`Your message to ${to.name} was not sent: "${text}"`);

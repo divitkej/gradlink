@@ -112,7 +112,8 @@ export default function StudentScanView({ studentProfileId, eventId }: { student
                 const before = status;
                 setStatus(st);
                 const ok = await upsertShortlist({ eventId, companyId: session!.profileId, studentId: studentProfileId, status: st, notes: note });
-                if (!ok) { setStatus(before); flash("Couldn't save, try again"); return; }
+                // Undo only if no later click has changed the status since.
+                if (!ok) { setStatus((cur) => (cur === st ? before : cur)); flash("Couldn't save, try again"); return; }
                 flash(st === "rejected" ? "Marked as not a fit" : st === "maybe" ? "Marked as maybe" : "Shortlisted");
               }}
               onSaveNote={async () => {
