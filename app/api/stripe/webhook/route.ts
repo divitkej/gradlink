@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { db } from "@/lib/server/sql";
+import { planFor, saveSubscription } from "@/lib/server/subscriptions";
 import { serverEnv } from "@/lib/server/env";
 
 export const runtime = "nodejs";
@@ -43,17 +43,6 @@ export async function POST(request: Request) {
   const iso = (unixSeconds: number | null | undefined) =>
     typeof unixSeconds === "number" ? new Date(unixSeconds * 1000).toISOString() : null;
 
-  /** Upsert only the fields given, leaving the other columns as they are. */
-  async function writeSubscription(profileId: string, data: Record<string, string | null>) {
-    const cols = Object.keys(data);
-    await db().query(
-      `insert into subscriptions (profile_id, ${cols.join(", ")}, updated_at)
-       values ($1, ${cols.map((_, i) => `$${i + 2}`).join(", ")}, now())
-       on conflict (profile_id) do update set ${cols.map((c) => `${c} = excluded.${c}`).join(", ")}, updated_at = now()`,
-      [profileId, ...cols.map((c) => data[c])],
-    );
-  }
-
   try {
     switch (event.type) {
       case "checkout.session.completed": {
@@ -63,20 +52,19 @@ export async function POST(request: Request) {
           console.warn("[stripe/webhook] completed session with no profileId", session.id);
           break;
         }
-        // Re-read the subscription so the stored period end is authoritative
-        // rather than inferred from the checkout session.
-        let periodEnd: string | null = null;
         const subId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
-        if (subId) {
-          const sub = await stripe.subscriptions.retrieve(subId);
-          periodEnd = iso(sub.items.data[0]?.current_period_end);
+        if (!subId) {
+          console.warn("[stripe/webhook] completed session with no subscription", session.id);
+          break;
         }
-        await writeSubscription(profileId, {
-          plan: "pro",
-          status: "active",
+        // Re-read the subscription so the plan and period end come from its
+        // current state. A delivery retried after the subscription was
+        // cancelled must not switch Pro back on.
+        const sub = await stripe.subscriptions.retrieve(subId);
+        await saveSubscription(profileId, subId, {
+          ...planFor(sub.status),
           stripe_customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
-          stripe_subscription_id: subId ?? null,
-          current_period_end: periodEnd,
+          current_period_end: iso(sub.items.data[0]?.current_period_end),
         });
         break;
       }
@@ -85,11 +73,8 @@ export async function POST(request: Request) {
         const sub = event.data.object;
         const profileId = sub.metadata?.profileId;
         if (!profileId) break;
-        const active = sub.status === "active" || sub.status === "trialing";
-        await writeSubscription(profileId, {
-          plan: active ? "pro" : "free",
-          status: sub.status === "trialing" ? "active" : (sub.status as string),
-          stripe_subscription_id: sub.id,
+        await saveSubscription(profileId, sub.id, {
+          ...planFor(sub.status),
           current_period_end: iso(sub.items.data[0]?.current_period_end),
         });
         break;
@@ -99,10 +84,10 @@ export async function POST(request: Request) {
         const sub = event.data.object;
         const profileId = sub.metadata?.profileId;
         if (!profileId) break;
-        await writeSubscription(profileId, {
+        // Ignored if the college has since moved to another subscription.
+        await saveSubscription(profileId, sub.id, {
           plan: "free",
           status: "canceled",
-          stripe_subscription_id: null,
           current_period_end: null,
         });
         break;

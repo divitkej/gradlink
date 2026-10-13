@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { db } from "@/lib/server/sql";
 import { serverEnv } from "@/lib/server/env";
 import { currentUser } from "@/lib/server/session";
+import { hasActivePro } from "@/lib/server/subscriptions";
 import { HttpError, assertSameOrigin } from "@/lib/server/http";
 import { OPERATOR } from "@/lib/site";
 
@@ -45,12 +46,14 @@ export async function POST(request: Request) {
   // account. Both are checked against the signed-in session, so the caller
   // can't buy a plan for someone else's profile by editing the request.
   let profile: { role: string; email: string; organization: string | null } | undefined;
+  let alreadyPro = false;
   try {
     const user = await currentUser(request);
     if (!user) return Response.json({ error: "Please sign in again." }, { status: 401 });
     if (user.id !== profileId) return Response.json({ error: "You can only upgrade your own account." }, { status: 403 });
     const rows = await db()`select role, email, organization from profiles where id = ${profileId}`;
     profile = rows[0] as typeof profile;
+    alreadyPro = await hasActivePro(profileId);
   } catch (err) {
     console.error("[checkout] account check failed:", err);
     return Response.json({ error: "Server isn't configured to verify accounts yet." }, { status: 503 });
@@ -58,6 +61,10 @@ export async function POST(request: Request) {
   if (!profile) return Response.json({ error: "We couldn't find that account." }, { status: 404 });
   if (profile.role !== "event_manager") {
     return Response.json({ error: "Only a college account can subscribe to Placement Pro." }, { status: 403 });
+  }
+  // A second checkout would start a second subscription and charge twice.
+  if (alreadyPro) {
+    return Response.json({ error: "Your college is already on Placement Pro." }, { status: 409 });
   }
 
   // Stripe sends the buyer back to our own origin, never to one the request names.
