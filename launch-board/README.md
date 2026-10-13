@@ -4,14 +4,14 @@
 
 ![Launch progress](progress.svg)
 
-**120 of 150 done (80%).** 0 in progress, 30 left. Checklists last changed 2026-10-13.
+**120 of 148 done (81%).** 0 in progress, 28 left. Checklists last changed 2026-10-13.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "Needs the owner" : 18
+  "Needs the owner" : 16
   "To do" : 5
   "Verify live" : 5
   "Parked by decision" : 2
@@ -24,9 +24,9 @@ pie showData
 
 | Phase | Status | Progress | Done | In progress | Left |
 |---|---|---|---|---|---|
-| [Phase 1: Core loop](#phase-1-core-loop) | **Ongoing** | `███████████░` 94% | 15 | 0 | 1 |
+| [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `█████████░░░` 79% | 11 | 0 | 3 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 67% | 31 | 0 | 15 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `████████░░░░` 69% | 31 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 5 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 85% | 52 | 0 | 9 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
@@ -35,11 +35,7 @@ pie showData
 
 Create or join an event, open it, work the checklist, edit the event, with the access checks behind it.
 
-**Ongoing.** 15 of 16 done, 0 in progress, 1 left.
-
-**Left**
-
-- [ ] Live rules match the repo · Needs the owner · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)
+**Done.** 15 of 15 done, 0 in progress, 0 left.
 
 <details><summary>Done (15)</summary>
 
@@ -93,14 +89,13 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 31 of 46 done, 0 in progress, 15 left.
+**Ongoing.** 31 of 45 done, 0 in progress, 14 left.
 
 **Left**
 
 - [ ] Cloudflare GitHub builds fail on every commit · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)
-- [ ] Old Vercel site still live · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)
-- [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
-- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
+- [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)
+- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
 - [ ] Set `APP_URL` · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L34)
 - [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L36)
 - [ ] Least-privilege database role · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L37)
@@ -119,7 +114,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [x] Worker points at the real KV namespace
 - [x] Worker secrets set
 - [x] Deployed and tested live
-- [x] Vercel removed from the repo
+- [x] Only Neon and Cloudflare in the repo
 - [x] Privacy Policy page
 - [x] Terms and Conditions page
 - [x] "UAE data residency" claim removed
@@ -266,9 +261,9 @@ Features that should work, checked once on a real device or the live site.
 
 | Area | Progress | Done | Left | Checklist |
 |---|---|---|---|---|
-| Launch | `█████████░░░` 71% | 10 | 4 | [launch.md](../docs/checklists/launch.md) |
+| Launch | `█████████░░░` 77% | 10 | 3 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
-| Core loop | `███████████░` 92% | 11 | 1 | [core-loop.md](../docs/checklists/core-loop.md) |
+| Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 89% | 8 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `██████████░░` 85% | 11 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `██████████░░` 86% | 6 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
@@ -276,7 +271,7 @@ Features that should work, checked once on a real device or the live site.
 | Security | `████████░░░░` 65% | 13 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `███████████░` 93% | 13 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **80%** | **120** | **30** | |
+| **All** | `██████████░░` **81%** | **120** | **28** | |
 
 ## In progress
 
@@ -284,13 +279,11 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ## Left to do
 
-### Needs the owner (18)
+### Needs the owner (16)
 
 - [ ] **Cloudflare GitHub builds fail on every commit** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm… · id `launch/cloudflare-github-builds-fail-on-every`</sub>
-- [ ] **Old Vercel site still live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L23)<br><sub>`https://gradlink-theta.vercel.app` returns 200. Delete the project in the Vercel dashboard (no repo access to it). Owner action · id `launch/old-vercel-site-still-live`</sub>
-- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
-- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
-- [ ] **Live rules match the repo** · Core loop · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/core-loop.md?plain=1#L43)<br><sub>Replaced: the app does not read Firestore any more, so there are no live rules to deploy. What is left is closing the old Firebase project so its data is not still readable under… · id `core-loop/live-rules-match-the-repo`</sub>
+- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
+- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
@@ -334,7 +327,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] Worker points at the real KV namespace <sub>Done in "Point the UPLOADS binding at the real KV namespace"</sub>
 - [x] Worker secrets set
 - [x] Deployed and tested live
-- [x] Vercel removed from the repo <sub>Done in "Remove leftover Vercel starter files and ignore entry"</sub>
+- [x] Only Neon and Cloudflare in the repo <sub>Done in "Remove Vercel, Supabase and Firebase leftovers"</sub>
 - [x] Privacy Policy page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] Terms and Conditions page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] "UAE data residency" claim removed <sub>Done in "Add Privacy Policy and Terms pages"</sub>
