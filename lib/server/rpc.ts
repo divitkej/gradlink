@@ -748,9 +748,12 @@ export const ops: Record<string, Op> = {
   },
 
   /* Checklist */
-  async getChecklistItems(_u, [role, eventId]) {
-    // Events created before the default checklist existed get it on first view.
-    if (s(eventId)) await addDefaultChecklist(s(eventId));
+  async getChecklistItems(u, [role, eventId]) {
+    if (!s(eventId)) return [];
+    // Only people at the event read its checklist, and only they can make the
+    // first view seed the default list (for events made before it existed).
+    await requireMember(u, eventId);
+    await addDefaultChecklist(s(eventId));
     return db()`
       select id, event_id, role, title, description, phase, order_index from checklist_items
       where event_id = ${s(eventId)} and role = ${s(role)} order by order_index asc
@@ -764,12 +767,18 @@ export const ops: Record<string, Op> = {
   async setChecklistProgress(u, [itemId, profileId, completed]) {
     isMe(u, profileId);
     const done = Boolean(completed);
-    await db()`
+    // Only a real item of an event the caller is at; anything else is a no-op
+    // rather than a foreign-key error.
+    const rows = await db()`
       insert into checklist_progress (checklist_item_id, profile_id, completed, completed_at)
-      values (${s(itemId)}, ${u.id}, ${done}, ${done ? new Date().toISOString() : null})
+      select i.id, ${u.id}, ${done}, ${done ? new Date().toISOString() : null}
+      from checklist_items i join events e on e.id = i.event_id
+      where i.id = ${s(itemId)}
+        and (e.created_by = ${u.id} or exists (select 1 from event_registrations r where r.event_id = i.event_id and r.profile_id = ${u.id}))
       on conflict (profile_id, checklist_item_id) do update set completed = excluded.completed, completed_at = excluded.completed_at
+      returning checklist_item_id
     `;
-    return true;
+    return rows.length > 0;
   },
 
   /* Profiles */
@@ -866,6 +875,9 @@ export const ops: Record<string, Op> = {
     const entries = Object.entries(f).filter(([k, v]) => k in allowed && v !== undefined && (k !== "timezone" || isTimeZone(v)));
     if (!entries.length) return true;
     if (f.title !== undefined && !s(f.title).trim()) throw new HttpError(400, "Give your event a name.");
+    for (const k of ["start_date", "end_date"] as const) {
+      if (s(f[k]) && !Number.isFinite(Date.parse(s(f[k])))) throw new HttpError(400, "Enter a valid date.");
+    }
     const sets = entries.map(([k], idx) => `${k} = $${idx + 3}`);
     const rows = await db().query(
       `update events set ${sets.join(", ")} where id = $1 and created_by = $2 returning id`,
@@ -978,6 +990,7 @@ export const ops: Record<string, Op> = {
 
   /* Sessions: workshops, mock interviews, company sessions, recruiter slots. */
   async listSessions(u, [eventId]) {
+    await requireMember(u, eventId);
     return db()`
       select es.*, p.full_name as host_name, p.organization as host_org, p.role as host_role, e.timezone as event_timezone,
         (select count(*)::int from session_bookings b where b.session_id = es.id and b.status in ('booked', 'attended')) as booked_count,
@@ -1100,11 +1113,18 @@ export const ops: Record<string, Op> = {
   },
   async markAttendance(u, [sessionId, profileId, attended]) {
     await assertCanManageSession(u, s(sessionId));
-    const rows = await db()`
-      update session_bookings set status = ${attended ? "attended" : "booked"}
-      where session_id = ${s(sessionId)} and profile_id = ${s(profileId)} and status in ('booked', 'waitlisted', 'attended')
-      returning status
-    `;
+    // Marking someone who came counts them whatever their booking said.
+    // Un-marking only undoes that: an attended booking goes back to booked.
+    // It never turns a waitlist place into a seat, which could overbook.
+    const rows = attended
+      ? await db()`
+          update session_bookings set status = 'attended'
+          where session_id = ${s(sessionId)} and profile_id = ${s(profileId)} and status in ('booked', 'waitlisted', 'attended')
+          returning status`
+      : await db()`
+          update session_bookings set status = 'booked'
+          where session_id = ${s(sessionId)} and profile_id = ${s(profileId)} and status = 'attended'
+          returning status`;
     return rows.length > 0;
   },
 
@@ -1118,8 +1138,12 @@ export const ops: Record<string, Op> = {
       saved: Boolean, interested: Boolean, visited: Boolean, follow_up: Boolean, note: (v) => textOrNull(v, 2000),
     };
     const entries = Object.entries((fields ?? {}) as Row).filter(([k, v]) => k in allowed && v !== undefined);
-    const company = await db()`select role from profiles where id = ${s(companyId)}`;
-    if (company[0]?.role !== "company") return { ok: false, error: "That company isn't on GradLink." };
+    // Both the student and the company must be at this event.
+    await requireMember(u, eventId);
+    const company = await db()`
+      select 1 from event_registrations where event_id = ${s(eventId)} and profile_id = ${s(companyId)} and role = 'company'
+    `;
+    if (!company.length) return { ok: false, error: "That company isn't at this event." };
     const cols = entries.map(([k]) => k);
     // Column names come from the whitelist above, never from the request.
     const rows = await db().query(
