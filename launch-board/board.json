@@ -1,17 +1,17 @@
 {
   "updated": "2026-10-13",
   "totals": {
-    "total": 136,
-    "done": 107,
-    "open": 29,
-    "percent": 79,
+    "total": 150,
+    "done": 120,
+    "open": 30,
+    "percent": 80,
     "counts": {
       "in_progress": 0,
       "owner": 18,
       "todo": 5,
-      "verify": 4,
+      "verify": 5,
       "parked": 2,
-      "done": 107
+      "done": 120
     }
   },
   "areas": [
@@ -131,6 +131,19 @@
         "parked": 0,
         "done": 2
       }
+    },
+    {
+      "key": "company-dashboard",
+      "name": "Company dashboard",
+      "total": 14,
+      "counts": {
+        "in_progress": 0,
+        "owner": 0,
+        "todo": 0,
+        "verify": 1,
+        "parked": 0,
+        "done": 13
+      }
     }
   ],
   "phases": [
@@ -198,14 +211,14 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 47,
+      "total": 61,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 5,
-        "verify": 2,
+        "verify": 3,
         "parked": 0,
-        "done": 39
+        "done": 52
       },
       "status": "Ongoing"
     },
@@ -549,6 +562,18 @@
       "doneIn": null,
       "phase": "5",
       "id": "student-dashboard/two-account-run-on-real-phones"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Owner decisions",
+      "line": 48,
+      "title": "Put the fixes live",
+      "detail": "Merge the PR into main, then deploy from main. Verify live",
+      "state": "verify",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/put-the-fixes-live"
     },
     {
       "area": "landing-page",
@@ -1857,6 +1882,162 @@
       "doneIn": "Add Privacy Policy and Terms pages",
       "phase": "3",
       "id": "features-to-build/uae-data-residency-in-the-cta"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Broken",
+      "line": 13,
+      "title": "Pre-shortlisting from the event console deleted the recruiter's note",
+      "detail": "Marking a student Priority, Shortlist or Maybe on the Students tab sent no note, and the server overwrote the saved one with nothing. A status change without a note now keeps the existing note; clearing a note on purpose still works. `lib/server/rpc.ts` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/pre-shortlisting-from-the-event-console-deleted"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Broken",
+      "line": 15,
+      "title": "A note typed while the student page was still loading could be wiped",
+      "detail": "The page reloaded itself whenever the session object was refreshed and reset the note and decision. It now reloads only when the account changes, and never overwrites a note or decision the recruiter has already touched. `components/scan/StudentScanView.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/a-note-typed-while-the-student"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Broken",
+      "line": 17,
+      "title": "\"Live\" badge showed for events that had not started (C3)",
+      "detail": "Both badges now show the real status (Upcoming, Live now, Ended). `app/dashboard/company/page.tsx` · Fixed on main before this checklist, confirmed in the browser run",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/live-badge-showed-for-events-that"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Dead or misleading",
+      "line": 22,
+      "title": "Export button did nothing (C1)",
+      "detail": "Export CSV now downloads the shown candidates with stage, notes and links. `components/dashboard/CompanyCandidates.tsx` · Fixed on main before this checklist, confirmed in the browser run",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/export-button-did-nothing-c1"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Dead or misleading",
+      "line": 24,
+      "title": "Filter chips were plain labels (C2)",
+      "detail": "Search plus degree, year, skill, target role and stage filters now work. `components/dashboard/CompanyCandidates.tsx` · Fixed on main before this checklist, confirmed in the browser run",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/filter-chips-were-plain-labels-c2"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Dead or misleading",
+      "line": 26,
+      "title": "\"Checked in\" showed on every student a company opened",
+      "detail": "It now only shows to college staff, from a real check-in scan. `components/scan/StudentScanView.tsx` · Fixed on main before this checklist, confirmed in the browser run",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/checked-in-showed-on-every-student"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Dead or misleading",
+      "line": 28,
+      "title": "Real brand names as profile placeholders",
+      "detail": "\"Ride-hailing & Delivery\" and \"careem.com\" replaced with generic examples. `components/dashboard/CompanyProfileEditor.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/real-brand-names-as-profile-placeholders"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Dead or misleading",
+      "line": 30,
+      "title": "\"1 roles posted\"",
+      "detail": "Singular when a company has one role. `app/dashboard/company/page.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/1-roles-posted"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Partial",
+      "line": 35,
+      "title": "Student interest never reached the company (Q5)",
+      "detail": "Interested and Request follow-up were saved but no company screen showed them. The company dashboard now has a \"Students interested in you\" panel, follow-up requests first. Only those two marks are shared; Save, Visited and the student's note stay private, and the student page says so. Students and companies outside the event are refused. `lib/server/rpc.ts`, `lib/db.ts`, `components/dashboard/CompanyInterest.tsx`, `components/scan/CompanyScanView.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/student-interest-never-reached-the-company"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Partial",
+      "line": 37,
+      "title": "New messages needed a reload (G3)",
+      "detail": "The inbox checks for new messages every 15 seconds while the tab is open and when you come back to it. `app/dashboard/messages/page.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/new-messages-needed-a-reload-g3"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Partial",
+      "line": 39,
+      "title": "A failed send stayed on screen as if delivered (G4)",
+      "detail": "It is now taken out of the thread, the text goes back in the box and an error says it was not sent. `app/dashboard/messages/page.tsx` · Done in \"Fix the company-side problems found in the live test\"",
+      "state": "done",
+      "doneIn": "Fix the company-side problems found in the live test",
+      "phase": "5",
+      "id": "company-dashboard/a-failed-send-stayed-on-screen"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Partial",
+      "line": 41,
+      "title": "Student saves lived only in the browser (Q5, first half)",
+      "detail": "Saves are stored in `saved_companies`, and old browser saves move there on first visit. `components/scan/CompanyScanView.tsx` · Fixed on main before this checklist, confirmed in the browser run",
+      "state": "done",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/student-saves-lived-only-in-the"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Owner decisions",
+      "line": 46,
+      "title": "Companies could see every registered student's email before scanning them",
+      "detail": "By owner decision, a company now gets a student's email only after it has scanned that student. Before that, profiles, the event's student list and the candidate CSV leave the email out. College staff still see it. `lib/server/rpc.ts`, `lib/db.ts`, `components/dashboard/CompanyCandidates.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in \"Show companies a student's email only after scanning them\"",
+      "state": "done",
+      "doneIn": "Show companies a student's email only after scanning them",
+      "phase": "5",
+      "id": "company-dashboard/companies-could-see-every-registered-student"
     }
   ]
 }
