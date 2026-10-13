@@ -1,8 +1,8 @@
 {
-  "updated": "2026-10-13",
+  "updated": "2026-10-14",
   "totals": {
-    "total": 148,
-    "done": 120,
+    "total": 149,
+    "done": 121,
     "open": 28,
     "percent": 81,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 120
+      "done": 121
     }
   },
   "areas": [
@@ -135,14 +135,14 @@
     {
       "key": "company-dashboard",
       "name": "Company dashboard",
-      "total": 14,
+      "total": 15,
       "counts": {
         "in_progress": 0,
         "owner": 0,
         "todo": 0,
         "verify": 1,
         "parked": 0,
-        "done": 13
+        "done": 14
       }
     }
   ],
@@ -211,14 +211,14 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 61,
+      "total": 62,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 5,
         "verify": 3,
         "parked": 0,
-        "done": 52
+        "done": 53
       },
       "status": "Ongoing"
     },
@@ -543,7 +543,7 @@
       "area": "company-dashboard",
       "areaName": "Company dashboard",
       "section": "Owner decisions",
-      "line": 48,
+      "line": 50,
       "title": "Put the fixes live",
       "detail": "Merge the PR into main, then deploy from main. Verify live",
       "state": "verify",
@@ -2014,6 +2014,18 @@
       "doneIn": "Show companies a student's email only after scanning them",
       "phase": "5",
       "id": "company-dashboard/companies-could-see-every-registered-student"
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Owner decisions",
+      "line": 48,
+      "title": "Opening a student's page counted as a scan",
+      "detail": "In-app links (\"View\", the scanner's attendee list) open the same page a QR scan opens, and that page recorded a scan, so a company could click through every student to get their emails, and a college viewing a student checked them in. A QR now carries the person's scan key (`&k=`, derived from `AUTH_SECRET`), and the server only records a scan with the right key. Opening a profile from the app is a view. `lib/server/session.ts`, `lib/server/rpc.ts`, `components/dashboard/QRCard.tsx`, `components/scan/StudentScanView.tsx`, `components/scan/CompanyScanView.tsx` · Done in \"Count a scan only when the QR's scan key comes with it\"",
+      "state": "done",
+      "doneIn": "Count a scan only when the QR's scan key comes with it",
+      "phase": "5",
+      "id": "company-dashboard/opening-a-student-s-page-counted"
     }
   ]
 }
