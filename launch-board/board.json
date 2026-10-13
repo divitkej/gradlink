@@ -1421,7 +1421,7 @@
       "section": "Built",
       "line": 36,
       "title": "Application tracker",
-      "detail": "Applied, interviewing, offer, accepted, not selected, withdrawn, with interview dates and notes. Private to the student. `components/dashboard/StudentApplications.tsx` · Done in \"Complete the student dashboard against the landing page\"",
+      "detail": "Applied, interviewing, offer, accepted, not selected, withdrawn, with interview dates and notes. Private to the student. `components/dashboard/StudentApplications.tsx` · Done in \"Complete the student dashboard against the landing page\" · Editing an application while another event is open no longer moves it to that event, in \"Keep an edited application at the event it was logged at\"",
       "state": "done",
       "doneIn": "Complete the student dashboard against the landing page",
       "phase": "5",
