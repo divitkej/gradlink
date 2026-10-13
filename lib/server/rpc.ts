@@ -1198,7 +1198,10 @@ export const ops: Record<string, Op> = {
     const rows = s(i.id)
       ? await db()`
           update applications set company_name = ${companyName}, role_title = ${roleTitle}, status = ${status},
-            interview_at = ${interviewAt}, notes = ${notes}, event_id = ${eventId}, company_id = ${companyId}, updated_at = now()
+            -- An application stays with the event it was logged at. The browser
+            -- sends whichever event is open now, so an edit made from another
+            -- event must not move it; one with no event yet can gain one.
+            interview_at = ${interviewAt}, notes = ${notes}, event_id = coalesce(applications.event_id, ${eventId}), company_id = ${companyId}, updated_at = now()
           where id = ${s(i.id)} and student_id = ${u.id} returning *`
       : await db()`
           insert into applications (student_id, event_id, company_id, company_name, role_title, status, interview_at, notes)
