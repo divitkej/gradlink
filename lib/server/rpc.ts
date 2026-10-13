@@ -1,7 +1,7 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
 import { serverEnv } from "./env";
-import type { AuthUser } from "./session";
+import { isScanKey, scanKey, type AuthUser } from "./session";
 import { CHECKLIST_TEMPLATE } from "./checklist-template";
 import { evaluateResume } from "../resume";
 import { engagementScore, shortName, type EngagementCounts } from "../engagement";
@@ -581,6 +581,11 @@ export const ops: Record<string, Op> = {
     // nothing to record, so it is skipped rather than failing.
     if (!i.eventId) return false;
     await requireMember(u, i.eventId);
+    // Only a real QR scan counts: it carries the scanned person's key. A
+    // profile opened from a link in the app (or a call made by hand) has no
+    // key, so it records nothing, and so cannot unlock a student's email,
+    // check someone in or inflate the scan counts.
+    if (!(await isScanKey(s(i.scannedProfileId), i.scanKey))) return false;
     // Both roles come from the accounts, not whatever the browser sends, and
     // the scanned person must be registered for the same event, so the stats
     // built from scans can be trusted.
@@ -593,6 +598,10 @@ export const ops: Record<string, Op> = {
       returning id
     `;
     return rows.length > 0;
+  },
+  /** The key for the signed-in person's own QR code. */
+  async getMyScanKey(u) {
+    return scanKey(u.id);
   },
   /** Scans you made or received; the whole event's scans for its staff. */
   async getScans(u, [filter]) {

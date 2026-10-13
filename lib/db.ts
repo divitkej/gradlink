@@ -296,8 +296,15 @@ export function recordScan(input: {
   scannedRole: string;
   scanContext?: string;
   notes?: string;
+  /** The `k` from the scanned QR. Without it nothing is recorded (a view, not a scan). */
+  scanKey?: string | null;
 }): Promise<boolean> {
   return safe("recordScan", false, () => rpc<boolean>("recordScan", input));
+}
+
+/** The key for the signed-in person's own QR code, or null if it can't be loaded. */
+export function getMyScanKey(): Promise<string | null> {
+  return safe("getMyScanKey", null, () => rpc<string>("getMyScanKey"));
 }
 
 export function getScans(filter: {

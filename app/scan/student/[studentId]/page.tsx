@@ -14,7 +14,8 @@ function Inner() {
   // A scanned QR always carries its event id; hand-typed URLs fall back
   // to whichever event the viewer currently has open.
   const eventId = sp.get("eventId") || activeEventId || "";
-  return <StudentScanView studentProfileId={studentId} eventId={eventId} />;
+  // `k` is the student's scan key, only present when their QR was scanned.
+  return <StudentScanView studentProfileId={studentId} eventId={eventId} scanKey={sp.get("k")} />;
 }
 
 export default function StudentScanPage() {

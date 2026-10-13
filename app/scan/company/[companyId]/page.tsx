@@ -14,7 +14,8 @@ function Inner() {
   // A scanned QR always carries its event id; hand-typed URLs fall back
   // to whichever event the viewer currently has open.
   const eventId = sp.get("eventId") || activeEventId || "";
-  return <CompanyScanView companyProfileId={companyId} eventId={eventId} />;
+  // `k` is the company's scan key, only present when its QR was scanned.
+  return <CompanyScanView companyProfileId={companyId} eventId={eventId} scanKey={sp.get("k")} />;
 }
 
 export default function CompanyScanPage() {
