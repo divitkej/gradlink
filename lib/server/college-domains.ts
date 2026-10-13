@@ -45,10 +45,21 @@ const MSG = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DOMAIN_RE = /^(?=.{3,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 
+function adminEmails(): string[] {
+  return (serverEnv().ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+}
+
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
-  const list = (serverEnv().ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  return list.includes(email.trim().toLowerCase());
+  return adminEmails().includes(email.trim().toLowerCase());
+}
+
+/** Whether any address in ADMIN_EMAILS already has an account. */
+export async function adminAccountExists(): Promise<boolean> {
+  const list = adminEmails();
+  if (!list.length) return false;
+  const rows = await db()`select 1 from auth_credentials where email_lower = any(${list}) limit 1`;
+  return rows.length > 0;
 }
 
 /** Owner-only routes answer 404 to everyone else, so they don't advertise themselves. */
