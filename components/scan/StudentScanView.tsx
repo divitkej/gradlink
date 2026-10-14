@@ -19,6 +19,7 @@ import { evaluateResume, scoreTone } from "@/lib/resume";
 import GsapReveal from "@/components/anim/GsapReveal";
 import { safeHttpUrl } from "@/lib/utils";
 import InterviewInvite from "./InterviewInvite";
+import OfferControl from "./OfferControl";
 import VerifiedCourses from "./VerifiedCourses";
 import VerifiedScores from "./VerifiedScores";
 import VerifiedCertificates from "./VerifiedCertificates";
@@ -119,7 +120,10 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
           <ProfileHeader student={student} checkedIn={viewer === "event_manager" && scanHistory.some((x) => x.scanner_role === "event_manager")} />
           {viewer === "company" && (
             <CompanyView
-              inviteSlot={<InterviewInvite eventId={eventId} companyId={session!.profileId} studentId={studentProfileId} firstName={student.full_name.split(" ")[0]} />}
+              inviteSlot={<>
+                <InterviewInvite eventId={eventId} companyId={session!.profileId} studentId={studentProfileId} firstName={student.full_name.split(" ")[0]} />
+                <OfferControl eventId={eventId} companyId={session!.profileId} studentId={studentProfileId} firstName={student.full_name.split(" ")[0]} />
+              </>}
               student={student} status={status} note={note} msg={msg} scanHistory={scanHistory}
               setNote={(v) => { touched.current.note = true; setNote(v); }} setMsg={setMsg}
               onStatus={async (st) => {

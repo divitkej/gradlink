@@ -360,6 +360,8 @@ export interface InterviewCounts {
   invited: number;
   /** Invites where the student picked a time. */
   booked: number;
+  /** Students with at least one invite that was not withdrawn. */
+  students?: number;
 }
 
 /** Interview invite counts for an event's staff (the college). */
@@ -584,6 +586,40 @@ export function respondInterviewInvite(inviteId: string, accept: boolean, chosen
 
 export function cancelInterviewInvite(inviteId: string): Promise<boolean> {
   return safe("cancelInterviewInvite", false, () => rpc<boolean>("cancelInterviewInvite", inviteId));
+}
+
+/* ---------------- Offers ---------------- */
+/** An offer a company recorded for a student it met at an event. */
+export interface OfferRow {
+  id: string;
+  created_at: string;
+  event_id: string;
+  company_id: string;
+  student_id: string;
+  role_title: string;
+}
+
+export function recordOffer(input: { eventId: string; studentId: string; roleTitle: string }): Promise<Result<"offer", OfferRow>> {
+  return safe("recordOffer", { ok: false, error: "Couldn't record the offer. Please try again." }, () => rpc("recordOffer", input));
+}
+
+export function withdrawOffer(eventId: string, studentId: string): Promise<boolean> {
+  return safe("withdrawOffer", false, () => rpc<boolean>("withdrawOffer", eventId, studentId));
+}
+
+/** The signed-in company's offers at an event, or null if they couldn't be loaded. */
+export function listOffersForCompany(eventId: string): Promise<OfferRow[] | null> {
+  return safe<OfferRow[] | null>("listOffersForCompany", null, () => rpc<OfferRow[]>("listOffersForCompany", eventId));
+}
+
+/** Every offer at an event, for its college. */
+export function listOffers(eventId: string): Promise<OfferRow[]> {
+  return safe("listOffers", [], () => rpc<OfferRow[]>("listOffers", eventId));
+}
+
+/** Ids of students the signed-in company messaged or sent an interview invite at an event. */
+export function listContactedStudents(eventId: string): Promise<string[]> {
+  return safe("listContactedStudents", [], () => rpc<string[]>("listContactedStudents", eventId));
 }
 
 /* ---------------- Booth queues ---------------- */

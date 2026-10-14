@@ -1,6 +1,6 @@
 "use client";
 
-import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow, InterviewCounts } from "./db";
+import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow, InterviewCounts, OfferRow } from "./db";
 import { evaluateResume } from "./resume";
 import { downloadCsv, slugify } from "./csv";
 import { fmtEventDate } from "./format";
@@ -20,6 +20,7 @@ export interface EmployerLine {
   studentScans: number;
   shortlisted: number;
   rejected: number;
+  offers: number;
 }
 
 export interface StudentLine {
@@ -31,7 +32,51 @@ export interface StudentLine {
   resumeScore: number;
   companiesMet: number;
   shortlists: number;
+  offers: number;
   status: string;
+}
+
+/**
+ * Event ROI score, out of 10: five parts worth 2 points each. A part earns
+ * its points in proportion to how close the event came to the part's target,
+ * capped at the target. Rates are shares of registered students, except
+ * employers active, which is a share of employers.
+ */
+export const ROI_PARTS = [
+  { key: "engaged", label: "Students engaged", target: 80, about: "met at least one employer" },
+  { key: "employers", label: "Employers active", target: 100, about: "scanned, shortlisted or were scanned by a student" },
+  { key: "shortlisted", label: "Students shortlisted", target: 30, about: "shortlisted by at least one employer" },
+  { key: "interviews", label: "Students invited to interview", target: 15, about: "got at least one interview invite" },
+  { key: "offers", label: "Students with an offer", target: 5, about: "got at least one offer" },
+] as const;
+export const ROI_POINTS_PER_PART = 2;
+
+export interface RoiPart {
+  key: (typeof ROI_PARTS)[number]["key"];
+  label: string;
+  about: string;
+  /** The event's rate, 0 to 100. */
+  rate: number;
+  target: number;
+  points: number;
+}
+
+export interface RoiScore {
+  /** Out of 10, one decimal; null while the event has no registered students. */
+  score: number | null;
+  parts: RoiPart[];
+}
+
+/** The ROI score from each part's rate (0 to 100). */
+export function roiScore(rates: Record<RoiPart["key"], number>, hasStudents: boolean): RoiScore {
+  const parts = ROI_PARTS.map((p) => {
+    const rate = rates[p.key];
+    const points = Math.round(Math.min(1, rate / p.target) * ROI_POINTS_PER_PART * 10) / 10;
+    return { key: p.key, label: p.label, about: p.about, rate, target: p.target, points };
+  });
+  // The sum of the points as shown, so the breakdown always adds up to the score.
+  const total = parts.reduce((sum, p) => sum + p.points, 0);
+  return { score: hasStudents ? Math.round(total * 10) / 10 : null, parts };
 }
 
 export interface OutcomeReport {
@@ -50,6 +95,10 @@ export interface OutcomeReport {
   interviewInvites: number;
   /** Invites where the student picked a time. */
   interviewsBooked: number;
+  /** Offers companies recorded at the event. */
+  offers: number;
+  /** Students with at least one offer. */
+  studentsWithOffer: number;
 
   avgResumeScore: number;
   resumeReady: number;
@@ -57,6 +106,9 @@ export interface OutcomeReport {
 
   engagementRate: number;
   shortlistRate: number;
+  /** Share of registered students with at least one offer. */
+  placementRate: number;
+  roi: RoiScore;
 
   employerTable: EmployerLine[];
   studentTable: StudentLine[];
@@ -65,6 +117,11 @@ export interface OutcomeReport {
 
 function pct(n: number, d: number) {
   return d > 0 ? Math.round((n / d) * 100) : 0;
+}
+
+/** Like pct, unrounded, so the ROI score is not thrown off by rounding small events. */
+function rate(n: number, d: number) {
+  return d > 0 ? Math.min(100, (n / d) * 100) : 0;
 }
 
 /**
@@ -82,8 +139,13 @@ export function buildReport(input: {
   shortlists: ShortlistRow[];
   analytics?: AnalyticsRow[];
   interviews?: InterviewCounts;
+  offers?: OfferRow[];
 }): OutcomeReport {
   const { event, students, companies, scans, shortlists } = input;
+  // Only offers to students registered for the event count toward its placement rate.
+  const registered = new Set(students.map((s) => s.profile_id));
+  const offers = (input.offers ?? []).filter((o) => registered.has(o.student_id));
+  const studentsWithOffer = new Set(offers.map((o) => o.student_id)).size;
 
   const scored = students.map((s) => ({ s, score: evaluateResume(s).score }));
   const withResume = students.filter((s) => Boolean(s.resume_url)).length;
@@ -119,6 +181,7 @@ export function buildReport(input: {
         studentScans,
         shortlisted: mine.filter(positive).length,
         rejected: mine.filter((s) => s.status === "rejected").length,
+        offers: offers.filter((o) => o.company_id === pid).length,
       };
     })
     .sort((a, b) => b.studentScans - a.studentScans || b.shortlisted - a.shortlisted);
@@ -138,6 +201,7 @@ export function buildReport(input: {
       ).size;
       const mine = shortlists.filter((sl) => sl.student_id === pid);
       const shortlistCount = mine.filter(positive).length;
+      const offerCount = offers.filter((o) => o.student_id === pid).length;
       return {
         name: s.full_name,
         email: s.email ?? "",
@@ -147,10 +211,11 @@ export function buildReport(input: {
         resumeScore: score,
         companiesMet,
         shortlists: shortlistCount,
-        status: shortlistCount > 0 ? "Shortlisted" : companiesMet > 0 ? "Engaged" : "No activity",
+        offers: offerCount,
+        status: offerCount > 0 ? "Offer" : shortlistCount > 0 ? "Shortlisted" : companiesMet > 0 ? "Engaged" : "No activity",
       };
     })
-    .sort((a, b) => b.shortlists - a.shortlists || b.companiesMet - a.companiesMet);
+    .sort((a, b) => b.offers - a.offers || b.shortlists - a.shortlists || b.companiesMet - a.companiesMet);
 
   const skillCounts = new Map<string, number>();
   students.forEach((s) => (s.skills ?? []).forEach((k) => {
@@ -175,6 +240,8 @@ export function buildReport(input: {
     uniqueStudentsShortlisted,
     interviewInvites: input.interviews?.invited ?? 0,
     interviewsBooked: input.interviews?.booked ?? 0,
+    offers: offers.length,
+    studentsWithOffer,
 
     avgResumeScore,
     resumeReady,
@@ -182,6 +249,14 @@ export function buildReport(input: {
 
     engagementRate: pct(engagedIds.size, students.length),
     shortlistRate: pct(uniqueStudentsShortlisted, students.length),
+    placementRate: pct(studentsWithOffer, students.length),
+    roi: roiScore({
+      engaged: rate(engagedIds.size, students.length),
+      employers: rate(employerTable.filter((e) => e.studentScans + e.shortlisted + e.rejected + e.offers > 0).length, companies.length),
+      shortlisted: rate(uniqueStudentsShortlisted, students.length),
+      interviews: rate(input.interviews?.students ?? 0, students.length),
+      offers: rate(studentsWithOffer, students.length),
+    }, students.length > 0),
 
     employerTable,
     studentTable,
@@ -211,20 +286,31 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
     ["Shortlist rate (%)", r.shortlistRate],
     ["Interview invites", r.interviewInvites],
     ["Interviews booked", r.interviewsBooked],
+    ["Offers", r.offers],
+    ["Students with an offer", r.studentsWithOffer],
+    ["Placement rate (%)", r.placementRate],
+    ["Event ROI score (out of 10)", r.roi.score ?? ""],
     ["Average resume score", r.avgResumeScore],
     ["Resume-ready (70+)", r.resumeReady],
     ["Students with a resume", r.withResume],
     [],
     ["Employer engagement"],
-    ["Company", "Booth", "Student scans", "Shortlisted", "Not a fit"],
-    ...r.employerTable.map((e) => [e.name, e.booth, e.studentScans, e.shortlisted, e.rejected]),
+    ["Company", "Booth", "Student scans", "Shortlisted", "Not a fit", "Offers"],
+    ...r.employerTable.map((e) => [e.name, e.booth, e.studentScans, e.shortlisted, e.rejected, e.offers]),
     [],
     ["Students"],
-    ["Name", "Email", "Degree", "University", "Grad year", "Resume score", "Companies met", "Shortlists", "Status"],
+    ["Name", "Email", "Degree", "University", "Grad year", "Resume score", "Companies met", "Shortlists", "Offers", "Status"],
     ...r.studentTable.map((s) => [
-      s.name, s.email, s.degree, s.university, s.graduationYear, s.resumeScore, s.companiesMet, s.shortlists, s.status,
+      s.name, s.email, s.degree, s.university, s.graduationYear, s.resumeScore, s.companiesMet, s.shortlists, s.offers, s.status,
     ]),
   ];
+
+  blocks.push(
+    [],
+    ["Event ROI score", r.roi.score ?? "Not enough data"],
+    ["Part", "This event (%)", "Target (%)", `Points (of ${ROI_POINTS_PER_PART})`],
+    ...r.roi.parts.map((p) => [p.label, Math.round(p.rate), p.target, p.points]),
+  );
 
   if (r.topSkills.length) {
     blocks.push([], ["Top skills"], ["Skill", "Students"], ...r.topSkills.map((s) => [s.skill, s.count]));
@@ -235,4 +321,49 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
 /** Trigger a browser download of the report as CSV. */
 export function downloadReportCsv(r: OutcomeReport) {
   downloadCsv(`gradlink-outcome-report-${slugify(r.eventTitle) || "event"}.csv`, reportBlocks(r));
+}
+
+/* ---------------- Year-over-year comparison ---------------- */
+
+export interface ComparisonRow {
+  label: string;
+  /** This event's value. */
+  current: number | null;
+  /** The earlier event's value. */
+  previous: number | null;
+  unit: "" | "%" | "/10";
+  /** current minus previous, in the row's unit (percentage points for rates); null when either is missing. */
+  change: number | null;
+}
+
+/** The headline numbers of two events side by side (Placement Pro). */
+export function compareReports(current: OutcomeReport, previous: OutcomeReport): ComparisonRow[] {
+  const row = (label: string, pick: (r: OutcomeReport) => number | null, unit: ComparisonRow["unit"] = ""): ComparisonRow => {
+    const a = pick(current), b = pick(previous);
+    return { label, current: a, previous: b, unit, change: a === null || b === null ? null : Math.round((a - b) * 10) / 10 };
+  };
+  return [
+    row("Students registered", (r) => r.studentsRegistered),
+    row("Employers", (r) => r.employers),
+    row("Engagement rate", (r) => r.engagementRate, "%"),
+    row("Shortlist rate", (r) => r.shortlistRate, "%"),
+    row("Interview invites", (r) => r.interviewInvites),
+    row("Offers", (r) => r.offers),
+    row("Placement rate", (r) => r.placementRate, "%"),
+    row("Average resume score", (r) => r.avgResumeScore),
+    row("Event ROI score", (r) => r.roi.score, "/10"),
+  ];
+}
+
+/** Trigger a browser download of a comparison as CSV. */
+export function downloadComparisonCsv(current: OutcomeReport, previous: OutcomeReport) {
+  const fmt = (v: number | null) => (v === null ? "" : v);
+  downloadCsv(`gradlink-comparison-${slugify(current.eventTitle) || "event"}-vs-${slugify(previous.eventTitle) || "earlier"}.csv`, [
+    ["GradLink: event comparison"],
+    ["This event", current.eventTitle, current.eventDate],
+    ["Compared with", previous.eventTitle, previous.eventDate],
+    [],
+    ["Measure", current.eventTitle, previous.eventTitle, "Change"],
+    ...compareReports(current, previous).map((r) => [r.unit ? `${r.label} (${r.unit === "%" ? "%" : "out of 10"})` : r.label, fmt(r.current), fmt(r.previous), fmt(r.change)]),
+  ]);
 }

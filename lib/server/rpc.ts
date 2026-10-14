@@ -699,10 +699,11 @@ export const ops: Record<string, Op> = {
     await requireStaff(u, eventId);
     const [r] = await db()`
       select count(*) filter (where status <> 'cancelled')::int as invited,
-             count(*) filter (where status = 'accepted')::int as booked
+             count(*) filter (where status = 'accepted')::int as booked,
+             count(distinct student_id) filter (where status <> 'cancelled')::int as students
       from interview_invites where event_id = ${s(eventId)}
     `;
-    return { invited: Number(r?.invited ?? 0), booked: Number(r?.booked ?? 0) };
+    return { invited: Number(r?.invited ?? 0), booked: Number(r?.booked ?? 0), students: Number(r?.students ?? 0) };
   },
 
   /* Messages — only the two participants can read a conversation. */
@@ -1432,6 +1433,99 @@ export const ops: Record<string, Op> = {
     const name = await companyName(u.id);
     await notifyQuery(rows[0].student_id as string, "interview_cancelled", `${name} cancelled an interview`, rows[0].role_title as string, "/dashboard/student/applications");
     return true;
+  },
+
+  /*
+   * Offers. A company records an offer to a student it met at an event; the
+   * student, the company and the event's college see it, and it counts toward
+   * the event's offers and placement rate.
+   */
+  async recordOffer(u, [input]) {
+    if (u.role !== "company") throw forbidden();
+    const i = (input ?? {}) as Row;
+    const eventId = s(i.eventId);
+    const studentId = s(i.studentId);
+    const roleTitle = s(i.roleTitle).trim().slice(0, 200);
+    if (!roleTitle) return { ok: false, error: "Add the role you are offering." };
+    await requireMember(u, eventId);
+    if (!(await companyMetStudent(u.id, studentId, eventId))) {
+      return { ok: false, error: "You can record offers for students you scanned or shortlisted at this event." };
+    }
+    const sql = db();
+    const inserted = await sql`
+      insert into offers (event_id, company_id, student_id, role_title) values (${eventId}, ${u.id}, ${studentId}, ${roleTitle})
+      on conflict (event_id, company_id, student_id) do nothing returning *
+    `;
+    if (!inserted.length) {
+      // Already recorded: only the role can change.
+      const rows = await sql`
+        update offers set role_title = ${roleTitle}, updated_at = now()
+        where event_id = ${eventId} and company_id = ${u.id} and student_id = ${studentId} returning *
+      `;
+      return { ok: true, offer: rows[0] };
+    }
+
+    // Book it into the student's applications, as an accepted interview is:
+    // their open application to this company (the same role first), else a new one.
+    const name = await companyName(u.id);
+    const [open] = await sql`
+      select id, status from applications
+      where student_id = ${studentId} and company_id = ${u.id} and status in ('applied', 'interviewing')
+      order by lower(role_title) = lower(${roleTitle}) desc, updated_at desc limit 1
+    `;
+    const [app] = open
+      ? await sql`update applications set status = 'offer', updated_at = now() where id = ${open.id as string} returning id`
+      : await sql`insert into applications (student_id, event_id, company_id, company_name, role_title, status)
+                  values (${studentId}, ${eventId}, ${u.id}, ${name}, ${roleTitle}, 'offer') returning id`;
+    const [rows] = await sql.transaction([
+      sql`update offers set application_id = ${app.id as string}, application_prev_status = ${(open?.status as string) ?? null}
+          where id = ${inserted[0].id as string} returning *`,
+      notifyQuery(studentId, "offer", `${name} made you an offer`, roleTitle, "/dashboard/student/applications"),
+    ]);
+    return { ok: true, offer: rows[0] };
+  },
+  /** Withdraw an offer recorded by mistake, putting the student's application back as it was. */
+  async withdrawOffer(u, [eventId, studentId]) {
+    if (u.role !== "company") throw forbidden();
+    const sql = db();
+    const [o] = await sql`
+      delete from offers where event_id = ${s(eventId)} and company_id = ${u.id} and student_id = ${s(studentId)} returning *
+    `;
+    if (!o) return false;
+    // Only while the student hasn't moved the application on (accepted, declined…) since.
+    if (o.application_id) {
+      if (o.application_prev_status) {
+        await sql`update applications set status = ${o.application_prev_status as string}, updated_at = now()
+                  where id = ${o.application_id as string} and status = 'offer'`;
+      } else {
+        await sql`delete from applications where id = ${o.application_id as string} and status = 'offer'`;
+      }
+    }
+    const name = await companyName(u.id);
+    await notifyQuery(o.student_id as string, "offer_withdrawn", `${name} withdrew an offer`, o.role_title as string, "/dashboard/student/applications");
+    return true;
+  },
+  async listOffersForCompany(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    return db()`select * from offers where company_id = ${u.id} and event_id = ${s(eventId)} order by created_at desc`;
+  },
+  /** The event's offers, for its staff. */
+  async listOffers(u, [eventId]) {
+    await requireStaff(u, eventId);
+    return db()`
+      select id, created_at, event_id, company_id, student_id, role_title from offers
+      where event_id = ${s(eventId)} order by created_at desc
+    `;
+  },
+  /** Students the company has contacted at the event: messaged, or sent an interview invite. */
+  async listContactedStudents(u, [eventId]) {
+    if (u.role !== "company") throw forbidden();
+    const rows = await db()`
+      select receiver_profile_id as id from messages where event_id = ${s(eventId)} and sender_profile_id = ${u.id}
+      union
+      select student_id from interview_invites where event_id = ${s(eventId)} and company_id = ${u.id}
+    `;
+    return rows.map((r) => r.id as string).filter(Boolean);
   },
 
   /* Booth queues: live, while the event is running. */

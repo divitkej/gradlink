@@ -33,7 +33,7 @@ const sections: LegalSection[] = [
           <li><strong>Company profile:</strong> company name, sector, website, description, roles you are hiring for, skills wanted, booth number, logo and brochure.</li>
           <li><strong>Alumni mentor profile:</strong> the year you graduated, your degree, current role and company, LinkedIn link and what you can help with.</li>
           <li><strong>College details:</strong> your institution, an example of your students’ email address (so their domain can be approved for sign-up) and the plan you chose.</li>
-          <li><strong>Event activity:</strong> events you create or join, check-ins, QR scans between students and companies with any notes added, shortlist decisions and notes, sessions you book, booth queues you join, companies you save or mark as interesting, interview invites, notifications, and per-event counts such as profile views and scans received.</li>
+          <li><strong>Event activity:</strong> events you create or join, check-ins, QR scans between students and companies with any notes added, shortlist decisions and notes, sessions you book, booth queues you join, companies you save or mark as interesting, interview invites, offers a company records, notifications, and per-event counts such as profile views and scans received.</li>
           <li><strong>Applications you track:</strong> the companies and roles you applied to, their status, interview dates and your notes.</li>
           <li><strong>Messages</strong> you send and receive on GradLink.</li>
           <li><strong>Files</strong> you upload (résumés, brochures, logos, photos, up to 10 MB each).</li>
@@ -80,6 +80,7 @@ const sections: LegalSection[] = [
             <strong>Visible only to the people involved:</strong> messages (the sender and the recipient), a scan (the two people in it), interview
             invites (the student and the company), and a student marking a company Interested or asking it for a follow-up (that student and that company).
             A company’s shortlist decisions and notes are seen by that company and the event’s college; a student only sees which companies shortlisted them.
+            An offer a company records is seen by that student, that company and the event’s college, which counts it in the event’s results.
           </li>
           <li><strong>Visible only to you:</strong> your checklist progress, your application tracker, companies you saved or marked visited and your notes on them, and your billing details.</li>
         </ul>

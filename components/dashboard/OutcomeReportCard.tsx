@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, Lock, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import { SectionCard } from "./cards";
+import RoiScore from "./RoiScore";
+import YearOverYear from "./YearOverYear";
 import { Badge, Button } from "@/components/ui/primitives";
 import { buildReport, downloadReportCsv, type OutcomeReport } from "@/lib/report";
 import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib/billing";
-import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, InterviewCounts } from "@/lib/db";
+import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, InterviewCounts, OfferRow } from "@/lib/db";
 
 /**
  * The post-event outcome report — GradLink's paid feature.
@@ -16,7 +18,7 @@ import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, Interview
  * having) but the full tables and the export are behind Placement Pro.
  */
 export default function OutcomeReportCard({
-  event, students, companies, scans, shortlists, interviews, profileId, email, organization,
+  event, students, companies, scans, shortlists, interviews, offers, profileId, email, organization,
 }: {
   event: EventRow | null;
   students: StudentRow[];
@@ -24,6 +26,7 @@ export default function OutcomeReportCard({
   scans: ScanRow[];
   shortlists: ShortlistRow[];
   interviews: InterviewCounts;
+  offers: OfferRow[];
   profileId: string;
   email?: string;
   organization?: string;
@@ -41,7 +44,7 @@ export default function OutcomeReportCard({
     return () => { cancelled = true; };
   }, [profileId]);
 
-  const report: OutcomeReport = buildReport({ event, students, companies, scans, shortlists, interviews });
+  const report: OutcomeReport = buildReport({ event, students, companies, scans, shortlists, interviews, offers });
 
   async function upgrade() {
     setError(null);
@@ -57,6 +60,8 @@ export default function OutcomeReportCard({
   const headline = [
     { label: "Students engaged", value: `${report.studentsEngaged}/${report.studentsRegistered}`, sub: `${report.engagementRate}% engagement` },
     { label: "Students shortlisted", value: report.uniqueStudentsShortlisted, sub: `${report.shortlistRate}% of registrations` },
+    { label: "Interviews", value: report.interviewInvites, sub: `${report.interviewsBooked} booked` },
+    { label: "Placement rate", value: `${report.placementRate}%`, sub: `${report.studentsWithOffer} with an offer, ${report.offers} ${report.offers === 1 ? "offer" : "offers"}` },
     { label: "Employer scans", value: report.totalScans, sub: `across ${report.employers} employers` },
     { label: "Avg resume score", value: report.avgResumeScore, sub: `${report.resumeReady} resume-ready` },
   ];
@@ -74,7 +79,7 @@ export default function OutcomeReportCard({
         )
       }
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 14 }} className="report-stats">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 14 }} className="report-stats">
         {headline.map((h) => (
           <div key={h.label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "11px 13px" }}>
             <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 5 }}>{h.label}</div>
@@ -83,6 +88,8 @@ export default function OutcomeReportCard({
           </div>
         ))}
       </div>
+
+      <RoiScore roi={report.roi} />
 
       {pro === null ? (
         <p style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
@@ -95,7 +102,9 @@ export default function OutcomeReportCard({
             <span>
               {report.resumeReady} of {report.studentsRegistered} students are resume-ready, {report.totalScans} scans
               recorded across {report.employers} employers, {report.shortlists} shortlists created, and{" "}
-              {report.interviewInvites} interview invites sent ({report.interviewsBooked} booked).
+              {report.interviewInvites} interview invites sent ({report.interviewsBooked} booked), and{" "}
+              {report.offers} {report.offers === 1 ? "offer" : "offers"} made to {report.studentsWithOffer} students
+              ({report.placementRate}% placement rate).
               Export the full breakdown: every student, every employer, every outcome.
             </span>
           </p>
@@ -104,7 +113,7 @@ export default function OutcomeReportCard({
             <div style={{ marginTop: 14, overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 360 }}>
                 <thead>
-                  <tr>{["Top employers", "Scans", "Shortlisted"].map((h, i) => (
+                  <tr>{["Top employers", "Scans", "Shortlisted", "Offers"].map((h, i) => (
                     <th key={h} style={{ padding: "8px 10px", textAlign: i === 0 ? "left" : "right", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--text-muted)" }}>{h}</th>
                   ))}</tr>
                 </thead>
@@ -115,12 +124,14 @@ export default function OutcomeReportCard({
                       <td style={{ padding: "9px 10px", fontSize: 13, fontWeight: 600, color: "var(--text)", borderTop: "1px solid var(--border)" }}>{e.name}</td>
                       <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.studentScans}</td>
                       <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--accent-2)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.shortlisted}</td>
+                      <td style={{ padding: "9px 10px", fontSize: 13, color: "var(--text)", fontWeight: 600, textAlign: "right", borderTop: "1px solid var(--border)" }}>{e.offers}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+          <YearOverYear event={event} report={report} profileId={profileId} />
         </>
       ) : (
         <div style={{ background: "rgba(247,201,72,0.05)", border: "1px solid rgba(247,201,72,0.22)", borderRadius: "var(--r-md)", padding: "16px 18px" }}>
