@@ -28,9 +28,11 @@ export async function hasActivePro(profileId: string): Promise<boolean> {
  *
  * Stripe can deliver events late, twice or out of order, and a college can end
  * up with an old subscription and a new one. So an event is applied only when
- * it is about the subscription already on file, the row has none yet, or it
- * grants Pro (a new subscription taking over). An event that would downgrade
- * the college because of some other, older subscription is ignored.
+ * it is about the subscription already on file, or the row has none yet, or it
+ * is a new subscription taking over: one that grants Pro for a period that has
+ * not ended, while the row is not on an active Pro plan (checkout refuses a
+ * second subscription while one is). Anything else about another subscription,
+ * such as a late retry for an old one, is ignored.
  * Returns whether the row was written.
  */
 export async function saveSubscription(
@@ -46,7 +48,10 @@ export async function saveSubscription(
      on conflict (profile_id) do update set ${cols.map((c) => `${c} = excluded.${c}`).join(", ")}, updated_at = now()
      where subscriptions.stripe_subscription_id is null
         or subscriptions.stripe_subscription_id = excluded.stripe_subscription_id
-        or excluded.plan = 'pro'
+        or (excluded.plan = 'pro'
+            and (excluded.current_period_end is null or excluded.current_period_end > now())
+            and not (subscriptions.plan = 'pro' and subscriptions.status in ('active', 'past_due')
+                     and (subscriptions.current_period_end is null or subscriptions.current_period_end > now())))
      returning profile_id`,
     [profileId, ...cols.map((c) => fields[c])],
   );
