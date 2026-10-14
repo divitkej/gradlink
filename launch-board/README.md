@@ -4,19 +4,18 @@
 
 ![Launch progress](progress.svg)
 
-**135 of 163 done (83%).** 2 in progress, 28 left. Checklists last changed 2026-10-14.
+**137 of 163 done (84%).** 0 in progress, 26 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "In progress" : 2
   "Needs the owner" : 16
   "To do" : 5
   "Verify live" : 3
   "Parked by decision" : 2
-  "Done" : 135
+  "Done" : 137
 ```
 
 ## By phase
@@ -29,7 +28,7 @@ pie showData
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 80% | 12 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 72% | 36 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 86% | 56 | 2 | 9 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `███████████░` 89% | 58 | 0 | 7 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -176,12 +175,7 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 56 of 65 done, 2 in progress, 9 left.
-
-**Ongoing**
-
-- [ ] Put the branch live · [PR #43](https://github.com/divitkej/gradlink/pull/43) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19)
-- [ ] Put the fixes live · [PR #43](https://github.com/divitkej/gradlink/pull/43) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L53)
+**Ongoing.** 58 of 65 done, 0 in progress, 7 left.
 
 **Left**
 
@@ -191,9 +185,9 @@ Organiser access, the full student dashboard and the features the site promises.
 - [ ] Build: Candidate stages "Contacted" and "Offer" · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
 - [ ] Build: Alumni accounts · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L56)
 - [ ] Build: Year-over-year comparison · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L57)
-- [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)
+- [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L93)
 
-<details><summary>Done (56)</summary>
+<details><summary>Done (58)</summary>
 
 - [x] Separate codes for students and employers
 - [x] Organiser can replace a code
@@ -208,6 +202,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [x] New schema applied to the live Neon database
 - [x] Schema applied to the live Neon database
 - [x] Tested live on a preview version
+- [x] Put the branch live
 - [x] Career Readiness Hub
 - [x] Career profile: goal, target roles, projects
 - [x] Sessions, booking and waitlists
@@ -251,6 +246,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [x] The company page reset itself and over-counted booth visits
 - [x] Companies could see every registered student's email before scanning them
 - [x] Opening a student's page counted as a scan
+- [x] Put the fixes live
 
 </details>
 
@@ -286,16 +282,15 @@ Features that should work, checked once on a real device or the live site.
 | Organiser access | `███████████░` 91% | 10 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `██████████░░` 86% | 12 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `███████████░` 92% | 11 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
-| Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
+| Student dashboard | `████████████` 97% | 32 | 1 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 72% | 18 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
-| Company dashboard | `███████████░` 94% | 15 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **83%** | **135** | **28** | |
+| Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
+| **All** | `██████████░░` **84%** | **137** | **26** | |
 
 ## In progress
 
-- [ ] **Put the branch live** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L19) · [PR #43](https://github.com/divitkej/gradlink/pull/43)<br><sub>Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions… · id `student-dashboard/put-the-branch-live`</sub>
-- [ ] **Put the fixes live** · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L53) · [PR #43](https://github.com/divitkej/gradlink/pull/43)<br><sub>Merge the PR into main, then deploy from main. Verify live · id `company-dashboard/put-the-fixes-live`</sub>
+Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
 
 ## Left to do
 
@@ -330,7 +325,7 @@ Features that should work, checked once on a real device or the live site.
 
 - [ ] **Opening hero on a low-end phone** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L58)<br><sub>WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU… · id `landing-page/opening-hero-on-a-low-end-phone`</sub>
 - [ ] **Link preview card** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)<br><sub>Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in "Replace the G logo with a graduation cap");… · id `landing-page/link-preview-card`</sub>
-- [ ] **Two-account run on real phones** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)<br><sub>Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live · id `student-dashboard/two-account-run-on-real-phones`</sub>
+- [ ] **Two-account run on real phones** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L93)<br><sub>Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live · id `student-dashboard/two-account-run-on-real-phones`</sub>
 
 ### Parked by decision (2)
 
@@ -438,11 +433,12 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Student dashboard</b>: 31 done</summary>
+<details><summary><b>Student dashboard</b>: 32 done</summary>
 
 - [x] New schema applied to the live Neon database
 - [x] Schema applied to the live Neon database
 - [x] Tested live on a preview version
+- [x] Put the branch live
 - [x] Career Readiness Hub <sub>Done in "Complete the student dashboard against the landing page"</sub>
 - [x] Career profile: goal, target roles, projects <sub>Done in "Complete the student dashboard against the landing page"</sub>
 - [x] Sessions, booking and waitlists <sub>Done in "Complete the student dashboard against the landing page"</sub>
@@ -504,7 +500,7 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Company dashboard</b>: 15 done</summary>
+<details><summary><b>Company dashboard</b>: 16 done</summary>
 
 - [x] Pre-shortlisting from the event console deleted the recruiter's note <sub>Done in "Fix the company-side problems found in the live test"</sub>
 - [x] A note typed while the student page was still loading could be wiped <sub>Done in "Fix the company-side problems found in the live test"</sub>
@@ -521,6 +517,7 @@ Features that should work, checked once on a real device or the live site.
 - [x] The company page reset itself and over-counted booth visits <sub>Done in "Stop the company page resetting and count booth visitors once"</sub>
 - [x] Companies could see every registered student's email before scanning them <sub>Done in "Show companies a student's email only after scanning them"</sub>
 - [x] Opening a student's page counted as a scan <sub>Done in "Count a scan only when the QR's scan key comes with it"</sub>
+- [x] Put the fixes live
 
 </details>
 
