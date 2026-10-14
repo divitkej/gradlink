@@ -1589,7 +1589,7 @@
       "section": "Student side, second pass",
       "line": 51,
       "title": "Booth queues",
-      "detail": "Only while the event is live, up to 3 queues per student, re-joining goes to the back, the student's page checks for their turn every 20 seconds. Done in \"Finish the student side: invites, queues, alerts, opportunities\"",
+      "detail": "Only while the event is live, up to 3 queues per student, re-joining goes to the back, the student's page checks for their turn every 20 seconds. Done in \"Finish the student side: invites, queues, alerts, opportunities\" · A failed check no longer clears the queue from the page and stops the checks, in \"Keep checking for a booth queue turn after a failed check\"",
       "state": "done",
       "doneIn": "Finish the student side: invites, queues, alerts, opportunities",
       "phase": "5",
