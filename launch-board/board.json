@@ -1,14 +1,14 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 161,
+    "total": 160,
     "done": 137,
-    "open": 24,
-    "percent": 85,
+    "open": 23,
+    "percent": 86,
     "counts": {
       "in_progress": 0,
       "owner": 16,
-      "todo": 3,
+      "todo": 2,
       "verify": 3,
       "parked": 2,
       "done": 137
@@ -122,11 +122,11 @@
     {
       "key": "features-to-build",
       "name": "Features to build",
-      "total": 8,
+      "total": 7,
       "counts": {
         "in_progress": 0,
         "owner": 3,
-        "todo": 3,
+        "todo": 2,
         "verify": 0,
         "parked": 0,
         "done": 2
@@ -211,11 +211,11 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 63,
+      "total": 62,
       "counts": {
         "in_progress": 0,
         "owner": 1,
-        "todo": 3,
+        "todo": 2,
         "verify": 1,
         "parked": 0,
         "done": 58
@@ -430,18 +430,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "features-to-build/dedicated-onboarding"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 55,
-      "title": "Build: Event ROI score",
-      "detail": "Where the site shows it: Analytics stats. Notes: No formula or data",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/event-roi-score"
     },
     {
       "area": "features-to-build",
