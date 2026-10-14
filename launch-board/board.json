@@ -6,10 +6,10 @@
     "open": 28,
     "percent": 83,
     "counts": {
-      "in_progress": 0,
+      "in_progress": 2,
       "owner": 16,
       "todo": 5,
-      "verify": 5,
+      "verify": 3,
       "parked": 2,
       "done": 135
     }
@@ -98,10 +98,10 @@
       "name": "Student dashboard",
       "total": 33,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 1,
         "owner": 0,
         "todo": 0,
-        "verify": 2,
+        "verify": 1,
         "parked": 0,
         "done": 31
       }
@@ -137,10 +137,10 @@
       "name": "Company dashboard",
       "total": 16,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 1,
         "owner": 0,
         "todo": 0,
-        "verify": 1,
+        "verify": 0,
         "parked": 0,
         "done": 15
       }
@@ -213,10 +213,10 @@
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
       "total": 65,
       "counts": {
-        "in_progress": 0,
+        "in_progress": 2,
         "owner": 1,
         "todo": 5,
-        "verify": 3,
+        "verify": 1,
         "parked": 0,
         "done": 56
       },
@@ -239,6 +239,42 @@
     }
   ],
   "items": [
+    {
+      "area": "student-dashboard",
+      "areaName": "Student dashboard",
+      "section": "Before deploying",
+      "line": 19,
+      "title": "Put the branch live",
+      "detail": "Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since). Verify live",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "5",
+      "id": "student-dashboard/put-the-branch-live",
+      "pr": {
+        "number": 43,
+        "title": "Tick the two go-live items now that main is deployed",
+        "url": "https://github.com/divitkej/gradlink/pull/43",
+        "draft": false
+      }
+    },
+    {
+      "area": "company-dashboard",
+      "areaName": "Company dashboard",
+      "section": "Owner decisions",
+      "line": 53,
+      "title": "Put the fixes live",
+      "detail": "Merge the PR into main, then deploy from main. Verify live",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "5",
+      "id": "company-dashboard/put-the-fixes-live",
+      "pr": {
+        "number": 43,
+        "title": "Tick the two go-live items now that main is deployed",
+        "url": "https://github.com/divitkej/gradlink/pull/43",
+        "draft": false
+      }
+    },
     {
       "area": "launch",
       "areaName": "Launch",
@@ -518,18 +554,6 @@
     {
       "area": "student-dashboard",
       "areaName": "Student dashboard",
-      "section": "Before deploying",
-      "line": 19,
-      "title": "Put the branch live",
-      "detail": "Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since). Verify live",
-      "state": "verify",
-      "doneIn": null,
-      "phase": "5",
-      "id": "student-dashboard/put-the-branch-live"
-    },
-    {
-      "area": "student-dashboard",
-      "areaName": "Student dashboard",
       "section": "Verify on the live site",
       "line": 94,
       "title": "Two-account run on real phones",
@@ -538,18 +562,6 @@
       "doneIn": null,
       "phase": "5",
       "id": "student-dashboard/two-account-run-on-real-phones"
-    },
-    {
-      "area": "company-dashboard",
-      "areaName": "Company dashboard",
-      "section": "Owner decisions",
-      "line": 53,
-      "title": "Put the fixes live",
-      "detail": "Merge the PR into main, then deploy from main. Verify live",
-      "state": "verify",
-      "doneIn": null,
-      "phase": "5",
-      "id": "company-dashboard/put-the-fixes-live"
     },
     {
       "area": "landing-page",
