@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 7 / 8 done
+## Progress: 11 / 12 done
 
 ## Pricing
 
@@ -41,3 +41,14 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `app/dashboard/messages/page.tsx` · Phase 4 · Done in "Show new messages in an open conversation without a reload"
 - [x] **The unread badge could not be cleared from Messages.** The badge counts unread messages at every event, but the inbox shows only the open one, so a message at another event kept the badge on with no way to reach it. The inbox now lists other events with unread messages and switches to one in a tap.
   `app/dashboard/messages/page.tsx`, `lib/server/rpc.ts` · Phase 4 · Done in "Show unread messages at other events in the inbox"
+
+## Scan pages
+
+- [x] **A new scan is missing from the page it was made on.** The history on a scanned student's page loaded before the scan was saved, so a recruiter saw "0 with this candidate" and a college missed the "Checked in" pill until a reload. The history now loads again once the scan is saved.
+  `components/scan/StudentScanView.tsx` · Phase 4 · Done in "Fix scan history, saves, camera shutdown and sign-in copy on the scan pages"
+- [x] **A student's saves could be wiped.** If a student's saves failed to load, tapping one mark sent every mark as off, clearing the others in the account; and a browser copy from before saves moved to the database was deleted before the account had it. A tap now sends only that mark, and the browser copy is removed once it is saved.
+  `components/scan/CompanyScanView.tsx` · Phase 4 · Done in "Fix scan history, saves, camera shutdown and sign-in copy on the scan pages"
+- [x] **The camera could stay on.** Leaving the scanner while the camera was still opening left it running, and the scan loop kept going after Stop while a frame was being read. Both now stop.
+  `components/scan/Scanner.tsx` · Phase 4 · Done in "Fix scan history, saves, camera shutdown and sign-in copy on the scan pages"
+- [x] **Scan page copy described the old flow.** The scanner said tapping someone "simulates a scan" (it now opens their profile without recording one), and the sign-in gate asked people to "choose your role". Both now say what happens.
+  `components/scan/Scanner.tsx`, `components/scan/StudentScanView.tsx`, `components/scan/CompanyScanView.tsx` · Phase 4 · Done in "Fix scan history, saves, camera shutdown and sign-in copy on the scan pages"
