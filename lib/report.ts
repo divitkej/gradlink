@@ -36,6 +36,49 @@ export interface StudentLine {
   status: string;
 }
 
+/**
+ * Event ROI score, out of 10: five parts worth 2 points each. A part earns
+ * its points in proportion to how close the event came to the part's target,
+ * capped at the target. Rates are shares of registered students, except
+ * employers active, which is a share of employers.
+ */
+export const ROI_PARTS = [
+  { key: "engaged", label: "Students engaged", target: 80, about: "met at least one employer" },
+  { key: "employers", label: "Employers active", target: 100, about: "scanned, shortlisted or were scanned by a student" },
+  { key: "shortlisted", label: "Students shortlisted", target: 30, about: "shortlisted by at least one employer" },
+  { key: "interviews", label: "Students invited to interview", target: 15, about: "got at least one interview invite" },
+  { key: "offers", label: "Students with an offer", target: 5, about: "got at least one offer" },
+] as const;
+export const ROI_POINTS_PER_PART = 2;
+
+export interface RoiPart {
+  key: (typeof ROI_PARTS)[number]["key"];
+  label: string;
+  about: string;
+  /** The event's rate, 0 to 100. */
+  rate: number;
+  target: number;
+  points: number;
+}
+
+export interface RoiScore {
+  /** Out of 10, one decimal; null while the event has no registered students. */
+  score: number | null;
+  parts: RoiPart[];
+}
+
+/** The ROI score from each part's rate (0 to 100). */
+export function roiScore(rates: Record<RoiPart["key"], number>, hasStudents: boolean): RoiScore {
+  const parts = ROI_PARTS.map((p) => {
+    const rate = rates[p.key];
+    const points = Math.round(Math.min(1, rate / p.target) * ROI_POINTS_PER_PART * 10) / 10;
+    return { key: p.key, label: p.label, about: p.about, rate, target: p.target, points };
+  });
+  // The sum of the points as shown, so the breakdown always adds up to the score.
+  const total = parts.reduce((sum, p) => sum + p.points, 0);
+  return { score: hasStudents ? Math.round(total * 10) / 10 : null, parts };
+}
+
 export interface OutcomeReport {
   eventTitle: string;
   eventDate: string;
@@ -65,6 +108,7 @@ export interface OutcomeReport {
   shortlistRate: number;
   /** Share of registered students with at least one offer. */
   placementRate: number;
+  roi: RoiScore;
 
   employerTable: EmployerLine[];
   studentTable: StudentLine[];
@@ -73,6 +117,11 @@ export interface OutcomeReport {
 
 function pct(n: number, d: number) {
   return d > 0 ? Math.round((n / d) * 100) : 0;
+}
+
+/** Like pct, unrounded, so the ROI score is not thrown off by rounding small events. */
+function rate(n: number, d: number) {
+  return d > 0 ? Math.min(100, (n / d) * 100) : 0;
 }
 
 /**
@@ -201,6 +250,13 @@ export function buildReport(input: {
     engagementRate: pct(engagedIds.size, students.length),
     shortlistRate: pct(uniqueStudentsShortlisted, students.length),
     placementRate: pct(studentsWithOffer, students.length),
+    roi: roiScore({
+      engaged: rate(engagedIds.size, students.length),
+      employers: rate(employerTable.filter((e) => e.studentScans + e.shortlisted + e.rejected + e.offers > 0).length, companies.length),
+      shortlisted: rate(uniqueStudentsShortlisted, students.length),
+      interviews: rate(input.interviews?.students ?? 0, students.length),
+      offers: rate(studentsWithOffer, students.length),
+    }, students.length > 0),
 
     employerTable,
     studentTable,
@@ -233,6 +289,7 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
     ["Offers", r.offers],
     ["Students with an offer", r.studentsWithOffer],
     ["Placement rate (%)", r.placementRate],
+    ["Event ROI score (out of 10)", r.roi.score ?? ""],
     ["Average resume score", r.avgResumeScore],
     ["Resume-ready (70+)", r.resumeReady],
     ["Students with a resume", r.withResume],
@@ -247,6 +304,13 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
       s.name, s.email, s.degree, s.university, s.graduationYear, s.resumeScore, s.companiesMet, s.shortlists, s.offers, s.status,
     ]),
   ];
+
+  blocks.push(
+    [],
+    ["Event ROI score", r.roi.score ?? "Not enough data"],
+    ["Part", "This event (%)", "Target (%)", `Points (of ${ROI_POINTS_PER_PART})`],
+    ...r.roi.parts.map((p) => [p.label, Math.round(p.rate), p.target, p.points]),
+  );
 
   if (r.topSkills.length) {
     blocks.push([], ["Top skills"], ["Skill", "Students"], ...r.topSkills.map((s) => [s.skill, s.count]));

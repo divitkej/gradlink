@@ -347,6 +347,8 @@ export interface InterviewCounts {
   invited: number;
   /** Invites where the student picked a time. */
   booked: number;
+  /** Students with at least one invite that was not withdrawn. */
+  students?: number;
 }
 
 /** Interview invite counts for an event's staff (the college). */

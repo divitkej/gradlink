@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, Lock, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import { SectionCard } from "./cards";
+import RoiScore from "./RoiScore";
 import { Badge, Button } from "@/components/ui/primitives";
 import { buildReport, downloadReportCsv, type OutcomeReport } from "@/lib/report";
 import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib/billing";
@@ -86,6 +87,8 @@ export default function OutcomeReportCard({
           </div>
         ))}
       </div>
+
+      <RoiScore roi={report.roi} />
 
       {pro === null ? (
         <p style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-muted)" }}>
