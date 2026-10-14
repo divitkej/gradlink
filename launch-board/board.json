@@ -1,17 +1,17 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 159,
-    "done": 137,
-    "open": 22,
-    "percent": 86,
+    "total": 163,
+    "done": 142,
+    "open": 21,
+    "percent": 87,
     "counts": {
       "in_progress": 0,
       "owner": 16,
-      "todo": 1,
+      "todo": 0,
       "verify": 3,
       "parked": 2,
-      "done": 137
+      "done": 142
     }
   },
   "areas": [
@@ -122,14 +122,14 @@
     {
       "key": "features-to-build",
       "name": "Features to build",
-      "total": 6,
+      "total": 10,
       "counts": {
         "in_progress": 0,
         "owner": 3,
-        "todo": 1,
+        "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 2
+        "done": 7
       }
     },
     {
@@ -211,14 +211,14 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 61,
+      "total": 65,
       "counts": {
         "in_progress": 0,
         "owner": 1,
-        "todo": 1,
+        "todo": 0,
         "verify": 1,
         "parked": 0,
-        "done": 58
+        "done": 63
       },
       "status": "Ongoing"
     },
@@ -430,18 +430,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "features-to-build/dedicated-onboarding"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 57,
-      "title": "Build: Alumni accounts",
-      "detail": "Where the site shows it: Why GradLink card \"Useful all year round\". Notes: Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/alumni-accounts"
     },
     {
       "area": "landing-page",
@@ -1930,6 +1918,66 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/run-npm-run-db-migrate"
+    },
+    {
+      "area": "features-to-build",
+      "areaName": "Features to build",
+      "section": "Not built yet",
+      "line": 53,
+      "title": "Alumni accounts",
+      "detail": "Each event has an alumni code the college sends as an invite link (`/sign-up/alumni?code=`); alumni sign up with any address that is not throwaway, join that college's events, host mentoring sessions students book (shown with their role, company and class year), keep a mentor profile, and see students as a fellow attendee does, without contact details, scores or verified achievements. Their scans record nothing (`alumni` in `db/schema.sql`, `components/dashboard/AlumniDashboard.tsx`, `components/dashboard/AlumniProfileEditor.tsx`, `lib/server/auth-api.ts`). Done in \"Add alumni mentor accounts invited by their college\"",
+      "state": "done",
+      "doneIn": "Add alumni mentor accounts invited by their college",
+      "phase": "5",
+      "id": "features-to-build/alumni-accounts"
+    },
+    {
+      "area": "features-to-build",
+      "areaName": "Features to build",
+      "section": "Not built yet",
+      "line": 54,
+      "title": "Offer tracking and placement rate",
+      "detail": "A company records an offer on a student it met (scanned or shortlisted) from the student's page, which books it into the student's applications and tells them; the college sees offers, students with an offer and the placement rate (students with an offer out of those registered) on its dashboard, in the outcome report and its CSV (`components/scan/OfferControl.tsx`, `lib/report.ts`, `offers` in `db/schema.sql`). Done in \"Track contacted and offer stages, offers and placement rate\"",
+      "state": "done",
+      "doneIn": "Track contacted and offer stages, offers and placement rate",
+      "phase": "5",
+      "id": "features-to-build/offer-tracking-and-placement-rate"
+    },
+    {
+      "area": "features-to-build",
+      "areaName": "Features to build",
+      "section": "Not built yet",
+      "line": 55,
+      "title": "Candidate stages \"Contacted\" and \"Offer\"",
+      "detail": "Stages Scanned, Shortlisted, Contacted, Interview and Offer on the company dashboard, its pipeline and the candidate filter. Contacted is set automatically when the company messages the student or sends an interview invite (`listContactedStudents` in `lib/server/rpc.ts`, `components/dashboard/CompanyCandidates.tsx`). Done in \"Track contacted and offer stages, offers and placement rate\"",
+      "state": "done",
+      "doneIn": "Track contacted and offer stages, offers and placement rate",
+      "phase": "5",
+      "id": "features-to-build/candidate-stages-contacted-and-offer"
+    },
+    {
+      "area": "features-to-build",
+      "areaName": "Features to build",
+      "section": "Not built yet",
+      "line": 56,
+      "title": "Event ROI score",
+      "detail": "A score out of 10 on the outcome report, with its breakdown, and in the CSV: five parts worth 2 points each, earned in proportion to a target (students engaged 80%, employers active 100%, students shortlisted 30%, students invited to interview 15%, students with an offer 5%) and capped there (`ROI_PARTS` in `lib/report.ts`, `components/dashboard/RoiScore.tsx`). Done in \"Add the Event ROI score to the outcome report\"",
+      "state": "done",
+      "doneIn": "Add the Event ROI score to the outcome report",
+      "phase": "5",
+      "id": "features-to-build/event-roi-score"
+    },
+    {
+      "area": "features-to-build",
+      "areaName": "Features to build",
+      "section": "Not built yet",
+      "line": 57,
+      "title": "Year-over-year comparison",
+      "detail": "Placement Pro: the outcome report shows this event's registrations, employers, engagement, shortlist and placement rates, interview invites, offers, average résumé score and ROI score next to another event the same college ran (by default the most recent one before it), with the change, and exports it as CSV (`components/dashboard/YearOverYear.tsx`, `compareReports` in `lib/report.ts`). Done in \"Compare an event with the college's earlier events\"",
+      "state": "done",
+      "doneIn": "Compare an event with the college's earlier events",
+      "phase": "5",
+      "id": "features-to-build/year-over-year-comparison"
     },
     {
       "area": "features-to-build",
