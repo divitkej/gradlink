@@ -1,8 +1,8 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 161,
-    "done": 133,
+    "total": 163,
+    "done": 135,
     "open": 28,
     "percent": 83,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 133
+      "done": 135
     }
   },
   "areas": [
@@ -57,14 +57,14 @@
     {
       "key": "organiser-access",
       "name": "Organiser access",
-      "total": 9,
+      "total": 11,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 8
+        "done": 10
       }
     },
     {
@@ -211,14 +211,14 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 63,
+      "total": 65,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 5,
         "verify": 3,
         "parked": 0,
-        "done": 54
+        "done": 56
       },
       "status": "Ongoing"
     },
@@ -279,7 +279,7 @@
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 30,
+      "line": 34,
       "title": "Set `ADMIN_EMAILS`, then sign up with that email straight away",
       "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages. While account email is off, only the first owner address can be registered this way; any other address in ADMIN_EMAILS can only register once email confirmation is on.",
       "state": "owner",
@@ -1082,8 +1082,32 @@
     {
       "area": "organiser-access",
       "areaName": "Organiser access",
+      "section": "Built",
+      "line": 25,
+      "title": "Signing in from pricing or the owner pages lost the way back",
+      "detail": "Upgrade on `/pricing` sent a signed-out college to sign-up with no way back, the `/admin` and `/admin/colleges` sign-in links went to the dashboard after signing in, and the Back link on the sign-up forms dropped `?next=` (so a QR-scanned profile was lost). All now return to where the person started. `components/PricingSection.tsx`, `components/admin/AdminDashboard.tsx`, `components/admin/CollegeApprovals.tsx`, `components/gradlink/AuthShell.tsx` · Browser check · Done in \"Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan\"",
+      "state": "done",
+      "doneIn": "Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan",
+      "phase": "5",
+      "id": "organiser-access/signing-in-from-pricing-or-the"
+    },
+    {
+      "area": "organiser-access",
+      "areaName": "Organiser access",
+      "section": "Built",
+      "line": 27,
+      "title": "Pricing offered Pro to a college already on it",
+      "detail": "A college on Placement Pro saw \"Upgrade to Pro\", and checkout then refused it. The Pro card now says \"Your current plan\". `components/PricingSection.tsx` · Browser check · Done in \"Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan\"",
+      "state": "done",
+      "doneIn": "Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan",
+      "phase": "5",
+      "id": "organiser-access/pricing-offered-pro-to-a-college"
+    },
+    {
+      "area": "organiser-access",
+      "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 28,
+      "line": 32,
       "title": "Run the migration before deploying this code",
       "detail": "`npm run db:migrate` creates `event_codes`, gives every existing event its codes, adds the plan columns and creates `app_errors`. The new code needs these tables; it is safe to run more than once. Checked on production Neon on 2026-10-12: `event_codes`, `app_errors` and the `colleges.plan_choice` and `plan_selected_at` columns exist, and no event is missing its codes. No commit (database change)",
       "state": "done",
@@ -1095,7 +1119,7 @@
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
-      "line": 31,
+      "line": 35,
       "title": "Starter promised one live event but nothing enforced it",
       "detail": "Decided to change the wording rather than add a limit: Starter now lists \"Unlimited events\", and \"Unlimited events\" is no longer sold as a Pro feature on the pricing page, the plan picker, the outcome report upsell or the pricing page description. `lib/billing.ts`, `components/dashboard/OutcomeReportCard.tsx`, `app/pricing/page.tsx` · Done in \"Say Starter includes unlimited events\"",
       "state": "done",

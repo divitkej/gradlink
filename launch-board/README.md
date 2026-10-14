@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**133 of 161 done (83%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
+**135 of 163 done (83%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -15,7 +15,7 @@ pie showData
   "To do" : 5
   "Verify live" : 5
   "Parked by decision" : 2
-  "Done" : 133
+  "Done" : 135
 ```
 
 ## By phase
@@ -28,7 +28,7 @@ pie showData
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 80% | 12 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 72% | 36 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 86% | 54 | 0 | 9 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 86% | 56 | 0 | 9 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -175,11 +175,11 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 54 of 63 done, 0 in progress, 9 left.
+**Ongoing.** 56 of 65 done, 0 in progress, 9 left.
 
 **Left**
 
-- [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)
+- [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)
 - [ ] Build: Offer tracking and placement rate · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)
 - [ ] Build: Event ROI score · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)
 - [ ] Build: Candidate stages "Contacted" and "Offer" · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
@@ -189,7 +189,7 @@ Organiser access, the full student dashboard and the features the site promises.
 - [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L94)
 - [ ] Put the fixes live · Verify live · Company dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/company-dashboard.md?plain=1#L53)
 
-<details><summary>Done (54)</summary>
+<details><summary>Done (56)</summary>
 
 - [x] Separate codes for students and employers
 - [x] Organiser can replace a code
@@ -197,6 +197,8 @@ Organiser access, the full student dashboard and the features the site promises.
 - [x] Organiser sees who joined
 - [x] Colleges choose a plan after signing in
 - [x] Owner dashboard at `/admin`
+- [x] Signing in from pricing or the owner pages lost the way back
+- [x] Pricing offered Pro to a college already on it
 - [x] Run the migration before deploying this code
 - [x] Starter promised one live event but nothing enforced it
 - [x] New schema applied to the live Neon database
@@ -277,14 +279,14 @@ Features that should work, checked once on a real device or the live site.
 | Launch | `█████████░░░` 77% | 10 | 3 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
-| Organiser access | `███████████░` 89% | 8 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
+| Organiser access | `███████████░` 91% | 10 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `██████████░░` 86% | 12 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `███████████░` 92% | 11 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 72% | 18 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `███████████░` 94% | 15 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **83%** | **133** | **28** | |
+| **All** | `██████████░░` **83%** | **135** | **28** | |
 
 ## In progress
 
@@ -297,7 +299,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Cloudflare GitHub builds fail on every commit** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm… · id `launch/cloudflare-github-builds-fail-on-every`</sub>
 - [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
-- [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
+- [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L46)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Set `APP_URL`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L39)<br><sub>in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it. · id `security/set-app-url`</sub>
@@ -385,7 +387,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 </details>
 
-<details><summary><b>Organiser access</b>: 8 done</summary>
+<details><summary><b>Organiser access</b>: 10 done</summary>
 
 - [x] Separate codes for students and employers <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Organiser can replace a code <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
@@ -393,6 +395,8 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] Organiser sees who joined <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Colleges choose a plan after signing in <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
 - [x] Owner dashboard at `/admin` <sub>Done in "Add separate student and employer codes, plan choice and owner dashboard"</sub>
+- [x] Signing in from pricing or the owner pages lost the way back <sub>Done in "Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan"</sub>
+- [x] Pricing offered Pro to a college already on it <sub>Done in "Keep the way back through sign-up, pricing and admin sign-in, and show Pro as the current plan"</sub>
 - [x] Run the migration before deploying this code
 - [x] Starter promised one live event but nothing enforced it <sub>Done in "Say Starter includes unlimited events"</sub>
 
