@@ -4,7 +4,7 @@ Scope: hosting, database, email, domain and the legal pages needed before GradLi
 
 Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Neon Free, region `aws-ap-southeast-1`).
 
-## Progress: 10 / 14 done
+## Progress: 11 / 14 done
 
 ## Hosting and database
 
@@ -18,8 +18,8 @@ Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Ne
   Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`
 - [x] **Only Neon and Cloudflare in the repo.** Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon.
   Done in "Remove Vercel, Supabase and Firebase leftovers"
-- [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
-  Owner action
+- [x] **Cloudflare GitHub builds work.** The Worker is connected to this repo in Cloudflare (Workers Builds). Merges to `main` build and deploy on their own (build `npx opennextjs-cloudflare build`, deploy `npx opennextjs-cloudflare deploy`), and "Update launch board [skip ci]" commits are skipped on purpose. Pull request branches failed in 0 seconds until the Previews Base tab got the same build command, the preview command `npx opennextjs-cloudflare upload` and a fresh build API token on both tabs.
+  Done on 2026-10-14 in the Cloudflare dashboard (Workers, gradlink, Settings, Build) · Recorded in "Record that Cloudflare builds work for main and preview branches"
 
 ## Domain and email
 
