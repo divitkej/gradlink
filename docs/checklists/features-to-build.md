@@ -31,6 +31,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Offers and placement rate: a company records an offer on a student it met (scanned or shortlisted) from the student's page, which books it into the student's applications and tells them; the college sees offers, students with an offer and the placement rate (students with an offer out of those registered) on its dashboard, in the outcome report and its CSV (`components/scan/OfferControl.tsx`, `lib/report.ts`, `offers` in `db/schema.sql`). Done in "Track contacted and offer stages, offers and placement rate"
 - Company candidate stages Scanned, Shortlisted, Contacted, Interview and Offer on the company dashboard, its pipeline and the candidate filter. Contacted is set automatically when the company messages the student or sends an interview invite (`listContactedStudents` in `lib/server/rpc.ts`, `components/dashboard/CompanyCandidates.tsx`). Done in "Track contacted and offer stages, offers and placement rate"
 - Event ROI score out of 10 on the outcome report, with its breakdown, and in the CSV: five parts worth 2 points each, earned in proportion to a target (students engaged 80%, employers active 100%, students shortlisted 30%, students invited to interview 15%, students with an offer 5%) and capped there (`ROI_PARTS` in `lib/report.ts`, `components/dashboard/RoiScore.tsx`). Done in "Add the Event ROI score to the outcome report"
+- Year-over-year comparison (Placement Pro): the outcome report shows this event's registrations, employers, engagement, shortlist and placement rates, interview invites, offers, average résumé score and ROI score next to another event the same college ran (by default the most recent one before it), with the change, and exports it as CSV (`components/dashboard/YearOverYear.tsx`, `compareReports` in `lib/report.ts`). Done in "Compare an event with the college's earlier events"
 
 ## Decision: employers see strengths, never assessments
 
@@ -54,7 +55,6 @@ So these are not planned for employers: filtering or sorting by readiness, résu
 | Feature | Where the site shows it | Notes |
 |---|---|---|
 | Alumni accounts | Why GradLink card "Useful all year round" | Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves |
-| Year-over-year comparison | Pricing (Placement Pro) | |
 
 ## Removed from the footer until they exist
 

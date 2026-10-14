@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Download, Lock, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import { SectionCard } from "./cards";
 import RoiScore from "./RoiScore";
+import YearOverYear from "./YearOverYear";
 import { Badge, Button } from "@/components/ui/primitives";
 import { buildReport, downloadReportCsv, type OutcomeReport } from "@/lib/report";
 import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib/billing";
@@ -130,6 +131,7 @@ export default function OutcomeReportCard({
               </table>
             </div>
           )}
+          <YearOverYear event={event} report={report} profileId={profileId} />
         </>
       ) : (
         <div style={{ background: "rgba(247,201,72,0.05)", border: "1px solid rgba(247,201,72,0.22)", borderRadius: "var(--r-md)", padding: "16px 18px" }}>
