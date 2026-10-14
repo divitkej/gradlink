@@ -322,3 +322,48 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
 export function downloadReportCsv(r: OutcomeReport) {
   downloadCsv(`gradlink-outcome-report-${slugify(r.eventTitle) || "event"}.csv`, reportBlocks(r));
 }
+
+/* ---------------- Year-over-year comparison ---------------- */
+
+export interface ComparisonRow {
+  label: string;
+  /** This event's value. */
+  current: number | null;
+  /** The earlier event's value. */
+  previous: number | null;
+  unit: "" | "%" | "/10";
+  /** current minus previous, in the row's unit (percentage points for rates); null when either is missing. */
+  change: number | null;
+}
+
+/** The headline numbers of two events side by side (Placement Pro). */
+export function compareReports(current: OutcomeReport, previous: OutcomeReport): ComparisonRow[] {
+  const row = (label: string, pick: (r: OutcomeReport) => number | null, unit: ComparisonRow["unit"] = ""): ComparisonRow => {
+    const a = pick(current), b = pick(previous);
+    return { label, current: a, previous: b, unit, change: a === null || b === null ? null : Math.round((a - b) * 10) / 10 };
+  };
+  return [
+    row("Students registered", (r) => r.studentsRegistered),
+    row("Employers", (r) => r.employers),
+    row("Engagement rate", (r) => r.engagementRate, "%"),
+    row("Shortlist rate", (r) => r.shortlistRate, "%"),
+    row("Interview invites", (r) => r.interviewInvites),
+    row("Offers", (r) => r.offers),
+    row("Placement rate", (r) => r.placementRate, "%"),
+    row("Average resume score", (r) => r.avgResumeScore),
+    row("Event ROI score", (r) => r.roi.score, "/10"),
+  ];
+}
+
+/** Trigger a browser download of a comparison as CSV. */
+export function downloadComparisonCsv(current: OutcomeReport, previous: OutcomeReport) {
+  const fmt = (v: number | null) => (v === null ? "" : v);
+  downloadCsv(`gradlink-comparison-${slugify(current.eventTitle) || "event"}-vs-${slugify(previous.eventTitle) || "earlier"}.csv`, [
+    ["GradLink: event comparison"],
+    ["This event", current.eventTitle, current.eventDate],
+    ["Compared with", previous.eventTitle, previous.eventDate],
+    [],
+    ["Measure", current.eventTitle, previous.eventTitle, "Change"],
+    ...compareReports(current, previous).map((r) => [r.unit ? `${r.label} (${r.unit === "%" ? "%" : "out of 10"})` : r.label, fmt(r.current), fmt(r.previous), fmt(r.change)]),
+  ]);
+}
