@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/primitives";
 import { useSession } from "@/lib/session";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, sendMessage, recordScan,
-  getStudentByProfile, listSavedCompanies, saveCompany, listMyQueues, getEvent,
+  getStudentByProfile, listSavedCompanies, saveCompany, listMyQueues, refreshMyQueues, getEvent,
   type CompanyRow, type ScanRow, type ShortlistRow, type SavedCompanyRow, type MyQueueRow,
 } from "@/lib/db";
 import QueueControl from "@/components/dashboard/QueueControl";
@@ -157,7 +157,7 @@ export default function CompanyScanView({ companyProfileId, eventId, scanKey }: 
               onNote={editNote}
               queueSlot={
                 <QueueControl eventId={eventId} companyId={companyProfileId} queue={queue} live={live}
-                  onChange={async () => setQueue((await listMyQueues(eventId)).find((q) => q.company_id === companyProfileId))} />
+                  onChange={async () => { const qs = await refreshMyQueues(eventId); if (qs) setQueue(qs.find((q) => q.company_id === companyProfileId)); }} />
               }
             />
           )}

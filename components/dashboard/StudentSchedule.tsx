@@ -11,7 +11,7 @@ import { useStudentData } from "@/lib/use-student-data";
 import { useActiveEvent } from "@/lib/use-active-event";
 import QueueControl from "./QueueControl";
 import {
-  bookSession, cancelBooking, listSessions, saveCompany, listMyQueues, SESSION_KIND_LABEL,
+  bookSession, cancelBooking, listSessions, saveCompany, refreshMyQueues, SESSION_KIND_LABEL,
   type SessionRow, type SessionKind, type CompanyRow,
 } from "@/lib/db";
 import { fmtDay, fmtTime, sessionEnd, sessionPhase, zoneNote } from "@/lib/format";
@@ -30,12 +30,13 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
   const inQueue = (data?.queues.length ?? 0) > 0;
 
   // While waiting in a queue, check for your turn every 20 seconds (visible tab only).
+  // A failed check keeps the queues shown and polling, rather than reading as "not in a queue".
   useEffect(() => {
     if (!inQueue) return;
     const t = window.setInterval(async () => {
       if (document.visibilityState !== "visible") return;
-      const queues = await listMyQueues(eventId);
-      patch((d) => ({ ...d, queues }));
+      const queues = await refreshMyQueues(eventId);
+      if (queues) patch((d) => ({ ...d, queues }));
     }, 20_000);
     return () => window.clearInterval(t);
   }, [inQueue, eventId, patch]);
@@ -81,8 +82,8 @@ export default function StudentSchedule({ eventId }: { eventId: string }) {
     .sort((a, b) => (a.c.booth_number ?? "").localeCompare(b.c.booth_number ?? "", undefined, { numeric: true }));
 
   const refreshQueues = async () => {
-    const queues = await listMyQueues(eventId);
-    patch((d) => ({ ...d, queues }));
+    const queues = await refreshMyQueues(eventId);
+    if (queues) patch((d) => ({ ...d, queues }));
   };
   const queueFor = new Map(data.queues.map((q) => [q.company_id, q]));
   const savedIds = new Set(plan.map((p) => p.s.company_id));

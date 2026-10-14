@@ -49,7 +49,7 @@ Status key as in `landing-page.md`.
 - [x] **Interview invites and bookings.** Company proposes up to five times; the student picks one, which books the interview into their applications (updating an existing application for that role rather than duplicating it). Only students the company scanned or shortlisted can be invited, one open invite at a time.
   Done in "Finish the student side: invites, queues, alerts, opportunities"
 - [x] **Booth queues.** Only while the event is live, up to 3 queues per student, re-joining goes to the back, the student's page checks for their turn every 20 seconds.
-  Done in "Finish the student side: invites, queues, alerts, opportunities"
+  Done in "Finish the student side: invites, queues, alerts, opportunities" · A failed check no longer clears the queue from the page and stops the checks, in "Keep checking for a booth queue turn after a failed check"
 - [x] **Notifications.** Interview invites and replies, a waitlist place opening up, and "It's your turn". The bell counts these and unread messages.
   Done in "Finish the student side: invites, queues, alerts, opportunities"
 - [x] **Opportunities.** Every open role at the event, target-role matches first, internships marked, "I applied" adds it to applications.
