@@ -12,13 +12,14 @@ import type { AppRole } from "./session";
    localStorage copy of the profile purely so the UI paints instantly.
    ============================================================ */
 
-export type Role = "student" | "company" | "college";
+export type Role = "student" | "company" | "college" | "alumni";
 
 /** Maps each role to its table and the org-name column. */
 export const ROLE_TABLE: Record<Role, { table: string; orgColumn: string }> = {
   student: { table: "students", orgColumn: "university" },
   company: { table: "companies", orgColumn: "company" },
   college: { table: "colleges", orgColumn: "institution" },
+  alumni: { table: "alumni", orgColumn: "current_company" },
 };
 
 export interface SignUpInput {
@@ -30,6 +31,10 @@ export interface SignUpInput {
   organization: string;
   /** Colleges only: an example of their students' email addresses. */
   studentEmail?: string;
+  /** Alumni only: the event's alumni code from the college's invite. */
+  alumniCode?: string;
+  graduationYear?: number | null;
+  currentTitle?: string;
 }
 
 export interface SignedInProfile {

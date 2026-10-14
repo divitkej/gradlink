@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, Plus, Trash2, Users } from "lucide-react";
 import { SectionCard, LoadingBlock, SmallButton, Labeled, fieldStyle as field } from "./cards";
 import {
-  listSessions, createSession, deleteSession, listSessionBookings, markAttendance, SESSION_KIND_LABEL,
+  listSessions, createSession, deleteSession, listSessionBookings, markAttendance, sessionHost, SESSION_KIND_LABEL,
   type SessionRow, type SessionKind, type SessionBookingRow,
 } from "@/lib/db";
 import type { AppRole } from "@/lib/session";
@@ -14,6 +14,7 @@ import TimeZoneSelect from "@/components/ui/TimeZoneSelect";
 
 const ALL_KINDS: SessionKind[] = ["workshop", "mock_interview", "company_session", "recruiter_slot", "networking", "talk", "mentoring"];
 const COMPANY_KINDS: SessionKind[] = ["company_session", "recruiter_slot", "mock_interview"];
+const ALUMNI_KINDS: SessionKind[] = ["mentoring"];
 
 
 /**
@@ -27,7 +28,7 @@ export default function SessionManager({ eventId, role, myId, isOwner, timezone,
   timezone: string | null;
   onTimezoneChange: (tz: string) => void;
 }) {
-  const kinds = isOwner ? ALL_KINDS : COMPANY_KINDS;
+  const kinds = isOwner ? ALL_KINDS : role === "alumni" ? ALUMNI_KINDS : COMPANY_KINDS;
   const [sessions, setSessions] = useState<SessionRow[] | null>(null);
   const [form, setForm] = useState({ kind: kinds[0], title: "", description: "", location: "", start: "", end: "", capacity: "" });
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export default function SessionManager({ eventId, role, myId, isOwner, timezone,
     return () => { cancelled = true; };
   }, [eventId, version]);
 
-  const canAdd = isOwner || role === "company";
+  const canAdd = isOwner || role === "company" || role === "alumni";
   const tz = isTimeZone(timezone) ? timezone : null;
   const [tzError, setTzError] = useState<string | null>(null);
 
@@ -76,7 +77,7 @@ export default function SessionManager({ eventId, role, myId, isOwner, timezone,
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {canAdd && (
-        <SectionCard title="Add a session" hint={isOwner ? "Workshops, mock interviews, talks and more" : "Company sessions, mock interviews and 1:1 slots"}>
+        <SectionCard title="Add a session" hint={isOwner ? "Workshops, mock interviews, talks and more" : role === "alumni" ? "Mentoring sessions students can book" : "Company sessions, mock interviews and 1:1 slots"}>
           <form onSubmit={add} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <ZoneLine tz={tz} isOwner={isOwner} onChange={changeZone} />
             {tzError && <p role="alert" style={{ fontSize: 12.5, color: "var(--danger)" }}>{tzError}</p>}
@@ -128,7 +129,7 @@ export default function SessionManager({ eventId, role, myId, isOwner, timezone,
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.title}</div>
                       <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
-                        {[SESSION_KIND_LABEL[s.kind], `${fmtDay(s.starts_at, tz)}, ${fmtTime(s.starts_at, tz)}${s.ends_at ? ` to ${fmtTime(s.ends_at, tz)}` : ""}`, s.location, s.host_org || s.host_name].filter(Boolean).join(" · ")}
+                        {[SESSION_KIND_LABEL[s.kind], `${fmtDay(s.starts_at, tz)}, ${fmtTime(s.starts_at, tz)}${s.ends_at ? ` to ${fmtTime(s.ends_at, tz)}` : ""}`, s.location, sessionHost(s)].filter(Boolean).join(" · ")}
                       </div>
                     </div>
                     <span style={{ fontSize: 12.5, color: "var(--text-2)", whiteSpace: "nowrap" }}>

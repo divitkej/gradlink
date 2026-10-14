@@ -5,12 +5,13 @@ import { signOutUser } from "./auth";
 import { useHydrated } from "./use-hydrated";
 
 /** App-level role vocabulary used across the platform. */
-export type AppRole = "student" | "company" | "event_manager";
+export type AppRole = "student" | "company" | "event_manager" | "alumni";
 
 export const ROLE_LABEL: Record<AppRole, string> = {
   student: "Student",
   company: "Company",
   event_manager: "Event Manager",
+  alumni: "Alumni mentor",
 };
 
 /**

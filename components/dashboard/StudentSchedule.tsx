@@ -11,7 +11,7 @@ import { useStudentData } from "@/lib/use-student-data";
 import { useActiveEvent } from "@/lib/use-active-event";
 import QueueControl from "./QueueControl";
 import {
-  bookSession, cancelBooking, listSessions, saveCompany, refreshMyQueues, SESSION_KIND_LABEL,
+  bookSession, cancelBooking, listSessions, saveCompany, sessionHost, refreshMyQueues, SESSION_KIND_LABEL,
   type SessionRow, type SessionKind, type CompanyRow,
 } from "@/lib/db";
 import { fmtDay, fmtTime, sessionEnd, sessionPhase, zoneNote } from "@/lib/format";
@@ -220,7 +220,7 @@ function SessionItem({ s, busy, error, clash, onAct }: {
 }) {
   const phase = sessionPhase(s);
   const full = s.capacity !== null && s.booked_count >= s.capacity;
-  const host = s.host_org || s.host_name;
+  const host = sessionHost(s);
   const places = s.capacity === null
     ? `${s.booked_count} booked`
     : full

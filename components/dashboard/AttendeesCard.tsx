@@ -5,20 +5,23 @@ import { Search } from "lucide-react";
 import { SectionCard, LoadingBlock } from "./cards";
 import { listAttendees, type AttendeeRow } from "@/lib/events";
 
-type Filter = "all" | "student" | "company";
+type Filter = "all" | "student" | "company" | "alumni";
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "Everyone" },
   { key: "student", label: "Students" },
   { key: "company", label: "Employers" },
+  { key: "alumni", label: "Alumni mentors" },
 ];
 
 function orgOf(a: AttendeeRow) {
+  if (a.role === "alumni") return a.current_company ?? a.organization;
   return a.role === "student" ? a.university ?? a.organization : a.company_name ?? a.company ?? a.organization;
 }
 
 function detailOf(a: AttendeeRow) {
   if (a.role === "student") return [a.degree, a.graduation_year].filter(Boolean).join(", ");
+  if (a.role === "alumni") return [a.current_title, a.graduation_year ? `Class of ${a.graduation_year}` : null].filter(Boolean).join(", ");
   return [a.sector, a.booth_number ? `Booth ${a.booth_number}` : null].filter(Boolean).join(", ");
 }
 
@@ -54,12 +57,13 @@ export default function AttendeesCard({ eventId }: { eventId: string }) {
 
   const students = rows?.filter((a) => a.role === "student").length ?? 0;
   const employers = rows?.filter((a) => a.role === "company").length ?? 0;
+  const mentors = rows?.filter((a) => a.role === "alumni").length ?? 0;
 
   const th: React.CSSProperties = { padding: "10px 12px", textAlign: "left", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--text-muted)", whiteSpace: "nowrap" };
   const td: React.CSSProperties = { padding: "10px 12px", fontSize: 13, color: "var(--text-2)", borderTop: "1px solid var(--border)", verticalAlign: "top" };
 
   return (
-    <SectionCard title="Attendees" hint={rows ? `${count(students, "student", "students")}, ${count(employers, "employer", "employers")}` : undefined}>
+    <SectionCard title="Attendees" hint={rows ? `${count(students, "student", "students")}, ${count(employers, "employer", "employers")}${mentors ? `, ${count(mentors, "alumni mentor", "alumni mentors")}` : ""}` : undefined}>
       <div id="attendees" />
       {rows === null ? (
         <LoadingBlock label="Loading attendees…" />
@@ -92,7 +96,7 @@ export default function AttendeesCard({ eventId }: { eventId: string }) {
                 {shown.map((a) => (
                   <tr key={a.profile_id}>
                     <td style={{ ...td, color: "var(--text)", fontWeight: 600 }}>{a.full_name || "No name given"}</td>
-                    <td style={td}>{a.role === "student" ? "Student" : "Employer"}</td>
+                    <td style={td}>{a.role === "student" ? "Student" : a.role === "alumni" ? "Alumni mentor" : "Employer"}</td>
                     <td style={td}>{orgOf(a) || ""}</td>
                     <td style={td}>{detailOf(a)}</td>
                     <td style={td}><a href={`mailto:${a.email}`} style={{ color: "var(--accent)", textDecoration: "none" }}>{a.email}</a></td>

@@ -1,7 +1,7 @@
 import { db } from "./sql";
 import { serverEnv } from "./env";
 import { HttpError } from "./http";
-import { domainWithin, emailDomain, isBlockedDomain, isSharedSuffix, sameOrganisation } from "./email-domains";
+import { domainWithin, emailDomain, isBlockedDomain, isSharedSuffix, isThrowawayDomain, sameOrganisation } from "./email-domains";
 import type { AuthUser } from "./session";
 
 /* ============================================================
@@ -15,11 +15,13 @@ import type { AuthUser } from "./session";
    up on an approved student domain or one of its subdomains, so every
    student account belongs to a known institution. Employers use any work
    domain that is not personal, throwaway or an approved student domain.
+   Alumni mentors join with a college's alumni code and may use any address
+   that is not throwaway, since their student email has usually stopped working.
    Emails in ADMIN_EMAILS skip the email rules so the owner can always get in.
    ============================================================ */
 
 export type DomainStatus = "pending" | "approved" | "rejected";
-export type SignUpRole = "student" | "company" | "college";
+export type SignUpRole = "student" | "company" | "college" | "alumni";
 
 export interface CollegeDomain {
   domain: string;
@@ -34,6 +36,7 @@ export interface CollegeDomain {
 
 const MSG = {
   personal: "Use your official email address. Personal and temporary addresses (like Gmail or Outlook) can't be used on GradLink.",
+  throwaway: "Use an email address you keep. Temporary inboxes can't be used on GradLink.",
   studentPending: "Your university has applied to join GradLink and is being reviewed. You can sign up once it's approved.",
   studentUnknown: "Your university isn't on GradLink yet. Ask your careers office to register, then sign up with your university email.",
   companyIsCollege: "That's a university email address. Sign up as a student or college instead, or use your company email.",
@@ -100,6 +103,10 @@ export function studentDomainFromSample(sample: string): string {
 export async function checkSignUpEmail(role: SignUpRole, email: string): Promise<void> {
   if (isAdminEmail(email)) return;
   const domain = emailDomain(email);
+  if (role === "alumni") {
+    if (isThrowawayDomain(domain)) throw new HttpError(400, MSG.throwaway);
+    return;
+  }
   if (isBlockedDomain(domain)) throw new HttpError(400, MSG.personal);
 
   if (role === "student") {

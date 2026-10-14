@@ -29,6 +29,7 @@ const DISPOSABLE = [
 const RESERVED = ["example.com", "example.net", "example.org", "test", "example", "invalid", "localhost", "local"];
 
 const BLOCKED = new Set([...PERSONAL, ...DISPOSABLE, ...RESERVED]);
+const THROWAWAY = new Set([...DISPOSABLE, ...RESERVED]);
 
 /** The lower-cased part after the @, or "" when there isn't one. */
 export function emailDomain(email: string): string {
@@ -42,6 +43,16 @@ export function domainWithin(domain: string, parent: string): boolean {
 }
 
 /** Personal, throwaway or reserved, including their subdomains. */
+/**
+ * Throwaway and reserved domains only. Alumni mentors may use a personal
+ * address (their student email has usually stopped working), but not these.
+ */
+export function isThrowawayDomain(domain: string): boolean {
+  if (!domain) return true;
+  const labels = domain.split(".");
+  return labels.some((_, i) => THROWAWAY.has(labels.slice(i).join(".")));
+}
+
 export function isBlockedDomain(domain: string): boolean {
   if (!domain) return true;
   const labels = domain.split(".");
