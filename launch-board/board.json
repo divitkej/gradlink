@@ -1,14 +1,14 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 160,
+    "total": 159,
     "done": 137,
-    "open": 23,
+    "open": 22,
     "percent": 86,
     "counts": {
       "in_progress": 0,
       "owner": 16,
-      "todo": 2,
+      "todo": 1,
       "verify": 3,
       "parked": 2,
       "done": 137
@@ -122,11 +122,11 @@
     {
       "key": "features-to-build",
       "name": "Features to build",
-      "total": 7,
+      "total": 6,
       "counts": {
         "in_progress": 0,
         "owner": 3,
-        "todo": 2,
+        "todo": 1,
         "verify": 0,
         "parked": 0,
         "done": 2
@@ -211,11 +211,11 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 62,
+      "total": 61,
       "counts": {
         "in_progress": 0,
         "owner": 1,
-        "todo": 2,
+        "todo": 1,
         "verify": 1,
         "parked": 0,
         "done": 58
@@ -435,25 +435,13 @@
       "area": "features-to-build",
       "areaName": "Features to build",
       "section": "Not built yet",
-      "line": 56,
+      "line": 57,
       "title": "Build: Alumni accounts",
       "detail": "Where the site shows it: Why GradLink card \"Useful all year round\". Notes: Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves",
       "state": "todo",
       "doneIn": null,
       "phase": "5",
       "id": "features-to-build/alumni-accounts"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 57,
-      "title": "Build: Year-over-year comparison",
-      "detail": "Where the site shows it: Pricing (Placement Pro)",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/year-over-year-comparison"
     },
     {
       "area": "landing-page",
