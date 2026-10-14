@@ -1769,7 +1769,7 @@
       "section": "Fixed in code",
       "line": 14,
       "title": "Some data API ops skipped the event check or failed on bad input",
-      "detail": "Listing an event's sessions and loading its checklist now need you to be at the event (loading a checklist could also seed the default list into any event). Ticking a checklist item, saving a company and editing an event's dates now check what they are given, so bad ids or dates get a clear answer instead of a server error, and a company can only be saved at an event it is at. Un-marking attendance no longer turns a waitlist place into a seat. `lib/server/rpc.ts` · Done in \"Check event membership and input in more data API ops\"",
+      "detail": "Listing an event's sessions and loading its checklist now need you to be at the event (loading a checklist could also seed the default list into any event). Ticking a checklist item, saving a company and editing an event's dates now check what they are given, so bad ids or dates get a clear answer instead of a server error, and a company can only be saved at an event it is at. Un-marking attendance no longer turns a waitlist place into a seat: it gives the seat back only if the session still has room, else returns the booking to the waitlist. `lib/server/rpc.ts` · Done in \"Check event membership and input in more data API ops\" and \"Return an un-marked booking to the waitlist when the session is full\"",
       "state": "done",
       "doneIn": "Check event membership and input in more data API ops",
       "phase": "3",
