@@ -1124,17 +1124,26 @@ export const ops: Record<string, Op> = {
   async markAttendance(u, [sessionId, profileId, attended]) {
     await assertCanManageSession(u, s(sessionId));
     // Marking someone who came counts them whatever their booking said.
-    // Un-marking only undoes that: an attended booking goes back to booked.
-    // It never turns a waitlist place into a seat, which could overbook.
+    // Un-marking undoes that. What the booking was before is not stored, so it
+    // gets a seat back only if the session still has room (or no limit), and
+    // otherwise returns to the waitlist, where created_at keeps its place. A
+    // waitlisted student marked by mistake therefore cannot skip the queue
+    // into a full session.
     const rows = attended
       ? await db()`
           update session_bookings set status = 'attended'
           where session_id = ${s(sessionId)} and profile_id = ${s(profileId)} and status in ('booked', 'waitlisted', 'attended')
           returning status`
       : await db()`
-          update session_bookings set status = 'booked'
-          where session_id = ${s(sessionId)} and profile_id = ${s(profileId)} and status = 'attended'
-          returning status`;
+          update session_bookings b set status = case
+              when es.capacity is null or (
+                select count(*) from session_bookings o
+                where o.session_id = b.session_id and o.id <> b.id and o.status in ('booked', 'attended')
+              ) < es.capacity then 'booked'
+              else 'waitlisted' end
+          from event_sessions es
+          where es.id = b.session_id and b.session_id = ${s(sessionId)} and b.profile_id = ${s(profileId)} and b.status = 'attended'
+          returning b.status`;
     return rows.length > 0;
   },
 
