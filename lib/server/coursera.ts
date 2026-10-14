@@ -214,12 +214,14 @@ const nameTokens = (s: string) =>
 /**
  * Does the name on the certificate belong to this student? Every word of the
  * certificate's name must appear in the student's name, in any order, so
- * "Sara Al-Rashidi" matches "Sara Al Rashidi" but not "Sara Khan". The
- * student's name may have up to two words the certificate leaves out (middle
- * names), but no more: a profile name stuffed with many names would otherwise
- * match strangers' certificates and lock their real owners out of adding them.
+ * "Sara Al-Rashidi" matches "Sara Al Rashidi" but not "Sara Khan". Coursera
+ * gives only a first and last name, and full names here often run to five or
+ * six parts ("Mohammed Rashid Saeed Obaid Al Ketbi"), so the student's name may
+ * have up to five words the certificate leaves out. Not more: a profile name
+ * stuffed with many names would otherwise match strangers' certificates and
+ * lock their real owners out of adding them.
  */
-const EXTRA_NAME_WORDS = 2;
+const EXTRA_NAME_WORDS = 5;
 export function namesMatch(certificateName: string, studentName: string): boolean {
   const cert = new Set(nameTokens(certificateName)), mine = new Set(nameTokens(studentName));
   if (cert.size < 2 || ![...cert].every((t) => mine.has(t))) return false;
