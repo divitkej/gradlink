@@ -34,6 +34,8 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
   const [companies, setCompanies] = useState<CompanyRow[]>([]);
   const [loading, setLoading] = useState(true);
   const scanned = useRef(false);
+  // Bumped once this visit's scan is saved, so the history below includes it.
+  const [scanSaved, setScanSaved] = useState(0);
 
   // local action state
   const [status, setStatus] = useState<ShortlistRow["status"] | null>(null);
@@ -58,17 +60,15 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
 
       if (viewer === "company" && session) {
         const sl = await getShortlist(session.profileId, studentProfileId, eventId);
-        const hist = await getScans({ eventId, scannerProfileId: session.profileId, scannedProfileId: studentProfileId });
         if (!cancelled) {
-          setShortlist(sl); setScanHistory(hist);
+          setShortlist(sl);
           // Don't overwrite a decision or note the recruiter made while this was loading.
           if (!touched.current.status) setStatus(sl?.status ?? null);
           if (!touched.current.note) setNote(sl?.notes ?? "");
         }
       } else if (viewer === "event_manager") {
-        const hist = await getScans({ eventId, scannedProfileId: studentProfileId });
         const comps = await getRegisteredCompanies(eventId);
-        if (!cancelled) { setScanHistory(hist); setCompanies(comps); }
+        if (!cancelled) setCompanies(comps);
       }
       if (!cancelled) setLoading(false);
     })();
@@ -77,6 +77,20 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
     // new object and would reload (and reset) the page mid-edit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewer, studentProfileId, eventId, session?.profileId]);
+
+  // Scan history: the company's own scans of this student, or every scan of
+  // them for the college. Loaded again once this visit's scan is saved.
+  useEffect(() => {
+    if (!session || !studentProfileId || !eventId) return;
+    if (viewer !== "company" && viewer !== "event_manager") return;
+    let cancelled = false;
+    getScans(viewer === "company"
+      ? { eventId, scannerProfileId: session.profileId, scannedProfileId: studentProfileId }
+      : { eventId, scannedProfileId: studentProfileId },
+    ).then((hist) => { if (!cancelled) setScanHistory(hist); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewer, studentProfileId, eventId, session?.profileId, scanSaved]);
 
   // Record the scan once for company / manager viewers. Only a scanned QR
   // carries the key; opening the profile from a link in the app is a view.
@@ -87,12 +101,12 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
       recordScan({
         eventId, scannerProfileId: session.profileId, scannedProfileId: studentProfileId,
         scannerRole: viewer, scannedRole: "student", scanContext: "qr", scanKey,
-      });
+      }).then((ok) => { if (ok) setScanSaved((n) => n + 1); });
     }
   }, [viewer, session, student, studentProfileId, eventId, scanKey]);
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center" }}><LoadingBlock /></div>;
-  if (!viewer) return <ViewerGate onPick={() => {}} hint="Choose your role to view this student profile the right way." />;
+  if (!viewer) return <ViewerGate hint="Sign in to see this student's profile. You will come straight back here." />;
 
   return (
     <ScanLayout viewerRole={viewer}>

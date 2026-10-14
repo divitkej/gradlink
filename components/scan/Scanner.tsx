@@ -33,6 +33,10 @@ export default function Scanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+  // Each start gets a new run number and Stop (or leaving the page) bumps it,
+  // so a camera that opens late, or a scan loop still awaiting a frame,
+  // sees it is stale and shuts itself down.
+  const runRef = useRef(0);
 
   useEffect(() => {
     if (!viewer || !eventId) return;
@@ -69,11 +73,13 @@ export default function Scanner() {
   async function startCamera() {
     setCamErr(null);
     if (!navigator.mediaDevices?.getUserMedia) {
-      setCamErr("This device can't open the camera here. Tap someone below or paste a link.");
+      setCamErr("This device can't open the camera here. Paste the QR link below instead.");
       return;
     }
+    const run = ++runRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+      if (run !== runRef.current) { stream.getTracks().forEach((t) => t.stop()); return; }
       streamRef.current = stream;
       setCamOn(true);
       // Native fast path where available (Chrome/Edge); jsQR fallback works everywhere else (incl. iOS Safari).
@@ -83,11 +89,13 @@ export default function Scanner() {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       let frame = 0;
       const tick = async () => {
+        if (run !== runRef.current) return;
         const video = videoRef.current;
         if (video && video.readyState >= 2 && video.videoWidth) {
           try {
             if (detector) {
               const codes = await detector.detect(video);
+              if (run !== runRef.current) return;
               if (codes.length) { const v = codes[0].rawValue; stopCamera(); go(v); return; }
             } else if (ctx && frame++ % 2 === 0) {
               const scale = Math.min(1, 640 / video.videoWidth);
@@ -103,6 +111,7 @@ export default function Scanner() {
         rafRef.current = requestAnimationFrame(tick);
       };
       setTimeout(() => {
+        if (run !== runRef.current) return;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.setAttribute("playsinline", "true");
@@ -111,21 +120,27 @@ export default function Scanner() {
         rafRef.current = requestAnimationFrame(tick);
       }, 60);
     } catch {
-      setCamErr("Couldn't access the camera. Allow camera permission, or tap someone below or paste a link.");
+      if (run === runRef.current) setCamErr("Couldn't access the camera. Allow camera permission, or paste the QR link below.");
     }
   }
 
   function stopCamera() {
+    runRef.current++;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     setCamOn(false);
   }
 
-  useEffect(() => () => stopCamera(), []);
+  // Leaving the page stops the camera, including one still being opened.
+  useEffect(() => () => {
+    runRef.current++;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+  }, []);
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}><LoadingBlock /></div>;
-  if (!viewer || !session) return <ViewerGate onPick={() => {}} hint="Choose your role to start scanning." />;
+  if (!viewer || !session) return <ViewerGate hint="Sign in to scan QR codes at your event. You will come straight back here." />;
   if (eventStatus !== "ready" || !eventId) {
     return (
       <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, position: "relative", zIndex: 1 }}>
@@ -187,7 +202,7 @@ export default function Scanner() {
             </div>
           ) : (
             <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55 }}>
-              Point your camera at a GradLink QR, or tap someone below to simulate a scan.
+              Point your camera at a GradLink QR to record a scan. Tapping someone below opens their profile without recording one.
             </p>
           )}
           {camErr && <p style={{ fontSize: 12.5, color: "var(--amber)", marginTop: 10 }}>{camErr}</p>}

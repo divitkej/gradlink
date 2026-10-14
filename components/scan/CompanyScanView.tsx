@@ -25,23 +25,27 @@ const fromRow = (r: SavedCompanyRow): Saves => ({
   saved: r.saved, interested: r.interested, visited: r.visited, followUp: r.follow_up, note: r.note ?? "",
 });
 const toRow = (s: Saves) => ({ saved: s.saved, interested: s.interested, visited: s.visited, follow_up: s.followUp, note: s.note || null });
+const ROW_KEY = { saved: "saved", interested: "interested", visited: "visited", followUp: "follow_up" } as const;
 
 /**
  * Saves used to live in this browser's localStorage. The first time a student
  * opens a company here, a browser copy is moved into their account for this
- * event and the local copy removed.
+ * event. The local copy is removed only once the account has it.
  */
-function takeLegacySaves(studentId: string, companyId: string): Saves | null {
+function readLegacySaves(studentId: string, companyId: string): Saves | null {
+  try {
+    const all = JSON.parse(localStorage.getItem(`gradlink.saves.${studentId}`) || "{}");
+    return all[companyId] ? ({ ...empty, ...all[companyId] } as Saves) : null;
+  } catch { return null; }
+}
+function dropLegacySaves(studentId: string, companyId: string) {
   try {
     const key = `gradlink.saves.${studentId}`;
     const all = JSON.parse(localStorage.getItem(key) || "{}");
-    if (!all[companyId]) return null;
-    const legacy = { ...empty, ...all[companyId] } as Saves;
     delete all[companyId];
     if (Object.keys(all).length) localStorage.setItem(key, JSON.stringify(all));
     else localStorage.removeItem(key);
-    return legacy;
-  } catch { return null; }
+  } catch { /* nothing to drop */ }
 }
 
 export default function CompanyScanView({ companyProfileId, eventId, scanKey }: { companyProfileId: string; eventId: string; scanKey?: string | null }) {
@@ -76,8 +80,10 @@ export default function CompanyScanView({ companyProfileId, eventId, scanKey }: 
 
       if (viewer === "student" && myProfileId) {
         const row = (await listSavedCompanies(eventId)).find((r) => r.company_id === companyProfileId);
-        const legacy = row ? null : takeLegacySaves(myProfileId, companyProfileId);
-        if (legacy) saveCompany(eventId, companyProfileId, toRow(legacy));
+        const legacy = row ? null : readLegacySaves(myProfileId, companyProfileId);
+        if (legacy) {
+          saveCompany(eventId, companyProfileId, toRow(legacy)).then((res) => { if (res.ok) dropLegacySaves(myProfileId, companyProfileId); });
+        }
         const [queues, ev] = await Promise.all([listMyQueues(eventId), getEvent(eventId)]);
         if (!cancelled) {
           setSaves(row ? fromRow(row) : legacy ?? empty);
@@ -112,14 +118,20 @@ export default function CompanyScanView({ companyProfileId, eventId, scanKey }: 
     }
   }, [viewer, session, company, companyProfileId, eventId, scanKey]);
 
-  async function toggle(key: keyof Saves, label: string) {
+  async function toggle(key: keyof typeof ROW_KEY, label: string) {
     if (!session) return;
-    const prev = saves;
-    const next = { ...saves, [key]: !saves[key] } as Saves;
-    setSaves(next);
-    const res = await saveCompany(eventId, companyProfileId, toRow(next));
-    if (!res.ok) { setSaves(prev); flash("Couldn't save, try again"); return; }
-    flash(next[key] ? label : `${label} removed`);
+    const value = !saves[key];
+    setSaves((cur) => ({ ...cur, [key]: value }));
+    // Only the mark that changed: if the saves didn't load, sending them all
+    // would wipe the others.
+    const res = await saveCompany(eventId, companyProfileId, { [ROW_KEY[key]]: value });
+    if (!res.ok) {
+      // Undo only if no later click has changed it since.
+      setSaves((cur) => (cur[key] === value ? { ...cur, [key]: !value } : cur));
+      flash("Couldn't save, try again");
+      return;
+    }
+    flash(value ? label : `${label} removed`);
   }
 
   // Notes save once typing pauses, not on every keystroke.
@@ -132,7 +144,7 @@ export default function CompanyScanView({ companyProfileId, eventId, scanKey }: 
   }
 
   if (!ready) return <div style={{ minHeight: "100svh", display: "flex", alignItems: "center", justifyContent: "center" }}><LoadingBlock /></div>;
-  if (!viewer) return <ViewerGate onPick={() => {}} hint="Choose your role to view this company the right way." />;
+  if (!viewer) return <ViewerGate hint="Sign in to see this company's profile. You will come straight back here." />;
 
   return (
     <ScanLayout viewerRole={viewer}>
@@ -197,7 +209,7 @@ function StudentView({
   company, saves, msg, setMsg, onToggle, onSend, onNote, queueSlot,
 }: {
   company: CompanyRow; saves: Saves; msg: string; setMsg: (v: string) => void;
-  onToggle: (k: keyof Saves, label: string) => void; onSend: () => void; onNote: (v: string) => void;
+  onToggle: (k: keyof typeof ROW_KEY, label: string) => void; onSend: () => void; onNote: (v: string) => void;
   queueSlot: React.ReactNode;
 }) {
   return (

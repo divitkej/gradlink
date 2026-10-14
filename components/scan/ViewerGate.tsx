@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { LogIn, UserPlus } from "lucide-react";
 import Logo from "@/components/Logo";
-import type { AppRole } from "@/lib/session";
 
 const SIGN_IN_STYLE: React.CSSProperties = { flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, height: 48, padding: "0 22px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" };
 
@@ -39,7 +38,7 @@ function SignUpLink() {
  * Shown when a QR is opened by someone who isn't signed in.
  * GradLink shows the right view based on your real account, so we ask them to sign in.
  */
-export default function ViewerGate({ hint }: { onPick?: (r: AppRole) => void; hint?: string }) {
+export default function ViewerGate({ hint }: { hint?: string }) {
   return (
     <div style={{ minHeight: "100svh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, position: "relative", zIndex: 1 }}>
       <div style={{ marginBottom: 18 }}><Logo size={26} /></div>
