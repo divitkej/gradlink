@@ -608,6 +608,11 @@ export function listMyQueues(eventId: string): Promise<MyQueueRow[]> {
   return safe("listMyQueues", [], () => rpc<MyQueueRow[]>("listMyQueues", eventId));
 }
 
+/** Like listMyQueues, but null when the check failed, so a failed refresh can keep the queues already shown. */
+export function refreshMyQueues(eventId: string): Promise<MyQueueRow[] | null> {
+  return safe<MyQueueRow[] | null>("listMyQueues", null, () => rpc<MyQueueRow[]>("listMyQueues", eventId));
+}
+
 export function listBoothQueue(eventId: string): Promise<BoothQueueRow[]> {
   return safe("listBoothQueue", [], () => rpc<BoothQueueRow[]>("listBoothQueue", eventId));
 }
