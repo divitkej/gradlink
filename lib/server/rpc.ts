@@ -677,10 +677,11 @@ export const ops: Record<string, Op> = {
     await requireStaff(u, eventId);
     const [r] = await db()`
       select count(*) filter (where status <> 'cancelled')::int as invited,
-             count(*) filter (where status = 'accepted')::int as booked
+             count(*) filter (where status = 'accepted')::int as booked,
+             count(distinct student_id) filter (where status <> 'cancelled')::int as students
       from interview_invites where event_id = ${s(eventId)}
     `;
-    return { invited: Number(r?.invited ?? 0), booked: Number(r?.booked ?? 0) };
+    return { invited: Number(r?.invited ?? 0), booked: Number(r?.booked ?? 0), students: Number(r?.students ?? 0) };
   },
 
   /* Messages — only the two participants can read a conversation. */
