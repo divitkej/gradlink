@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
-import { PLANS, startCheckout, type Plan } from "@/lib/billing";
+import { PLANS, startCheckout, getSubscription, isPro, type Plan } from "@/lib/billing";
 import { useSession } from "@/lib/session";
 
 /** Stripe Checkout sends a cancelled checkout back here with ?canceled=1 (app/api/checkout). */
@@ -23,6 +23,16 @@ export default function PricingSection() {
   const [error, setError] = useState<string | null>(null);
 
   const isManager = session?.role === "event_manager";
+  const managerId = isManager ? session.profileId : null;
+  // A college already on Placement Pro sees that instead of an Upgrade button.
+  const [proFor, setProFor] = useState<string | null>(null);
+  const onPro = !!managerId && proFor === managerId;
+  useEffect(() => {
+    if (!managerId) return;
+    let cancelled = false;
+    getSubscription(managerId).then((sub) => { if (!cancelled && isPro(sub)) setProFor(managerId); });
+    return () => { cancelled = true; };
+  }, [managerId]);
 
   async function onCta(plan: Plan) {
     setError(null);
@@ -33,7 +43,8 @@ export default function PricingSection() {
 
     if (!ready) return;
     if (!session) {
-      window.location.assign("/sign-up/college");
+      // Back here after signing up (or signing in from that page) to finish upgrading.
+      window.location.assign(`/sign-up/college?next=${encodeURIComponent("/pricing")}`);
       return;
     }
     if (!isManager) {
@@ -106,6 +117,11 @@ export default function PricingSection() {
               <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{plan.cadence}</span>
             </div>
 
+            {plan.id !== "free" && onPro ? (
+              <div role="status" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 46, borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14.5, marginBottom: 24, color: "var(--text)", border: "1px solid var(--border-strong)", background: "rgba(255,255,255,0.06)" }}>
+                <Check size={15} color="var(--accent-2)" /> Your current plan
+              </div>
+            ) : (
             <button
               onClick={() => onCta(plan)}
               disabled={busy === plan.id}
@@ -123,6 +139,7 @@ export default function PricingSection() {
               {busy === plan.id ? "Opening checkout…" : plan.cta}
               {busy !== plan.id && plan.highlight ? <ArrowRight size={15} /> : null}
             </button>
+            )}
 
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 11 }}>
               {plan.features.map((f) => (

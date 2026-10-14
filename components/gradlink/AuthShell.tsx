@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CanvasRevealEffect } from "@/components/ui/sign-in-flow-1";
 import Logo from "@/components/Logo";
+import CarryNextLink from "./CarryNextLink";
 
 /**
  * Shared chrome for auth pages (sign-in / sign-up): themed dot-matrix reveal
@@ -18,6 +19,7 @@ export default function AuthShell({
   backHref?: string;
   backLabel?: string;
 }) {
+  const BackLink = backHref === "/" ? Link : CarryNextLink;
   return (
     <div style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column" }}>
       <div
@@ -68,7 +70,8 @@ export default function AuthShell({
         <Link href="/" aria-label="GradLink home" style={{ textDecoration: "none" }}>
           <Logo size={22} />
         </Link>
-        <Link
+        {/* Back to sign-in or the role picker keeps ?next= (a scanned QR, /pricing). */}
+        <BackLink
           href={backHref}
           className="gl-back"
           style={{
@@ -88,7 +91,7 @@ export default function AuthShell({
         >
           <ArrowLeft size={15} />
           {backLabel}
-        </Link>
+        </BackLink>
       </header>
 
       <main
