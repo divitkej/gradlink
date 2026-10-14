@@ -13,8 +13,8 @@ import AttendeesCard from "./AttendeesCard";
 import EventCodes from "@/components/events/EventCodes";
 import { useSession } from "@/lib/session";
 import { scanLabel,
-  getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists, getInterviewCounts,
-  type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow, type InterviewCounts,
+  getEvent, getRegisteredStudents, getRegisteredCompanies, listAnalytics, getScans, listShortlists, getInterviewCounts, listOffers,
+  type EventRow, type StudentRow, type CompanyRow, type AnalyticsRow, type ScanRow, type ShortlistRow, type InterviewCounts, type OfferRow,
 } from "@/lib/db";
 import { scoreTone } from "@/lib/resume";
 
@@ -27,6 +27,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [shortlists, setShortlists] = useState<ShortlistRow[]>([]);
   const [interviews, setInterviews] = useState<InterviewCounts>({ invited: 0, booked: 0 });
+  const [offers, setOffers] = useState<OfferRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,18 +35,23 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [ev, st, co, an, sc, sl, iv] = await Promise.all([
+      const [ev, st, co, an, sc, sl, iv, of] = await Promise.all([
         getEvent(eventId), getRegisteredStudents(eventId), getRegisteredCompanies(eventId),
-        listAnalytics(eventId), getScans({ eventId }), listShortlists(eventId), getInterviewCounts(eventId),
+        listAnalytics(eventId), getScans({ eventId }), listShortlists(eventId), getInterviewCounts(eventId), listOffers(eventId),
       ]);
       if (cancelled) return;
-      setEvent(ev); setStudents(st); setCompanies(co); setAnalytics(an); setScans(sc); setShortlists(sl); setInterviews(iv);
+      setEvent(ev); setStudents(st); setCompanies(co); setAnalytics(an); setScans(sc); setShortlists(sl); setInterviews(iv); setOffers(of);
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [ready, eventId]);
 
   if (loading) return <LoadingBlock label="Loading live event data…" />;
+
+  // Placement rate: registered students with at least one offer recorded at this event.
+  const registeredIds = new Set(students.map((s) => s.profile_id));
+  const placed = new Set(offers.filter((o) => registeredIds.has(o.student_id)).map((o) => o.student_id)).size;
+  const placementRate = students.length ? Math.round((placed / students.length) * 100) : 0;
 
   const avg = analytics.length ? Math.round(analytics.reduce((s, a) => s + a.resume_score, 0) / analytics.length) : 0;
   const ready70 = analytics.filter((a) => a.resume_score >= 70).length;
@@ -74,13 +80,15 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             <Link href="/scan" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 16px", borderRadius: "var(--r-md)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "#0A0A0A", background: "linear-gradient(100deg, var(--accent), var(--accent-2))", textDecoration: "none" }}><ScanLine size={16} /> Scanner</Link>
           </div>
         </div>
-        <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginTop: 20 }}>
+        <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 20 }}>
           <StatTile label="Registered students" value={students.length} />
           <StatTile label="Companies" value={companies.length} accent />
           <StatTile label="Total scans" value={scans.length} accent />
           <StatTile label="Shortlists" value={shortlists.length} />
           <StatTile label="Interview invites" value={interviews.invited} accent />
           <StatTile label="Interviews booked" value={interviews.booked} />
+          <StatTile label="Offers" value={offers.length} accent />
+          <StatTile label={`Placement rate (${placed} of ${students.length})`} value={placementRate} suffix="%" />
         </div>
       </SectionCard>
 
@@ -188,6 +196,7 @@ export default function EventManagerDashboard({ eventId }: { eventId: string }) 
             scans={scans}
             shortlists={shortlists}
             interviews={interviews}
+            offers={offers}
             profileId={session.profileId}
             organization={session.org}
           />

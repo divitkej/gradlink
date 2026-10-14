@@ -28,6 +28,8 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - Event history and company connections on the career profile, across every event (`components/dashboard/StudentHistory.tsx`)
 - Company candidate list with filters (degree, graduation year, skill, target role, stage), bulk follow-up messages to scanned or shortlisted students, and CSV export (`components/dashboard/CompanyCandidates.tsx`)
 - Interview counts for colleges: interview invites sent at the event (not counting ones the company withdrew) and interviews booked, on the college dashboard and in the outcome report and its CSV (`getInterviewCounts` in `lib/server/rpc.ts`, `components/dashboard/EventManagerDashboard.tsx`, `lib/report.ts`). Done in "Count interview invites and bookings for colleges"
+- Offers and placement rate: a company records an offer on a student it met (scanned or shortlisted) from the student's page, which books it into the student's applications and tells them; the college sees offers, students with an offer and the placement rate (students with an offer out of those registered) on its dashboard, in the outcome report and its CSV (`components/scan/OfferControl.tsx`, `lib/report.ts`, `offers` in `db/schema.sql`). Done in "Track contacted and offer stages, offers and placement rate"
+- Company candidate stages Scanned, Shortlisted, Contacted, Interview and Offer on the company dashboard, its pipeline and the candidate filter. Contacted is set automatically when the company messages the student or sends an interview invite (`listContactedStudents` in `lib/server/rpc.ts`, `components/dashboard/CompanyCandidates.tsx`). Done in "Track contacted and offer stages, offers and placement rate"
 
 ## Decision: employers see strengths, never assessments
 
@@ -50,9 +52,7 @@ So these are not planned for employers: filtering or sorting by readiness, résu
 
 | Feature | Where the site shows it | Notes |
 |---|---|---|
-| Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
-| Candidate stages "Contacted" and "Offer" | Employer CRM pipeline, Platform tab CRM mini | "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies |
 | Alumni accounts | Why GradLink card "Useful all year round" | Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves |
 | Year-over-year comparison | Pricing (Placement Pro) | |
 

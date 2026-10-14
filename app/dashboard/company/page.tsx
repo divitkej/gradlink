@@ -15,7 +15,8 @@ import { useActiveEvent } from "@/lib/use-active-event";
 import EventGate from "@/components/events/EventGate";
 import {
   getCompanyByProfile, getScans, listShortlistsForCompany, getStudentByProfile, listInterviewInvitesForCompany,
-  type CompanyRow, type ShortlistRow, type StudentRow, type ScanRow, type InterviewInviteRow,
+  listOffersForCompany, listContactedStudents,
+  type CompanyRow, type ShortlistRow, type StudentRow, type ScanRow, type InterviewInviteRow, type OfferRow,
 } from "@/lib/db";
 import CompanyCandidates from "@/components/dashboard/CompanyCandidates";
 import CompanyQueue from "@/components/dashboard/CompanyQueue";
@@ -35,17 +36,21 @@ function CompanyOverview({ eventId }: { eventId: string }) {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [invites, setInvites] = useState<InterviewInviteRow[]>([]);
+  const [offers, setOffers] = useState<OfferRow[]>([]);
+  const [contacted, setContacted] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [c, sc, sl, inv] = await Promise.all([
+      const [c, sc, sl, inv, of, ct] = await Promise.all([
         getCompanyByProfile(profileId),
         getScans({ eventId, scannerProfileId: profileId }),
         listShortlistsForCompany(profileId, eventId),
         listInterviewInvitesForCompany(eventId),
+        listOffersForCompany(eventId),
+        listContactedStudents(eventId),
       ]);
       const ids = Array.from(new Set([
         ...sc.map((s) => s.scanned_profile_id).filter(Boolean) as string[],
@@ -53,7 +58,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
       ]));
       const rows = (await Promise.all(ids.map((id) => getStudentByProfile(id)))).filter(Boolean) as StudentRow[];
       if (cancelled) return;
-      setMe(c); setShortlists(sl); setScans(sc); setInvites(inv); setStudents(rows); setLoading(false);
+      setMe(c); setShortlists(sl); setScans(sc); setInvites(inv); setOffers(of ?? []); setContacted(ct); setStudents(rows); setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [profileId, eventId]);
@@ -62,14 +67,18 @@ function CompanyOverview({ eventId }: { eventId: string }) {
   // so count the distinct students this company actually scanned.
   const scannedCount = new Set(scans.map((s) => s.scanned_profile_id).filter(Boolean)).size;
   const shortlisted = shortlists.filter((s) => s.status === "shortlisted" || s.status === "priority").length;
-  const priority = shortlists.filter((s) => s.status === "priority").length;
   const maybe = shortlists.filter((s) => s.status === "maybe").length;
   const rejected = shortlists.filter((s) => s.status === "rejected").length;
+  // Contacted: messaged or invited to interview. Interviews: an invite still open or booked.
+  const contactedCount = new Set(contacted).size;
+  const interviews = new Set(invites.filter((i) => i.status === "pending" || i.status === "accepted").map((i) => i.student_id)).size;
 
   const pipeline = [
     { label: "Scanned", count: scannedCount, color: "var(--text-muted)" },
     { label: "Shortlisted", count: shortlisted, color: "var(--accent-2)" },
-    { label: "Priority", count: priority, color: "var(--accent)" },
+    { label: "Contacted", count: contactedCount, color: "var(--accent)" },
+    { label: "Interview", count: interviews, color: "#D4D4D4" },
+    { label: "Offer", count: offers.length, color: "var(--accent-2)" },
     { label: "Maybe", count: maybe, color: "#D4D4D4" },
     { label: "Not a fit", count: rejected, color: "var(--amber)" },
   ];
@@ -93,9 +102,9 @@ function CompanyOverview({ eventId }: { eventId: string }) {
             <div className="dash-stats" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 12, marginTop: 20 }}>
               <StatCard label="Students scanned" value={scannedCount} accent delay={0.05} />
               <StatCard label="Shortlisted" value={shortlisted} accent delay={0.1} />
-              <StatCard label="Priority" value={priority} delay={0.15} />
-              <StatCard label="Maybe" value={maybe} delay={0.2} />
-              <StatCard label="Open roles" value={me?.hiring_roles?.length ?? 0} delay={0.25} />
+              <StatCard label="Contacted" value={contactedCount} delay={0.15} />
+              <StatCard label="Interviews" value={interviews} delay={0.2} />
+              <StatCard label="Offers" value={offers.length} accent delay={0.25} />
             </div>
           </GlassPanel>
         </Reveal>
@@ -109,7 +118,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
         </div>
 
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20 }}>
-          <CompanyCandidates eventId={eventId} eventTitle={eventTitle} loading={loading} students={students} shortlists={shortlists} scans={scans} invites={invites} />
+          <CompanyCandidates eventId={eventId} eventTitle={eventTitle} loading={loading} students={students} shortlists={shortlists} scans={scans} invites={invites} offers={offers} contacted={contacted} />
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <CompanyQueue eventId={eventId} live={isLive} />
