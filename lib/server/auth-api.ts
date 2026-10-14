@@ -35,6 +35,8 @@ const MSG = {
   badLogin: "Incorrect email or password.",
   locked: "Too many attempts. Please wait a moment and try again.",
   exists: "An account with this email already exists. Please sign in instead.",
+  alumniCode: "That alumni invite code isn't valid. Use the link or code your college sent you.",
+  alumniEnded: "That event has already finished. Ask your college for the code of an upcoming event.",
   ownerAddress: "This address can only be registered once account email is switched on. Contact the site owner.",
   badEmail: "That email address doesn't look right.",
   weak: "That password is too weak. Use at least 8 characters.",
@@ -103,7 +105,7 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   const organization = str(body.organization, 300);
   const emailLower = email.toLowerCase();
 
-  if (!["student", "company", "college"].includes(role)) throw new HttpError(400, "Choose an account type.");
+  if (!["student", "company", "college", "alumni"].includes(role)) throw new HttpError(400, "Choose an account type.");
   if (!fullName) throw new HttpError(400, "Enter your full name.");
   if (!validEmail(email)) throw new HttpError(400, MSG.badEmail);
   if (!validPassword(body.password)) throw new HttpError(400, MSG.weak);
@@ -120,6 +122,19 @@ async function signUp(request: Request, body: Body): Promise<Response> {
   const studentDomain = role === "college" ? studentDomainFromSample(str(body.studentEmail, 320)) : null;
 
   const sql = db();
+  // Alumni mentors are invited: the college's alumni code says which event they join.
+  let alumniEvent: string | null = null;
+  if (role === "alumni") {
+    const code = str(body.alumniCode, 20).toUpperCase();
+    const [hit] = code ? await sql`
+      select e.id, e.status from event_codes k join events e on e.id = k.event_id where k.code = ${code} and k.role = 'alumni'
+    ` : [];
+    if (!hit) throw new HttpError(400, MSG.alumniCode);
+    if (hit.status === "ended") throw new HttpError(400, MSG.alumniEnded);
+    alumniEvent = hit.id as string;
+  }
+  const year = Number(body.graduationYear);
+  const gradYear = Number.isInteger(year) && year >= 1950 && year <= 2100 ? year : null;
   const taken = await sql`select 1 from auth_credentials where email_lower = ${emailLower}`;
   if (taken.length) throw new HttpError(409, MSG.exists);
 
@@ -133,7 +148,10 @@ async function signUp(request: Request, body: Body): Promise<Response> {
       ? sql`insert into students (id, profile_id, full_name, email, university) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`
       : role === "company"
         ? sql`insert into companies (id, profile_id, full_name, email, company) values (${id}, ${id}, ${fullName}, ${email}, ${organization})`
-        : sql`insert into colleges (id, profile_id, full_name, email, institution, student_domain) values (${id}, ${id}, ${fullName}, ${email}, ${organization}, ${studentDomain})`;
+        : role === "alumni"
+          ? sql`insert into alumni (id, profile_id, full_name, email, graduation_year, current_title, current_company)
+                values (${id}, ${id}, ${fullName}, ${email}, ${gradYear}, ${str(body.currentTitle, 200) || null}, ${organization || null})`
+          : sql`insert into colleges (id, profile_id, full_name, email, institution, student_domain) values (${id}, ${id}, ${fullName}, ${email}, ${organization}, ${studentDomain})`;
 
   // No email provider means no way to confirm, so the account starts confirmed.
   const confirmNow = !emailEnabled();
@@ -148,6 +166,7 @@ async function signUp(request: Request, body: Body): Promise<Response> {
           values (${id}, ${emailLower}, ${hash}, ${confirmNow ? new Date().toISOString() : null})`,
       roleRow,
       ...(domainRequest ? [domainRequest.query] : []),
+      ...(alumniEvent ? [sql`insert into event_registrations (event_id, profile_id, role) values (${alumniEvent}, ${id}, 'alumni')`] : []),
     ]);
   } catch (err) {
     if ((err as { code?: string }).code === "23505") throw new HttpError(409, MSG.exists);

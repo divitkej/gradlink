@@ -8,7 +8,7 @@
 -- so re-running is safe.
 --
 -- Tables:
---   * profiles, students, companies, colleges: accounts and their role rows
+--   * profiles, students, companies, colleges, alumni: accounts and their role rows
 --   * events (join_code, host_org) and everything keyed by an event
 --   * subscriptions: Stripe entitlement
 --   * auth_credentials, password_reset_tokens, email_verification_tokens:
@@ -39,13 +39,16 @@
 create table if not exists profiles (
   id            text primary key default gen_random_uuid()::text,
   created_at    timestamptz not null default now(),
-  role          text not null check (role in ('student', 'company', 'event_manager')),
+  role          text not null check (role in ('student', 'company', 'event_manager', 'alumni')),
   full_name     text not null default '',
   email         text not null,
   organization  text,
   avatar_url    text
 );
 create index if not exists profiles_email_lower_idx on profiles (lower(email));
+-- Alumni mentors joined the account types after the table was first created.
+alter table profiles drop constraint if exists profiles_role_check;
+alter table profiles add constraint profiles_role_check check (role in ('student', 'company', 'event_manager', 'alumni'));
 
 -- One sign-in identity per profile. A null password_hash means the account
 -- has no password yet and must set one via "Forgot password". Bumping
@@ -171,6 +174,25 @@ create index if not exists colleges_email_lower_idx on colleges (lower(email));
 -- (dubai.bits-pilani.ac.in); its approval is in college_domains.
 alter table colleges add column if not exists student_domain text;
 
+-- Alumni mentors. A college invites its alumni with the event's alumni code
+-- (their student email has usually stopped working, so any non-throwaway
+-- address is accepted). Students and the college at the same event see this
+-- row, never the email; alumni host mentoring sessions students book.
+create table if not exists alumni (
+  id               text primary key references profiles (id) on delete cascade,
+  profile_id       text references profiles (id) on delete cascade,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now(),
+  full_name        text,
+  email            text,
+  graduation_year  integer,
+  degree           text,
+  current_title    text,
+  current_company  text,
+  linkedin_url     text,
+  bio              text
+);
+
 -- ---------------------------------------------------------------- events --
 create table if not exists events (
   id           text primary key default gen_random_uuid()::text,
@@ -193,16 +215,19 @@ create table if not exists events (
 alter table events add column if not exists timezone text;
 create index if not exists events_created_by_idx on events (created_by, created_at desc);
 
--- Each event has one code for students and a different one for employers.
--- The code is the primary key, so no two codes are ever the same across
--- events or roles, and a code alone says which event and which role it is.
+-- Each event has one code for students, a different one for employers and
+-- a third the college sends its alumni mentors. The code is the primary key,
+-- so no two codes are ever the same across events or roles, and a code alone
+-- says which event and which role it is.
 create table if not exists event_codes (
   code        text primary key,
   created_at  timestamptz not null default now(),
   event_id    text not null references events (id) on delete cascade,
-  role        text not null check (role in ('student', 'company')),
+  role        text not null check (role in ('student', 'company', 'alumni')),
   unique (event_id, role)
 );
+alter table event_codes drop constraint if exists event_codes_role_check;
+alter table event_codes add constraint event_codes_role_check check (role in ('student', 'company', 'alumni'));
 
 -- Carry legacy join codes over as student codes.
 insert into event_codes (code, event_id, role)
@@ -217,7 +242,7 @@ declare
   c text;
 begin
   for r in
-    select e.id, x.role from events e cross join (values ('student'), ('company')) as x(role)
+    select e.id, x.role from events e cross join (values ('student'), ('company'), ('alumni')) as x(role)
     where not exists (select 1 from event_codes k where k.event_id = e.id and k.role = x.role)
   loop
     loop
@@ -238,10 +263,12 @@ create table if not exists event_registrations (
   created_at  timestamptz not null default now(),
   event_id    text not null references events (id) on delete cascade,
   profile_id  text not null references profiles (id) on delete cascade,
-  role        text not null check (role in ('student', 'company', 'event_manager')),
+  role        text not null check (role in ('student', 'company', 'event_manager', 'alumni')),
   checked_in  boolean not null default false,
   unique (event_id, profile_id)
 );
+alter table event_registrations drop constraint if exists event_registrations_role_check;
+alter table event_registrations add constraint event_registrations_role_check check (role in ('student', 'company', 'event_manager', 'alumni'));
 create index if not exists event_registrations_profile_idx on event_registrations (profile_id);
 
 create table if not exists scans (

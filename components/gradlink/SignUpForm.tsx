@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User, Building2, GraduationCap, Briefcase, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Mail, Lock, User, Building2, GraduationCap, Briefcase, ArrowRight, CheckCircle2, AlertCircle, HeartHandshake, Ticket, Calendar } from "lucide-react";
 import type { ComponentType } from "react";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
@@ -39,6 +39,12 @@ const ROLE_CONFIG: Record<Role, {
     emailPlaceholder: "you@institution.ac.ae", emailNote: "Use your official institution email. Personal addresses like Gmail or Outlook are not accepted.",
     subtitle: "Run events, track engagement, and prove outcomes.", label: "college / event host",
   },
+  alumni: {
+    badge: "Alumni mentor", icon: HeartHandshake, accent: "var(--accent-2)",
+    orgLabel: "Company you work at (optional)", orgPlaceholder: "Where you work now", orgIcon: Building2,
+    emailPlaceholder: "you@example.com", emailNote: "Any email you use today works, including a personal one. Temporary inboxes are not accepted.",
+    subtitle: "Mentor students from your college at its events.", label: "alumni mentor",
+  },
 };
 
 function Field({
@@ -71,7 +77,7 @@ function Field({
   );
 }
 
-export default function SignUpForm({ role }: { role: Role }) {
+export default function SignUpForm({ role, alumniCode = "" }: { role: Role; alumniCode?: string }) {
   const router = useRouter();
   const c = ROLE_CONFIG[role];
   const appRole: AppRole = role === "college" ? "event_manager" : role;
@@ -84,6 +90,11 @@ export default function SignUpForm({ role }: { role: Role }) {
   // Colleges only: what one of their students' emails looks like.
   const [studentEmail, setStudentEmail] = useState("");
   const isCollege = role === "college";
+  // Alumni only: the invite code from their college, their class year and current role.
+  const isAlumni = role === "alumni";
+  const [code, setCode] = useState(alumniCode);
+  const [gradYear, setGradYear] = useState("");
+  const [title, setTitle] = useState("");
   const at = studentEmail.lastIndexOf("@");
   const studentDomain = at > 0 ? studentEmail.slice(at + 1).trim().toLowerCase() : "";
   const [submitting, setSubmitting] = useState(false);
@@ -102,7 +113,7 @@ export default function SignUpForm({ role }: { role: Role }) {
       : { busy: false, msg: res.error ?? "Couldn't send the email. Please try again.", error: true });
   }
 
-  const canSubmit = fullName.trim() && email.trim() && org.trim() && (!isCollege || studentDomain.includes(".")) && passwordIsStrong(password) && !submitting;
+  const canSubmit = fullName.trim() && email.trim() && (isAlumni ? code.trim() : org.trim()) && (!isCollege || studentDomain.includes(".")) && passwordIsStrong(password) && !submitting;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -112,7 +123,11 @@ export default function SignUpForm({ role }: { role: Role }) {
       return;
     }
     setSubmitting(true);
-    const res = await signUpUser({ role, fullName, email, password, organization: org, ...(isCollege ? { studentEmail } : {}) });
+    const res = await signUpUser({
+      role, fullName, email, password, organization: org,
+      ...(isCollege ? { studentEmail } : {}),
+      ...(isAlumni ? { alumniCode: code.trim(), graduationYear: gradYear ? Number(gradYear) : null, currentTitle: title } : {}),
+    });
     if (res.ok && res.verify) {
       setSubmitting(false);
       setCheckEmail({ email: email.trim(), sent: Boolean(res.sent) });
@@ -202,7 +217,21 @@ export default function SignUpForm({ role }: { role: Role }) {
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {isAlumni && (
+          <div>
+            <Field id="alumniCode" label="Alumni invite code" type="text" placeholder="From your college's invite" icon={<Ticket size={16} />} value={code} onChange={(v) => setCode(v.toUpperCase())} />
+            <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 7 }}>
+              Alumni accounts are by invitation. The link your college sent fills this in; it also adds you to that event.
+            </p>
+          </div>
+        )}
         <Field id="name" label="Full name" type="text" placeholder="Your name" icon={<User size={16} />} value={fullName} onChange={setFullName} autoComplete="name" />
+        {isAlumni && (
+          <>
+            <Field id="gradYear" label="Year you graduated" type="number" placeholder="2019" icon={<Calendar size={16} />} value={gradYear} onChange={setGradYear} />
+            <Field id="title" label="Current role (optional)" type="text" placeholder="Software Engineer" icon={<Briefcase size={16} />} value={title} onChange={setTitle} autoComplete="organization-title" />
+          </>
+        )}
         <Field id="org" label={c.orgLabel} type="text" placeholder={c.orgPlaceholder} icon={<OrgIcon size={16} />} value={org} onChange={setOrg} autoComplete="organization" />
         <div>
           <Field id="email" label="Email" type="email" placeholder={c.emailPlaceholder} icon={<Mail size={16} />} value={email} onChange={setEmail} autoComplete="email" />

@@ -32,6 +32,7 @@ export interface EventRow {
   /** Only present for the event's owner. Students join with one, employers with the other. */
   student_code?: string | null;
   company_code?: string | null;
+  alumni_code?: string | null;
   created_at?: string | null;
   /** IANA zone session times are entered and shown in. Null for older events. */
   timezone?: string | null;
@@ -161,7 +162,7 @@ export async function joinEventByCode(
 }
 
 /** Swap a code for a fresh one; the old code stops working. Owner only. */
-export async function regenerateEventCode(eventId: string, role: "student" | "company"): Promise<string | null> {
+export async function regenerateEventCode(eventId: string, role: "student" | "company" | "alumni"): Promise<string | null> {
   try {
     return await rpc<string>("regenerateEventCode", eventId, role);
   } catch (e) {
@@ -172,7 +173,7 @@ export async function regenerateEventCode(eventId: string, role: "student" | "co
 
 export interface AttendeeRow {
   profile_id: string;
-  role: "student" | "company";
+  role: "student" | "company" | "alumni";
   joined_at: string;
   checked_in: boolean;
   full_name: string;
@@ -185,6 +186,9 @@ export interface AttendeeRow {
   company: string | null;
   sector: string | null;
   booth_number: string | null;
+  /** Alumni mentors. */
+  current_title?: string | null;
+  current_company?: string | null;
 }
 
 /** Everyone who joined with a code, newest first. Owner only. */

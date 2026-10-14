@@ -165,6 +165,10 @@ export interface SessionRow {
   host_name: string | null;
   host_org: string | null;
   host_role: string | null;
+  /** Alumni mentors hosting a session: their current role, company and class year. */
+  host_title?: string | null;
+  host_company?: string | null;
+  host_class?: number | null;
   booked_count: number;
   waitlist_count: number;
   /** The signed-in user's booking, if any (never "cancelled"). */
@@ -172,6 +176,15 @@ export interface SessionRow {
   my_waitlist_position: number | null;
   /** The event's IANA time zone; times are shown in it. Null for older events. */
   event_timezone: string | null;
+}
+
+/** Who runs a session, as students see it: the company or college, or an alumni mentor with what they do now. */
+export function sessionHost(s: SessionRow): string | null {
+  if (s.host_role === "alumni") {
+    const now = [s.host_title, s.host_company].filter(Boolean).join(" at ");
+    return [`Alumni mentor ${s.host_name ?? ""}`.trim(), now, s.host_class ? `Class of ${s.host_class}` : null].filter(Boolean).join(", ");
+  }
+  return s.host_org || s.host_name;
 }
 
 export interface SessionBookingRow {
@@ -826,3 +839,23 @@ export function normalizeFeedback(fb: AIFeedback | string | null): AIFeedback | 
 /* Events moved to lib/events.ts; re-exported so existing imports keep resolving. */
 export type { EventRow } from "./events";
 export { getEvent } from "./events";
+
+/* ---------------- Alumni mentors ---------------- */
+export interface AlumniProfile {
+  id: string;
+  full_name: string | null;
+  graduation_year: number | null;
+  degree: string | null;
+  current_title: string | null;
+  current_company: string | null;
+  linkedin_url: string | null;
+  bio: string | null;
+}
+
+export function getAlumniProfile(profileId: string): Promise<AlumniProfile | null> {
+  return safe("getAlumniProfile", null, () => rpc<AlumniProfile | null>("getAlumniProfile", profileId));
+}
+
+export function updateAlumniProfile(fields: Partial<Omit<AlumniProfile, "id" | "full_name">>): Promise<Result<"profile", AlumniProfile>> {
+  return safe("updateAlumniProfile", { ok: false, error: "Couldn't save your profile. Please try again." }, () => rpc("updateAlumniProfile", fields));
+}

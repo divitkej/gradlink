@@ -80,10 +80,10 @@ export default function EventConsole({ eventId }: { eventId: string }) {
 
   const tabs: { key: Tab; label: string; icon: React.ComponentType<{ size?: number }>; hide?: boolean }[] = [
     { key: "overview", label: "Overview", icon: LayoutGrid },
-    { key: "people", label: role === "student" ? "Companies" : role === "company" ? "Students" : "People", icon: Users },
+    { key: "people", label: role === "student" ? "Companies" : role === "company" || role === "alumni" ? "Students" : "People", icon: Users },
     { key: "sessions", label: "Sessions", icon: CalendarClock, hide: role === "student" },
-    { key: "qr", label: "My QR", icon: QrCode, hide: role === "event_manager" },
-    { key: "checklist", label: "Checklist", icon: ListChecks },
+    { key: "qr", label: "My QR", icon: QrCode, hide: role === "event_manager" || role === "alumni" },
+    { key: "checklist", label: "Checklist", icon: ListChecks, hide: role === "alumni" },
     { key: "manual", label: "Manual", icon: BookOpen },
   ];
   // The URL can name a tab this role does not have; fall back to the overview.
@@ -114,7 +114,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
         <GsapReveal key={tab} style={{ display: "block" }}>
           {shownTab === "overview" && <Overview role={role} me={me} students={students} companies={companies} analytics={analytics} eventId={eventId} />}
           {shownTab === "people" && <People role={role} students={students} companies={companies} shortlists={shortlists} eventId={eventId} myId={session.profileId} onShortlist={setShortlists} />}
-          {shownTab === "qr" && role !== "event_manager" && (
+          {shownTab === "qr" && (role === "student" || role === "company") && (
             <SectionCard title="My event QR" accent="var(--border-strong)">
               <QRCard
                 payload={role === "student" ? `/scan/student/${session.profileId}?eventId=${eventId}` : `/scan/company/${session.profileId}?eventId=${eventId}`}
@@ -126,7 +126,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
             <SessionManager eventId={eventId} role={role} myId={session.profileId} isOwner={event?.created_by === session.profileId}
               timezone={event?.timezone ?? null} onTimezoneChange={(tz) => setEvent((e) => (e ? { ...e, timezone: tz } : e))} />
           )}
-          {shownTab === "checklist" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
+          {shownTab === "checklist" && role !== "alumni" && <Checklist role={role} profileId={session.profileId} eventId={eventId} />}
           {shownTab === "manual" && <ManualSection defaultRole={role} />}
         </GsapReveal>
       )}
@@ -236,6 +236,16 @@ function Overview({ role, me, students, companies, analytics, eventId }: { role:
             </Link>
           ))}
         </div>
+      </SectionCard>
+    );
+  }
+  if (role === "alumni") {
+    return (
+      <SectionCard title="Mentoring at this event" hint={`${students.length} ${students.length === 1 ? "student" : "students"} registered`}>
+        <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, maxWidth: 620 }}>
+          Add mentoring sessions on the Sessions tab and students book them from their schedule. After each one, mark who came.
+          The Students tab shows who is at the event: their degree, year, skills and bio.
+        </p>
       </SectionCard>
     );
   }
@@ -354,6 +364,27 @@ function People({
               </div>
             );
           })}
+        </div>
+      </SectionCard>
+    );
+  }
+
+  if (role === "alumni") {
+    // As a fellow attendee sees them: no scores, no contact details.
+    return (
+      <SectionCard title="Students at this event" hint={`${students.length} registered`}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {students.length === 0 && <p style={{ fontSize: 13, color: "var(--text-muted)" }}>No students have registered yet.</p>}
+          {students.map((s) => (
+            <Link key={s.id} href={`/scan/student/${s.profile_id}?eventId=${eventId}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 13px", background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", textDecoration: "none" }}>
+              <Avatar name={s.full_name} size={34} />
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{s.full_name}</span>
+                <span style={{ display: "block", fontSize: 11.5, color: "var(--text-muted)" }}>{[s.degree, s.graduation_year ? `Class of ${s.graduation_year}` : null, s.university].filter(Boolean).join(" · ")}</span>
+              </span>
+              {s.skills?.length ? <span style={{ fontSize: 11.5, color: "var(--text-2)" }}>{s.skills.slice(0, 3).join(", ")}</span> : null}
+            </Link>
+          ))}
         </div>
       </SectionCard>
     );

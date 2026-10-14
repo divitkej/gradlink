@@ -22,6 +22,7 @@ Audited against `db/schema.sql`, `lib/db.ts` and the dashboards.
 - In-app notifications for interview invites and replies, waitlist places and queue calls, behind the header bell (`/dashboard/notifications`)
 - Opportunities: every open role at the event, ranked for the student, with internships marked and one-click tracking (`/dashboard/student/opportunities`)
 - Alumni mentoring as a session type the college publishes and students book
+- Alumni mentor accounts: each event has an alumni code the college sends as an invite link (`/sign-up/alumni?code=`); alumni sign up with any address that is not throwaway, join that college's events, host mentoring sessions students book (shown with their role, company and class year), keep a mentor profile, and see students as a fellow attendee does, without contact details, scores or verified achievements. Their scans record nothing (`alumni` in `db/schema.sql`, `components/dashboard/AlumniDashboard.tsx`, `components/dashboard/AlumniProfileEditor.tsx`, `lib/server/auth-api.ts`). Done in "Add alumni mentor accounts invited by their college"
 - Coursera courses on the career profile: certificate links verified with Coursera (course, issuer, completion date, skills; the name on the certificate must match the student), plus courses in progress; employers and the college see the ones the student chooses (`lib/server/coursera.ts`, `components/dashboard/StudentCourses.tsx`)
 - Coding profiles and certificates on the career profile: LeetCode and Codeforces verified with each site after the student proves the account is theirs; Credly badges verified with Credly, other certificates marked self-reported with their credential link; employers see the ones the student chooses (`lib/server/coding.ts`, `lib/server/credly.ts`, `components/dashboard/StudentCertificates.tsx`)
 - Event time zones: session times are entered and shown in the event's zone on every device (`lib/format.ts`)
@@ -53,7 +54,6 @@ So these are not planned for employers: filtering or sorting by readiness, résu
 | Offer tracking and placement rate | Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04 | Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet |
 | Event ROI score | Analytics stats | No formula or data |
 | Candidate stages "Contacted" and "Offer" | Employer CRM pipeline, Platform tab CRM mini | "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies |
-| Alumni accounts | Why GradLink card "Useful all year round" | Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign in as themselves |
 | Year-over-year comparison | Pricing (Placement Pro) | |
 
 ## Removed from the footer until they exist

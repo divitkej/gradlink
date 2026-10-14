@@ -26,11 +26,12 @@ const sections: LegalSection[] = [
       <>
         <p>We only collect what you give us or what GradLink needs to work:</p>
         <ul>
-          <li><strong>Account details:</strong> your name, email address, account type (student, company or college) and organisation, and whether you have confirmed your email address. Your password is stored only as a one-way hash; we cannot read it.</li>
+          <li><strong>Account details:</strong> your name, email address, account type (student, company, college or alumni mentor) and organisation, and whether you have confirmed your email address. Your password is stored only as a one-way hash; we cannot read it.</li>
           <li><strong>Student profile:</strong> university, degree, graduation year, skills, bio, career goal, target roles, projects, links to LinkedIn, GitHub and a portfolio, and your résumé file.</li>
           <li><strong>Achievements you choose to add:</strong> LeetCode and Codeforces usernames and the stats those sites show for them, Coursera certificates (course, issuer, completion date and skills), Credly badges, and other certificates with their links.</li>
           <li><strong>Scores we work out:</strong> a résumé score, a career readiness score with its competencies, and an engagement score for each event.</li>
           <li><strong>Company profile:</strong> company name, sector, website, description, roles you are hiring for, skills wanted, booth number, logo and brochure.</li>
+          <li><strong>Alumni mentor profile:</strong> the year you graduated, your degree, current role and company, LinkedIn link and what you can help with.</li>
           <li><strong>College details:</strong> your institution, an example of your students’ email address (so their domain can be approved for sign-up) and the plan you chose.</li>
           <li><strong>Event activity:</strong> events you create or join, check-ins, QR scans between students and companies with any notes added, shortlist decisions and notes, sessions you book, booth queues you join, companies you save or mark as interesting, interview invites, notifications, and per-event counts such as profile views and scans received.</li>
           <li><strong>Applications you track:</strong> the companies and roles you applied to, their status, interview dates and your notes.</li>
@@ -73,6 +74,7 @@ const sections: LegalSection[] = [
             They see a student’s email only after scanning that student’s QR code. They never see a student’s scores.
           </li>
           <li><strong>The college running your event</strong> sees the profiles, scores, scans, shortlists and activity of the people at that event.</li>
+          <li><strong>Alumni mentors at your event</strong> see students as other students do: name, university, degree, graduation year, skills and bio, without contact details or scores. Students and the college at a mentor’s events see the mentor’s profile, never their email; the college that invited them also sees their email.</li>
           <li><strong>Other students at your event</strong> see your name, university, degree, graduation year, skills and bio, without contact details, and the top five on the engagement leaderboard by first name and last initial.</li>
           <li>
             <strong>Visible only to the people involved:</strong> messages (the sender and the recipient), a scan (the two people in it), interview
@@ -192,7 +194,7 @@ export default function PrivacyPolicy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="13 October 2026"
+      updated="14 October 2026"
       intro={
         <p>
           This policy explains what personal data GradLink collects, why, who can see it and the choices you have. It applies

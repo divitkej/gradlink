@@ -7,11 +7,11 @@ import AuthShell from "./AuthShell";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/primitives";
 import { signIn, sendReset, resendVerification } from "@/lib/auth";
-import { setSession, useSession } from "@/lib/session";
+import { setSession, useSession, type AppRole } from "@/lib/session";
 import { returnPath } from "@/lib/return-path";
 import CarryNextLink from "./CarryNextLink";
 
-function roleHome(role: "student" | "company" | "event_manager") {
+function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
 }
 

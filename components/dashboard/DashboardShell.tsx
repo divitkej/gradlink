@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, QrCode, UserCircle, ListChecks, CalendarDays, Building2, Compass,
-  MessageSquare, BarChart3, Users, Briefcase, ScanLine,
+  MessageSquare, BarChart3, Users, Briefcase, ScanLine, HeartHandshake,
   Bell, Menu, X, BookOpen, Network, LogOut, History, Gauge, CalendarClock, Stamp, CalendarRange,
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -72,6 +72,15 @@ function buildNav(eventId: string | null): Record<AppRole, NavItem[]> {
     { label: "Scan Monitor", href: "/dashboard/event-manager#scans", icon: History },
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Manual", href: "/dashboard/event-manager#manual", icon: BookOpen },
+  ],
+  alumni: [
+    { label: "Overview", href: "/dashboard/alumni", icon: LayoutDashboard },
+    { label: "Event", href: EV, icon: CalendarDays },
+    { label: "Mentoring sessions", href: eventId ? `${EV}?tab=sessions` : ALL_EVENTS, icon: HeartHandshake },
+    { label: "Students", href: eventId ? `${EV}?tab=people` : ALL_EVENTS, icon: Users },
+    { label: "Mentor Profile", href: "/dashboard/profile", icon: UserCircle },
+    { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
+    { label: "Manual", href: "/dashboard/alumni#manual", icon: BookOpen },
   ],
   };
   const all: NavItem = { label: "All events", href: ALL_EVENTS, icon: CalendarRange };

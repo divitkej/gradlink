@@ -108,6 +108,14 @@ export default function RoleSelect() {
       </div>
 
       <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 28 }}>
+        Alumni mentor? Use the invite link from your college, or{" "}
+        <CarryNextLink href="/sign-up/alumni" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
+          enter its code
+        </CarryNextLink>
+        .
+      </p>
+
+      <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 10 }}>
         Already have an account?{" "}
         <CarryNextLink href="/sign-in" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Sign in

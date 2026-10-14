@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GraduationCap, Building2, Briefcase, BookOpen } from "lucide-react";
+import { GraduationCap, Building2, Briefcase, BookOpen, HeartHandshake } from "lucide-react";
 import { SectionCard } from "./cards";
 import type { AppRole } from "@/lib/session";
 
@@ -47,6 +47,19 @@ const MANUAL: Record<AppRole, { icon: React.ComponentType<{ size?: number }>; ac
       "Identify students with low or no engagement and help them.",
       "Scan any attendee to see their live event analytics.",
       "Export post-event reports and outcome analytics.",
+      "Invite your alumni as mentors: send them the event's alumni code or sign-up link from the event page.",
+    ],
+  },
+  alumni: {
+    icon: HeartHandshake,
+    accent: "var(--accent-2)",
+    steps: [
+      "Sign up with the alumni link your college sent you. Any email you use today works.",
+      "Fill in your mentor profile: class year, degree, current role and company, and LinkedIn.",
+      "Add mentoring sessions from the event page. Students book them on their schedule.",
+      "See who booked, and mark who came after each session.",
+      "Browse the students at the event: their degree, year, skills and bio. Contact details and scores stay private.",
+      "Reply to students who message you, and join other events with that event's alumni code.",
     ],
   },
 };
@@ -55,6 +68,7 @@ const TABS: { key: AppRole; label: string }[] = [
   { key: "student", label: "Students" },
   { key: "company", label: "Companies" },
   { key: "event_manager", label: "Event managers" },
+  { key: "alumni", label: "Alumni mentors" },
 ];
 
 export default function ManualSection({ defaultRole = "student" }: { defaultRole?: AppRole }) {

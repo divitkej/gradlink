@@ -50,7 +50,9 @@ export default function EventGate({
       <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.6, marginBottom: 18, maxWidth: 620 }}>
         {session?.role === "company"
           ? "The college running the fair gives employers their own code. Enter it here to register your company. Your QR, candidate list and checklist open once you're in."
-          : "Your college gives students a code for each career fair. Enter it here to register. Your QR, checklist and the employer list open once you're in."}
+          : session?.role === "alumni"
+            ? "Your college sends its alumni mentors a code for each event. Enter it here to join, then add your mentoring sessions."
+            : "Your college gives students a code for each career fair. Enter it here to register. Your QR, checklist and the employer list open once you're in."}
       </p>
       <JoinEventForm />
     </SectionCard>

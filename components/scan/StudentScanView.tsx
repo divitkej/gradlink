@@ -147,7 +147,7 @@ export default function StudentScanView({ studentProfileId, eventId, scanKey }: 
           {viewer === "event_manager" && (
             <ManagerView student={student} analytics={analytics} scanHistory={scanHistory} companies={companies} />
           )}
-          {viewer === "student" && (
+          {(viewer === "student" || viewer === "alumni") && (
             <SectionCard title="Student profile">
               <p style={{ fontSize: 14, color: "var(--text-2)", lineHeight: 1.6 }}>{student.bio ?? "This is a fellow student's public profile."}</p>
               {student.skills?.length ? <div style={{ marginTop: 14 }}><TagRow items={student.skills} /></div> : null}

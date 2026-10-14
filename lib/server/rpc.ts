@@ -131,6 +131,25 @@ const COMPANY_FIELDS: Record<string, (v: unknown) => unknown> = {
 /** What a student sees of a fellow student: no contact details. */
 const PEER_STUDENT_COLS = `id, profile_id, created_at, full_name, university, degree, graduation_year, skills, bio`;
 
+/**
+ * Students and alumni mentors see students as a fellow attendee does: the
+ * peer columns, without contact details, scores or verified achievements.
+ */
+function peerViewer(u: AuthUser): boolean {
+  return u.role === "student" || u.role === "alumni";
+}
+
+/** What an alumni mentor may edit on their own profile. */
+const ALUMNI_FIELDS: Record<string, (v: unknown) => unknown> = {
+  graduation_year: (v) => { const n = intOrNull(v); return n !== null && n >= 1950 && n <= 2100 ? n : null; },
+  degree: (v) => textOrNull(v, 200),
+  current_title: (v) => textOrNull(v, 200),
+  current_company: (v) => textOrNull(v, 200),
+  linkedin_url: (v) => urlOrNull(v),
+  bio: (v) => textOrNull(v, 1000),
+};
+const ALUMNI_PUBLIC_COLS = `id, full_name, graduation_year, degree, current_title, current_company, linkedin_url, bio`;
+
 
 /**
  * Upsert the caller's own role row with only whitelisted columns, leaving
@@ -230,11 +249,11 @@ async function withCodes(events: Row[]): Promise<Row[]> {
   if (!events.length) return events;
   const codes = await db()`select event_id, role, code from event_codes where event_id = any(${events.map((e) => e.id as string)}::text[])`;
   const code = (id: unknown, role: string) => (codes.find((c) => c.event_id === id && c.role === role)?.code as string) ?? null;
-  return events.map((e) => ({ ...e, student_code: code(e.id, "student"), company_code: code(e.id, "company") }));
+  return events.map((e) => ({ ...e, student_code: code(e.id, "student"), company_code: code(e.id, "company"), alumni_code: code(e.id, "alumni") }));
 }
 
 /** Which event, and which role, a typed code lets someone into. */
-async function resolveCode(code: string): Promise<{ event: Row; role: "student" | "company" } | null> {
+async function resolveCode(code: string): Promise<{ event: Row; role: "student" | "company" | "alumni" } | null> {
   const sql = db();
   // Only event_codes counts. `npm run db:migrate` copies any legacy
   // events.join_code in as the student code, and a code replaced in the event
@@ -242,7 +261,7 @@ async function resolveCode(code: string): Promise<{ event: Row; role: "student" 
   const rows = await sql`select e.*, k.role as code_role from event_codes k join events e on e.id = k.event_id where k.code = ${code}`;
   if (!rows[0]) return null;
   const event = { ...rows[0] };
-  const role = event.code_role as "student" | "company";
+  const role = event.code_role as "student" | "company" | "alumni";
   delete event.code_role;
   return { event, role };
 }
@@ -383,6 +402,7 @@ async function companyMetStudent(companyId: string, studentId: string, eventId: 
  */
 function studentView(u: AuthUser, row: Row, scanned?: Set<string>): Row {
   if (u.id === row.id || u.role === "event_manager") return row;
+  if (peerViewer(u)) return { ...row, email: null, resume_score: null, ai_feedback: null };
   // A company gets a student's email only once it has scanned that student.
   const email = u.role === "company" && !scanned?.has(row.id as string) ? null : row.email;
   return { ...row, email, resume_score: null, ai_feedback: null };
@@ -481,7 +501,7 @@ export const ops: Record<string, Op> = {
     const id = s(profileId);
     // Someone else's profile only when you share an event with them.
     if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return null;
-    const cols = u.role === "student" && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const cols = peerViewer(u) && id !== u.id ? PEER_STUDENT_COLS : STUDENT_COLS;
     const rows = await db().query(`select ${cols} from students where id = $1`, [id]);
     return rows[0] ? studentView(u, rows[0], await scannedByCompany(u, [id])) : null;
   },
@@ -492,7 +512,7 @@ export const ops: Record<string, Op> = {
   },
   async getRegisteredStudents(u, [eventId]) {
     await requireMember(u, eventId);
-    const cols = u.role === "student" ? PEER_STUDENT_COLS : STUDENT_COLS;
+    const cols = peerViewer(u) ? PEER_STUDENT_COLS : STUDENT_COLS;
     const rows = await db().query(
       `select ${cols.replace(/(\w+)/g, "s.$1")} from event_registrations r join students s on s.id = r.profile_id
        where r.event_id = $1 and r.role = 'student'`,
@@ -578,6 +598,8 @@ export const ops: Record<string, Op> = {
     // A scan belongs to an event. Without one (a hand-typed link) there is
     // nothing to record, so it is skipped rather than failing.
     if (!i.eventId) return false;
+    // Alumni mentors don't scan: their visits must not count toward a student's engagement.
+    if (u.role === "alumni") return false;
     await requireMember(u, i.eventId);
     // Only a real QR scan counts: it carries the scanned person's key. A
     // profile opened from a link in the app (or a call made by hand) has no
@@ -820,6 +842,40 @@ export const ops: Record<string, Op> = {
     );
   },
 
+  /* Alumni mentors */
+  /** An alumni mentor's profile: their own, or one at an event the caller is at. Never the email. */
+  async getAlumniProfile(u, [profileId]) {
+    const id = s(profileId);
+    if (id !== u.id) {
+      const shared = await db()`
+        select 1 from event_registrations t join events e on e.id = t.event_id
+        where t.profile_id = ${id} and t.role = 'alumni'
+          and (e.created_by = ${u.id} or exists (select 1 from event_registrations me where me.event_id = t.event_id and me.profile_id = ${u.id}))
+        limit 1
+      `;
+      if (!shared.length) return null;
+    }
+    const rows = await db().query(`select ${ALUMNI_PUBLIC_COLS} from alumni where id = $1`, [id]);
+    return rows[0] ?? null;
+  },
+  async updateAlumniProfile(u, [fields]) {
+    if (u.role !== "alumni") throw forbidden();
+    const f = (fields ?? {}) as Row;
+    const entries = Object.entries(f).filter(([k, v]) => k in ALUMNI_FIELDS && v !== undefined);
+    const cols = entries.map(([k]) => k);
+    const vals = entries.map(([k, v]) => ALUMNI_FIELDS[k](v));
+    const sql = db();
+    const rows = await sql.query(
+      `insert into alumni (id, profile_id${cols.map((c) => `, ${c}`).join("")}) values ($1, $1${cols.map((_, i) => `, $${i + 2}`).join("")})
+       on conflict (id) do update set updated_at = now()${cols.map((c) => `, ${c} = excluded.${c}`).join("")}
+       returning ${ALUMNI_PUBLIC_COLS}`,
+      [u.id, ...vals],
+    );
+    // The company shows as the account's organisation, as it does for other roles.
+    if ("current_company" in f) await sql`update profiles set organization = ${(rows[0]?.current_company as string) ?? null} where id = ${u.id}`;
+    return { ok: true, profile: rows[0] };
+  },
+
   /* Events */
   /** Registered people and the owner only; the codes only for the owner. */
   async getEvent(u, [eventId]) {
@@ -866,6 +922,8 @@ export const ops: Record<string, Op> = {
       const studentCode = randomCode(len);
       let companyCode = randomCode(len);
       while (companyCode === studentCode) companyCode = randomCode(len);
+      let alumniCode = randomCode(len);
+      while (alumniCode === studentCode || alumniCode === companyCode) alumniCode = randomCode(len);
       try {
         const [rows] = await sql.transaction([
           sql`insert into events (id, title, description, location, start_date, end_date, status, created_by, host_org, timezone)
@@ -873,8 +931,9 @@ export const ops: Record<string, Op> = {
                       ${s(i.startDate) || null}, ${s(i.endDate) || null}, ${status}, ${u.id},
                       ${textOrNull(i.hostOrg, 300)}, ${isTimeZone(i.timezone) ? i.timezone : null})
               returning *`,
-          // One code for students and a different one for employers.
-          sql`insert into event_codes (code, event_id, role) values (${studentCode}, ${id}, 'student'), (${companyCode}, ${id}, 'company')`,
+          // One code for students, a different one for employers, a third for alumni mentors.
+          sql`insert into event_codes (code, event_id, role)
+              values (${studentCode}, ${id}, 'student'), (${companyCode}, ${id}, 'company'), (${alumniCode}, ${id}, 'alumni')`,
           // The organiser is registered into their own event so it appears in
           // their event list the same way a joined event does.
           sql`insert into event_registrations (event_id, profile_id, role, checked_in)
@@ -929,12 +988,9 @@ export const ops: Record<string, Op> = {
     if (!found) return { ok: false, error: "No event matches that code. Check it and try again." };
     const { event, role } = found;
     if (role !== u.role) {
-      return {
-        ok: false,
-        error: role === "company"
-          ? "That is the employer code for this event. Ask your college for the student code."
-          : "That is the student code for this event. Ask the college for the employer code.",
-      };
+      const want = u.role === "company" ? "employer" : u.role === "alumni" ? "alumni" : "student";
+      const got = role === "company" ? "employer" : role;
+      return { ok: false, error: `That is the ${got} code for this event. Ask the college for the ${want} code.` };
     }
     if (event.status === "ended") return { ok: false, error: `${event.title} has already finished.` };
 
@@ -946,7 +1002,7 @@ export const ops: Record<string, Op> = {
   /** Replace a leaked code. The old one stops working at once. Owner only. */
   async regenerateEventCode(u, [eventId, role]) {
     if (!(await eventAccess(u, eventId)).owner) throw forbidden();
-    if (role !== "student" && role !== "company") throw new HttpError(400, "Unknown code type.");
+    if (role !== "student" && role !== "company" && role !== "alumni") throw new HttpError(400, "Unknown code type.");
     const sql = db();
     for (let attempt = 0; attempt < 5; attempt++) {
       const code = randomCode(attempt < 4 ? 6 : 8);
@@ -967,13 +1023,15 @@ export const ops: Record<string, Op> = {
     return db()`
       select r.profile_id, r.role, r.created_at as joined_at, r.checked_in,
              p.full_name, p.email, p.organization,
-             s.university, s.degree, s.graduation_year,
-             c.company_name, c.company, c.sector, c.booth_number
+             s.university, coalesce(s.degree, a.degree) as degree, coalesce(s.graduation_year, a.graduation_year) as graduation_year,
+             c.company_name, c.company, c.sector, c.booth_number,
+             a.current_title, a.current_company
       from event_registrations r
       join profiles p on p.id = r.profile_id
       left join students s on s.id = r.profile_id
       left join companies c on c.id = r.profile_id
-      where r.event_id = ${s(eventId)} and r.role in ('student', 'company')
+      left join alumni a on a.id = r.profile_id
+      where r.event_id = ${s(eventId)} and r.role in ('student', 'company', 'alumni')
       order by r.created_at desc
     `;
   },
@@ -1022,6 +1080,7 @@ export const ops: Record<string, Op> = {
     await requireMember(u, eventId);
     return db()`
       select es.*, p.full_name as host_name, p.organization as host_org, p.role as host_role, e.timezone as event_timezone,
+        ha.current_title as host_title, ha.current_company as host_company, ha.graduation_year as host_class,
         (select count(*)::int from session_bookings b where b.session_id = es.id and b.status in ('booked', 'attended')) as booked_count,
         (select count(*)::int from session_bookings b where b.session_id = es.id and b.status = 'waitlisted') as waitlist_count,
         mine.status as my_status,
@@ -1032,6 +1091,7 @@ export const ops: Record<string, Op> = {
       from event_sessions es
       join events e on e.id = es.event_id
       left join profiles p on p.id = es.host_profile_id
+      left join alumni ha on ha.id = es.host_profile_id
       left join session_bookings mine on mine.session_id = es.id and mine.profile_id = ${u.id} and mine.status <> 'cancelled'
       where es.event_id = ${s(eventId)}
       order by es.starts_at asc, es.title asc
@@ -1057,7 +1117,9 @@ export const ops: Record<string, Op> = {
     if (!events.length) return { ok: false, error: "That event no longer exists." };
     const owner = events[0].created_by === u.id;
     const company = u.role === "company" && COMPANY_SESSION_KINDS.includes(kind) && (await isInEvent(u.id, eventId));
-    if (!owner && !company) throw forbidden();
+    // Alumni mentors at the event host mentoring sessions only.
+    const mentor = u.role === "alumni" && kind === "mentoring" && (await isInEvent(u.id, eventId));
+    if (!owner && !company && !mentor) throw forbidden();
 
     const rows = await db()`
       insert into event_sessions (event_id, host_profile_id, kind, title, description, location, starts_at, ends_at, capacity)
@@ -1558,7 +1620,7 @@ export const ops: Record<string, Op> = {
   /** The student sees all of theirs; companies and colleges at their events only what the student shows employers. */
   async listStudentCourses(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
+    if (id !== u.id && (peerViewer(u) || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_courses where student_id = ${id} order by status, completed_at desc nulls last, created_at desc`
       : db()`
@@ -1671,7 +1733,7 @@ export const ops: Record<string, Op> = {
   /** The student sees all of theirs, pending ones included; companies and colleges at their events only verified profiles the student shows. */
   async listStudentScores(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
+    if (id !== u.id && (peerViewer(u) || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_scores where student_id = ${id} order by kind`
       : db()`
@@ -1766,7 +1828,7 @@ export const ops: Record<string, Op> = {
   /** The student sees all of theirs; companies and colleges at their events only the ones the student shows. */
   async listStudentCertificates(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
+    if (id !== u.id && (peerViewer(u) || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_certificates where student_id = ${id} order by verified_at is null, issued_on desc nulls last, created_at desc`
       : db()`
