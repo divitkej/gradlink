@@ -1,8 +1,8 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 155,
-    "done": 127,
+    "total": 156,
+    "done": 128,
     "open": 28,
     "percent": 82,
     "counts": {
@@ -11,7 +11,7 @@
       "todo": 5,
       "verify": 5,
       "parked": 2,
-      "done": 127
+      "done": 128
     }
   },
   "areas": [
@@ -70,14 +70,14 @@
     {
       "key": "dashboard",
       "name": "Dashboard",
-      "total": 13,
+      "total": 14,
       "counts": {
         "in_progress": 0,
         "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 11
+        "done": 12
       }
     },
     {
@@ -166,14 +166,14 @@
       "key": "2",
       "name": "Phase 2: Dead and misleading UI",
       "goal": "Every visible button works, nothing claims what the app does not do.",
-      "total": 14,
+      "total": 15,
       "counts": {
         "in_progress": 0,
         "owner": 2,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 11
+        "done": 12
       },
       "status": "Ongoing"
     },
@@ -291,7 +291,7 @@
       "area": "dashboard",
       "areaName": "Dashboard",
       "section": "Copy and polish",
-      "line": 43,
+      "line": 46,
       "title": "Several Claude sessions deploy to the same Worker",
       "detail": "Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging. Owner decision",
       "state": "owner",
@@ -567,7 +567,7 @@
       "area": "dashboard",
       "areaName": "Dashboard",
       "section": "Copy and polish",
-      "line": 41,
+      "line": 44,
       "title": "Pill shapes on labels and tabs",
       "detail": "Section badges on the landing page, role chips, the manual tabs and \"Back to site\" are fully rounded. Left as they are by decision for now. Tracked",
       "state": "parked",
@@ -1214,8 +1214,20 @@
     {
       "area": "dashboard",
       "areaName": "Dashboard",
+      "section": "Dead or misleading",
+      "line": 35,
+      "title": "Sidebar links to a section landed at the top of the page",
+      "detail": "\"Readiness\", \"Analytics\", \"Checklist\" and the other `#section` links opened the page at the top when its data loaded slowly, because Next tries the hash scroll once, before the section exists. The dashboard now brings the section under the header once it renders, and stops as soon as the person scrolls, types or clicks. `components/dashboard/DashboardShell.tsx` · Done in \"Scroll sidebar section links to their section once it has loaded\"",
+      "state": "done",
+      "doneIn": "Scroll sidebar section links to their section once it has loaded",
+      "phase": "2",
+      "id": "dashboard/sidebar-links-to-a-section-landed"
+    },
+    {
+      "area": "dashboard",
+      "areaName": "Dashboard",
       "section": "Copy and polish",
-      "line": 37,
+      "line": 40,
       "title": "Em dashes in visible copy",
       "detail": "All 39 outside code comments replaced, including \"—\" used for missing values (\"Booth —\" is now \"Booth not set\", blank in CSV exports). Raw \"qr\" in scan history now reads \"QR scan\". `app/dashboard/*`, `components/*`, `lib/report.ts`, `lib/resume.ts`, `lib/db.ts` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",
@@ -1227,7 +1239,7 @@
       "area": "dashboard",
       "areaName": "Dashboard",
       "section": "Copy and polish",
-      "line": 39,
+      "line": 42,
       "title": "Unbranded 404 page",
       "detail": "Unknown addresses now show the site navbar and footer with links home and to sign in. `app/not-found.tsx`, `components/site/NotFound.tsx` · Done in \"Fix the problems found in the site audit\"",
       "state": "done",

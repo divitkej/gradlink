@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**127 of 155 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
+**128 of 156 done (82%).** 0 in progress, 28 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -15,7 +15,7 @@ pie showData
   "To do" : 5
   "Verify live" : 5
   "Parked by decision" : 2
-  "Done" : 127
+  "Done" : 128
 ```
 
 ## By phase
@@ -25,7 +25,7 @@ pie showData
 | Phase | Status | Progress | Done | In progress | Left |
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
-| [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `█████████░░░` 79% | 11 | 0 | 3 |
+| [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 80% | 12 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 71% | 35 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 6 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `██████████░░` 86% | 54 | 0 | 9 |
@@ -61,15 +61,15 @@ Create or join an event, open it, work the checklist, edit the event, with the a
 
 Every visible button works, nothing claims what the app does not do.
 
-**Ongoing.** 11 of 14 done, 0 in progress, 3 left.
+**Ongoing.** 12 of 15 done, 0 in progress, 3 left.
 
 **Left**
 
-- [ ] Several Claude sessions deploy to the same Worker · Needs the owner · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)
+- [ ] Several Claude sessions deploy to the same Worker · Needs the owner · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L46)
 - [ ] College sidebar has no Messages or Profile link · Needs the owner · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)
-- [ ] Pill shapes on labels and tabs · Parked by decision · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L41)
+- [ ] Pill shapes on labels and tabs · Parked by decision · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L44)
 
-<details><summary>Done (11)</summary>
+<details><summary>Done (12)</summary>
 
 - [x] Navbar logo and section links fail on /pricing
 - [x] Colleges and Analytics go to the same section
@@ -78,6 +78,7 @@ Every visible button works, nothing claims what the app does not do.
 - [x] College header said "Live Monitor" with a pulsing dot for events that had not started
 - [x] "Everyone is engaged 🎉" with zero students
 - [x] "Upgrade to Placement Pro" showed a developer message
+- [x] Sidebar links to a section landed at the top of the page
 - [x] Em dashes in visible copy
 - [x] Unbranded 404 page
 - [x] "Start free" does nothing
@@ -272,13 +273,13 @@ Features that should work, checked once on a real device or the live site.
 | Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 89% | 8 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
-| Dashboard | `██████████░░` 85% | 11 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
+| Dashboard | `██████████░░` 86% | 12 | 2 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `███████████░` 88% | 7 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `███████████░` 94% | 31 | 2 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 71% | 17 | 7 | [security.md](../docs/checklists/security.md) |
 | Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `███████████░` 94% | 15 | 1 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **82%** | **127** | **28** | |
+| **All** | `██████████░░` **82%** | **128** | **28** | |
 
 ## In progress
 
@@ -292,7 +293,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L30)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
-- [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L43)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
+- [ ] **Several Claude sessions deploy to the same Worker** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L46)<br><sub>Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main`… · id `dashboard/several-claude-sessions-deploy-to-the`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Set `APP_URL`** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L38)<br><sub>in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it. · id `security/set-app-url`</sub>
 - [ ] **Optional, after the custom domain is connected** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L40)<br><sub>add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address. · id `security/optional-after-the-custom-domain-is`</sub>
@@ -324,7 +325,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 ### Parked by decision (2)
 
 - [ ] **Promises features that are not built** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)<br><sub>Kept on the page by decision. Every unbuilt feature, and where it appears, is listed in `docs/checklists/features-to-build.md`. `components/landing/*` · Tracked · id `landing-page/promises-features-that-are-not-built`</sub>
-- [ ] **Pill shapes on labels and tabs** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L41)<br><sub>Section badges on the landing page, role chips, the manual tabs and "Back to site" are fully rounded. Left as they are by decision for now. Tracked · id `dashboard/pill-shapes-on-labels-and-tabs`</sub>
+- [ ] **Pill shapes on labels and tabs** · Dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/dashboard.md?plain=1#L44)<br><sub>Section badges on the landing page, role chips, the manual tabs and "Back to site" are fully rounded. Left as they are by decision for now. Tracked · id `dashboard/pill-shapes-on-labels-and-tabs`</sub>
 
 ## Done
 
@@ -392,7 +393,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 </details>
 
-<details><summary><b>Dashboard</b>: 11 done</summary>
+<details><summary><b>Dashboard</b>: 12 done</summary>
 
 - [x] New events had no checklist <sub>Done in "Fix the problems found in the site audit"</sub>
 - [x] Join code could not be found after creating an event <sub>Done in "Fix the problems found in the site audit"</sub>
@@ -403,6 +404,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] College header said "Live Monitor" with a pulsing dot for events that had not started <sub>Done in "Fix the problems found in the site audit"</sub>
 - [x] "Everyone is engaged 🎉" with zero students <sub>Done in "Fix the problems found in the site audit"</sub>
 - [x] "Upgrade to Placement Pro" showed a developer message <sub>Done in "Fix the problems found in the site audit"</sub>
+- [x] Sidebar links to a section landed at the top of the page <sub>Done in "Scroll sidebar section links to their section once it has loaded"</sub>
 - [x] Em dashes in visible copy <sub>Done in "Fix the problems found in the site audit"</sub>
 - [x] Unbranded 404 page <sub>Done in "Fix the problems found in the site audit"</sub>
 
