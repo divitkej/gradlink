@@ -797,10 +797,24 @@ export const ops: Record<string, Op> = {
   },
 
   /* Profiles */
-  async getProfileNames(_u, [ids]) {
+  /** Names of people the caller shares an event with, or has messaged or scanned (ids not allowed are left out). */
+  async getProfileNames(u, [ids]) {
     const list = Array.from(new Set(strArray(ids, 1000)));
     if (!list.length) return {};
-    const rows = await db()`select id, full_name, role, organization from profiles where id = any(${list}::text[])`;
+    const rows = await db()`
+      select p.id, p.full_name, p.role, p.organization from profiles p
+      where p.id = any(${list}::text[])
+        and (p.id = ${u.id}
+          or exists (select 1 from events e
+                     where (e.created_by = p.id or exists (select 1 from event_registrations t where t.event_id = e.id and t.profile_id = p.id))
+                       and (e.created_by = ${u.id} or exists (select 1 from event_registrations me where me.event_id = e.id and me.profile_id = ${u.id})))
+          or exists (select 1 from messages m
+                     where (m.sender_profile_id = ${u.id} and m.receiver_profile_id = p.id)
+                        or (m.sender_profile_id = p.id and m.receiver_profile_id = ${u.id}))
+          or exists (select 1 from scans c
+                     where (c.scanner_profile_id = ${u.id} and c.scanned_profile_id = p.id)
+                        or (c.scanner_profile_id = p.id and c.scanned_profile_id = ${u.id})))
+    `;
     return Object.fromEntries(
       rows.map((r) => [r.id as string, { name: (r.full_name as string) ?? "", role: (r.role as string) ?? "", org: (r.organization as string) ?? "" }]),
     );
@@ -1541,10 +1555,10 @@ export const ops: Record<string, Op> = {
       throw err;
     }
   },
-  /** The student sees all of theirs; everyone else only what the student shows employers. */
+  /** The student sees all of theirs; companies and colleges at their events only what the student shows employers. */
   async listStudentCourses(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
+    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_courses where student_id = ${id} order by status, completed_at desc nulls last, created_at desc`
       : db()`
@@ -1654,10 +1668,10 @@ export const ops: Record<string, Op> = {
       throw err;
     }
   },
-  /** The student sees all of theirs, pending ones included; everyone else only verified profiles the student shows. */
+  /** The student sees all of theirs, pending ones included; companies and colleges at their events only verified profiles the student shows. */
   async listStudentScores(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
+    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_scores where student_id = ${id} order by kind`
       : db()`
@@ -1749,10 +1763,10 @@ export const ops: Record<string, Op> = {
     `;
     return { ok: true, certificate: row };
   },
-  /** The student sees all of theirs; everyone else only the ones the student shows. */
+  /** The student sees all of theirs; companies and colleges at their events only the ones the student shows. */
   async listStudentCertificates(u, [studentId]) {
     const id = s(studentId);
-    if (id !== u.id && !(await sharesEventWith(u, id, "student"))) return [];
+    if (id !== u.id && (u.role === "student" || !(await sharesEventWith(u, id, "student")))) return [];
     return u.id === id
       ? db()`select * from student_certificates where student_id = ${id} order by verified_at is null, issued_on desc nulls last, created_at desc`
       : db()`

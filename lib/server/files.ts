@@ -1,4 +1,5 @@
 import { serverEnv, type KVLike } from "./env";
+import { db } from "./sql";
 import { HttpError } from "./http";
 import type { AuthUser } from "./session";
 
@@ -7,9 +8,10 @@ import type { AuthUser } from "./session";
 
    KV is part of the Workers Free plan with no extra product to enable
    (1 GB stored, 1,000 writes/day, 100,000 reads/day), which is ample
-   for occasional uploads of files under 10 MB. The rules match
-   storage.rules: only signed-in users can read, only the owner can
+   for occasional uploads of files under 10 MB. Only the owner can
    upload, and keys are `{folder}/{profileId}-{timestamp}-{name}`.
+   A file can be read by its owner and by people at the same event as
+   the owner, except a résumé, which fellow students don't get.
    ============================================================ */
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -78,9 +80,29 @@ export async function uploadFile(request: Request, user: AuthUser): Promise<{ ur
   return { url: `${base}/api/files/${key.split("/").map(encodeURIComponent).join("/")}` };
 }
 
-export async function serveFile(key: string): Promise<Response> {
+/** Whether `viewer` and `owner` are at the same event (as its owner, or registered for it). */
+async function sharesEvent(viewer: string, owner: string): Promise<boolean> {
+  const rows = await db()`
+    select 1 from events e
+    where (e.created_by = ${owner} or exists (select 1 from event_registrations t where t.event_id = e.id and t.profile_id = ${owner}))
+      and (e.created_by = ${viewer} or exists (select 1 from event_registrations me where me.event_id = e.id and me.profile_id = ${viewer}))
+    limit 1
+  `;
+  return rows.length > 0;
+}
+
+export async function serveFile(key: string, user: AuthUser): Promise<Response> {
   const { value, metadata } = await bucket().getWithMetadata<FileMeta>(key, "stream");
   if (!value) return new Response("Not found", { status: 404 });
+  const owner = metadata?.owner;
+  if (owner !== user.id) {
+    // Same answer as a missing file, so keys can't be probed.
+    const allowed = !!owner && !(key.startsWith("resumes/") && user.role === "student") && (await sharesEvent(user.id, owner));
+    if (!allowed) {
+      await value.cancel();
+      return new Response("Not found", { status: 404 });
+    }
+  }
 
   const type = metadata?.contentType ?? "application/octet-stream";
   const inline = INLINE_TYPES.includes(type);
