@@ -17,6 +17,7 @@
 --       the student readiness hub, schedule, passport and application tracker
 --   * notifications, interview_invites, booth_queue: alerts, interview
 --       invites and live booth queues
+--   * offers: offers companies record for students they met at an event
 --   * student_courses: Coursera certificates verified with Coursera, and
 --       courses in progress
 --   * student_scores: LeetCode and Codeforces profiles verified with those
@@ -451,6 +452,28 @@ create table if not exists interview_invites (
 );
 create index if not exists interview_invites_student_idx on interview_invites (student_id, created_at desc);
 create index if not exists interview_invites_company_idx on interview_invites (company_id, event_id);
+
+-- ------------------------------------------------------------------ offers --
+-- An offer a company made to a student it met at an event. Only the company
+-- records it; the student and the event's college see it, and it counts
+-- toward the event's offers and placement rate. Recording one also books it
+-- into the student's applications (application_id). application_prev_status
+-- is that application's status before the offer, or null when the offer
+-- created it, so withdrawing the offer can put it back.
+create table if not exists offers (
+  id                   text primary key default gen_random_uuid()::text,
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now(),
+  event_id             text not null references events (id) on delete cascade,
+  company_id           text not null references profiles (id) on delete cascade,
+  student_id           text not null references profiles (id) on delete cascade,
+  role_title           text not null,
+  application_id           text references applications (id) on delete set null,
+  application_prev_status  text,
+  unique (event_id, company_id, student_id)
+);
+create index if not exists offers_event_idx on offers (event_id);
+create index if not exists offers_student_idx on offers (student_id);
 
 -- ------------------------------------------------------------ booth queues --
 -- A live queue at each company's booth. One row per student per booth;

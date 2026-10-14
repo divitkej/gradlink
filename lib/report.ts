@@ -1,6 +1,6 @@
 "use client";
 
-import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow, InterviewCounts } from "./db";
+import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, AnalyticsRow, InterviewCounts, OfferRow } from "./db";
 import { evaluateResume } from "./resume";
 import { downloadCsv, slugify } from "./csv";
 import { fmtEventDate } from "./format";
@@ -20,6 +20,7 @@ export interface EmployerLine {
   studentScans: number;
   shortlisted: number;
   rejected: number;
+  offers: number;
 }
 
 export interface StudentLine {
@@ -31,6 +32,7 @@ export interface StudentLine {
   resumeScore: number;
   companiesMet: number;
   shortlists: number;
+  offers: number;
   status: string;
 }
 
@@ -50,6 +52,10 @@ export interface OutcomeReport {
   interviewInvites: number;
   /** Invites where the student picked a time. */
   interviewsBooked: number;
+  /** Offers companies recorded at the event. */
+  offers: number;
+  /** Students with at least one offer. */
+  studentsWithOffer: number;
 
   avgResumeScore: number;
   resumeReady: number;
@@ -57,6 +63,8 @@ export interface OutcomeReport {
 
   engagementRate: number;
   shortlistRate: number;
+  /** Share of registered students with at least one offer. */
+  placementRate: number;
 
   employerTable: EmployerLine[];
   studentTable: StudentLine[];
@@ -82,8 +90,13 @@ export function buildReport(input: {
   shortlists: ShortlistRow[];
   analytics?: AnalyticsRow[];
   interviews?: InterviewCounts;
+  offers?: OfferRow[];
 }): OutcomeReport {
   const { event, students, companies, scans, shortlists } = input;
+  // Only offers to students registered for the event count toward its placement rate.
+  const registered = new Set(students.map((s) => s.profile_id));
+  const offers = (input.offers ?? []).filter((o) => registered.has(o.student_id));
+  const studentsWithOffer = new Set(offers.map((o) => o.student_id)).size;
 
   const scored = students.map((s) => ({ s, score: evaluateResume(s).score }));
   const withResume = students.filter((s) => Boolean(s.resume_url)).length;
@@ -119,6 +132,7 @@ export function buildReport(input: {
         studentScans,
         shortlisted: mine.filter(positive).length,
         rejected: mine.filter((s) => s.status === "rejected").length,
+        offers: offers.filter((o) => o.company_id === pid).length,
       };
     })
     .sort((a, b) => b.studentScans - a.studentScans || b.shortlisted - a.shortlisted);
@@ -138,6 +152,7 @@ export function buildReport(input: {
       ).size;
       const mine = shortlists.filter((sl) => sl.student_id === pid);
       const shortlistCount = mine.filter(positive).length;
+      const offerCount = offers.filter((o) => o.student_id === pid).length;
       return {
         name: s.full_name,
         email: s.email ?? "",
@@ -147,10 +162,11 @@ export function buildReport(input: {
         resumeScore: score,
         companiesMet,
         shortlists: shortlistCount,
-        status: shortlistCount > 0 ? "Shortlisted" : companiesMet > 0 ? "Engaged" : "No activity",
+        offers: offerCount,
+        status: offerCount > 0 ? "Offer" : shortlistCount > 0 ? "Shortlisted" : companiesMet > 0 ? "Engaged" : "No activity",
       };
     })
-    .sort((a, b) => b.shortlists - a.shortlists || b.companiesMet - a.companiesMet);
+    .sort((a, b) => b.offers - a.offers || b.shortlists - a.shortlists || b.companiesMet - a.companiesMet);
 
   const skillCounts = new Map<string, number>();
   students.forEach((s) => (s.skills ?? []).forEach((k) => {
@@ -175,6 +191,8 @@ export function buildReport(input: {
     uniqueStudentsShortlisted,
     interviewInvites: input.interviews?.invited ?? 0,
     interviewsBooked: input.interviews?.booked ?? 0,
+    offers: offers.length,
+    studentsWithOffer,
 
     avgResumeScore,
     resumeReady,
@@ -182,6 +200,7 @@ export function buildReport(input: {
 
     engagementRate: pct(engagedIds.size, students.length),
     shortlistRate: pct(uniqueStudentsShortlisted, students.length),
+    placementRate: pct(studentsWithOffer, students.length),
 
     employerTable,
     studentTable,
@@ -211,18 +230,21 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
     ["Shortlist rate (%)", r.shortlistRate],
     ["Interview invites", r.interviewInvites],
     ["Interviews booked", r.interviewsBooked],
+    ["Offers", r.offers],
+    ["Students with an offer", r.studentsWithOffer],
+    ["Placement rate (%)", r.placementRate],
     ["Average resume score", r.avgResumeScore],
     ["Resume-ready (70+)", r.resumeReady],
     ["Students with a resume", r.withResume],
     [],
     ["Employer engagement"],
-    ["Company", "Booth", "Student scans", "Shortlisted", "Not a fit"],
-    ...r.employerTable.map((e) => [e.name, e.booth, e.studentScans, e.shortlisted, e.rejected]),
+    ["Company", "Booth", "Student scans", "Shortlisted", "Not a fit", "Offers"],
+    ...r.employerTable.map((e) => [e.name, e.booth, e.studentScans, e.shortlisted, e.rejected, e.offers]),
     [],
     ["Students"],
-    ["Name", "Email", "Degree", "University", "Grad year", "Resume score", "Companies met", "Shortlists", "Status"],
+    ["Name", "Email", "Degree", "University", "Grad year", "Resume score", "Companies met", "Shortlists", "Offers", "Status"],
     ...r.studentTable.map((s) => [
-      s.name, s.email, s.degree, s.university, s.graduationYear, s.resumeScore, s.companiesMet, s.shortlists, s.status,
+      s.name, s.email, s.degree, s.university, s.graduationYear, s.resumeScore, s.companiesMet, s.shortlists, s.offers, s.status,
     ]),
   ];
 

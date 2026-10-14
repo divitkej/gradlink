@@ -6,11 +6,11 @@ import { Download, Search, Send, ScanLine, Users } from "lucide-react";
 import { GlassPanel, PanelTitle } from "./widgets";
 import { Avatar, LoadingBlock, SmallButton, fieldStyle } from "./cards";
 import { Badge } from "@/components/ui/primitives";
-import { sendBulkMessage, type ScanRow, type ShortlistRow, type StudentRow, type InterviewInviteRow } from "@/lib/db";
+import { sendBulkMessage, type ScanRow, type ShortlistRow, type StudentRow, type InterviewInviteRow, type OfferRow } from "@/lib/db";
 import { downloadCsv, slugify } from "@/lib/csv";
 import { fmtDateTime, fmtDateTimeZoned } from "@/lib/format";
 
-type Stage = "all" | "undecided" | "interview" | ShortlistRow["status"];
+type Stage = "all" | "undecided" | "contacted" | "interview" | "offer" | ShortlistRow["status"];
 
 const STAGE_LABEL: Record<Exclude<Stage, "all">, string> = {
   undecided: "Scanned, no decision",
@@ -18,7 +18,9 @@ const STAGE_LABEL: Record<Exclude<Stage, "all">, string> = {
   shortlisted: "Shortlisted",
   maybe: "Maybe",
   rejected: "Not a fit",
+  contacted: "Contacted",
   interview: "Interview invited or booked",
+  offer: "Offer made",
 };
 
 const statusTone = (s?: string) =>
@@ -35,9 +37,12 @@ const select: React.CSSProperties = { ...fieldStyle, height: 36, fontSize: 12.5,
  * target roles) plus the company's own stage. No scores are shown to employers.
  */
 export default function CompanyCandidates({
-  eventId, eventTitle, loading, students, shortlists, scans, invites,
+  eventId, eventTitle, loading, students, shortlists, scans, invites, offers, contacted,
 }: {
   invites: InterviewInviteRow[];
+  offers: OfferRow[];
+  /** Students the company messaged or invited to interview. */
+  contacted: string[];
   eventId: string;
   eventTitle: string;
   loading: boolean;
@@ -62,6 +67,8 @@ export default function CompanyCandidates({
     () => new Map(invites.filter((i) => i.status === "pending" || i.status === "accepted").map((i) => [i.student_id, i])),
     [invites],
   );
+  const offerBy = useMemo(() => new Map(offers.map((o) => [o.student_id, o])), [offers]);
+  const contactedSet = useMemo(() => new Set(contacted), [contacted]);
   const firstScan = useMemo(() => {
     const m = new Map<string, string>();
     for (const s of scans) {
@@ -78,6 +85,16 @@ export default function CompanyCandidates({
   const skills = uniq(students.flatMap((s) => s.skills ?? []));
   const roles = uniq(students.flatMap((s) => s.target_roles ?? []));
 
+  function matchesStage(id: string, st: ShortlistRow["status"] | undefined) {
+    switch (stage) {
+      case "undecided": return !st;
+      case "contacted": return contactedSet.has(id);
+      case "interview": return inviteBy.has(id);
+      case "offer": return offerBy.has(id);
+      default: return st === stage;
+    }
+  }
+
   const needle = q.trim().toLowerCase();
   const shown = students.filter((s) => {
     const st = slBy.get(s.profile_id ?? "")?.status;
@@ -86,7 +103,7 @@ export default function CompanyCandidates({
       (year === "all" || String(s.graduation_year) === year) &&
       (skill === "all" || (s.skills ?? []).includes(skill)) &&
       (role === "all" || (s.target_roles ?? []).includes(role)) &&
-      (stage === "all" || (stage === "undecided" ? !st : stage === "interview" ? inviteBy.has(s.profile_id ?? "") : st === stage)) &&
+      (stage === "all" || matchesStage(s.profile_id ?? "", st)) &&
       (!needle || [s.full_name, s.degree, s.university, ...(s.skills ?? []), ...(s.target_roles ?? [])].join(" ").toLowerCase().includes(needle))
     );
   });
@@ -109,7 +126,12 @@ export default function CompanyCandidates({
         return [
           s.full_name, s.email ?? "", s.degree ?? "", s.university ?? "", s.graduation_year ?? "", (s.skills ?? []).join("; "),
           (s.target_roles ?? []).join("; "),
-          [sl ? STAGE_LABEL[sl.status] : STAGE_LABEL.undecided, inviteLabel(inviteBy.get(s.profile_id ?? ""))].filter(Boolean).join(", "),
+          [
+            sl ? STAGE_LABEL[sl.status] : STAGE_LABEL.undecided,
+            contactedSet.has(s.profile_id ?? "") ? STAGE_LABEL.contacted : "",
+            inviteLabel(inviteBy.get(s.profile_id ?? "")),
+            offerBy.has(s.profile_id ?? "") ? `Offer: ${offerBy.get(s.profile_id ?? "")!.role_title}` : "",
+          ].filter(Boolean).join(", "),
           sl?.notes ?? "",
           abs(s.resume_url), s.linkedin_url ?? "", s.portfolio_url ?? "", s.github_url ?? "", scanned ? fmtDateTime(scanned) : "",
         ];
@@ -219,7 +241,9 @@ export default function CompanyCandidates({
                   </div>
                 ) : null}
               </div>
-              {inviteBy.has(id) && <Badge tone="teal">{inviteLabel(inviteBy.get(id))}</Badge>}
+              {offerBy.has(id) ? <Badge tone="teal">Offer made</Badge>
+                : inviteBy.has(id) ? <Badge tone="teal">{inviteLabel(inviteBy.get(id))}</Badge>
+                : contactedSet.has(id) ? <Badge tone="cyan">Contacted</Badge> : null}
               <Badge tone={statusTone(status) as "teal" | "cyan" | "amber" | "muted"}>{status ? STAGE_LABEL[status] : "Scanned"}</Badge>
               <Link href={`/scan/student/${id}?eventId=${eventId}`} style={{ fontSize: 12, fontWeight: 600, color: "var(--accent)", textDecoration: "none", whiteSpace: "nowrap" }}>View →</Link>
             </div>
