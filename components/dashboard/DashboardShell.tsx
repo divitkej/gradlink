@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -113,6 +113,39 @@ function usePlanRequired(profileId: string | undefined, isManager: boolean) {
   return { required: known ?? null, done };
 }
 
+/**
+ * Brings the section a sidebar link names (`/dashboard/student#readiness`)
+ * into view once it exists. Next tries the hash scroll once, before the
+ * dashboard's data has loaded and the section rendered, so it landed at the
+ * top. This keeps the section just under the sticky header while content
+ * loads, and stops as soon as the person scrolls, types or clicks, or after 8 seconds.
+ * Returns a function that stops it early.
+ */
+const HEADER_HEIGHT = 64;
+function followSection(id: string): () => void {
+  if (!id) return () => {};
+  let done = false;
+  const align = () => {
+    const el = document.getElementById(id);
+    if (!el || done) return;
+    const off = el.getBoundingClientRect().top - HEADER_HEIGHT - 12;
+    if (Math.abs(off) > 2) window.scrollBy({ top: off });
+  };
+  const observer = new MutationObserver(align);
+  const userEvents = ["wheel", "touchmove", "keydown", "pointerdown"] as const;
+  const stop = () => {
+    done = true;
+    observer.disconnect();
+    window.clearTimeout(timer);
+    for (const e of userEvents) window.removeEventListener(e, stop);
+  };
+  const timer = window.setTimeout(stop, 8000);
+  for (const e of userEvents) window.addEventListener(e, stop, { passive: true });
+  observer.observe(document.body, { childList: true, subtree: true });
+  align();
+  return stop;
+}
+
 function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
 }
@@ -131,6 +164,13 @@ export default function DashboardShell({
   const { session, ready, signOut } = useSession();
   const { eventId } = useActiveEvent();
   const [open, setOpen] = useState(false);
+  const stopFollowing = useRef<() => void>(() => {});
+  // Each dashboard page mounts its own shell, so this runs after arriving
+  // from another page; a link to a section on this same page starts it on click.
+  useEffect(() => {
+    stopFollowing.current = followSection(decodeURIComponent(window.location.hash.slice(1)));
+    return () => stopFollowing.current();
+  }, []);
   const { count: unread, alerts } = useUnreadMessages(session?.profileId);
   const bellCount = unread + alerts;
   const plan = usePlanRequired(session?.profileId, session?.role === "event_manager");
@@ -183,7 +223,14 @@ export default function DashboardShell({
           <Link
             key={item.label}
             href={item.href}
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              setOpen(false);
+              const hash = item.href.split("#")[1];
+              if (hash && item.href.split("#")[0] === pathname) {
+                stopFollowing.current();
+                stopFollowing.current = followSection(hash);
+              }
+            }}
             className="dash-nav"
             style={{
               display: "flex", alignItems: "center", gap: 11, padding: "9px 12px",

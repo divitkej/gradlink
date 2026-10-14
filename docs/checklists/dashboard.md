@@ -6,7 +6,7 @@ Update this file in the same commit as the fix.
 
 "Browser run-through" below means a Playwright run on the Workers runtime (`wrangler dev`) against Neon: a college creates an event, a student and a company join with the code, the company opens the student, shortlists, saves a note and messages, the student replies, the student saves a profile and uploads a résumé.
 
-## Progress: 11 / 13 done
+## Progress: 12 / 14 done
 
 ## Broken
 
@@ -31,6 +31,9 @@ Update this file in the same commit as the fix.
   `components/dashboard/EventConsole.tsx`, `components/dashboard/StudentDashboard.tsx`, `components/landing/SpatialShowcaseSection.tsx` · Done in "Fix the problems found in the site audit"
 - [x] **"Upgrade to Placement Pro" showed a developer message** ("Add STRIPE_SECRET_KEY and STRIPE_PRICE_PRO"). It now tells the college to email the operator to upgrade.
   `app/api/checkout/route.ts` · Done in "Fix the problems found in the site audit"
+
+- [x] **Sidebar links to a section landed at the top of the page.** "Readiness", "Analytics", "Checklist" and the other `#section` links opened the page at the top when its data loaded slowly, because Next tries the hash scroll once, before the section exists. The dashboard now brings the section under the header once it renders, and stops as soon as the person scrolls, types or clicks.
+  `components/dashboard/DashboardShell.tsx` · Done in "Scroll sidebar section links to their section once it has loaded"
 
 ## Copy and polish
 
