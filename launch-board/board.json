@@ -1,14 +1,14 @@
 {
   "updated": "2026-10-14",
   "totals": {
-    "total": 163,
+    "total": 161,
     "done": 137,
-    "open": 26,
-    "percent": 84,
+    "open": 24,
+    "percent": 85,
     "counts": {
       "in_progress": 0,
       "owner": 16,
-      "todo": 5,
+      "todo": 3,
       "verify": 3,
       "parked": 2,
       "done": 137
@@ -122,11 +122,11 @@
     {
       "key": "features-to-build",
       "name": "Features to build",
-      "total": 10,
+      "total": 8,
       "counts": {
         "in_progress": 0,
         "owner": 3,
-        "todo": 5,
+        "todo": 3,
         "verify": 0,
         "parked": 0,
         "done": 2
@@ -211,11 +211,11 @@
       "key": "5",
       "name": "Phase 5: Product build-out",
       "goal": "Organiser access, the full student dashboard and the features the site promises.",
-      "total": 65,
+      "total": 63,
       "counts": {
         "in_progress": 0,
         "owner": 1,
-        "todo": 5,
+        "todo": 3,
         "verify": 1,
         "parked": 0,
         "done": 58
@@ -435,37 +435,13 @@
       "area": "features-to-build",
       "areaName": "Features to build",
       "section": "Not built yet",
-      "line": 53,
-      "title": "Build: Offer tracking and placement rate",
-      "detail": "Where the site shows it: Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04. Notes: Students log offers in the application tracker (private to them). No college-facing offer count or placement rate yet",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/offer-tracking-and-placement-rate"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 54,
+      "line": 55,
       "title": "Build: Event ROI score",
       "detail": "Where the site shows it: Analytics stats. Notes: No formula or data",
       "state": "todo",
       "doneIn": null,
       "phase": "5",
       "id": "features-to-build/event-roi-score"
-    },
-    {
-      "area": "features-to-build",
-      "areaName": "Features to build",
-      "section": "Not built yet",
-      "line": 55,
-      "title": "Build: Candidate stages \"Contacted\" and \"Offer\"",
-      "detail": "Where the site shows it: Employer CRM pipeline, Platform tab CRM mini. Notes: \"Interview\" now shows from invites; \"Contacted\" and \"Offer\" are not tracked for companies",
-      "state": "todo",
-      "doneIn": null,
-      "phase": "5",
-      "id": "features-to-build/candidate-stages-contacted-and-offer"
     },
     {
       "area": "features-to-build",

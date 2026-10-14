@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**137 of 163 done (84%).** 0 in progress, 26 left. Checklists last changed 2026-10-14.
+**137 of 161 done (85%).** 0 in progress, 24 left. Checklists last changed 2026-10-14.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -12,7 +12,7 @@ Open the interactive version: download [`index.html`](index.html) and open it in
 pie showData
   title Where everything stands
   "Needs the owner" : 16
-  "To do" : 5
+  "To do" : 3
   "Verify live" : 3
   "Parked by decision" : 2
   "Done" : 137
@@ -28,7 +28,7 @@ pie showData
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 80% | 12 | 0 | 3 |
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 72% | 36 | 0 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
-| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `███████████░` 89% | 58 | 0 | 7 |
+| [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `███████████░` 92% | 58 | 0 | 5 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
 
 ### Phase 1: Core loop
@@ -175,14 +175,12 @@ Search basics, confirmations, redirects and live updates.
 
 Organiser access, the full student dashboard and the features the site promises.
 
-**Ongoing.** 58 of 65 done, 0 in progress, 7 left.
+**Ongoing.** 58 of 63 done, 0 in progress, 5 left.
 
 **Left**
 
 - [ ] Set `ADMIN_EMAILS`, then sign up with that email straight away · Needs the owner · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)
-- [ ] Build: Offer tracking and placement rate · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)
-- [ ] Build: Event ROI score · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)
-- [ ] Build: Candidate stages "Contacted" and "Offer" · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
+- [ ] Build: Event ROI score · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)
 - [ ] Build: Alumni accounts · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L56)
 - [ ] Build: Year-over-year comparison · To do · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L57)
 - [ ] Two-account run on real phones · Verify live · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L93)
@@ -284,9 +282,9 @@ Features that should work, checked once on a real device or the live site.
 | Audit follow-ups | `███████████░` 92% | 11 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `████████████` 97% | 32 | 1 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
 | Security | `█████████░░░` 72% | 18 | 7 | [security.md](../docs/checklists/security.md) |
-| Features to build | `██░░░░░░░░░░` 20% | 2 | 8 | [features-to-build.md](../docs/checklists/features-to-build.md) |
+| Features to build | `███░░░░░░░░░` 25% | 2 | 6 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `██████████░░` **84%** | **137** | **26** | |
+| **All** | `██████████░░` **85%** | **137** | **24** | |
 
 ## In progress
 
@@ -313,11 +311,9 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
 
-### To do (5)
+### To do (3)
 
-- [ ] **Build: Offer tracking and placement rate** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L53)<br><sub>Where the site shows it: Analytics funnel, stats panels, Hero dashboard, Product reveal, Journey step 04. Notes: Students log offers in the application tracker (private to them).… · id `features-to-build/offer-tracking-and-placement-rate`</sub>
-- [ ] **Build: Event ROI score** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L54)<br><sub>Where the site shows it: Analytics stats. Notes: No formula or data · id `features-to-build/event-roi-score`</sub>
-- [ ] **Build: Candidate stages "Contacted" and "Offer"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)<br><sub>Where the site shows it: Employer CRM pipeline, Platform tab CRM mini. Notes: "Interview" now shows from invites; "Contacted" and "Offer" are not tracked for companies · id `features-to-build/candidate-stages-contacted-and-offer`</sub>
+- [ ] **Build: Event ROI score** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L55)<br><sub>Where the site shows it: Analytics stats. Notes: No formula or data · id `features-to-build/event-roi-score`</sub>
 - [ ] **Build: Alumni accounts** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L56)<br><sub>Where the site shows it: Why GradLink card "Useful all year round". Notes: Mentoring runs as college-published sessions and internships show on Opportunities; alumni cannot sign… · id `features-to-build/alumni-accounts`</sub>
 - [ ] **Build: Year-over-year comparison** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L57)<br><sub>Where the site shows it: Pricing (Placement Pro) · id `features-to-build/year-over-year-comparison`</sub>
 
