@@ -392,9 +392,9 @@ export function getUnreadMessageCount(profileId: string): Promise<number> {
  * Pass `fromProfileId` to mark only one conversation read; omit to mark all.
  * Returns the number of rows that were newly marked read.
  */
-export function markMessagesRead(profileId: string, fromProfileId?: string): Promise<number> {
+export function markMessagesRead(profileId: string, fromProfileId?: string, eventId?: string): Promise<number> {
   if (!profileId) return Promise.resolve(0);
-  return safe("markMessagesRead", 0, () => rpc<number>("markMessagesRead", profileId, fromProfileId));
+  return safe("markMessagesRead", 0, () => rpc<number>("markMessagesRead", profileId, fromProfileId, eventId));
 }
 
 /* ---------------- Checklist ---------------- */

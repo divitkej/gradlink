@@ -41,6 +41,8 @@ export default function MessagesPage() {
   const reloadRef = useRef<() => void>(() => {});
   // The conversation on screen now, for a send that fails after the user moved on.
   const openRef = useRef<string | null>(null);
+  // Numbers the optimistic copies of messages being sent.
+  const tempSeq = useRef(0);
   // The draft in the box now, for the same reason.
   const replyRef = useRef("");
   useEffect(() => { replyRef.current = reply; }, [reply]);
@@ -72,6 +74,18 @@ export default function MessagesPage() {
       }
       if (cancelled || mine !== seq) return;
       setElsewhere(byEvent.filter((e) => e.event_id !== eventId));
+      // On a wide screen a conversation is open from the start: the newest one,
+      // chosen once. Later reloads never switch it, even when another
+      // conversation gets a newer message, so a reply being typed always goes
+      // to the person on screen. On a narrow screen the list shows first.
+      const newest = [...m].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))[0];
+      const newestOther = newest ? (newest.sender_profile_id === me ? newest.receiver_profile_id : newest.sender_profile_id) : null;
+      const involves = (id: string) => m.some((x) => x.sender_profile_id === id || x.receiver_profile_id === id);
+      if (window.innerWidth >= 760) {
+        setActiveId((cur) => (cur && (!initial || involves(cur)) ? cur : newestOther ?? null));
+      } else if (initial) {
+        setActiveId((cur) => (cur && involves(cur) ? cur : null));
+      }
       setNames(known);
       setMsgs((prev) => {
         // A failed reload comes back empty. Messages are never deleted, so an
@@ -112,7 +126,7 @@ export default function MessagesPage() {
       .sort((a, b) => +new Date(b.last.created_at) - +new Date(a.last.created_at));
   }, [msgs, names, me]);
 
-  const active = activeId ? convs.find((c) => c.id === activeId) : mobile ? undefined : convs[0];
+  const active = activeId ? convs.find((c) => c.id === activeId) : undefined;
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [active?.list.length, activeId]);
 
@@ -124,14 +138,14 @@ export default function MessagesPage() {
     const hasUnread = msgs.some((m) => m.sender_profile_id === activeOpenId && m.receiver_profile_id === me && !m.read_at);
     if (!hasUnread) return;
     (async () => {
-      await markMessagesRead(me, activeOpenId);
+      await markMessagesRead(me, activeOpenId, eventId ?? undefined);
       const now = new Date().toISOString();
       setMsgs((prev) => prev.map((m) =>
         m.sender_profile_id === activeOpenId && m.receiver_profile_id === me && !m.read_at ? { ...m, read_at: now } : m
       ));
       notifyMessagesRead();
     })();
-  }, [activeOpenId, me, msgs]);
+  }, [activeOpenId, me, msgs, eventId]);
 
   async function send() {
     const text = reply.trim();
@@ -140,7 +154,7 @@ export default function MessagesPage() {
     setSending(true);
     setSendError(null);
     const temp: MessageRow = {
-      id: "temp-" + Math.random().toString(36).slice(2),
+      id: `temp-${++tempSeq.current}`,
       created_at: new Date().toISOString(),
       event_id: eventId, sender_profile_id: me, receiver_profile_id: to.id, message: text, read_at: null,
     };
@@ -178,7 +192,7 @@ export default function MessagesPage() {
         <div role="status" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text-2)", padding: "10px 14px", marginBottom: 14, border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)", background: "rgba(255,255,255,0.03)" }}>
           <span>Unread messages at other events:</span>
           {elsewhere.map((e) => (
-            <button key={e.event_id} type="button" onClick={() => selectEvent(e.event_id)}
+            <button key={e.event_id} type="button" onClick={() => { setSendError(null); selectEvent(e.event_id); }}
               style={{ fontSize: 12.5, fontWeight: 600, color: "var(--accent)", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "3px 10px", cursor: "pointer" }}>
               {e.title} ({e.unread})
             </button>
@@ -207,7 +221,7 @@ export default function MessagesPage() {
                   const on = active?.id === c.id;
                   const mine = c.last.sender_profile_id === me;
                   return (
-                    <button key={c.id} onClick={() => setActiveId(c.id)}
+                    <button key={c.id} onClick={() => { setActiveId(c.id); setSendError(null); }}
                       style={{ width: "100%", display: "flex", gap: 11, alignItems: "center", padding: "12px 16px", cursor: "pointer", textAlign: "left", background: on ? "rgba(255,255,255,0.08)" : "transparent", border: "none", borderBottom: "1px solid var(--border)", borderLeft: `2px solid ${on ? "var(--accent)" : "transparent"}` }}>
                       <Avatar name={c.name} size={38} tone={c.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                       <span style={{ flex: 1, minWidth: 0 }}>

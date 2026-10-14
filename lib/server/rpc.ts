@@ -747,11 +747,16 @@ export const ops: Record<string, Op> = {
     return rows[0]?.n ?? 0;
   },
   /** The recipient may only ever flip read_at — the message itself is never editable. */
-  async markMessagesRead(u, [profileId, fromProfileId]) {
+  async markMessagesRead(u, [profileId, fromProfileId, eventId]) {
     isMe(u, profileId);
+    // With an event, only that event's messages: the inbox shows one event at a
+    // time, so opening a conversation must not clear the person's messages at
+    // another event the reader has not seen.
+    const ev = s(eventId) || null;
     const rows = fromProfileId
       ? await db()`update messages set read_at = now()
-          where receiver_profile_id = ${u.id} and read_at is null and sender_profile_id = ${s(fromProfileId)} returning id`
+          where receiver_profile_id = ${u.id} and read_at is null and sender_profile_id = ${s(fromProfileId)}
+            and (${ev}::text is null or event_id = ${ev}) returning id`
       : await db()`update messages set read_at = now()
           where receiver_profile_id = ${u.id} and read_at is null returning id`;
     return rows.length;
