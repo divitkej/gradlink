@@ -208,7 +208,7 @@ export default function AdminDashboard() {
       return shell(
         <SectionCard title="Sign in to continue">
           <p style={{ fontSize: 13.5, color: "var(--text-2)" }}>
-            <Link href="/sign-in" style={{ color: "var(--accent)" }}>Sign in</Link> with the owner account, then come back to this page.
+            <Link href={`/sign-in?next=${encodeURIComponent("/admin")}`} style={{ color: "var(--accent)" }}>Sign in</Link> with the owner account and you will come straight back here.
           </p>
         </SectionCard>,
       );

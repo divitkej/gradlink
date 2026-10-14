@@ -124,7 +124,7 @@ export default function CollegeApprovals() {
     body = (
       <SectionCard title="Not available">
         <p style={{ fontSize: 13.5, color: "var(--text-2)" }}>
-          This page is only for the GradLink owner. <Link href="/sign-in" style={{ color: "var(--text)" }}>Sign in</Link> with the owner account to continue.
+          This page is only for the GradLink owner. <Link href={`/sign-in?next=${encodeURIComponent("/admin/colleges")}`} style={{ color: "var(--text)" }}>Sign in</Link> with the owner account to continue.
         </p>
       </SectionCard>
     );
