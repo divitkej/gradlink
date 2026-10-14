@@ -6,7 +6,7 @@ Goal: everything the landing page shows a student is real in the dashboard. Rema
 
 Status key as in `landing-page.md`.
 
-## Progress: 31 / 33 done, 2 need a real device or the go-live step
+## Progress: 32 / 33 done, 1 needs real phones
 
 ## Before deploying
 
@@ -16,8 +16,7 @@ Status key as in `landing-page.md`.
   `db/schema.sql` · Done on 2026-09-29, no commit (database change)
 - [x] **Tested live on a preview version.** Uploaded with `npm run upload` as Worker version `1efa9168` (preview URL only, production traffic untouched). With three short-lived test accounts against the live database and coursera.org: event creation and its 18-item student checklist, session booking, the student overview, a Coursera course added, someone else's certificate and a fake link refused, the employer view showing the course and no scores, and the API refusing student analytics to an employer. All 15 checks passed; the test accounts and event were deleted afterwards.
   Done on 2026-09-29
-- [ ] **Put the branch live.** Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since).
-  Verify live
+- [x] **Put the branch live.** Merge the PR into main, then `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy` (or promote the tested preview version `0ec7412c` with `wrangler versions deploy` if main has not changed since). Checked on 2026-10-14: the live site serves code merged today (the "Your current plan" pricing badge from the auth and pricing PR, and the scanner copy from the scan pages PR), so main was deployed after these fixes. No commit (deploy)
 
 ## Built
 
