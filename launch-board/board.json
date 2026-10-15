@@ -1,28 +1,28 @@
 {
-  "updated": "2026-10-14",
+  "updated": "2026-10-15",
   "totals": {
-    "total": 163,
-    "done": 142,
-    "open": 21,
-    "percent": 87,
+    "total": 166,
+    "done": 146,
+    "open": 20,
+    "percent": 88,
     "counts": {
-      "in_progress": 4,
-      "owner": 12,
-      "todo": 0,
+      "in_progress": 0,
+      "owner": 14,
+      "todo": 1,
       "verify": 3,
       "parked": 2,
-      "done": 142
+      "done": 146
     }
   },
   "areas": [
     {
       "key": "launch",
       "name": "Launch",
-      "total": 13,
+      "total": 14,
       "counts": {
-        "in_progress": 1,
-        "owner": 2,
-        "todo": 0,
+        "in_progress": 0,
+        "owner": 3,
+        "todo": 1,
         "verify": 0,
         "parked": 0,
         "done": 10
@@ -72,12 +72,12 @@
       "name": "Dashboard",
       "total": 14,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 0,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 12
+        "done": 13
       }
     },
     {
@@ -109,14 +109,14 @@
     {
       "key": "security",
       "name": "Security",
-      "total": 25,
+      "total": 27,
       "counts": {
-        "in_progress": 2,
-        "owner": 5,
+        "in_progress": 0,
+        "owner": 6,
         "todo": 0,
         "verify": 0,
         "parked": 0,
-        "done": 18
+        "done": 21
       }
     },
     {
@@ -168,12 +168,12 @@
       "goal": "Every visible button works, nothing claims what the app does not do.",
       "total": 15,
       "counts": {
-        "in_progress": 1,
+        "in_progress": 0,
         "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 1,
-        "done": 12
+        "done": 13
       },
       "status": "Ongoing"
     },
@@ -181,14 +181,14 @@
       "key": "3",
       "name": "Phase 3: Launch readiness",
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
-      "total": 50,
+      "total": 53,
       "counts": {
-        "in_progress": 3,
-        "owner": 10,
-        "todo": 0,
+        "in_progress": 0,
+        "owner": 12,
+        "todo": 1,
         "verify": 0,
         "parked": 1,
-        "done": 36
+        "done": 39
       },
       "status": "Ongoing"
     },
@@ -243,73 +243,13 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
-      "line": 21,
-      "title": "Cloudflare GitHub builds fail on every commit",
-      "detail": "The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed. Owner action",
-      "state": "in_progress",
+      "line": 17,
+      "title": "Create the Worker and set its secrets",
+      "detail": "Owner action: this needs a Cloudflare API token, which no tool in the setup session had. Either add the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets and let the Deploy workflow run, or run `npx wrangler login` and `npm run deploy` on your own machine. Then set the secrets listed in README.md (Cloudflare): `DATABASE_URL` must be the `gradlink_app` role's pooled connection string, not the owner role's, and `AUTH_SECRET` a new random value.",
+      "state": "owner",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/cloudflare-github-builds-fail-on-every",
-      "pr": {
-        "number": 48,
-        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
-        "url": "https://github.com/divitkej/gradlink/pull/48",
-        "draft": false
-      }
-    },
-    {
-      "area": "dashboard",
-      "areaName": "Dashboard",
-      "section": "Copy and polish",
-      "line": 46,
-      "title": "Several Claude sessions deploy to the same Worker",
-      "detail": "Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging. Owner decision",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "2",
-      "id": "dashboard/several-claude-sessions-deploy-to-the",
-      "pr": {
-        "number": 48,
-        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
-        "url": "https://github.com/divitkej/gradlink/pull/48",
-        "draft": false
-      }
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 39,
-      "title": "Set `APP_URL`",
-      "detail": "in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/set-app-url",
-      "pr": {
-        "number": 48,
-        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
-        "url": "https://github.com/divitkej/gradlink/pull/48",
-        "draft": false
-      }
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 42,
-      "title": "Least-privilege database role",
-      "detail": "In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.",
-      "state": "in_progress",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/least-privilege-database-role",
-      "pr": {
-        "number": 48,
-        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
-        "url": "https://github.com/divitkej/gradlink/pull/48",
-        "draft": false
-      }
+      "id": "launch/create-the-worker-and-set-its"
     },
     {
       "area": "launch",
@@ -363,7 +303,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 41,
+      "line": 43,
       "title": "Optional, after the custom domain is connected",
       "detail": "add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.",
       "state": "owner",
@@ -375,9 +315,9 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 43,
+      "line": 45,
       "title": "Backups",
-      "detail": "Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise it in the Neon project settings; the Neon plan sets the maximum. Owner action",
+      "detail": "Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which is the Free plan's maximum on Neon's pricing page (checked 2026-10-15). Owner decision: accept 6 hours while the data is small, or take regular `pg_dump` copies to private storage, or move to a paid Neon plan.",
       "state": "owner",
       "doneIn": null,
       "phase": "3",
@@ -387,7 +327,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 44,
+      "line": 46,
       "title": "Secrets",
       "detail": "Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.",
       "state": "owner",
@@ -399,7 +339,7 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 45,
+      "line": 47,
       "title": "Account verification",
       "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). Still open: confirming the email itself needs a sender (see `launch.md`, account email), and a college whose domain is still pending can already create events.",
       "state": "owner",
@@ -411,7 +351,19 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 46,
+      "line": 48,
+      "title": "Revoke the exposed 21st.dev API key",
+      "detail": "It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev account that issued it (it was committed by the previous owner): revoke it at 21st.dev, create a new one and keep it in the `TWENTY_FIRST_API_KEY` environment variable. The git history is not rewritten.",
+      "state": "owner",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/revoke-the-exposed-21st-dev-api"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 49,
       "title": "Verify live",
       "detail": "after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.",
       "state": "owner",
@@ -454,6 +406,18 @@
       "doneIn": null,
       "phase": "3",
       "id": "features-to-build/dedicated-onboarding"
+    },
+    {
+      "area": "launch",
+      "areaName": "Launch",
+      "section": "Hosting and database",
+      "line": 18,
+      "title": "Verify live",
+      "detail": "After the first deploy, `https://gradlink.bharatg0904.workers.dev/api/health` answers `{\"ok\":true,\"database\":\"connected\"}`, the public pages return 200, and one test account signs up, signs in and is deleted again.",
+      "state": "todo",
+      "doneIn": null,
+      "phase": "3",
+      "id": "launch/verify-live"
     },
     {
       "area": "landing-page",
@@ -520,48 +484,36 @@
       "areaName": "Launch",
       "section": "Hosting and database",
       "line": 11,
-      "title": "Neon tables created",
-      "detail": "`npm run db:migrate` applied `db/schema.sql`: 17 tables including `password_reset_tokens`. No old data imported (by decision). `db/schema.sql` · Done on 2026-09-27, no commit (database change)",
+      "title": "Neon project and tables created",
+      "detail": "Project `gradlink` in the owner's Neon organisation (Free plan), in Singapore as the Privacy Policy says, branch `production`, database `gradlink`. `npm run db:migrate` applied `db/schema.sql` (34 tables) and a second run changed nothing. It started empty: nothing was copied from the previous owner's database. `db/schema.sql` · Done on 2026-10-15, no commit (database change)",
       "state": "done",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/neon-tables-created"
+      "id": "launch/neon-project-and-tables-created"
     },
     {
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
       "line": 13,
-      "title": "Worker points at the real KV namespace",
-      "detail": "`UPLOADS` binding set to the namespace created in the GradLink Cloudflare account. `wrangler.jsonc` · Done in \"Point the UPLOADS binding at the real KV namespace\"",
+      "title": "Worker points at the new KV namespace",
+      "detail": "`UPLOADS` is bound to `gradlink-UPLOADS`, created in the owner's Cloudflare account. `wrangler.jsonc` · Done in \"Move GradLink to the new owner's Neon project and Cloudflare account\"",
       "state": "done",
-      "doneIn": "Point the UPLOADS binding at the real KV namespace",
+      "doneIn": "Move GradLink to the new owner's Neon project and Cloudflare account",
       "phase": "3",
-      "id": "launch/worker-points-at-the-real-kv"
+      "id": "launch/worker-points-at-the-new-kv"
     },
     {
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
       "line": 15,
-      "title": "Worker secrets set",
-      "detail": "`AUTH_SECRET` and `DATABASE_URL` (Neon pooled string) are Worker secrets. Done on 2026-09-27, no commit (Cloudflare setting)",
+      "title": "Tested on the Workers runtime against the new database",
+      "detail": "The OpenNext build ran in `wrangler dev` (workerd) against the new Neon project as the least-privilege role: 144 API checks passed (every public page, the five account types, event codes, QR scan keys, scans, messages, interviews, offers, sessions and waitlist, booth queue, uploads and who may open them, Coursera, Credly, LeetCode and Codeforces lookups, owner pages, sign-out, password change) and 9 Stripe webhook checks passed (unsigned, forged and stale deliveries refused; signed ones move a college to Pro and back). Every test row was deleted afterwards. Done on 2026-10-15, no commit (test run)",
       "state": "done",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/worker-secrets-set"
-    },
-    {
-      "area": "launch",
-      "areaName": "Launch",
-      "section": "Hosting and database",
-      "line": 17,
-      "title": "Deployed and tested live",
-      "detail": "All public pages, robots.txt, sitemap and favicon return 200. A test student account signed up, held a session and signed in against Neon, then was deleted. Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`",
-      "state": "done",
-      "doneIn": null,
-      "phase": "3",
-      "id": "launch/deployed-and-tested-live"
+      "id": "launch/tested-on-the-workers-runtime-against"
     },
     {
       "area": "launch",
@@ -574,6 +526,18 @@
       "doneIn": "Remove Vercel, Supabase and Firebase leftovers",
       "phase": "3",
       "id": "launch/only-neon-and-cloudflare-in-the"
+    },
+    {
+      "area": "launch",
+      "areaName": "Launch",
+      "section": "Hosting and database",
+      "line": 21,
+      "title": "Cloudflare GitHub builds fail on every commit",
+      "detail": "The previous owner's `gradlink` Worker is connected to this repo through Cloudflare Workers Builds, and every build since PR #5 has failed; its logs are in that account, which this project no longer uses. Deploys to the new Worker now run from GitHub Actions instead, the same way the owner's other Workers deploy: typecheck and lint, `npm run db:migrate`, `npm run deploy`, then wait for `/api/health` to report the database connected. The job skips with a notice until the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets exist. The previous owner can disconnect the old Worker's Workers Builds so commits stop starting failed builds there. `.github/workflows/deploy.yml`, `app/api/health/route.ts` · Done in \"Deploy from main with GitHub Actions and add a health check\"",
+      "state": "done",
+      "doneIn": "Deploy from main with GitHub Actions and add a health check",
+      "phase": "3",
+      "id": "launch/cloudflare-github-builds-fail-on-every"
     },
     {
       "area": "launch",
@@ -1210,6 +1174,18 @@
       "doneIn": "Fix the problems found in the site audit",
       "phase": "2",
       "id": "dashboard/unbranded-404-page"
+    },
+    {
+      "area": "dashboard",
+      "areaName": "Dashboard",
+      "section": "Copy and polish",
+      "line": 46,
+      "title": "Several Claude sessions deploy to the same Worker",
+      "detail": "Each `npm run deploy` replaced the whole live site with that session's branch, so work from other branches disappeared from the live site until merged. The Deploy workflow now deploys `main` after every merge; sessions should not run `npm run deploy` from a branch (use `npm run upload` for a preview version instead). `.github/workflows/deploy.yml` · Done in \"Deploy from main with GitHub Actions and add a health check\"",
+      "state": "done",
+      "doneIn": "Deploy from main with GitHub Actions and add a health check",
+      "phase": "2",
+      "id": "dashboard/several-claude-sessions-deploy-to-the"
     },
     {
       "area": "audit-follow-ups",
@@ -1934,14 +1910,50 @@
     {
       "area": "security",
       "areaName": "Security",
+      "section": "Fixed in code",
+      "line": 27,
+      "title": "A 21st.dev API key was committed in `.mcp.json`",
+      "detail": "The `magic` MCP server's key was written into the file in the baseline commit. The file now reads it from the `TWENTY_FIRST_API_KEY` environment variable, so the key lives on the developer's machine only. `.mcp.json` · Done in \"Remove the committed 21st.dev API key from .mcp.json\"",
+      "state": "done",
+      "doneIn": "Remove the committed 21st.dev API key from .mcp.json",
+      "phase": "3",
+      "id": "security/a-21st-dev-api-key-was"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 40,
+      "line": 41,
+      "title": "Set `APP_URL`",
+      "detail": "in `wrangler.jsonc`. Reset emails, upload links and Stripe return URLs use it. Set to `https://gradlink.bharatg0904.workers.dev`; change it with the `SITE_URL` fallback when the custom domain goes live (see `launch.md`). `wrangler.jsonc` · Done in \"Move GradLink to the new owner's Neon project and Cloudflare account\"",
+      "state": "done",
+      "doneIn": "Move GradLink to the new owner's Neon project and Cloudflare account",
+      "phase": "3",
+      "id": "security/set-app-url"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 42,
       "title": "Run `npm run db:migrate`",
       "detail": "against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)",
       "state": "done",
       "doneIn": null,
       "phase": "3",
       "id": "security/run-npm-run-db-migrate"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 44,
+      "title": "Least-privilege database role",
+      "detail": "In the Neon project `gradlink`, the role `gradlink_app` has only select, insert, update and delete on the app tables (and on tables `gradlink_owner` creates later), is not a member of `neon_superuser`, and is refused when it tries to create a table. It is the role the app connects as; `gradlink_owner` is kept for `npm run db:migrate` only. Checked on 2026-10-15 by running the whole app as `gradlink_app` against the new database. Done on 2026-10-15, no commit (database change)",
+      "state": "done",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/least-privilege-database-role"
     },
     {
       "area": "features-to-build",
