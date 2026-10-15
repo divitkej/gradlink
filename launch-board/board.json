@@ -6,8 +6,8 @@
     "open": 21,
     "percent": 87,
     "counts": {
-      "in_progress": 0,
-      "owner": 16,
+      "in_progress": 4,
+      "owner": 12,
       "todo": 0,
       "verify": 3,
       "parked": 2,
@@ -20,8 +20,8 @@
       "name": "Launch",
       "total": 13,
       "counts": {
-        "in_progress": 0,
-        "owner": 3,
+        "in_progress": 1,
+        "owner": 2,
         "todo": 0,
         "verify": 0,
         "parked": 0,
@@ -72,8 +72,8 @@
       "name": "Dashboard",
       "total": 14,
       "counts": {
-        "in_progress": 0,
-        "owner": 1,
+        "in_progress": 1,
+        "owner": 0,
         "todo": 0,
         "verify": 0,
         "parked": 1,
@@ -111,8 +111,8 @@
       "name": "Security",
       "total": 25,
       "counts": {
-        "in_progress": 0,
-        "owner": 7,
+        "in_progress": 2,
+        "owner": 5,
         "todo": 0,
         "verify": 0,
         "parked": 0,
@@ -168,8 +168,8 @@
       "goal": "Every visible button works, nothing claims what the app does not do.",
       "total": 15,
       "counts": {
-        "in_progress": 0,
-        "owner": 2,
+        "in_progress": 1,
+        "owner": 1,
         "todo": 0,
         "verify": 0,
         "parked": 1,
@@ -183,8 +183,8 @@
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
       "total": 50,
       "counts": {
-        "in_progress": 0,
-        "owner": 13,
+        "in_progress": 3,
+        "owner": 10,
         "todo": 0,
         "verify": 0,
         "parked": 1,
@@ -246,10 +246,70 @@
       "line": 21,
       "title": "Cloudflare GitHub builds fail on every commit",
       "detail": "The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed. Owner action",
-      "state": "owner",
+      "state": "in_progress",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/cloudflare-github-builds-fail-on-every"
+      "id": "launch/cloudflare-github-builds-fail-on-every",
+      "pr": {
+        "number": 48,
+        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
+        "url": "https://github.com/divitkej/gradlink/pull/48",
+        "draft": false
+      }
+    },
+    {
+      "area": "dashboard",
+      "areaName": "Dashboard",
+      "section": "Copy and polish",
+      "line": 46,
+      "title": "Several Claude sessions deploy to the same Worker",
+      "detail": "Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging. Owner decision",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "2",
+      "id": "dashboard/several-claude-sessions-deploy-to-the",
+      "pr": {
+        "number": 48,
+        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
+        "url": "https://github.com/divitkej/gradlink/pull/48",
+        "draft": false
+      }
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 39,
+      "title": "Set `APP_URL`",
+      "detail": "in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/set-app-url",
+      "pr": {
+        "number": 48,
+        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
+        "url": "https://github.com/divitkej/gradlink/pull/48",
+        "draft": false
+      }
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 42,
+      "title": "Least-privilege database role",
+      "detail": "In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.",
+      "state": "in_progress",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/least-privilege-database-role",
+      "pr": {
+        "number": 48,
+        "title": "Move GradLink to the new owner's Neon and Cloudflare accounts, deploy from main",
+        "url": "https://github.com/divitkej/gradlink/pull/48",
+        "draft": false
+      }
     },
     {
       "area": "launch",
@@ -288,18 +348,6 @@
       "id": "organiser-access/set-admin-emails-then-sign-up"
     },
     {
-      "area": "dashboard",
-      "areaName": "Dashboard",
-      "section": "Copy and polish",
-      "line": 46,
-      "title": "Several Claude sessions deploy to the same Worker",
-      "detail": "Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging. Owner decision",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "2",
-      "id": "dashboard/several-claude-sessions-deploy-to-the"
-    },
-    {
       "area": "audit-follow-ups",
       "areaName": "Audit follow-ups",
       "section": "Navigation",
@@ -315,18 +363,6 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 39,
-      "title": "Set `APP_URL`",
-      "detail": "in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/set-app-url"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
       "line": 41,
       "title": "Optional, after the custom domain is connected",
       "detail": "add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.",
@@ -334,18 +370,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/optional-after-the-custom-domain-is"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 42,
-      "title": "Least-privilege database role",
-      "detail": "In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/least-privilege-database-role"
     },
     {
       "area": "security",
