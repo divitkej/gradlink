@@ -6,7 +6,7 @@ Update this file in the same commit as the fix.
 
 "Browser run-through" below means a Playwright run on the Workers runtime (`wrangler dev`) against Neon: a college creates an event, a student and a company join with the code, the company opens the student, shortlists, saves a note and messages, the student replies, the student saves a profile and uploads a résumé.
 
-## Progress: 12 / 14 done
+## Progress: 13 / 14 done
 
 ## Broken
 
@@ -43,5 +43,5 @@ Update this file in the same commit as the fix.
   `app/not-found.tsx`, `components/site/NotFound.tsx` · Done in "Fix the problems found in the site audit"
 - [ ] **Pill shapes on labels and tabs.** Section badges on the landing page, role chips, the manual tabs and "Back to site" are fully rounded. Left as they are by decision for now.
   Tracked
-- [ ] **Several Claude sessions deploy to the same Worker.** Each `npm run deploy` replaces the whole live site with that session's branch, so work from other branches disappears from the live site until merged. Deploy only from `main` after merging.
-  Owner decision
+- [x] **Several Claude sessions deploy to the same Worker.** Each `npm run deploy` replaced the whole live site with that session's branch, so work from other branches disappeared from the live site until merged. The Deploy workflow now deploys `main` after every merge; sessions should not run `npm run deploy` from a branch (use `npm run upload` for a preview version instead).
+  `.github/workflows/deploy.yml` · Done in "Deploy from main with GitHub Actions and add a health check"

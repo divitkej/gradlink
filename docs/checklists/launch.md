@@ -4,7 +4,7 @@ Scope: hosting, database, email, domain and the legal pages needed before GradLi
 
 GradLink now runs on the new owner's accounts, both on Free plans: the Neon project `gradlink` (id `round-sun-26602992`, region `aws-ap-southeast-1`, Singapore) and the `gradlink` Worker at `https://gradlink.bharatg0904.workers.dev`. The earlier site at `https://gradlink.divitkej.workers.dev` runs on the previous owner's Neon and Cloudflare accounts; nothing in this repo points at those any more, and they were not read, changed or deleted.
 
-## Progress: 9 / 14 done
+## Progress: 10 / 14 done
 
 ## Hosting and database
 
@@ -18,8 +18,8 @@ GradLink now runs on the new owner's accounts, both on Free plans: the Neon proj
 - [ ] **Verify live.** After the first deploy, `https://gradlink.bharatg0904.workers.dev/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in and is deleted again.
 - [x] **Only Neon and Cloudflare in the repo.** Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon.
   Done in "Remove Vercel, Supabase and Firebase leftovers"
-- [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
-  Owner action
+- [x] **Cloudflare GitHub builds fail on every commit.** The previous owner's `gradlink` Worker is connected to this repo through Cloudflare Workers Builds, and every build since PR #5 has failed; its logs are in that account, which this project no longer uses. Deploys to the new Worker now run from GitHub Actions instead, the same way the owner's other Workers deploy: typecheck and lint, `npm run db:migrate`, `npm run deploy`, then wait for `/api/health` to report the database connected. The job skips with a notice until the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets exist. The previous owner can disconnect the old Worker's Workers Builds so commits stop starting failed builds there.
+  `.github/workflows/deploy.yml`, `app/api/health/route.ts` · Done in "Deploy from main with GitHub Actions and add a health check"
 
 ## Domain and email
 

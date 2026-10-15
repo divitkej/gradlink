@@ -30,7 +30,7 @@ Every change, on every branch, must leave the repo in this shape. If a change ne
 | `docs/checklists/` | Live launch checklists, one file per area |
 | `docs/brand/` | Sources for the share images and icons in `app/` |
 | `launch-board/` | Launch board generated from `docs/checklists/` by `launch-board/generate.mjs`. Edit `generate.mjs` or `template.html`, never the generated files |
-| `.github/workflows/` | GitHub Actions. `launch-board.yml` rebuilds `launch-board/` on `main` |
+| `.github/workflows/` | GitHub Actions. `launch-board.yml` rebuilds `launch-board/` on `main`; `deploy.yml` deploys `main` to the `gradlink` Worker |
 
 Rules:
 - A component used by one area goes in that area's folder. Move it to `components/ui/` only once a second area uses it.

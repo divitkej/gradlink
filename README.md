@@ -165,17 +165,29 @@ npm run deploy      # opennextjs-cloudflare build && deploy → https://gradlink
 npm run upload      # same build, uploaded as a preview version without going live
 ```
 
-If the Worker is connected to this repo in the Cloudflare dashboard (Workers,
-gradlink, Settings, Build), its build command must be
-`npx opennextjs-cloudflare build` and its deploy command
-`npx opennextjs-cloudflare deploy`. Plain `next build` and `wrangler deploy`
-fail, because the Worker is the OpenNext output in `.open-next/`.
+Every push to `main` deploys through GitHub Actions
+(`.github/workflows/deploy.yml`): typecheck and lint, `npm run db:migrate`,
+`npm run deploy`, then it waits until `/api/health` answers
+`{"ok":true,"database":"connected"}`. It needs these repository secrets
+(Settings, Secrets and variables, Actions), and skips with a notice until the
+first two exist:
+
+| Secret | What it is |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | API token with "Edit Cloudflare Workers" on the GradLink account |
+| `CLOUDFLARE_ACCOUNT_ID` | That account's id |
+| `NEON_MIGRATE_URL` | Optional. `gradlink_owner`'s connection string, for `npm run db:migrate` only |
+
+Deploy from `main` only: `npm run deploy` from a branch replaces the whole
+live site with that branch. Use `npm run upload` for a preview version.
+Plain `next build` and `wrangler deploy` do not work, because the Worker is
+the OpenNext output in `.open-next/`.
 
 Stripe webhook endpoint: `https://<your-worker-url>/api/stripe/webhook`
 (events: `checkout.session.completed`, `customer.subscription.updated`,
 `customer.subscription.deleted`).
 
-Free-plan notes: the Worker bundle is ~2.3 MiB gzipped against the 3 MiB
+Free-plan notes: the Worker bundle is ~2.5 MiB gzipped (2,490 KiB on 2026-10-15) against the 3 MiB
 limit — check the `Total Upload … gzip` line when adding dependencies. Share
 images are static PNGs for this reason (`docs/brand/README.md`).
 
