@@ -2,24 +2,24 @@
 
 Scope: hosting, database, email, domain and the legal pages needed before GradLink is announced publicly.
 
-Live now at `https://gradlink.divitkej.workers.dev` (Cloudflare Workers Free, Neon Free, region `aws-ap-southeast-1`).
+GradLink now runs on the new owner's accounts, both on Free plans: the Neon project `gradlink` (id `round-sun-26602992`, region `aws-ap-southeast-1`, Singapore) and the `gradlink` Worker at `https://gradlink.bharatg0904.workers.dev`. The earlier site at `https://gradlink.divitkej.workers.dev` runs on the previous owner's Neon and Cloudflare accounts; nothing in this repo points at those any more, and they were not read, changed or deleted.
 
 ## Progress: 10 / 14 done
 
 ## Hosting and database
 
-- [x] **Neon tables created.** `npm run db:migrate` applied `db/schema.sql`: 17 tables including `password_reset_tokens`. No old data imported (by decision).
-  `db/schema.sql` · Done on 2026-09-27, no commit (database change)
-- [x] **Worker points at the real KV namespace.** `UPLOADS` binding set to the namespace created in the GradLink Cloudflare account.
-  `wrangler.jsonc` · Done in "Point the UPLOADS binding at the real KV namespace"
-- [x] **Worker secrets set.** `AUTH_SECRET` and `DATABASE_URL` (Neon pooled string) are Worker secrets.
-  Done on 2026-09-27, no commit (Cloudflare setting)
-- [x] **Deployed and tested live.** All public pages, robots.txt, sitemap and favicon return 200. A test student account signed up, held a session and signed in against Neon, then was deleted.
-  Done on 2026-09-27 with `NEXT_PUBLIC_SITE_URL=https://gradlink.divitkej.workers.dev npm run deploy`
+- [x] **Neon project and tables created.** Project `gradlink` in the owner's Neon organisation (Free plan), in Singapore as the Privacy Policy says, branch `production`, database `gradlink`. `npm run db:migrate` applied `db/schema.sql` (34 tables) and a second run changed nothing. It started empty: nothing was copied from the previous owner's database.
+  `db/schema.sql` · Done on 2026-10-15, no commit (database change)
+- [x] **Worker points at the new KV namespace.** `UPLOADS` is bound to `gradlink-UPLOADS`, created in the owner's Cloudflare account.
+  `wrangler.jsonc` · Done in "Move GradLink to the new owner's Neon project and Cloudflare account"
+- [x] **Tested on the Workers runtime against the new database.** The OpenNext build ran in `wrangler dev` (workerd) against the new Neon project as the least-privilege role: 144 API checks passed (every public page, the five account types, event codes, QR scan keys, scans, messages, interviews, offers, sessions and waitlist, booth queue, uploads and who may open them, Coursera, Credly, LeetCode and Codeforces lookups, owner pages, sign-out, password change) and 9 Stripe webhook checks passed (unsigned, forged and stale deliveries refused; signed ones move a college to Pro and back). Every test row was deleted afterwards.
+  Done on 2026-10-15, no commit (test run)
+- [ ] **Create the Worker and set its secrets.** Owner action: this needs a Cloudflare API token, which no tool in the setup session had. Either add the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets and let the Deploy workflow run, or run `npx wrangler login` and `npm run deploy` on your own machine. Then set the secrets listed in README.md (Cloudflare): `DATABASE_URL` must be the `gradlink_app` role's pooled connection string, not the owner role's, and `AUTH_SECRET` a new random value.
+- [ ] **Verify live.** After the first deploy, `https://gradlink.bharatg0904.workers.dev/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in and is deleted again.
 - [x] **Only Neon and Cloudflare in the repo.** Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon.
   Done in "Remove Vercel, Supabase and Firebase leftovers"
-- [ ] **Cloudflare GitHub builds fail on every commit.** The Worker is connected to this repo in Cloudflare (Workers Builds) and every build since PR #5 opened has failed; the live site is unaffected because it was deployed with `npm run deploy`. In the dashboard (Workers, gradlink, Settings, Build) set the build command to `npx opennextjs-cloudflare build` and the deploy command to `npx opennextjs-cloudflare deploy`, or disconnect the repo. The API token cannot read build logs, so the exact error is unconfirmed.
-  Owner action
+- [x] **Cloudflare GitHub builds fail on every commit.** The previous owner's `gradlink` Worker is connected to this repo through Cloudflare Workers Builds, and every build since PR #5 has failed; its logs are in that account, which this project no longer uses. Deploys to the new Worker now run from GitHub Actions instead, the same way the owner's other Workers deploy: typecheck and lint, `npm run db:migrate`, `npm run deploy`, then wait for `/api/health` to report the database connected. The job skips with a notice until the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets exist. The previous owner can disconnect the old Worker's Workers Builds so commits stop starting failed builds there.
+  `.github/workflows/deploy.yml`, `app/api/health/route.ts` · Done in "Deploy from main with GitHub Actions and add a health check"
 
 ## Domain and email
 

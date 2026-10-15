@@ -19,6 +19,13 @@
   // secrets onto process.env, which the API routes read.
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 
+  // Run the Worker next to the Neon database (Neon project "gradlink",
+  // aws-ap-southeast-1, Singapore). One API request makes several queries in a
+  // row, so they are made close to Neon and only the request itself travels.
+  // Static files are still served from the visitor's nearest location.
+  // Placement is available on every Workers plan, the Free plan included.
+  "placement": { "mode": "targeted", "region": "aws:ap-southeast-1" },
+
   // Pages, JS/CSS and prerendered HTML. Static asset requests are free and
   // don't count against the Free plan's daily Worker request limit.
   "assets": {
@@ -27,21 +34,23 @@
   },
 
   // Résumés, brochures and logos.
-  // Namespace "UPLOADS" in the GradLink Cloudflare account.
+  // Namespace "gradlink-UPLOADS" in the GradLink owner's Cloudflare account
+  // (the one serving gradlink.bharatg0904.workers.dev).
   "kv_namespaces": [
     {
       "binding": "UPLOADS",
-      "id": "c980a36355cf49e0836f8d9fff403b69"
+      "id": "98b70a47d074491cbf9d5f6c5b388ba7"
     }
   ],
 
-  // Non-secret configuration. APP_URL is optional — when empty, emailed links
-  // use the origin of the request that triggered them.
+  // Non-secret configuration. APP_URL is the public origin used in emailed
+  // links, upload URLs and the Stripe return URL. Change it to the custom
+  // domain once that is attached to this Worker.
   // Account email (confirm your email, password reset) is paused: no sender
   // is configured, so new accounts are confirmed on creation. To turn it on,
   // add SMTP_USER here and the SMTP_PASS secret, or Resend (see README.md).
   "vars": {
-    "APP_URL": ""
+    "APP_URL": "https://gradlink.bharatg0904.workers.dev"
   },
 
   "observability": {
