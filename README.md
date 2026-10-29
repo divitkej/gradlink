@@ -97,11 +97,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 
 ## Neon
 
-Production database: Neon project `gradlink` (id `round-sun-26602992`) in the
-owner's Neon organisation, Free plan, region `aws-ap-southeast-1` (Singapore,
-as the Privacy Policy states), branch `production`, database `gradlink`.
+Production database: Neon project `Gradlink` (id `plain-tooth-17985241`) in the
+owner's own Neon organisation, Free plan, region `aws-ap-southeast-1`
+(Singapore, as the Privacy Policy states), branch `production`, database
+`neondb`. It has only the `neondb_owner` role so far; give the Worker a
+least-privilege role as below (`gradlink_app`, with `neondb_owner` in place of
+`gradlink_owner` and `neondb` in place of `gradlink`).
 
-It has two roles:
+The intended setup has two roles:
 
 | Role | Can | Used by |
 |---|---|---|
