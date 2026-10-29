@@ -1,7 +1,7 @@
 /* ============================================================
    Minimal SMTP client over a Workers TCP socket.
 
-   Lets GradLink send mail through an ordinary mailbox (Gmail with an app
+   Lets GradLeap send mail through an ordinary mailbox (Gmail with an app
    password) without owning a domain or signing up to an email API. Gmail
    allows about 500 messages a day this way.
 
@@ -14,7 +14,7 @@ export interface SmtpConfig {
   port: number;
   user: string;
   pass: string;
-  /** Header From, e.g. `GradLink <you@gmail.com>`. The envelope sender is always `user`. */
+  /** Header From, e.g. `GradLeap <you@gmail.com>`. The envelope sender is always `user`. */
   from: string;
 }
 
@@ -128,7 +128,7 @@ async function converse(cfg: SmtpConfig, msg: Message): Promise<void> {
 
   try {
     await step(null, [220]);
-    await step("EHLO gradlink", [250]);
+    await step("EHLO gradleap", [250]);
     await step(`AUTH PLAIN ${b64(`\0${cfg.user}\0${cfg.pass}`)}`, [235], "AUTH");
     await step(`MAIL FROM:<${cfg.user}>`, [250]);
     await step(`RCPT TO:<${msg.to}>`, [250, 251]);

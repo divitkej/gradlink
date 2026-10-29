@@ -41,7 +41,7 @@ const MSG = {
   badEmail: "That email address doesn't look right.",
   weak: "That password is too weak. Use at least 8 characters.",
   noPassword:
-    "Your account moved to GradLink's new sign-in system and needs a new password. Tap \"Forgot password?\" to set one.",
+    "Your account moved to GradLeap's new sign-in system and needs a new password. Tap \"Forgot password?\" to set one.",
   expired: "This reset link has expired or has already been used. Request a new one from the sign-in page.",
   verifyExpired: "This confirmation link has expired or has already been used. Sign in to get a new one.",
 };
@@ -59,7 +59,7 @@ function validPassword(pw: unknown): pw is string {
 /**
  * A throwaway hash checked when the email has no account (or no password), so
  * a failed sign-in costs the same time either way and response timing can't be
- * used to find out which emails have GradLink accounts.
+ * used to find out which emails have GradLeap accounts.
  */
 let dummyHash: Promise<string> | null = null;
 async function burnHashTime(password: string) {
@@ -90,9 +90,9 @@ async function sendVerification(request: Request, profileId: string, email: stri
   const hi = name ? `Hi ${name},` : "Hi,";
   return sendEmail({
     to: email,
-    subject: "Confirm your GradLink email",
-    text: `${hi}\n\nConfirm your email to finish creating your GradLink account:\n${link}\n\nThis link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLink, you can ignore this email.`,
-    html: `<p>${escapeHtml(hi)}</p><p>Confirm your email to finish creating your GradLink account.</p><p><a href="${link}">Confirm my email</a></p><p>This link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLink, you can ignore this email.</p>`,
+    subject: "Confirm your GradLeap email",
+    text: `${hi}\n\nConfirm your email to finish creating your GradLeap account:\n${link}\n\nThis link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLeap, you can ignore this email.`,
+    html: `<p>${escapeHtml(hi)}</p><p>Confirm your email to finish creating your GradLeap account.</p><p><a href="${link}">Confirm my email</a></p><p>This link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLeap, you can ignore this email.</p>`,
   });
 }
 
@@ -313,7 +313,7 @@ async function requestReset(request: Request, body: Body): Promise<Response> {
   if (!validEmail(emailLower)) throw new HttpError(400, MSG.badEmail);
   await takeHit(request, LIMITS.resetRequest);
   // Checked before the account lookup, so the answer never depends on whether the email exists.
-  if (!emailEnabled()) throw new HttpError(503, "Password reset email isn't set up yet. Please contact your GradLink administrator.");
+  if (!emailEnabled()) throw new HttpError(503, "Password reset email isn't set up yet. Please contact your GradLeap administrator.");
 
   const sql = db();
   const rows = await sql`
@@ -334,9 +334,9 @@ async function requestReset(request: Request, body: Body): Promise<Response> {
     const link = `${appBase(request)}/reset-password?token=${encodeURIComponent(token)}`;
     const sent = await sendEmail({
       to: r.email as string,
-      subject: "Reset your GradLink password",
-      text: `Someone asked to reset the password for your GradLink account.\n\nSet a new password: ${link}\n\nThis link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.`,
-      html: `<p>Someone asked to reset the password for your GradLink account.</p><p><a href="${link}">Set a new password</a></p><p>This link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.</p>`,
+      subject: "Reset your GradLeap password",
+      text: `Someone asked to reset the password for your GradLeap account.\n\nSet a new password: ${link}\n\nThis link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.`,
+      html: `<p>Someone asked to reset the password for your GradLeap account.</p><p><a href="${link}">Set a new password</a></p><p>This link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.</p>`,
     });
     if (!sent) throw new HttpError(502, "Couldn't send the reset email. Please try again.");
   }

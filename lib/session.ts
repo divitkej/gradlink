@@ -32,7 +32,7 @@ export interface GLSession {
   activeEventId: string | null;
 }
 
-const KEY = "gradlink.session";
+const KEY = "gradleap.session";
 const EVT = "gl-session-change";
 
 /* ------------------------------------------------------------------

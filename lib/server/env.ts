@@ -31,7 +31,7 @@ export interface ServerEnv {
   SMTP_PORT?: string;
   /** Optional: Resend API key, used instead of SMTP once there is a verified domain. Secret. */
   RESEND_API_KEY?: string;
-  /** Header From for account email, e.g. `GradLink <you@gmail.com>`. Required for Resend. */
+  /** Header From for account email, e.g. `GradLeap <you@gmail.com>`. Required for Resend. */
   EMAIL_FROM?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;

@@ -118,7 +118,7 @@ export default function EventConsole({ eventId }: { eventId: string }) {
             <SectionCard title="My event QR" accent="var(--border-strong)">
               <QRCard
                 payload={role === "student" ? `/scan/student/${session.profileId}?eventId=${eventId}` : `/scan/company/${session.profileId}?eventId=${eventId}`}
-                caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${role}-qr`}
+                caption={session.name} sub={`${session.org}`} accent={role === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradleap-${role}-qr`}
               />
             </SectionCard>
           )}

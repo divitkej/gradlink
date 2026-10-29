@@ -51,7 +51,7 @@ export default function RoleSelect() {
           marginBottom: 8,
         }}
       >
-        Join GradLink
+        Join GradLeap
       </h1>
       <p style={{ fontSize: 15, color: "var(--text-muted)", textAlign: "center", marginBottom: 36 }}>
         Tell us who you are and we&apos;ll tailor the rest.

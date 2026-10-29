@@ -1,7 +1,7 @@
-import AuthShell from "@/components/gradlink/AuthShell";
-import SignUpForm from "@/components/gradlink/SignUpForm";
+import AuthShell from "@/components/gradleap/AuthShell";
+import SignUpForm from "@/components/gradleap/SignUpForm";
 
-export const metadata = { title: "Company sign-up · GradLink" };
+export const metadata = { title: "Company sign-up · GradLeap" };
 
 export default function CompanySignUp() {
   return (

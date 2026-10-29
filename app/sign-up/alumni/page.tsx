@@ -1,7 +1,7 @@
-import AuthShell from "@/components/gradlink/AuthShell";
-import SignUpForm from "@/components/gradlink/SignUpForm";
+import AuthShell from "@/components/gradleap/AuthShell";
+import SignUpForm from "@/components/gradleap/SignUpForm";
 
-export const metadata = { title: "Alumni mentor sign-up · GradLink" };
+export const metadata = { title: "Alumni mentor sign-up · GradLeap" };
 
 /** Reached from a college's alumni invite link, which carries the event's alumni code as ?code=. */
 export default async function AlumniSignUp({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {

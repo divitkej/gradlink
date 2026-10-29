@@ -121,7 +121,7 @@ export default function MessagesPage() {
     return [...map.entries()]
       .map(([id, list]) => {
         list.sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
-        return { id, name: names[id]?.name ?? "GradLink", role: names[id]?.role, list, last: list[list.length - 1] };
+        return { id, name: names[id]?.name ?? "GradLeap", role: names[id]?.role, list, last: list[list.length - 1] };
       })
       .sort((a, b) => +new Date(b.last.created_at) - +new Date(a.last.created_at));
   }, [msgs, names, me]);

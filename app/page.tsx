@@ -2,7 +2,7 @@ import Navbar from "@/components/site/Navbar";
 import OpeningHero from "@/components/landing/OpeningHero";
 import HeroSection from "@/components/landing/HeroSection";
 import ProblemSection from "@/components/landing/ProblemSection";
-import WhyGradLinkSection from "@/components/landing/WhyGradLinkSection";
+import WhyGradLeapSection from "@/components/landing/WhyGradLeapSection";
 import ProductJourneySection from "@/components/landing/ProductJourneySection";
 import SpatialShowcaseSection from "@/components/landing/SpatialShowcaseSection";
 import ReadinessSection from "@/components/landing/ReadinessSection";
@@ -24,10 +24,10 @@ export default function Home() {
         <ProductReveal />
         <ProblemSection />
         <StatementBand
-          eyebrow="The GradLink difference"
+          eyebrow="The GradLeap difference"
           text="Measure the journey, not the attendance."
         />
-        <WhyGradLinkSection />
+        <WhyGradLeapSection />
         <ProductJourneySection />
         <SpatialShowcaseSection />
         <ReadinessSection />

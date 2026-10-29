@@ -35,10 +35,10 @@ export interface CollegeDomain {
 }
 
 const MSG = {
-  personal: "Use your official email address. Personal and temporary addresses (like Gmail or Outlook) can't be used on GradLink.",
-  throwaway: "Use an email address you keep. Temporary inboxes can't be used on GradLink.",
-  studentPending: "Your university has applied to join GradLink and is being reviewed. You can sign up once it's approved.",
-  studentUnknown: "Your university isn't on GradLink yet. Ask your careers office to register, then sign up with your university email.",
+  personal: "Use your official email address. Personal and temporary addresses (like Gmail or Outlook) can't be used on GradLeap.",
+  throwaway: "Use an email address you keep. Temporary inboxes can't be used on GradLeap.",
+  studentPending: "Your university has applied to join GradLeap and is being reviewed. You can sign up once it's approved.",
+  studentUnknown: "Your university isn't on GradLeap yet. Ask your careers office to register, then sign up with your university email.",
   companyIsCollege: "That's a university email address. Sign up as a student or college instead, or use your company email.",
   sampleMissing: "Enter an example of your students' email addresses, like f20250409@dubai.bits-pilani.ac.in.",
   samplePersonal: "Your students' example email must be on your institution's domain, not a personal one like Gmail.",

@@ -160,7 +160,7 @@ export default function PricingSection() {
       </div>
 
       <p style={{ textAlign: "center", fontSize: 13.5, color: "var(--text-muted)", marginTop: 36, lineHeight: 1.6 }}>
-        Students and employers never pay to use GradLink.{" "}
+        Students and employers never pay to use GradLeap.{" "}
         <Link href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
           Create a free account
         </Link>

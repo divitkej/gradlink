@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "GradLink · career event intelligence for UAE colleges";
+export const alt = "GradLeap · career event intelligence for UAE colleges";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -30,7 +30,7 @@ export default function Image() {
             <circle cx="25" cy="23" r="2.2" fill="#0A0A0A" />
           </svg>
           <div style={{ display: "flex", fontSize: 100, fontWeight: 600, letterSpacing: "-3px", color: "#F5F5F5" }}>
-            GradLink
+            GradLeap
           </div>
         </div>
 

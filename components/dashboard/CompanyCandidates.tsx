@@ -118,7 +118,7 @@ export default function CompanyCandidates({
 
   function exportCsv() {
     const abs = (u: string | null) => (u ? new URL(u, window.location.origin).href : "");
-    downloadCsv(`gradlink-candidates-${slugify(eventTitle) || "event"}.csv`, [
+    downloadCsv(`gradleap-candidates-${slugify(eventTitle) || "event"}.csv`, [
       ["Name", "Email", "Degree", "University", "Graduation year", "Skills", "Target roles", "Stage", "Your notes", "Résumé", "LinkedIn", "Portfolio", "GitHub", "First scanned"],
       ...shown.map((s) => {
         const sl = slBy.get(s.profile_id ?? "");

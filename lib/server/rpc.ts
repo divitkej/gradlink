@@ -1657,7 +1657,7 @@ export const ops: Record<string, Op> = {
       const taken = await sql`select * from student_courses where provider = 'coursera' and certificate_code = ${code}`;
       if (taken.length) {
         if (taken[0].student_id === u.id) return { ok: true, course: taken[0], newSkills: [] };
-        return { ok: false, error: "This certificate is already on another GradLink account." };
+        return { ok: false, error: "This certificate is already on another GradLeap account." };
       }
       const cert = await fetchCertificate(code);
       if (!cert) return { ok: false, error: "Coursera has no certificate at that link. Check it and try again." };
@@ -1667,7 +1667,7 @@ export const ops: Record<string, Op> = {
       const [me] = await sql`select p.full_name, st.skills from profiles p left join students st on st.id = p.id where p.id = ${u.id}`;
       const myName = s(me?.full_name);
       if (!namesMatch(cert.matchName, myName)) {
-        return { ok: false, error: `The name on this certificate (${cert.learnerName}) doesn't match your GradLink name (${myName}). Only your own certificates can be added.` };
+        return { ok: false, error: `The name on this certificate (${cert.learnerName}) doesn't match your GradLeap name (${myName}). Only your own certificates can be added.` };
       }
       // Only for a name the page left out; the certificate itself is already verified.
       const fallback = !cert.courseName && cert.courseId ? await courseById(cert.courseId).catch(() => null) : null;
@@ -1685,7 +1685,7 @@ export const ops: Record<string, Op> = {
       return { ok: true, course: row[0], newSkills: cert.skills.filter((k) => !have.has(k.toLowerCase())) };
     } catch (err) {
       if (err instanceof CourseraError) return { ok: false, error: err.message };
-      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This certificate is already on another GradLink account." };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This certificate is already on another GradLeap account." };
       throw err;
     }
   },
@@ -1753,8 +1753,8 @@ export const ops: Record<string, Op> = {
       const profile = kind === "leetcode" ? await fetchLeetCode(handle) : await fetchCodeforces(handle);
       if (!profile) return { ok: false, error: `${label} has no user called ${handle}.` };
       const taken = await sql`select 1 from student_scores where kind = ${kind} and lower(handle) = ${profile.handle.toLowerCase()} and verified_at is not null`;
-      if (taken.length) return { ok: false, error: `This ${label} profile is already on another GradLink account.` };
-      const code = kind === "leetcode" ? `gradlink-${randomCode(6).toLowerCase()}` : null;
+      if (taken.length) return { ok: false, error: `This ${label} profile is already on another GradLeap account.` };
+      const code = kind === "leetcode" ? `gradleap-${randomCode(6).toLowerCase()}` : null;
       const [row] = await sql`
         insert into student_scores (student_id, kind, handle, verify_code, verify_started_at)
         values (${u.id}, ${kind}, ${profile.handle}, ${code}, now())
@@ -1800,7 +1800,7 @@ export const ops: Record<string, Op> = {
       return { ok: true, score: saved };
     } catch (err) {
       if (err instanceof CodingError) return { ok: false, error: err.message };
-      if ((err as { code?: string }).code === "23505") return { ok: false, error: `This ${label} profile is already on another GradLink account.` };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: `This ${label} profile is already on another GradLeap account.` };
       throw err;
     }
   },
@@ -1860,7 +1860,7 @@ export const ops: Record<string, Op> = {
       const [taken] = await sql`select * from student_certificates where provider = 'credly' and credential_id = ${id}`;
       if (taken) {
         if (taken.student_id === u.id) return { ok: true, certificate: taken };
-        return { ok: false, error: "This badge is already on another GradLink account." };
+        return { ok: false, error: "This badge is already on another GradLeap account." };
       }
       if ((await certificateCount(u.id)) >= MAX_CERTIFICATES) return { ok: false, error: `You can add up to ${MAX_CERTIFICATES} certificates.` };
       const badge = await fetchCredlyBadge(id);
@@ -1872,8 +1872,8 @@ export const ops: Record<string, Op> = {
         return {
           ok: false,
           error: badge.earnerName
-            ? `The name on this badge (${badge.earnerName}) doesn't match your GradLink name (${myName}). Only your own badges can be added.`
-            : "Credly isn't showing who earned this badge, and it wasn't issued to your GradLink email. Make the badge public on Credly, then try again.",
+            ? `The name on this badge (${badge.earnerName}) doesn't match your GradLeap name (${myName}). Only your own badges can be added.`
+            : "Credly isn't showing who earned this badge, and it wasn't issued to your GradLeap email. Make the badge public on Credly, then try again.",
         };
       }
       const [row] = await sql`
@@ -1885,7 +1885,7 @@ export const ops: Record<string, Op> = {
       return { ok: true, certificate: row };
     } catch (err) {
       if (err instanceof CredlyError) return { ok: false, error: err.message };
-      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This badge is already on another GradLink account." };
+      if ((err as { code?: string }).code === "23505") return { ok: false, error: "This badge is already on another GradLeap account." };
       throw err;
     }
   },

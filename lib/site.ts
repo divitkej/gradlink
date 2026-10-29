@@ -4,7 +4,7 @@
 // localhost. Change the fallback when the custom domain goes live.
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://gradlink.bharatg0904.workers.dev").replace(/\/+$/, "");
 
-// Who runs GradLink and how to reach them, shown on the Privacy and Terms
+// Who runs GradLeap and how to reach them, shown on the Privacy and Terms
 // pages. Swap the email for an address on the custom domain once it exists.
 export const OPERATOR = {
   name: "Divit Kejriwal",

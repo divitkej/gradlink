@@ -9,7 +9,7 @@ const vsSource = `
   }
 `;
 
-/* Recolored to the GradLink theme:
+/* Recolored to the GradLeap theme:
    - near-black background (bgColor1/bgColor2)
    - grey plasma lines (lineColor)
    - line output scaled down so it stays premium, not glaring */

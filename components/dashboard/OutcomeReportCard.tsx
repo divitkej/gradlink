@@ -12,7 +12,7 @@ import { getSubscription, isPro, startCheckout, PRO_FEATURES_BLURB } from "@/lib
 import type { StudentRow, CompanyRow, EventRow, ScanRow, ShortlistRow, InterviewCounts, OfferRow } from "@/lib/db";
 
 /**
- * The post-event outcome report — GradLink's paid feature.
+ * The post-event outcome report — GradLeap's paid feature.
  *
  * Free colleges see the headline numbers (enough to know the report is worth
  * having) but the full tables and the export are behind Placement Pro.

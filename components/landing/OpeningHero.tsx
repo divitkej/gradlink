@@ -30,7 +30,7 @@ export default function OpeningHero() {
   const mounted = useMounted();
 
   // Intro choreography (slower):
-  //   1. particles converge into "GradLink"            (phase: "intro")
+  //   1. particles converge into "GradLeap"            (phase: "intro")
   //   2. dissolve into the solid wordmark, SAME size    (phase: "solid")
   //   3. tagline appears, then the plasma background    (after solid)
   const [phase, setPhase] = useState<"intro" | "solid">("intro");
@@ -143,7 +143,7 @@ export default function OpeningHero() {
               style={{ position: "absolute", inset: 0 }}
             >
               <ParticleText
-                text="GradLink"
+                text="GradLeap"
                 fontSize={wordSize}
                 height={boxH}
                 color="#FFFFFF"

@@ -190,7 +190,7 @@ export default function Scanner() {
       <main style={{ flex: 1, width: "100%", maxWidth: 680, margin: "0 auto", padding: "22px 18px 60px", display: "flex", flexDirection: "column", gap: 18 }}>
         {myPayload && (
           <SectionCard title="My event QR" accent="var(--border-strong)">
-            <QRCard payload={myPayload} caption={session.name} sub={`${ROLE_LABEL[viewer]} · ${session.org}`} accent={viewer === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradlink-${viewer}-qr`} />
+            <QRCard payload={myPayload} caption={session.name} sub={`${ROLE_LABEL[viewer]} · ${session.org}`} accent={viewer === "company" ? "var(--accent-2)" : "var(--accent)"} filename={`gradleap-${viewer}-qr`} />
           </SectionCard>
         )}
 
@@ -202,7 +202,7 @@ export default function Scanner() {
             </div>
           ) : (
             <p style={{ fontSize: 13.5, color: "var(--text-muted)", lineHeight: 1.55 }}>
-              Point your camera at a GradLink QR to record a scan. Tapping someone below opens their profile without recording one.
+              Point your camera at a GradLeap QR to record a scan. Tapping someone below opens their profile without recording one.
             </p>
           )}
           {camErr && <p style={{ fontSize: 12.5, color: "var(--amber)", marginTop: 10 }}>{camErr}</p>}

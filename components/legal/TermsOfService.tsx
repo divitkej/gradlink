@@ -10,24 +10,24 @@ const sections: LegalSection[] = [
     heading: "Who you are agreeing with",
     body: (
       <p>
-        GradLink is run by <strong>{OPERATOR.name}</strong>, an individual based in {OPERATOR.location} (“we” or
-        “us”). GradLink is not yet a registered company. By creating an account or using GradLink, you agree to these
-        terms and to our <a href="/privacy">Privacy Policy</a>. If you use GradLink for an organisation, you confirm you are
+        GradLeap is run by <strong>{OPERATOR.name}</strong>, an individual based in {OPERATOR.location} (“we” or
+        “us”). GradLeap is not yet a registered company. By creating an account or using GradLeap, you agree to these
+        terms and to our <a href="/privacy">Privacy Policy</a>. If you use GradLeap for an organisation, you confirm you are
         allowed to accept these terms for it.
       </p>
     ),
   },
   {
-    heading: "Who can use GradLink",
+    heading: "Who can use GradLeap",
     body: (
       <>
-        <p>GradLink has three kinds of account:</p>
+        <p>GradLeap has three kinds of account:</p>
         <ul>
           <li><strong>Students</strong> build a career profile, join events and connect with employers.</li>
           <li><strong>Companies</strong> join events, scan and shortlist students and message them.</li>
           <li><strong>Colleges</strong> create and run events and see their outcomes.</li>
         </ul>
-        <p>You must be 18 or older, or have a parent or guardian’s permission, to use GradLink.</p>
+        <p>You must be 18 or older, or have a parent or guardian’s permission, to use GradLeap.</p>
       </>
     ),
   },
@@ -46,14 +46,14 @@ const sections: LegalSection[] = [
     heading: "Your content",
     body: (
       <p>
-        You own what you add to GradLink, such as your profile, résumé, notes and messages. You give us permission to store,
-        display and process it only as needed to run GradLink, including showing it to other users as described in the
+        You own what you add to GradLeap, such as your profile, résumé, notes and messages. You give us permission to store,
+        display and process it only as needed to run GradLeap, including showing it to other users as described in the
         Privacy Policy. You confirm you have the right to share it and that it does not break anyone else’s rights or the law.
       </p>
     ),
   },
   {
-    heading: "Rules for using GradLink",
+    heading: "Rules for using GradLeap",
     body: (
       <>
         <p>You must not:</p>
@@ -63,7 +63,7 @@ const sections: LegalSection[] = [
           <li>upload anything unlawful, offensive, or containing viruses or harmful code,</li>
           <li>copy, scrape or collect other users’ data by automated means,</li>
           <li>try to get around security, access accounts or data that are not yours, or overload the service,</li>
-          <li>use GradLink in a way that breaks UAE law or the law where you are.</li>
+          <li>use GradLeap in a way that breaks UAE law or the law where you are.</li>
         </ul>
       </>
     ),
@@ -72,7 +72,7 @@ const sections: LegalSection[] = [
     heading: "Extra rules for companies and colleges",
     body: (
       <p>
-        Student information on GradLink may only be used for recruitment and career services connected to GradLink events. You
+        Student information on GradLeap may only be used for recruitment and career services connected to GradLeap events. You
         must not sell it, share it with anyone outside your organisation, or use it for marketing. You are responsible for
         following employment and data protection law when you contact, assess or hire students.
       </p>
@@ -89,17 +89,17 @@ const sections: LegalSection[] = [
             in advance through Stripe. It renews automatically each year until cancelled.
           </li>
           <li>To cancel, email {mail} before your renewal date. You keep Placement Pro until the end of the year you have paid for.</li>
-          <li>Fees already paid are not refunded, except where the law requires it or where we close GradLink or your account without you breaking these terms, in which case we refund the unused part.</li>
+          <li>Fees already paid are not refunded, except where the law requires it or where we close GradLeap or your account without you breaking these terms, in which case we refund the unused part.</li>
           <li>If we change the price, we will tell you at least 30 days before your next renewal.</li>
         </ul>
       </>
     ),
   },
   {
-    heading: "What GradLink does today",
+    heading: "What GradLeap does today",
     body: (
       <p>
-        GradLink is new and still growing. Some screens on our website show sample data and features that are still being
+        GradLeap is new and still growing. Some screens on our website show sample data and features that are still being
         built; they are labelled as a product preview. What each plan includes today is listed on the{" "}
         <a href="/pricing">pricing page</a>. The résumé score is automatic guidance, not professional career advice, and we do
         not guarantee any interview, job or hiring outcome.
@@ -110,9 +110,9 @@ const sections: LegalSection[] = [
     heading: "Availability and changes",
     body: (
       <p>
-        We work to keep GradLink running, but it is provided “as is” and may sometimes be unavailable, for example during
+        We work to keep GradLeap running, but it is provided “as is” and may sometimes be unavailable, for example during
         maintenance or problems with our hosting providers. We may improve, change or remove features. If we plan to shut
-        GradLink down, we will give you at least 30 days’ notice so you can ask for a copy of your data.
+        GradLeap down, we will give you at least 30 days’ notice so you can ask for a copy of your data.
       </p>
     ),
   },
@@ -130,7 +130,7 @@ const sections: LegalSection[] = [
     body: (
       <p>
         As far as the law allows, we are not liable for indirect losses such as lost profits, lost opportunities or lost data,
-        or for what other users do or say on GradLink. Our total liability to you for any claim is limited to the amount you
+        or for what other users do or say on GradLeap. Our total liability to you for any claim is limited to the amount you
         paid us in the 12 months before the claim, or AED 500 if that is higher. Nothing in these terms limits liability that
         cannot be limited under UAE law.
       </p>
@@ -149,8 +149,8 @@ const sections: LegalSection[] = [
     heading: "Changes to these terms",
     body: (
       <p>
-        We may update these terms as GradLink grows. We will change the date at the top and, for significant changes, tell you by
-        email or on GradLink at least 14 days before they take effect. If you keep using GradLink after that, the new terms apply.
+        We may update these terms as GradLeap grows. We will change the date at the top and, for significant changes, tell you by
+        email or on GradLeap at least 14 days before they take effect. If you keep using GradLeap after that, the new terms apply.
       </p>
     ),
   },
@@ -165,7 +165,7 @@ export default function TermsOfService() {
     <LegalPage
       title="Terms and Conditions"
       updated="27 September 2026"
-      intro={<p>These terms set out the rules for using GradLink and what you can expect from us. Please read them before you sign up.</p>}
+      intro={<p>These terms set out the rules for using GradLeap and what you can expect from us. Please read them before you sign up.</p>}
       sections={sections}
     />
   );

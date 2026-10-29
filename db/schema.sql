@@ -1,5 +1,5 @@
 -- ============================================================================
--- GradLink — Neon PostgreSQL schema
+-- GradLeap — Neon PostgreSQL schema
 -- ============================================================================
 -- Apply with:   npm run db:migrate        (reads DATABASE_URL from .dev.vars)
 -- or paste into the Neon console's SQL Editor.
@@ -421,7 +421,7 @@ create table if not exists saved_companies (
 );
 
 -- Applications a student is tracking, with interview date and outcome.
--- company_id is set when the company is on GradLink, company_name always.
+-- company_id is set when the company is on GradLeap, company_name always.
 create table if not exists applications (
   id            text primary key default gen_random_uuid()::text,
   created_at    timestamptz not null default now(),

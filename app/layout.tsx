@@ -3,7 +3,7 @@ import { Space_Grotesk, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
 import Providers from "@/components/Providers";
-import GradLinkBackground from "@/components/gradlink/gradlink-background";
+import GradLeapBackground from "@/components/gradleap/gradleap-background";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -19,20 +19,20 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const SHARE_TITLE = "GradLink · Prepare students. Connect employers. Track outcomes.";
+const SHARE_TITLE = "GradLeap · Prepare students. Connect employers. Track outcomes.";
 const SHARE_DESC =
   "Career-event intelligence for UAE colleges. From check-in to offer, every student interaction becomes measurable career data.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "GradLink · Career event intelligence for UAE colleges",
+  title: "GradLeap · Career event intelligence for UAE colleges",
   description: SHARE_DESC,
-  applicationName: "GradLink",
+  applicationName: "GradLeap",
   openGraph: {
     title: SHARE_TITLE,
     description: SHARE_DESC,
     url: SITE_URL,
-    siteName: "GradLink",
+    siteName: "GradLeap",
     type: "website",
     locale: "en_US",
   },
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body>
-        <GradLinkBackground />
+        <GradLeapBackground />
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -67,7 +67,7 @@ export default function AuthShell({
           width: "100%",
         }}
       >
-        <Link href="/" aria-label="GradLink home" style={{ textDecoration: "none" }}>
+        <Link href="/" aria-label="GradLeap home" style={{ textDecoration: "none" }}>
           <Logo size={22} />
         </Link>
         {/* Back to sign-in or the role picker keeps ?next= (a scanned QR, /pricing). */}
