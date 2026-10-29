@@ -190,11 +190,10 @@ export default function EmployerCRMSection() {
                   </div>
                   <Badge tone={stageTone[c.stage]}>{c.stage}</Badge>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, marginBottom: 8 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4 }}>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Looking for <strong style={{ color: "var(--text)" }}>{c.targetRole}</strong></span>
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Skills <strong style={{ color: "var(--text)" }}>{c.skills.join(", ")}</strong></span>
                 </div>
-                <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`Skills: ${c.skills.join(", ")}`}</div>
               </div>
             ))}
             <div style={{ padding: "14px 20px", fontSize: 11.5, color: "var(--text-muted)" }}>
