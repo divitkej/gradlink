@@ -43,14 +43,23 @@
     }
   ],
 
+  // The custom domain, registered at Hostinger with its nameservers on
+  // Cloudflare. Deploy attaches both hostnames to this Worker and creates their
+  // DNS records and certificates. The zone must be in the same Cloudflare
+  // account, and no other A, AAAA or CNAME record may exist for either name.
+  // www redirects to the bare domain (next.config.ts).
+  "routes": [
+    { "pattern": "gradleap.online", "custom_domain": true },
+    { "pattern": "www.gradleap.online", "custom_domain": true }
+  ],
+
   // Non-secret configuration. APP_URL is the public origin used in emailed
-  // links, upload URLs and the Stripe return URL. Change it to the custom
-  // domain once that is attached to this Worker.
+  // links, upload URLs and the Stripe return URL.
   // Account email (confirm your email, password reset) is paused: no sender
   // is configured, so new accounts are confirmed on creation. To turn it on,
   // add SMTP_USER here and the SMTP_PASS secret, or Resend (see README.md).
   "vars": {
-    "APP_URL": "https://gradlink.bharatg0904.workers.dev"
+    "APP_URL": "https://gradleap.online"
   },
 
   "observability": {

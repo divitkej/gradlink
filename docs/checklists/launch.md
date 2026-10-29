@@ -23,8 +23,8 @@ GradLink now runs on the new owner's accounts, both on Free plans: the Neon proj
 
 ## Domain and email
 
-- [ ] **Custom domain.** Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it.
-  Owner action, then `wrangler.jsonc`
+- [ ] **Custom domain.** `gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in "Serve GradLink on gradleap.online": `wrangler.jsonc` attaches `gradleap.online` and `www.gradleap.online` to the `gradlink` Worker on deploy, `APP_URL`, the `SITE_URL` fallback and the deploy health check use it, and www and the workers.dev address redirect to it (`next.config.ts`). Still open, owner action in the Cloudflare dashboard before merging: the zone must be in the same account as the Worker, and the parked-page A and AAAA records Cloudflare copied for `gradleap.online` and `www` must be deleted (keep the Hostinger MX and SPF records). Then merge to main and check `https://gradleap.online/api/health`.
+  `wrangler.jsonc`, `lib/site.ts`, `next.config.ts`, `.github/workflows/deploy.yml`
 - [ ] **Account email: confirm email and password reset.** Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link. Sending through `divitkej@gmail.com` is paused by decision, so no sender is configured: accounts are confirmed on creation and "Forgot password" says it is not set up. To turn it on, pick a sender (a dedicated Gmail with an app password as `SMTP_USER` + `SMTP_PASS`, or Resend once the domain exists), then add it to the Privacy Policy's list of services.
   Done in "Send account email through Gmail and require email confirmation" · Paused in "Pause account email from the personal Gmail"
 
