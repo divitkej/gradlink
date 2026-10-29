@@ -8,7 +8,7 @@ export function Section({
   id?: string;
   children: ReactNode;
   style?: CSSProperties;
-  /** Deprecated: sections are now transparent so the global GradLinkBackground
+  /** Deprecated: sections are now transparent so the global GradLeapBackground
    *  shows through continuously. Kept in the type for call-site compatibility. */
   bg?: string;
 }) {

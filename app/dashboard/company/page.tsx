@@ -112,7 +112,7 @@ function CompanyOverview({ eventId }: { eventId: string }) {
         <div className="dash-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <GlassPanel id="qr">
             <PanelTitle>Company QR</PanelTitle>
-            <QRCard payload={`/scan/company/${profileId}?eventId=${eventId}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--accent-2)" filename="gradlink-company-qr" />
+            <QRCard payload={`/scan/company/${profileId}?eventId=${eventId}`} caption={orgName} sub="Scan to view company & open roles" accent="var(--accent-2)" filename="gradleap-company-qr" />
           </GlassPanel>
           <Checklist role="company" profileId={profileId} eventId={eventId} />
         </div>

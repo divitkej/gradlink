@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import VerifyEmail from "@/components/gradlink/VerifyEmail";
+import VerifyEmail from "@/components/gradleap/VerifyEmail";
 
-export const metadata = { title: "Confirm your email · GradLink" };
+export const metadata = { title: "Confirm your email · GradLeap" };
 
 export default function VerifyEmailPage() {
   // VerifyEmail reads the `token` query param via useSearchParams, which needs

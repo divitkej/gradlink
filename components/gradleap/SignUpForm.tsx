@@ -24,7 +24,7 @@ const ROLE_CONFIG: Record<Role, {
   student: {
     badge: "Student account", icon: GraduationCap, accent: "var(--accent)",
     orgLabel: "University name", orgPlaceholder: "Your university", orgIcon: GraduationCap,
-    emailPlaceholder: "you@university.ac.ae", emailNote: "Use your university email. Your university must already be registered on GradLink.",
+    emailPlaceholder: "you@university.ac.ae", emailNote: "Use your university email. Your university must already be registered on GradLeap.",
     subtitle: "Get fair-ready and tracked from check-in to offer.", label: "student",
   },
   company: {
@@ -244,7 +244,7 @@ export default function SignUpForm({ role, alumniCode = "" }: { role: Role; alum
             <Field id="studentEmail" label="Student email example" type="email" placeholder="f20250409@dubai.bits-pilani.ac.in" icon={<GraduationCap size={16} />} value={studentEmail} onChange={setStudentEmail} autoComplete="off" />
             <p style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 7 }}>
               {studentDomain.includes(".")
-                ? `Students with @${studentDomain} addresses can sign up once GradLink approves your college.`
+                ? `Students with @${studentDomain} addresses can sign up once GradLeap approves your college.`
                 : "What one of your students' email addresses looks like. It can be made up; we only use the part after the @."}
             </p>
           </div>

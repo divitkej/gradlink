@@ -55,7 +55,7 @@ function friendlyError(err: unknown): string {
  * When the server can send email, the account must be confirmed first:
  * `verify` is true and `sent` says whether the link went out. Otherwise the
  * user is signed in straight away and `profileId` is set. The profile id is
- * the account id throughout GradLink.
+ * the account id throughout GradLeap.
  */
 export async function signUpUser(
   input: SignUpInput

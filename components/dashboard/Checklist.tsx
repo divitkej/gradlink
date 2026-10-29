@@ -19,7 +19,7 @@ const PHASES: { key: ChecklistItemRow["phase"]; label: string; tone: string }[] 
 ];
 
 function lsKey(profileId: string) {
-  return `gradlink.checklist.${profileId}`;
+  return `gradleap.checklist.${profileId}`;
 }
 
 /** Student auto rules. Returns true/false if the item is auto-tracked, or null if it's manual. */

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 /**
  * ProductFrame · centred title above a framed product card.
- * Transparent (shares the global GradLinkBackground).
+ * Transparent (shares the global GradLeapBackground).
  */
 export function ProductFrame({
   titleComponent,

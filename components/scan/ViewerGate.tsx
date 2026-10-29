@@ -36,7 +36,7 @@ function SignUpLink() {
 
 /**
  * Shown when a QR is opened by someone who isn't signed in.
- * GradLink shows the right view based on your real account, so we ask them to sign in.
+ * GradLeap shows the right view based on your real account, so we ask them to sign in.
  */
 export default function ViewerGate({ hint }: { hint?: string }) {
   return (
@@ -44,7 +44,7 @@ export default function ViewerGate({ hint }: { hint?: string }) {
       <div style={{ marginBottom: 18 }}><Logo size={26} /></div>
       <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: 8 }}>Sign in to view this</h1>
       <p style={{ fontSize: 14, color: "var(--text-muted)", textAlign: "center", marginBottom: 28, maxWidth: 380, lineHeight: 1.55 }}>
-        {hint ?? "GradLink shows this profile based on your account. Sign in and you will come straight back here."}
+        {hint ?? "GradLeap shows this profile based on your account. Sign in and you will come straight back here."}
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", width: "100%", maxWidth: 360 }}>
         {/* useSearchParams needs a Suspense boundary; /scan is prerendered. */}

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { Loader2, AlertCircle, Trash2 } from "lucide-react";
 
-/* Reusable dashboard / scan primitives — all on the GradLink dark theme. */
+/* Reusable dashboard / scan primitives — all on the GradLeap dark theme. */
 
 export function SectionCard({
   title,

@@ -10,7 +10,7 @@ const outcomePanels: StatPanel[] = [
   {
     value: "500",
     label: "Registered",
-    depth: "Every student who signed up for the event: the top of the funnel GradLink measures end to end.",
+    depth: "Every student who signed up for the event: the top of the funnel GradLeap measures end to end.",
     sub: [
       { k: "Programmes", v: "9" },
       { k: "Year groups", v: "3 & 4" },
@@ -46,7 +46,7 @@ const outcomePanels: StatPanel[] = [
   {
     value: "26",
     label: "Interview Invites",
-    depth: "Interview invitations sent through GradLink's CRM after the fair closed · follow-ups that used to vanish.",
+    depth: "Interview invitations sent through GradLeap's CRM after the fair closed · follow-ups that used to vanish.",
     sub: [
       { k: "From scans", v: "14%" },
       { k: "Avg response", v: "1.8 days" },

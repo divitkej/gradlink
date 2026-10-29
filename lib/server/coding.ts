@@ -13,6 +13,8 @@
    query parameter, never as part of the host or path.
    ============================================================ */
 
+import { SITE_URL } from "@/lib/site";
+
 export type CodingSite = "leetcode" | "codeforces";
 
 export interface LeetCodeStats {
@@ -43,7 +45,7 @@ export interface CodingProfile {
 
 export class CodingError extends Error {}
 
-const UA = "Mozilla/5.0 (compatible; GradLink profile check; +https://gradlink.app)";
+const UA = `Mozilla/5.0 (compatible; GradLeap profile check; +${SITE_URL})`;
 const DOWN = (site: string) => `${site} didn't respond. Please try again in a minute.`;
 
 /** A LeetCode username from a bare name or a profile link. */
@@ -78,7 +80,7 @@ async function getJson(site: string, url: string, init?: RequestInit): Promise<{
 
 /* ---------------- LeetCode ---------------- */
 
-const LC_QUERY = `query gradlink($u: String!) {
+const LC_QUERY = `query gradleap($u: String!) {
   matchedUser(username: $u) {
     username
     profile { aboutMe }

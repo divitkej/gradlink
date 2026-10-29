@@ -1,4 +1,4 @@
-// GradLink on Cloudflare Workers — Workers FREE plan only.
+// GradLeap on Cloudflare Workers — Workers FREE plan only.
 //
 // Everything below is available on the Free plan: static assets, Workers KV,
 // workers.dev hosting and Workers Logs. Nothing here needs Workers Paid, and
@@ -34,7 +34,7 @@
   },
 
   // Résumés, brochures and logos.
-  // Namespace "gradlink-UPLOADS" in the GradLink owner's Cloudflare account
+  // Namespace "gradlink-UPLOADS" in the GradLeap owner's Cloudflare account
   // (the one serving gradlink.bharatg0904.workers.dev).
   "kv_namespaces": [
     {

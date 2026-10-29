@@ -95,7 +95,7 @@ export default function YearOverYear({ event, report, profileId }: { event: Even
         <LoadingBlock label="Loading your events…" />
       ) : events.length === 0 ? (
         <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.55 }}>
-          This is your first event on GradLink. Once you run another, its results show here next to this one.
+          This is your first event on GradLeap. Once you run another, its results show here next to this one.
         </p>
       ) : !previous ? (
         <LoadingBlock label="Loading the earlier event…" />

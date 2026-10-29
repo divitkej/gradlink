@@ -34,13 +34,13 @@ const ROW_KEY = { saved: "saved", interested: "interested", visited: "visited", 
  */
 function readLegacySaves(studentId: string, companyId: string): Saves | null {
   try {
-    const all = JSON.parse(localStorage.getItem(`gradlink.saves.${studentId}`) || "{}");
+    const all = JSON.parse(localStorage.getItem(`gradleap.saves.${studentId}`) || "{}");
     return all[companyId] ? ({ ...empty, ...all[companyId] } as Saves) : null;
   } catch { return null; }
 }
 function dropLegacySaves(studentId: string, companyId: string) {
   try {
-    const key = `gradlink.saves.${studentId}`;
+    const key = `gradleap.saves.${studentId}`;
     const all = JSON.parse(localStorage.getItem(key) || "{}");
     delete all[companyId];
     if (Object.keys(all).length) localStorage.setItem(key, JSON.stringify(all));

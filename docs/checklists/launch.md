@@ -1,8 +1,8 @@
 # Launch checklist
 
-Scope: hosting, database, email, domain and the legal pages needed before GradLink is announced publicly.
+Scope: hosting, database, email, domain and the legal pages needed before GradLeap is announced publicly.
 
-GradLink now runs on the new owner's accounts, both on Free plans: the Neon project `gradlink` (id `round-sun-26602992`, region `aws-ap-southeast-1`, Singapore) and the `gradlink` Worker at `https://gradlink.bharatg0904.workers.dev`. The earlier site at `https://gradlink.divitkej.workers.dev` runs on the previous owner's Neon and Cloudflare accounts; nothing in this repo points at those any more, and they were not read, changed or deleted.
+GradLeap now runs on the new owner's accounts, both on Free plans: the Neon project `gradlink` (id `round-sun-26602992`, region `aws-ap-southeast-1`, Singapore) and the `gradlink` Worker at `https://gradlink.bharatg0904.workers.dev`. The earlier site at `https://gradlink.divitkej.workers.dev` runs on the previous owner's Neon and Cloudflare accounts; nothing in this repo points at those any more, and they were not read, changed or deleted.
 
 ## Progress: 10 / 14 done
 
@@ -36,7 +36,7 @@ GradLink now runs on the new owner's accounts, both on Free plans: the Neon proj
   `app/terms/page.tsx`, `components/legal/TermsOfService.tsx` · Done in "Add Privacy Policy and Terms pages"
 - [x] **"UAE data residency" claim removed.** Data sits in Singapore and Neon has no UAE region. The chip now reads "Free for students and employers", which matches the pricing page.
   `components/landing/CTASection.tsx` · Done in "Add Privacy Policy and Terms pages"
-- [x] **Unregistered company name removed.** Footer now reads "© GradLink".
+- [x] **Unregistered company name removed.** Footer now reads "© GradLeap".
   `components/site/Footer.tsx` · Done in "Drop the unregistered company name from the footer"
 - [x] **Favicon.** `app/icon.svg` and `app/apple-icon.png` served live. The G mark read as a monochrome Google logo, so the logo, favicon, home-screen icon and share images now use a graduation cap whose tassel ends in a dot.
   `components/Logo.tsx`, `app/icon.svg`, `docs/brand/` · Done in "Replace the G logo with a graduation cap"

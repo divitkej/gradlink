@@ -67,7 +67,7 @@ export default function LiveEventSection() {
             </div>
             <p style={{ marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--border)", fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>
               A student attends a resume workshop, completes a mock interview, checks into Fintech firm, visits Consulting firm, and sends a
-              follow-up. <strong style={{ color: "var(--text)" }}>GradLink turns each action into a signal.</strong>
+              follow-up. <strong style={{ color: "var(--text)" }}>GradLeap turns each action into a signal.</strong>
             </p>
           </GlassCard>
         </div>

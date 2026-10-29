@@ -1,4 +1,4 @@
-# GradLink
+# GradLeap
 
 Campus career-fair platform — prepare students, connect employers, track outcomes.
 
@@ -15,7 +15,7 @@ Browser ──► Cloudflare Workers (one Worker: "gradlink")
              └─ deployed with Wrangler via OpenNext
 ```
 
-**Cost target: $0.** GradLink is designed to run entirely on the
+**Cost target: $0.** GradLeap is designed to run entirely on the
 **Neon Free** plan and the **Cloudflare Workers Free** plan, within their
 current limits. Nothing in this repo requires a paid plan: no Workers Paid
 features, no R2/Durable Objects/Queues/Images bindings, no cron triggers, and
@@ -82,8 +82,8 @@ into the build.
 | `SMTP_USER` | for account email | Mailbox that sends mail (e.g. a Gmail). Not set yet: account email is paused |
 | `SMTP_PASS` | for account email | That Gmail's 16-character app password (Google Account, Security, 2-Step Verification, App passwords). Secret |
 | `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
-| `RESEND_API_KEY` | no | Alternative to SMTP once GradLink has a verified domain |
-| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLink <SMTP_USER>`; required with Resend |
+| `RESEND_API_KEY` | no | Alternative to SMTP once GradLeap has a verified domain |
+| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend |
 | `APP_URL` | yes | Public origin used in password-reset links, upload URLs and the Stripe return URL. Set in `wrangler.jsonc` `vars` to `https://gradlink.bharatg0904.workers.dev` until the custom domain is attached. Falls back to the request origin when empty |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can open the owner dashboard at `/admin` and approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Sign up with the email right after setting it, so nobody else can register it. Secret |
@@ -174,7 +174,7 @@ first two exist:
 
 | Secret | What it is |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | API token with "Edit Cloudflare Workers" on the GradLink account |
+| `CLOUDFLARE_API_TOKEN` | API token with "Edit Cloudflare Workers" on the GradLeap account |
 | `CLOUDFLARE_ACCOUNT_ID` | That account's id |
 | `NEON_MIGRATE_URL` | Optional. `gradlink_owner`'s connection string, for `npm run db:migrate` only |
 

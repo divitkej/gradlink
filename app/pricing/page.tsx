@@ -3,9 +3,9 @@ import Footer from "@/components/site/Footer";
 import PricingSection from "@/components/PricingSection";
 
 export const metadata = {
-  title: "Pricing · GradLink",
+  title: "Pricing · GradLeap",
   description:
-    "GradLink is free for students and employers. Colleges upgrade to Placement Pro for outcome reporting and exports.",
+    "GradLeap is free for students and employers. Colleges upgrade to Placement Pro for outcome reporting and exports.",
 };
 
 export default function PricingPage() {

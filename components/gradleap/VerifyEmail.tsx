@@ -13,7 +13,7 @@ function roleHome(role: AppRole) {
   return role === "event_manager" ? "/dashboard/event-manager" : `/dashboard/${role}`;
 }
 
-/** Landing page for the link in the "Confirm your GradLink email" message. */
+/** Landing page for the link in the "Confirm your GradLeap email" message. */
 export default function VerifyEmail() {
   const router = useRouter();
   const token = useSearchParams().get("token");

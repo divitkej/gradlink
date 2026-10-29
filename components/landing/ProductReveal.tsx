@@ -48,7 +48,7 @@ export default function ProductReveal() {
             <span className="text-gradient">signal.</span>
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: "var(--text-2)", maxWidth: 640, margin: "0 auto" }}>
-            GradLink connects readiness, live event engagement, recruiter scans, and follow-up outcomes in one command center.
+            GradLeap connects readiness, live event engagement, recruiter scans, and follow-up outcomes in one command center.
           </p>
         </>
       }

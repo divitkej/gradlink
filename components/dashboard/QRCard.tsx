@@ -19,7 +19,7 @@ export default function QRCard({
   caption,
   sub,
   accent = "var(--accent)",
-  filename = "gradlink-qr",
+  filename = "gradleap-qr",
 }: {
   payload: string;
   caption: string;
@@ -63,7 +63,7 @@ export default function QRCard({
     if (!ready) return;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "GradLink", text: caption, url });
+        await navigator.share({ title: "GradLeap", text: caption, url });
       } else {
         await navigator.clipboard.writeText(url);
         setCopied(true);

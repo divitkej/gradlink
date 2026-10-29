@@ -3,7 +3,7 @@
 import { rpc } from "./api-client";
 
 /* ============================================================
-   GradLink billing — colleges pay, companies and students are free.
+   GradLeap billing — colleges pay, companies and students are free.
 
    The free tier runs real events end to end, with no limit on how many.
    The paid tier unlocks what a placement office needs after the fair:

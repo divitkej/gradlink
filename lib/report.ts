@@ -269,7 +269,7 @@ export function buildReport(input: {
 /** The rows of one CSV containing the summary, the employer table and the student table. */
 function reportBlocks(r: OutcomeReport): unknown[][] {
   const blocks: unknown[][] = [
-    ["GradLink: post-event outcome report"],
+    ["GradLeap: post-event outcome report"],
     ["Event", r.eventTitle],
     ["Date", r.eventDate],
     ["Location", r.location],
@@ -320,7 +320,7 @@ function reportBlocks(r: OutcomeReport): unknown[][] {
 
 /** Trigger a browser download of the report as CSV. */
 export function downloadReportCsv(r: OutcomeReport) {
-  downloadCsv(`gradlink-outcome-report-${slugify(r.eventTitle) || "event"}.csv`, reportBlocks(r));
+  downloadCsv(`gradleap-outcome-report-${slugify(r.eventTitle) || "event"}.csv`, reportBlocks(r));
 }
 
 /* ---------------- Year-over-year comparison ---------------- */
@@ -358,8 +358,8 @@ export function compareReports(current: OutcomeReport, previous: OutcomeReport):
 /** Trigger a browser download of a comparison as CSV. */
 export function downloadComparisonCsv(current: OutcomeReport, previous: OutcomeReport) {
   const fmt = (v: number | null) => (v === null ? "" : v);
-  downloadCsv(`gradlink-comparison-${slugify(current.eventTitle) || "event"}-vs-${slugify(previous.eventTitle) || "earlier"}.csv`, [
-    ["GradLink: event comparison"],
+  downloadCsv(`gradleap-comparison-${slugify(current.eventTitle) || "event"}-vs-${slugify(previous.eventTitle) || "earlier"}.csv`, [
+    ["GradLeap: event comparison"],
     ["This event", current.eventTitle, current.eventDate],
     ["Compared with", previous.eventTitle, previous.eventDate],
     [],

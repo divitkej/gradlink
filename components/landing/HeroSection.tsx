@@ -86,7 +86,7 @@ export default function HeroSection() {
               gap: 8,
             }}
           >
-            <span>GradLink helps colleges</span>
+            <span>GradLeap helps colleges</span>
             <AnimatedTextCycle
               phrases={["Prepare students.", "Connect employers.", "Track outcomes.", "Prove career impact."]}
             />
@@ -99,7 +99,7 @@ export default function HeroSection() {
             animate="show"
             style={{ fontSize: 17, lineHeight: 1.7, color: "var(--text-2)", maxWidth: 480, marginBottom: 14 }}
           >
-            GradLink turns campus career fairs, workshops, recruiter scans, and follow-ups into measurable
+            GradLeap turns campus career fairs, workshops, recruiter scans, and follow-ups into measurable
             placement outcomes.
           </motion.p>
 

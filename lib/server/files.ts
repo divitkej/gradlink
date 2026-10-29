@@ -40,7 +40,7 @@ const FOLDERS: Record<string, string[]> = {
 };
 
 /**
- * Files are served from GradLink's own origin, so anything that a browser
+ * Files are served from GradLeap's own origin, so anything that a browser
  * could execute (HTML, SVG, …) must never be served inline. Only these types
  * are; everything else downloads as an opaque attachment.
  */

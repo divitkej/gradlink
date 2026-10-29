@@ -119,7 +119,7 @@ export default function StudentDashboard({ eventId }: { eventId: string }) {
               caption={session?.name ?? "Your profile"}
               sub={session?.org ?? data.me?.university ?? ""}
               accent="var(--accent)"
-              filename="gradlink-student-qr"
+              filename="gradleap-student-qr"
             />
           </GlassPanel>
         </Reveal>
