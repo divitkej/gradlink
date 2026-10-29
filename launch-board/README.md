@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**147 of 167 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
+**148 of 168 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -16,7 +16,7 @@ pie showData
   "To do" : 1
   "Verify live" : 3
   "Parked by decision" : 2
-  "Done" : 147
+  "Done" : 148
 ```
 
 ## By phase
@@ -27,7 +27,7 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 87% | 13 | 0 | 2 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 74% | 39 | 2 | 14 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 74% | 40 | 2 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `████████████` 97% | 63 | 0 | 2 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 78% | 7 | 0 | 2 |
@@ -91,7 +91,7 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 39 of 53 done, 2 in progress, 14 left.
+**Ongoing.** 40 of 54 done, 2 in progress, 14 left.
 
 **Ongoing**
 
@@ -101,19 +101,19 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 **Left**
 
 - [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
-- [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L43)
-- [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L45)
-- [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L46)
-- [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)
-- [ ] Revoke the exposed 21st.dev API key · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)
-- [ ] Verify live · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)
+- [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L44)
+- [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L46)
+- [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)
+- [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)
+- [ ] Revoke the exposed 21st.dev API key · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)
+- [ ] Verify live · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L50)
 - [ ] Confirm the claim "Setup in 48 hours" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)
 - [ ] Confirm the claim "No contract lock-in" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)
 - [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
 - [ ] Verify live · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L18)
 - [ ] Promises features that are not built · Parked by decision · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)
 
-<details><summary>Done (39)</summary>
+<details><summary>Done (40)</summary>
 
 - [x] Neon project and tables created
 - [x] Worker points at the owner's KV namespace
@@ -148,6 +148,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [x] No per-IP limit on the auth endpoints
 - [x] Sign-in timing revealed which emails have accounts
 - [x] Anyone could claim an unregistered owner address
+- [x] Next.js had known vulnerabilities
 - [x] A 21st.dev API key was committed in `.mcp.json`
 - [x] Set `APP_URL`
 - [x] Run `npm run db:migrate`
@@ -291,10 +292,10 @@ Features that should work, checked once on a real device or the live site.
 | Dashboard | `███████████░` 93% | 13 | 1 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `███████████░` 92% | 11 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `████████████` 97% | 32 | 1 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
-| Security | `█████████░░░` 78% | 21 | 6 | [security.md](../docs/checklists/security.md) |
+| Security | `█████████░░░` 79% | 22 | 6 | [security.md](../docs/checklists/security.md) |
 | Features to build | `████████░░░░` 70% | 7 | 3 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `███████████░` **88%** | **147** | **20** | |
+| **All** | `███████████░` **88%** | **148** | **20** | |
 
 ## In progress
 
@@ -308,12 +309,12 @@ Features that should work, checked once on a real device or the live site.
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
-- [ ] **Optional, after the custom domain is connected** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L43)<br><sub>add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address. · id `security/optional-after-the-custom-domain-is`</sub>
-- [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L45)<br><sub>Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which… · id `security/backups`</sub>
-- [ ] **Secrets** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L46)<br><sub>Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production. · id `security/secrets`</sub>
-- [ ] **Account verification** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)<br><sub>Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that… · id `security/account-verification`</sub>
-- [ ] **Revoke the exposed 21st.dev API key** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)<br><sub>It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev… · id `security/revoke-the-exposed-21st-dev-api`</sub>
-- [ ] **Verify live** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)<br><sub>after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone. · id `security/verify-live`</sub>
+- [ ] **Optional, after the custom domain is connected** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L44)<br><sub>add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address. · id `security/optional-after-the-custom-domain-is`</sub>
+- [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L46)<br><sub>Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which… · id `security/backups`</sub>
+- [ ] **Secrets** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)<br><sub>Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production. · id `security/secrets`</sub>
+- [ ] **Account verification** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)<br><sub>Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that… · id `security/account-verification`</sub>
+- [ ] **Revoke the exposed 21st.dev API key** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)<br><sub>It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev… · id `security/revoke-the-exposed-21st-dev-api`</sub>
+- [ ] **Verify live** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L50)<br><sub>after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone. · id `security/verify-live`</sub>
 - [ ] **Confirm the claim "Setup in 48 hours"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)<br><sub>Where: CTA section · id `features-to-build/setup-in-48-hours`</sub>
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
@@ -473,7 +474,7 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Security</b>: 21 done</summary>
+<details><summary><b>Security</b>: 22 done</summary>
 
 - [x] Event data was readable by any signed-in account <sub>Done in "Lock down the data API, uploads and response headers"</sub>
 - [x] A replaced student code kept working on older events <sub>Done in "Make a replaced join code stop working on older events"</sub>
@@ -492,6 +493,7 @@ Features that should work, checked once on a real device or the live site.
 - [x] No per-IP limit on the auth endpoints <sub>Done in "Rate-limit sign-in, sign-up and password reset per IP"</sub>
 - [x] Sign-in timing revealed which emails have accounts <sub>Done in "Lock down the data API, uploads and response headers"</sub>
 - [x] Anyone could claim an unregistered owner address <sub>Done in "Stop unregistered owner addresses being claimed while email is off"</sub>
+- [x] Next.js had known vulnerabilities <sub>Done in "Upgrade Next.js to 16.4.3 to close its security advisories"</sub>
 - [x] A 21st.dev API key was committed in `.mcp.json` <sub>Done in "Remove the committed 21st.dev API key from .mcp.json"</sub>
 - [x] Set `APP_URL` <sub>Done in "Move GradLink to the new owner's Neon project and Cloudflare account"</sub>
 - [x] Run `npm run db:migrate`
