@@ -58,7 +58,9 @@ const sections: LegalSection[] = [
         </ul>
         <p>
           We use your data because it is needed to provide the service you signed up for, to meet legal duties, or for our
-          legitimate interest in keeping GradLeap safe. We do not sell your data, show ads, or use analytics or tracking tools.
+          legitimate interest in keeping GradLeap safe and working well. We do not sell your data or show ads. To see how the site
+          is used and how fast it loads, we use Cloudflare Web Analytics, which counts visits without cookies and does not track
+          you across sites or build a profile of you.
         </p>
       </>
     ),
@@ -94,7 +96,7 @@ const sections: LegalSection[] = [
       <>
         <ul>
           <li><strong>Neon</strong> stores the GradLeap database, in Singapore.</li>
-          <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network.</li>
+          <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network. Its Web Analytics records the page you visit, the page you came from, your browser, operating system and device type, your country and how fast the page loaded. It sets no cookies, stores nothing in your browser and does not identify you.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
           <li>
             <strong>LeetCode, Codeforces, Coursera and Credly</strong>: when you add a coding profile, certificate or badge, our server looks it
@@ -163,7 +165,7 @@ const sections: LegalSection[] = [
         GradLeap sets one cookie, which keeps you signed in. It is needed for the site to work, so there is no cookie banner.
         Your browser’s local storage also keeps a copy of your account id, name, organisation, account type and the event you have
         open, so pages load quickly (removed when you sign out), and your checklist ticks. We do not use advertising or analytics
-        cookies.
+        cookies: Cloudflare Web Analytics works without them.
       </p>
     ),
   },
@@ -195,7 +197,7 @@ export default function PrivacyPolicy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="14 October 2026"
+      updated="29 October 2026"
       intro={
         <p>
           This policy explains what personal data GradLeap collects, why, who can see it and the choices you have. It applies

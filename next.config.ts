@@ -7,11 +7,13 @@ const isDev = process.env.NODE_ENV !== "production";
  * Content Security Policy without nonces (see the Next.js CSP guide), so pages
  * stay statically rendered. Scripts, styles, fonts and API calls are all
  * same-origin; images may be https because company logos are external URLs.
+ * The one outside script is Cloudflare Web Analytics, which Cloudflare injects
+ * at the edge and which reports back to this site's own /cdn-cgi/rum.
  * Dev adds 'unsafe-eval' and websockets for React debugging and hot reload.
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
