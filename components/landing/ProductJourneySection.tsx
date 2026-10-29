@@ -1,9 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { ClipboardCheck, Radio, MessageSquareReply, TrendingUp } from "lucide-react";
 import { Section } from "../ui/Section";
 import MatteCard from "./MatteCard";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, RevealGroup, RevealItem } from "../anim/primitives";
 
 const steps = [
   {
@@ -42,12 +43,17 @@ export default function ProductJourneySection() {
         subtitle="GradLeap connects preparation, live engagement, follow-up, and outcome reporting in one continuous loop."
       />
 
-      <div style={{ position: "relative", marginTop: 64 }}>
-        {/* Glowing connection line (desktop) */}
-        <div
+      <RevealGroup stagger={0.18} style={{ position: "relative", marginTop: 64 }}>
+        {/* Connection line (desktop), drawn left to right as the steps appear */}
+        <motion.div
           className="journey-line"
           aria-hidden
+          variants={{
+            hidden: { scaleX: 0 },
+            show: { scaleX: 1, transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1] } },
+          }}
           style={{
+            transformOrigin: "left center",
             position: "absolute",
             top: 38,
             left: "12.5%",
@@ -64,7 +70,7 @@ export default function ProductJourneySection() {
           {steps.map((s) => {
             const Icon = s.icon;
             return (
-              <div key={s.n}>
+              <RevealItem key={s.n}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                   {/* Node */}
                   <div
@@ -106,11 +112,11 @@ export default function ProductJourneySection() {
                     <p style={{ fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>{s.body}</p>
                   </MatteCard>
                 </div>
-              </div>
+              </RevealItem>
             );
           })}
         </div>
-      </div>
+      </RevealGroup>
 
       <style>{`
         @media (max-width: 980px) {

@@ -1,11 +1,13 @@
 "use client";
 
 import { ProductFrame } from "./ProductFrame";
+import { AnimatedBar, RevealGroup, RevealItem } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
 function Stat({ label, value, suffix = "", accent = false }: { label: string; value: number; suffix?: string; accent?: boolean }) {
   return (
-    <div
+    <RevealItem
+      y={14}
       style={{
         background: accent ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
         border: `1px solid ${accent ? "rgba(255,255,255,0.22)" : "var(--border)"}`,
@@ -17,7 +19,7 @@ function Stat({ label, value, suffix = "", accent = false }: { label: string; va
         {value}{suffix}
       </div>
       <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
-    </div>
+    </RevealItem>
   );
 }
 
@@ -63,14 +65,14 @@ export default function ProductReveal() {
           <SampleDataLabel />
         </div>
 
-        <div className="reveal-stats" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
+        <RevealGroup className="reveal-stats" stagger={0.07} delay={0.35} style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 10 }}>
           <Stat label="Readiness Score" value={72} suffix="%" />
           <Stat label="Event Check-ins" value={500} suffix="+" accent />
           <Stat label="Recruiter Scans" value={180} />
           <Stat label="Shortlisted" value={74} accent />
           <Stat label="Interview Invites" value={26} />
           <Stat label="Offers" value={14} accent />
-        </div>
+        </RevealGroup>
 
         <div className="reveal-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1.1fr", gap: 12 }}>
           <Panel title="Live Schedule">
@@ -110,14 +112,12 @@ export default function ProductReveal() {
 
           <Panel title="Outcome Funnel">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {funnel.map((f) => (
+              {funnel.map((f, i) => (
                 <div key={f.l}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 3 }}>
                     <span style={{ color: "var(--text-2)" }}>{f.l}</span>
                   </div>
-                  <div style={{ height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${f.v}%`, background: f.c, borderRadius: 3 }} />
-                  </div>
+                  <AnimatedBar value={f.v} color={f.c} height={6} delay={0.5 + i * 0.08} />
                 </div>
               ))}
             </div>

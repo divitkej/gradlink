@@ -1,8 +1,12 @@
+"use client";
+
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 /**
  * ProductFrame · centred title above a framed product card.
- * Transparent (shares the global GradLeapBackground).
+ * Transparent (shares the global GradLeapBackground). The card rises and
+ * settles once when it scrolls into view.
  */
 export function ProductFrame({
   titleComponent,
@@ -23,7 +27,13 @@ export function ProductFrame({
     >
       <div style={{ maxWidth: 900, textAlign: "center", marginBottom: 28 }}>{titleComponent}</div>
 
-      <div style={{ width: "100%", maxWidth: 1100 }}>
+      <motion.div
+        style={{ width: "100%", maxWidth: 1100 }}
+        initial={{ opacity: 0, y: 48, scale: 0.97 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div
           style={{
             borderRadius: "var(--r-xl)",
@@ -38,7 +48,7 @@ export function ProductFrame({
         >
           {children}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

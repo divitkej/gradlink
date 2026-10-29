@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Section } from "../ui/Section";
-import { GlassCard, Badge, Meter } from "../ui/primitives";
-import { SectionHeading } from "../anim/primitives";
+import { GlassCard, Badge } from "../ui/primitives";
+import { SectionHeading, AnimatedBar, Reveal } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
 const pipeline = [
@@ -68,12 +69,15 @@ export default function EmployerCRMSection() {
   // Chosen option index per filter id, and which filter's options are open.
   const [chosen, setChosen] = useState<Record<string, number>>({});
   const [open, setOpen] = useState<string | null>(null);
+  // Rows fade in when a filter brings them back, not on first render.
+  const [filtered, setFiltered] = useState(false);
 
   const shown = candidates.filter((c) => filters.every((f) => chosen[f.id] === undefined || f.options[chosen[f.id]].test(c)));
   const anyChosen = Object.keys(chosen).length > 0;
   const openFilter = filters.find((f) => f.id === open);
 
   function pick(filterId: string, index: number | null) {
+    setFiltered(true);
     setChosen((prev) => {
       const next = { ...prev };
       if (index === null) delete next[filterId];
@@ -94,7 +98,7 @@ export default function EmployerCRMSection() {
       <div className="crm-grid" style={{ display: "grid", gridTemplateColumns: "4fr 5fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Pipeline */}
-          <div>
+          <Reveal>
             <GlassCard padding={26}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)" }}>
@@ -103,19 +107,19 @@ export default function EmployerCRMSection() {
                 <SampleDataLabel />
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {pipeline.map((p) => (
+                {pipeline.map((p, i) => (
                   <div key={p.l} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <span style={{ fontSize: 12.5, color: "var(--text-2)", width: 80 }}>{p.l}</span>
-                    <div style={{ flex: 1 }}><Meter value={p.pct} tone={p.c} /></div>
+                    <div style={{ flex: 1 }}><AnimatedBar value={p.pct} color={p.c} delay={0.2 + i * 0.08} /></div>
                     <span style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: p.c, width: 28, textAlign: "right" }}>{p.v}</span>
                   </div>
                 ))}
               </div>
             </GlassCard>
-          </div>
+          </Reveal>
 
           {/* Filters: work on the sample students in the list */}
-          <div>
+          <Reveal delay={0.1}>
             <GlassCard padding={22}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <span style={{ fontSize: 12.5, color: "var(--text-muted)" }}>Filter candidates by:</span>
@@ -155,11 +159,11 @@ export default function EmployerCRMSection() {
                 </div>
               )}
             </GlassCard>
-          </div>
+          </Reveal>
         </div>
 
         {/* Candidate list */}
-        <div>
+        <Reveal delay={0.15}>
           <GlassCard padding={0} style={{ overflow: "hidden", border: "1px solid var(--border-strong)" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <div>
@@ -177,7 +181,13 @@ export default function EmployerCRMSection() {
               </div>
             )}
             {shown.map((c) => (
-              <div key={c.name} style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+              <motion.div
+                key={c.name}
+                initial={filtered ? { opacity: 0, y: 8 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}
+              >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 10 }}>
                   <div style={{ display: "flex", gap: 11, alignItems: "center", minWidth: 0 }}>
                     <div style={{ flexShrink: 0, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.10)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--accent)", fontFamily: "var(--font-display)" }}>
@@ -195,13 +205,13 @@ export default function EmployerCRMSection() {
                   <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Skills <strong style={{ color: "var(--text)" }}>{c.skills.join(", ")}</strong></span>
                 </div>
                 <div style={{ fontSize: 11.5, color: "var(--text-muted)" }}>{`Skills: ${c.skills.join(", ")}`}</div>
-              </div>
+              </motion.div>
             ))}
             <div style={{ padding: "14px 20px", fontSize: 11.5, color: "var(--text-muted)" }}>
               From each card a recruiter can shortlist, add a note, send a follow-up or invite to interview.
             </div>
           </GlassCard>
-        </div>
+        </Reveal>
       </div>
 
       <style>{`

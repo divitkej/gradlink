@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserCircle, Gauge, Radio, Database, Check } from "lucide-react";
 import { Section } from "../ui/Section";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, Reveal } from "../anim/primitives";
 import { Badge } from "../ui/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
@@ -176,7 +176,7 @@ export default function SpatialShowcaseSection() {
         subtitle="Four connected modules that help colleges manage the full student-to-employer journey."
       />
 
-      <div
+      <Reveal
         className="showcase-grid"
         style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 32, marginTop: 56, alignItems: "stretch" }}
       >
@@ -257,11 +257,17 @@ export default function SpatialShowcaseSection() {
               </div>
 
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 9, marginBottom: 24 }}>
-                {m.bullets.map((b) => (
-                  <li key={b} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 14, color: "var(--text-2)" }}>
+                {m.bullets.map((b, i) => (
+                  <motion.li
+                    key={b}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, ease: EASE, delay: 0.15 + i * 0.06 }}
+                    style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 14, color: "var(--text-2)" }}
+                  >
                     <Check size={15} color="var(--accent-2)" strokeWidth={2.2} />
                     {b}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
 
@@ -271,7 +277,7 @@ export default function SpatialShowcaseSection() {
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
+      </Reveal>
 
       <style>{`
         @media (max-width: 920px) { .showcase-grid { grid-template-columns: minmax(0, 1fr) !important; } }

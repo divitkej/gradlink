@@ -3,7 +3,7 @@
 import { Layers, QrCode, GraduationCap, BarChart3, Send, CalendarRange } from "lucide-react";
 import { Section } from "../ui/Section";
 import MatteCard from "./MatteCard";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, RevealGroup, RevealItem } from "../anim/primitives";
 
 const reasons = [
   { icon: Layers, title: "Built for the full event lifecycle", body: "Before, during, after, and between events · not just registration." },
@@ -23,14 +23,15 @@ export default function WhyGradLeapSection() {
         subtitle="Because a career fair should produce more than attendance numbers. It should produce preparation, engagement, follow-ups, and measurable outcomes."
       />
 
-      <div
+      <RevealGroup
         className="why-grid"
+        stagger={0.08}
         style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 56 }}
       >
         {reasons.map((r) => {
           const Icon = r.icon;
           return (
-            <div key={r.title}>
+            <RevealItem key={r.title}>
               <MatteCard style={{ padding: 26, height: "100%" }}>
                 <div
                   style={{
@@ -52,10 +53,10 @@ export default function WhyGradLeapSection() {
                 </h3>
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)" }}>{r.body}</p>
               </MatteCard>
-            </div>
+            </RevealItem>
           );
         })}
-      </div>
+      </RevealGroup>
 
       <style>{`
         @media (max-width: 980px) { .why-grid { grid-template-columns: 1fr 1fr !important; } }
