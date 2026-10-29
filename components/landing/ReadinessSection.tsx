@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Check, Clock, Sparkles } from "lucide-react";
 import { Section } from "../ui/Section";
 import { GlassCard } from "../ui/primitives";
-import { SectionHeading, AnimatedBar, Reveal, RevealGroup, RevealItem } from "../anim/primitives";
+import { SectionHeading, AnimatedBar, Reveal, RevealGroup, RevealItem, FILL_EASE, FILL_DURATION, FILL_MARGIN } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
 const competencies = [
@@ -37,8 +37,8 @@ function Ring({ v, label, delay }: { v: number; label: string; delay: number }) 
           strokeDasharray={c}
           initial={{ strokeDashoffset: c }}
           whileInView={{ strokeDashoffset: c - (v / 100) * c }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: reduce ? 0 : 1.3, ease: [0.22, 1, 0.36, 1], delay: reduce ? 0 : delay }}
+          viewport={{ once: true, margin: FILL_MARGIN }}
+          transition={{ duration: reduce ? 0 : FILL_DURATION, ease: FILL_EASE, delay: reduce ? 0 : delay }}
         />
         <text x={40} y={40} transform="rotate(90 40 40)" textAnchor="middle" dominantBaseline="middle" style={{ fill: "var(--text)", fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)" }}>{v}%</text>
       </svg>
