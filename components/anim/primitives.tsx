@@ -176,20 +176,27 @@ export function AnimatedBar({
         background: track,
         borderRadius: "var(--r-full)",
         overflow: "hidden",
+        // Own layer, so Safari clips the sliding fill to the rounded track.
+        transform: "translateZ(0)",
       }}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={100}
     >
+      {/* The fill is sized once and slides in on a transform, so filling the
+          bar never re-lays out the page (animating width stuttered on phones). */}
       <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: inView ? `${value}%` : 0 }}
+        initial={{ x: "-101%" }}
+        animate={{ x: inView ? "0%" : "-101%" }}
         transition={{ duration: reduce ? 0 : 1.1, ease: EASE, delay: reduce ? 0 : delay }}
         style={{
           height: "100%",
+          width: `${value}%`,
           background: color,
           borderRadius: "var(--r-full)",
+          transition: "width 0.6s cubic-bezier(0.22,1,0.36,1)",
+          willChange: "transform",
         }}
       />
     </div>
