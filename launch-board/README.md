@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**146 of 166 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
+**147 of 167 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
@@ -16,7 +16,7 @@ pie showData
   "To do" : 1
   "Verify live" : 3
   "Parked by decision" : 2
-  "Done" : 146
+  "Done" : 147
 ```
 
 ## By phase
@@ -30,7 +30,7 @@ pie showData
 | [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 74% | 39 | 2 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `████████████` 97% | 63 | 0 | 2 |
-| [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
+| [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 78% | 7 | 0 | 2 |
 
 ### Phase 1: Core loop
 
@@ -261,17 +261,18 @@ Organiser access, the full student dashboard and the features the site promises.
 
 Features that should work, checked once on a real device or the live site.
 
-**Ongoing.** 6 of 8 done, 0 in progress, 2 left.
+**Ongoing.** 7 of 9 done, 0 in progress, 2 left.
 
 **Left**
 
 - [ ] Opening hero on a low-end phone · Verify live · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L58)
 - [ ] Link preview card · Verify live · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)
 
-<details><summary>Done (6)</summary>
+<details><summary>Done (7)</summary>
 
 - [x] Smooth scroll lands anchor links correctly
 - [x] Scroll progress bar and thread
+- [x] In-view animations finish and stay out of the way
 - [x] Navbar links on the home page
 - [x] Mobile menu at 375px
 - [x] Hero and CTA buttons
@@ -284,7 +285,7 @@ Features that should work, checked once on a real device or the live site.
 | Area | Progress | Done | Left | Checklist |
 |---|---|---|---|---|
 | Launch | `█████████░░░` 71% | 10 | 4 | [launch.md](../docs/checklists/launch.md) |
-| Landing page | `██████████░░` 83% | 15 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
+| Landing page | `██████████░░` 84% | 16 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 91% | 10 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `███████████░` 93% | 13 | 1 | [dashboard.md](../docs/checklists/dashboard.md) |
@@ -293,7 +294,7 @@ Features that should work, checked once on a real device or the live site.
 | Security | `█████████░░░` 78% | 21 | 6 | [security.md](../docs/checklists/security.md) |
 | Features to build | `████████░░░░` 70% | 7 | 3 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `███████████░` **88%** | **146** | **20** | |
+| **All** | `███████████░` **88%** | **147** | **20** | |
 
 ## In progress
 
@@ -349,7 +350,7 @@ Features that should work, checked once on a real device or the live site.
 
 </details>
 
-<details><summary><b>Landing page</b>: 15 done</summary>
+<details><summary><b>Landing page</b>: 16 done</summary>
 
 - [x] Navbar logo and section links fail on /pricing <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
 - [x] Colleges and Analytics go to the same section <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
@@ -362,6 +363,7 @@ Features that should work, checked once on a real device or the live site.
 - [x] Add robots.txt and sitemap <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
 - [x] Smooth scroll lands anchor links correctly <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
 - [x] Scroll progress bar and thread
+- [x] In-view animations finish and stay out of the way <sub>Done in "Animate landing sections as they scroll into view"</sub>
 - [x] Navbar links on the home page <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
 - [x] Mobile menu at 375px <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
 - [x] Hero and CTA buttons <sub>Done in "Fix landing links, sample-data labels and SEO basics"</sub>
