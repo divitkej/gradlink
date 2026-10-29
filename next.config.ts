@@ -50,9 +50,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     // One public address: www and the workers.dev address go to the domain.
     return ["www.gradleap.online", "gradlink.divitkej.workers.dev"].map((host) => ({
-      source: "/:path*",
+      // (.*) also matches the empty path, so "/" lands on the home page. With
+      // :path* an empty match left ":path*" in the redirect URL.
+      source: "/:path(.*)",
       has: [{ type: "host" as const, value: host }],
-      destination: "https://gradleap.online/:path*",
+      destination: "https://gradleap.online/:path",
       permanent: true,
     }));
   },
