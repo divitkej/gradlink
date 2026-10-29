@@ -51,7 +51,7 @@ export default function CTASection() {
           <RevealItem>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <Button href="/sign-up" variant="primary" icon={<ArrowRight size={17} />}>Get Started</Button>
-              <Button href="#product" variant="secondary">Explore Platform</Button>
+              <Button href="#platform" variant="secondary">Explore Platform</Button>
             </div>
           </RevealItem>
 

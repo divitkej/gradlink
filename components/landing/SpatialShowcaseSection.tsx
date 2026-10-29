@@ -169,7 +169,7 @@ export default function SpatialShowcaseSection() {
   const Icon = m.icon;
 
   return (
-    <Section id="product" bg="var(--bg-2)">
+    <Section id="platform" bg="var(--bg-2)">
       <SectionHeading
         badge="Product"
         title="A career operating system, not another event form."

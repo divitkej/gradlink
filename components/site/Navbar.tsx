@@ -13,7 +13,7 @@ import { Button } from "../ui/primitives";
 // different section, and the "/" prefix makes them work from other pages too.
 const links = [
   { label: "How it works", href: "/#journey" },
-  { label: "Platform", href: "/#product" },
+  { label: "Platform", href: "/#platform" },
   { label: "Students", href: "/#readiness" },
   { label: "Live events", href: "/#live" },
   { label: "Colleges", href: "/#analytics" },

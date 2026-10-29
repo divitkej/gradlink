@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
 import { PLANS, startCheckout, getSubscription, isPro, type Plan } from "@/lib/billing";
 import { useSession } from "@/lib/session";
@@ -19,6 +19,7 @@ function CanceledNotice() {
 
 export default function PricingSection() {
   const { session, ready } = useSession();
+  const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,14 +38,14 @@ export default function PricingSection() {
   async function onCta(plan: Plan) {
     setError(null);
     if (plan.id === "free") {
-      window.location.assign("/sign-up");
+      router.push("/sign-up");
       return;
     }
 
     if (!ready) return;
     if (!session) {
       // Back here after signing up (or signing in from that page) to finish upgrading.
-      window.location.assign(`/sign-up/college?next=${encodeURIComponent("/pricing")}`);
+      router.push(`/sign-up/college?next=${encodeURIComponent("/pricing")}`);
       return;
     }
     if (!isManager) {
