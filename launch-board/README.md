@@ -4,7 +4,7 @@
 
 ![Launch progress](progress.svg)
 
-**148 of 168 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
+**148 of 168 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-30.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
