@@ -103,7 +103,7 @@ function Stage({ stage, index, offset }: { stage: (typeof stages)[number]; index
                 right: -2,
                 top: "54%",
                 height: 1.5,
-                background: "var(--danger)",
+                background: "var(--text)",
                 transformOrigin: "left center",
               }}
             />
@@ -115,7 +115,7 @@ function Stage({ stage, index, offset }: { stage: (typeof stages)[number]; index
         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: t(verdictAt) } }}
         style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 600, color: "var(--text)" }}
       >
-        <X size={17} color="var(--danger)" strokeWidth={2.4} aria-hidden />
+        <X size={17} color="var(--text)" strokeWidth={2.4} aria-hidden />
         {stage.verdict}
       </motion.div>
     </motion.div>
