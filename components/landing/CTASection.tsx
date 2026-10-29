@@ -4,7 +4,6 @@ import { ArrowRight, Check } from "lucide-react";
 import { Section } from "../ui/Section";
 import { Button } from "../ui/primitives";
 import AnimatedTextCycle from "../anim/AnimatedTextCycle";
-import ParticleText from "../anim/ParticleText";
 import { RevealGroup, RevealItem } from "../anim/primitives";
 
 const chips = ["Setup in 48 hours", "No contract lock-in", "Dedicated onboarding", "Free for students and employers"];
@@ -22,13 +21,6 @@ export default function CTASection() {
       >
 
         <RevealGroup stagger={0.1} style={{ position: "relative", zIndex: 1, maxWidth: 720, margin: "0 auto" }}>
-          {/* Particle headline */}
-          <RevealItem>
-            <div style={{ marginBottom: 8 }}>
-              <ParticleText text="GradLeap" fontSize={64} height={96} color="#FFFFFF" />
-            </div>
-          </RevealItem>
-
           <RevealItem>
             <h2 style={{ fontSize: "clamp(26px, 3.6vw, 42px)", fontWeight: 700, color: "var(--text)", lineHeight: 1.12, marginBottom: 20 }}>
               Your next career fair should do more than fill a hall.
