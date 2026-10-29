@@ -24,6 +24,8 @@ Update this file in the same commit as the fix.
 - [x] **Sign-in timing revealed which emails have accounts.** Unknown emails now take the same hashing time. `lib/server/auth-api.ts` · Done in "Lock down the data API, uploads and response headers"
 - [x] **Anyone could claim an unregistered owner address.** While account email is off, sign-up confirms an account at once, and ADMIN_EMAILS addresses skip the email rules, so whoever registered an owner address first got the owner pages. Now only the first owner address can be claimed that way; once an owner account exists, any other ADMIN_EMAILS address must wait until sign-up email confirmation is on. The first one still has to be claimed by the owner straight after setting ADMIN_EMAILS (see `organiser-access.md`). `lib/server/auth-api.ts`, `lib/server/college-domains.ts` · Done in "Stop unregistered owner addresses being claimed while email is off"
 
+- [x] **A 21st.dev API key was committed in `.mcp.json`.** The `magic` MCP server's key was written into the file in the baseline commit. The file now reads it from the `TWENTY_FIRST_API_KEY` environment variable, so the key lives on the developer's machine only. `.mcp.json` · Done in "Remove the committed 21st.dev API key from .mcp.json"
+
 ## Already sound (checked, no change needed)
 
 - Every SQL query is parameterised; dynamic column names come from fixed allowlists.
@@ -32,15 +34,16 @@ Update this file in the same commit as the fix.
 - Reset tokens: random, stored only as SHA-256, single use, expire in 60 minutes, 3 per hour.
 - Cross-site requests to the API are refused (Origin check plus JSON-only bodies).
 - Stripe webhook verifies its signature and is the only writer of `subscriptions`.
-- No secrets in the repository or its git history; `.dev.vars` and `.env*` are ignored.
+- No secrets in the repository; `.dev.vars` and `.env*` are ignored. The git history still holds the old 21st.dev key from `.mcp.json` (see "Revoke the exposed 21st.dev API key" below).
 
 ## Needs doing outside the code (before launch)
 
-- [ ] **Set `APP_URL`** in `wrangler.jsonc` to the custom domain. Reset emails, upload links and Stripe return URLs use it.
+- [x] **Set `APP_URL`** in `wrangler.jsonc`. Reset emails, upload links and Stripe return URLs use it. Set to `https://gradlink.bharatg0904.workers.dev`; change it with the `SITE_URL` fallback when the custom domain goes live (see `launch.md`). `wrangler.jsonc` · Done in "Move GradLink to the new owner's Neon project and Cloudflare account"
 - [x] **Run `npm run db:migrate`** against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)
 - [ ] **Optional, after the custom domain is connected:** add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.
-- [ ] **Least-privilege database role.** In Neon, create a role with only select, insert, update, delete on the app tables and use it for `DATABASE_URL`, instead of the owner role. Keep the owner role for `npm run db:migrate` only.
-- [ ] **Backups.** Confirm Neon's restore window covers at least 7 days. Checked on 2026-10-12: it does not. The Gradlink project keeps 6 hours of history (`history_retention_seconds` 21600). Raise it in the Neon project settings; the Neon plan sets the maximum. Owner action
+- [x] **Least-privilege database role.** In the Neon project `gradlink`, the role `gradlink_app` has only select, insert, update and delete on the app tables (and on tables `gradlink_owner` creates later), is not a member of `neon_superuser`, and is refused when it tries to create a table. It is the role the app connects as; `gradlink_owner` is kept for `npm run db:migrate` only. Checked on 2026-10-15 by running the whole app as `gradlink_app` against the new database. Done on 2026-10-15, no commit (database change)
+- [ ] **Backups.** Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which is the Free plan's maximum on Neon's pricing page (checked 2026-10-15). Owner decision: accept 6 hours while the data is small, or take regular `pg_dump` copies to private storage, or move to a paid Neon plan.
 - [ ] **Secrets.** Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production.
 - [ ] **Account verification.** Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in "Restrict sign-up to campus and company email domains"). Still open: confirming the email itself needs a sender (see `launch.md`, account email), and a college whose domain is still pending can already create events.
+- [ ] **Revoke the exposed 21st.dev API key.** It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev account that issued it (it was committed by the previous owner): revoke it at 21st.dev, create a new one and keep it in the `TWENTY_FIRST_API_KEY` environment variable. The git history is not rewritten.
 - [ ] **Verify live:** after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.
