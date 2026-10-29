@@ -2,7 +2,6 @@
 
 import { Layers, QrCode, GraduationCap, BarChart3, Send, CalendarRange } from "lucide-react";
 import { Section } from "../ui/Section";
-import MatteCard from "./MatteCard";
 import { SectionHeading, RevealGroup, RevealItem } from "../anim/primitives";
 
 const reasons = [
@@ -16,7 +15,7 @@ const reasons = [
 
 export default function WhyGradLeapSection() {
   return (
-    <Section id="why" bg="var(--bg-2)">
+    <Section id="why">
       <SectionHeading
         badge="Why GradLeap"
         title="Why choose GradLeap for your next campus career fair?"
@@ -26,33 +25,17 @@ export default function WhyGradLeapSection() {
       <RevealGroup
         className="why-grid"
         stagger={0.08}
-        style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginTop: 56 }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "48px 40px", marginTop: 56 }}
       >
         {reasons.map((r) => {
           const Icon = r.icon;
           return (
-            <RevealItem key={r.title}>
-              <MatteCard style={{ padding: 26, height: "100%" }}>
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "var(--r-md)",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))",
-                    border: "1px solid var(--border-strong)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 18,
-                  }}
-                >
-                  <Icon size={21} color="var(--accent)" strokeWidth={1.6} />
-                </div>
-                <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", marginBottom: 9, lineHeight: 1.3 }}>
-                  {r.title}
-                </h3>
-                <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)" }}>{r.body}</p>
-              </MatteCard>
+            <RevealItem key={r.title} style={{ borderTop: "1px solid var(--border-strong)", paddingTop: 24 }}>
+              <Icon size={22} color="var(--accent)" strokeWidth={1.6} style={{ marginBottom: 16 }} />
+              <h3 style={{ fontSize: 17, fontWeight: 600, color: "var(--text)", marginBottom: 9, lineHeight: 1.3 }}>
+                {r.title}
+              </h3>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--text-2)" }}>{r.body}</p>
             </RevealItem>
           );
         })}
@@ -60,7 +43,7 @@ export default function WhyGradLeapSection() {
 
       <style>{`
         @media (max-width: 980px) { .why-grid { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 640px) { .why-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 640px) { .why-grid { grid-template-columns: 1fr !important; gap: 36px !important; } }
       `}</style>
     </Section>
   );

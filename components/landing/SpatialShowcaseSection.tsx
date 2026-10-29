@@ -181,7 +181,7 @@ export default function SpatialShowcaseSection() {
         style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 32, marginTop: 56, alignItems: "stretch" }}
       >
         {/* Tab list */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {modules.map((mod, i) => {
             const MIcon = mod.icon;
             const isActive = i === active;
@@ -193,31 +193,17 @@ export default function SpatialShowcaseSection() {
                 style={{
                   textAlign: "left",
                   cursor: "pointer",
-                  background: isActive ? "var(--surface-elev)" : "var(--glass)",
-                  border: `1px solid ${isActive ? "var(--border-strong)" : "var(--border)"}`,
-                  borderRadius: "var(--r-lg)",
-                  padding: 20,
+                  background: "none",
+                  border: "none",
+                  borderLeft: `2px solid ${isActive ? "var(--accent)" : "var(--border)"}`,
+                  padding: "16px 20px",
                   display: "flex",
                   gap: 14,
                   alignItems: "flex-start",
                   transition: "all 0.25s ease",
                 }}
               >
-                <div
-                  style={{
-                    width: 42,
-                    height: 42,
-                    flexShrink: 0,
-                    borderRadius: "var(--r-md)",
-                    background: isActive ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "rgba(255,255,255,0.04)",
-                    border: isActive ? "none" : "1px solid var(--border)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <MIcon size={20} color={isActive ? "#0A0A0A" : "var(--text-2)"} strokeWidth={1.7} />
-                </div>
+                <MIcon size={20} color={isActive ? "var(--accent)" : "var(--text-muted)"} strokeWidth={1.7} style={{ flexShrink: 0, marginTop: 2 }} />
                 <div>
                   <div style={{ fontSize: 15.5, fontWeight: 600, color: isActive ? "var(--text)" : "var(--text-2)", marginBottom: 3 }}>
                     {mod.name}

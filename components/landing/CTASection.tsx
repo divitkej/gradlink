@@ -16,10 +16,7 @@ export default function CTASection() {
         style={{
           position: "relative",
           overflow: "hidden",
-          borderRadius: "var(--r-xl)",
-          border: "1px solid var(--border-strong)",
-          background: "linear-gradient(160deg, var(--surface) 0%, var(--bg-2) 100%)",
-          padding: "clamp(40px, 7vw, 80px) clamp(24px, 5vw, 64px)",
+          padding: "clamp(24px, 5vw, 48px) 0",
           textAlign: "center",
         }}
       >

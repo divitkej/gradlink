@@ -49,11 +49,7 @@ export default function HoverExpandStats({ panels }: { panels: StatPanel[] }) {
               minWidth: "5.5rem",
               cursor: "pointer",
               overflow: "hidden",
-              borderRadius: "var(--r-lg)",
-              border: `1px solid ${isActive ? "var(--border-strong)" : "var(--border)"}`,
-              background: isActive
-                ? "linear-gradient(160deg, var(--surface-elev), var(--surface))"
-                : "var(--glass)",
+              borderLeft: `1px solid ${isActive ? "var(--accent)" : "var(--border-strong)"}`,
               transition: "border-color 0.3s ease",
             }}
           >
