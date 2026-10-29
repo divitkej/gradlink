@@ -5,6 +5,14 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* Shared by every statistic fill (bars, rings, chart columns). They start
+   only once fully on screen, above the bottom 15%, and fill at an even pace,
+   so the whole fill is seen instead of a jump that has mostly finished by
+   the time the eye reaches it. */
+export const FILL_EASE = [0.45, 0, 0.25, 1] as const;
+export const FILL_DURATION = 1.2;
+export const FILL_MARGIN = "0px 0px -15% 0px";
+
 /* ---------- useMounted (hydration-safe client gate) ---------- */
 export function useMounted() {
   const [mounted, setMounted] = useState(false);
@@ -167,7 +175,7 @@ export function AnimatedBar({
   // Watch the track, not the fill: a zero-width fill near the screen edge
   // never counts as in view, so the bar would stay empty on phones.
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-30px" });
+  const inView = useInView(ref, { once: true, margin: FILL_MARGIN });
   return (
     <div
       ref={ref}
@@ -189,7 +197,7 @@ export function AnimatedBar({
       <motion.div
         initial={{ x: "-101%" }}
         animate={{ x: inView ? "0%" : "-101%" }}
-        transition={{ duration: reduce ? 0 : 1.1, ease: EASE, delay: reduce ? 0 : delay }}
+        transition={{ duration: reduce ? 0 : FILL_DURATION, ease: FILL_EASE, delay: reduce ? 0 : delay }}
         style={{
           height: "100%",
           width: `${value}%`,
