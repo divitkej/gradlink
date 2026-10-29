@@ -175,7 +175,7 @@ export default function OpeningHero() {
               }}
             >
               <span style={{ color: "var(--text)" }}>Grad</span>
-              <span className="text-gradient">Link</span>
+              <span className="text-gradient">Leap</span>
             </span>
           </motion.div>
         </div>
