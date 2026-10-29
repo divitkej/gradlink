@@ -94,7 +94,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 
 **Left**
 
-- [ ] Create the Worker and set its secrets · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)
+- [ ] Point deploys and secrets at the divitkej account · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)
 - [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)
 - [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
 - [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L43)
@@ -112,7 +112,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 <details><summary>Done (39)</summary>
 
 - [x] Neon project and tables created
-- [x] Worker points at the new KV namespace
+- [x] Worker points at the owner's KV namespace
 - [x] Tested on the Workers runtime against the new database
 - [x] Only Neon and Cloudflare in the repo
 - [x] Cloudflare GitHub builds fail on every commit
@@ -299,8 +299,8 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ### Needs the owner (14)
 
-- [ ] **Create the Worker and set its secrets** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)<br><sub>Owner action: this needs a Cloudflare API token, which no tool in the setup session had. Either add the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets and… · id `launch/create-the-worker-and-set-its`</sub>
-- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>Add the domain to Cloudflare, then attach it to the `gradlink` Worker, set `APP_URL` in `wrangler.jsonc` and change the `SITE_URL` fallback in `lib/site.ts` to it. Owner action,… · id `launch/custom-domain`</sub>
+- [ ] **Point deploys and secrets at the divitkej account** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)<br><sub>Owner action. In GitHub (Settings, Secrets and variables, Actions) replace `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` with a token and id from the divitkej account; the… · id `launch/point-deploys-and-secrets-at-the`</sub>
+- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>`gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in "Serve GradLink… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
@@ -316,7 +316,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ### To do (1)
 
-- [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L18)<br><sub>After the first deploy, `https://gradlink.bharatg0904.workers.dev/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account… · id `launch/verify-live`</sub>
+- [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L18)<br><sub>After the first deploy, `https://gradleap.online/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in… · id `launch/verify-live`</sub>
 
 ### Verify live (3)
 
@@ -334,7 +334,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 <details><summary><b>Launch</b>: 10 done</summary>
 
 - [x] Neon project and tables created
-- [x] Worker points at the new KV namespace <sub>Done in "Move GradLink to the new owner's Neon project and Cloudflare account"</sub>
+- [x] Worker points at the owner's KV namespace <sub>Done in "Move the Worker back to the divitkej Cloudflare account"</sub>
 - [x] Tested on the Workers runtime against the new database
 - [x] Only Neon and Cloudflare in the repo <sub>Done in "Remove Vercel, Supabase and Firebase leftovers"</sub>
 - [x] Cloudflare GitHub builds fail on every commit <sub>Done in "Deploy from main with GitHub Actions and add a health check"</sub>
