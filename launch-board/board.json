@@ -785,7 +785,7 @@
       "section": "Test pass",
       "line": 70,
       "title": "Hero and CTA buttons",
-      "detail": "Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#product`. `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
+      "detail": "Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#platform` (renamed from `#product` in \"Rename the landing page product anchor to platform\"). Section links scroll to their section and leave the address as `/` instead of adding `#section`, in \"Scroll to home page sections without a hash in the address\". `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in \"Fix landing links, sample-data labels and SEO basics\"",
       "state": "done",
       "doneIn": "Fix landing links, sample-data labels and SEO basics",
       "phase": "test",
