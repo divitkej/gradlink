@@ -28,7 +28,7 @@ no always-on database compute.
 | Auth | Email + password in `lib/server/auth-api.ts`; HttpOnly signed session cookie |
 | Authorization | Per-operation checks in `lib/server/rpc.ts` |
 | File uploads | Workers KV namespace `UPLOADS` (`lib/server/files.ts`) |
-| Account email (confirm email, password reset) | Gmail over SMTP from the Worker (`lib/server/smtp.ts`), no domain needed; Resend once there is a domain (`lib/server/mail.ts`) |
+| Account email (confirm email, password reset) | SMTP from the Worker (`lib/server/smtp.ts`) through the Hostinger mailbox `no-reply@gradleap.online`; Resend is the alternative (`lib/server/mail.ts`) |
 | Payments | Stripe Checkout + webhook (`app/api/checkout`, `app/api/stripe/webhook`) |
 
 ## Stack
@@ -79,11 +79,11 @@ into the build.
 |---|---|---|
 | `DATABASE_URL` | yes | Neon **pooled** connection string for the `gradlink_app` role (see Neon below). Use the owner role only for `npm run db:migrate` |
 | `AUTH_SECRET` | yes | ≥32 random characters; signs session cookies |
-| `SMTP_USER` | for account email | Mailbox that sends mail (e.g. a Gmail). Not set yet: account email is paused |
-| `SMTP_PASS` | for account email | That Gmail's 16-character app password (Google Account, Security, 2-Step Verification, App passwords). Secret |
-| `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
+| `SMTP_USER` | for account email | Mailbox that sends mail. Set in `wrangler.jsonc` `vars` to `no-reply@gradleap.online` (Hostinger Mail) |
+| `SMTP_PASS` | for account email | That mailbox's password. Secret. Email stays off until it is set |
+| `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465`. Set in `wrangler.jsonc` to `smtp.hostinger.com` and `465` |
 | `RESEND_API_KEY` | no | Alternative to SMTP once GradLeap has a verified domain |
-| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend |
+| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend. Set in `wrangler.jsonc` to `GradLeap <no-reply@gradleap.online>` |
 | `APP_URL` | yes | Public origin used in password-reset links, upload URLs and the Stripe return URL. Set in `wrangler.jsonc` `vars` to `https://gradleap.online`. Falls back to the request origin when empty |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can open the owner dashboard at `/admin` and approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Sign up with the email right after setting it, so nobody else can register it. Secret |
@@ -154,7 +154,7 @@ npx wrangler login
 npx wrangler secret put DATABASE_URL          # gradlink_app's pooled connection string
 npx wrangler secret put AUTH_SECRET           # a new random value (command above)
 npx wrangler secret put ADMIN_EMAILS          # your email, then sign up with it straight away
-npx wrangler secret put SMTP_PASS             # optional: Gmail app password; turns on email confirmation and password reset
+npx wrangler secret put SMTP_PASS             # no-reply@gradleap.online's password; turns on email confirmation and password reset
 ```
 
 If the Worker does not exist yet, `wrangler secret put` offers to create it;

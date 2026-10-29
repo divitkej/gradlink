@@ -55,11 +55,16 @@
 
   // Non-secret configuration. APP_URL is the public origin used in emailed
   // links, upload URLs and the Stripe return URL.
-  // Account email (confirm your email, password reset) is paused: no sender
-  // is configured, so new accounts are confirmed on creation. To turn it on,
-  // add SMTP_USER here and the SMTP_PASS secret, or Resend (see README.md).
+  // Account email (confirm your email, password reset) goes out over SMTP
+  // from the Hostinger mailbox no-reply@gradleap.online. Its password is the
+  // SMTP_PASS secret; until that secret exists, no email is sent and new
+  // accounts are confirmed on creation.
   "vars": {
-    "APP_URL": "https://gradleap.online"
+    "APP_URL": "https://gradleap.online",
+    "SMTP_USER": "no-reply@gradleap.online",
+    "SMTP_HOST": "smtp.hostinger.com",
+    "SMTP_PORT": "465",
+    "EMAIL_FROM": "GradLeap <no-reply@gradleap.online>"
   },
 
   "observability": {
