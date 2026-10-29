@@ -1,8 +1,11 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 /**
  * A quiet full-bleed band: a deliberate breathing moment that links the
- * sections around it. Minimal by design.
+ * sections around it. The headline rises in word by word, once, when it
+ * scrolls into view.
  */
 export default function StatementBand({
   text,
@@ -34,7 +37,11 @@ export default function StatementBand({
             {eyebrow}
           </div>
         )}
-        <h2
+        <motion.h2
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
           style={{
             fontSize: "clamp(28px, 5vw, 60px)",
             fontWeight: 700,
@@ -43,8 +50,21 @@ export default function StatementBand({
             color: "var(--text)",
           }}
         >
-          {text}
-        </h2>
+          {text.split(" ").map((word, i) => (
+            <span key={i}>
+              {i > 0 && " "}
+              <motion.span
+                style={{ display: "inline-block" }}
+                variants={{
+                  hidden: { opacity: 0, y: 28 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+                }}
+              >
+                {word}
+              </motion.span>
+            </span>
+          ))}
+        </motion.h2>
       </div>
     </section>
   );

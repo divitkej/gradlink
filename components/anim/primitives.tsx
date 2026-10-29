@@ -23,18 +23,21 @@ export function Reveal({
   delay = 0,
   y = 24,
   className,
+  style,
   as = "div",
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
   className?: string;
+  style?: React.CSSProperties;
   as?: "div" | "section" | "li";
 }) {
   const MotionTag = motion[as] as typeof motion.div;
   return (
     <MotionTag
       className={className}
+      style={style}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -42,6 +45,57 @@ export function Reveal({
     >
       {children}
     </MotionTag>
+  );
+}
+
+/* ---------- RevealGroup + RevealItem (staggered in-view reveal) ---------- */
+const revealItem = {
+  hidden: (y: number) => ({ opacity: 0, y }),
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
+export function RevealGroup({
+  children,
+  stagger = 0.08,
+  delay = 0,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  stagger?: number;
+  delay?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <motion.div
+      className={className}
+      style={style}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger, delayChildren: delay } } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function RevealItem({
+  children,
+  y = 20,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  y?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <motion.div className={className} style={style} custom={y} variants={revealItem}>
+      {children}
+    </motion.div>
   );
 }
 
@@ -110,8 +164,13 @@ export function AnimatedBar({
   delay?: number;
 }) {
   const reduce = useReducedMotion();
+  // Watch the track, not the fill: a zero-width fill near the screen edge
+  // never counts as in view, so the bar would stay empty on phones.
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-30px" });
   return (
     <div
+      ref={ref}
       style={{
         height,
         background: track,
@@ -125,8 +184,7 @@ export function AnimatedBar({
     >
       <motion.div
         initial={{ width: 0 }}
-        whileInView={{ width: `${value}%` }}
-        viewport={{ once: true, margin: "-30px" }}
+        animate={{ width: inView ? `${value}%` : 0 }}
         transition={{ duration: reduce ? 0 : 1.1, ease: EASE, delay: reduce ? 0 : delay }}
         style={{
           height: "100%",
@@ -153,7 +211,11 @@ export function SectionHeading({
   accent?: string;
 }) {
   return (
-    <div
+    <motion.div
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
       style={{
         textAlign: align,
         maxWidth: align === "center" ? 720 : 760,
@@ -161,7 +223,9 @@ export function SectionHeading({
         marginRight: align === "center" ? "auto" : 0,
       }}
     >
-        <span
+        <motion.span
+          custom={12}
+          variants={revealItem}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -187,8 +251,10 @@ export function SectionHeading({
             }}
           />
           {badge}
-        </span>
-        <h2
+        </motion.span>
+        <motion.h2
+          custom={20}
+          variants={revealItem}
           style={{
             fontSize: "clamp(28px, 3.6vw, 44px)",
             fontWeight: 700,
@@ -198,9 +264,11 @@ export function SectionHeading({
           }}
         >
           {title}
-        </h2>
+        </motion.h2>
       {subtitle && (
-          <p
+          <motion.p
+            custom={20}
+            variants={revealItem}
             style={{
               fontSize: 17,
               lineHeight: 1.7,
@@ -211,8 +279,8 @@ export function SectionHeading({
             }}
           >
             {subtitle}
-          </p>
+          </motion.p>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -3,7 +3,7 @@
 import { CalendarX, EyeOff, FileX2 } from "lucide-react";
 import { Section } from "../ui/Section";
 import MatteCard from "./MatteCard";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, RevealGroup, RevealItem } from "../anim/primitives";
 
 const problems = [
   {
@@ -41,8 +41,9 @@ export default function ProblemSection() {
         subtitle="Colleges know who attended. They rarely know who prepared, who met recruiters, who followed up, who got shortlisted, and who converted into interviews or offers."
       />
 
-      <div
+      <RevealGroup
         className="problem-grid"
+        stagger={0.12}
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
@@ -53,7 +54,7 @@ export default function ProblemSection() {
         {problems.map((p) => {
           const Icon = p.icon;
           return (
-            <div key={p.title}>
+            <RevealItem key={p.title}>
               <MatteCard style={{ padding: 28, height: "100%" }}>
                 <div
                   style={{
@@ -89,10 +90,10 @@ export default function ProblemSection() {
                   {p.tag}
                 </span>
               </MatteCard>
-            </div>
+            </RevealItem>
           );
         })}
-      </div>
+      </RevealGroup>
 
       <style>{`
         @media (max-width: 900px) { .problem-grid { grid-template-columns: 1fr !important; } }

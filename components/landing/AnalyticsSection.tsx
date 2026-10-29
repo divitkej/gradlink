@@ -1,9 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Section } from "../ui/Section";
-import { GlassCard, Meter } from "../ui/primitives";
+import { GlassCard } from "../ui/primitives";
 import SampleDataLabel from "./SampleDataLabel";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, AnimatedBar, Reveal } from "../anim/primitives";
 import HoverExpandStats, { type StatPanel } from "../anim/HoverExpandStats";
 
 const outcomePanels: StatPanel[] = [
@@ -101,7 +102,7 @@ export default function AnalyticsSection() {
 
       <div className="analytics-grid" style={{ display: "grid", gridTemplateColumns: "5fr 4fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         {/* Funnel */}
-        <div>
+        <Reveal>
           <GlassCard padding={28}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 22 }}>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)" }}>
@@ -110,7 +111,7 @@ export default function AnalyticsSection() {
               <SampleDataLabel />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {funnel.map((f) => (
+              {funnel.map((f, i) => (
                 <div key={f.l}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
                     <span style={{ fontSize: 13, color: "var(--text-2)" }}>{f.l}</span>
@@ -118,7 +119,7 @@ export default function AnalyticsSection() {
                       {f.v}
                     </span>
                   </div>
-                  <Meter value={f.pct} tone={f.c} />
+                  <AnimatedBar value={f.pct} color={f.c} delay={0.2 + i * 0.09} />
                 </div>
               ))}
             </div>
@@ -136,11 +137,11 @@ export default function AnalyticsSection() {
               ))}
             </div>
           </GlassCard>
-        </div>
+        </Reveal>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Company table */}
-          <div>
+          <Reveal delay={0.1}>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Company Engagement</div>
@@ -168,24 +169,32 @@ export default function AnalyticsSection() {
                 </table>
               </div>
             </GlassCard>
-          </div>
+          </Reveal>
 
           {/* Activity chart */}
-          <div>
+          <Reveal delay={0.2}>
             <GlassCard padding={20}>
               <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)", marginBottom: 18 }}>Student Activity Breakdown</div>
-              <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 96 }}>
-                {activity.map((b, i) => (
+              <motion.div
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.3 } } }}
+                style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 96 }}
+              >
+                {activity.map((b) => (
                   <div key={b.l} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                     <div style={{ width: "100%", height: 80, display: "flex", alignItems: "flex-end" }}>
-                      <div
-                        className="bar"
+                      <motion.div
+                        variants={{
+                          hidden: { scaleY: 0 },
+                          show: { scaleY: 1, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } },
+                        }}
                         style={{
                           width: "100%",
                           height: `${b.h}%`,
                           background: "linear-gradient(180deg, var(--accent), var(--accent-2))",
                           borderRadius: "4px 4px 0 0",
-                          animation: `growBar 0.9s ${i * 0.08}s ease both`,
                           transformOrigin: "bottom",
                         }}
                       />
@@ -193,14 +202,14 @@ export default function AnalyticsSection() {
                     <span style={{ fontSize: 9.5, color: "var(--text-muted)" }}>{b.l}</span>
                   </div>
                 ))}
-              </div>
+              </motion.div>
             </GlassCard>
-          </div>
+          </Reveal>
         </div>
       </div>
 
       {/* Interactive outcomes · hover any metric for the breakdown */}
-      <div>
+      <Reveal>
         <div
           style={{
             display: "flex",
@@ -219,10 +228,9 @@ export default function AnalyticsSection() {
           </span>
         </div>
         <HoverExpandStats panels={outcomePanels} />
-      </div>
+      </Reveal>
 
       <style>{`
-        @keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
         @media (max-width: 900px) { .analytics-grid { grid-template-columns: 1fr !important; gap: 24px !important; } }
       `}</style>
     </Section>

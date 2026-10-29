@@ -19,7 +19,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Automated check" below means a Playwright run against a production build (`next build` + `next start`) at 1440px and 375px.
 
-## Progress: 14 / 17 done, 1 tracked, 2 need a real device or the live site
+## Progress: 15 / 18 done, 1 tracked, 2 need a real device or the live site
 
 ## Phase 2: Navigation fixes
 
@@ -61,6 +61,8 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `app/opengraph-image.png` · Verify live
 - [x] **Scroll progress bar and thread.** Removed with all other scroll-triggered animations ahead of the redesign, so there is nothing left to test.
   Done in `1317868`
+- [x] **In-view animations finish and stay out of the way.** Sections play once as they enter the screen: headings and cards fade up, bars fill, readiness rings draw, the journey line draws across, the activity chart grows, the statement band rises word by word. No scroll-scrubbed, parallax or cursor effects, and no count-up numbers. Automated check at 1440px, 375px and 390px with reduced motion: all 23 bars reach their value, rings and chart finish, nothing is left transparent, no horizontal scroll, nav links land on their sections, CRM filters still work. Bars now start from their full-width track, which fixed bars staying empty on phones.
+  `components/anim/primitives.tsx`, `components/landing/*` · Done in "Animate landing sections as they scroll into view"
 - [x] **Navbar links on the home page.** Automated check: all 7 tabs, Login and Get Started go to the right place. The logo scrolls back to the top when you are already on `/` (fixed in "Fix code review findings on the landing branch").
   `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Mobile menu at 375px.** Automated check: opens, closes with X, tapping a link closes it and lands on the section, no horizontal scroll anywhere on the page (fixed a 56px overflow from the sample-data labels).

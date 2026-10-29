@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 import { Section } from "../ui/Section";
 import { GlassCard, Badge } from "../ui/primitives";
-import { SectionHeading } from "../anim/primitives";
+import { SectionHeading, Reveal, RevealGroup, RevealItem } from "../anim/primitives";
 import SampleDataLabel from "./SampleDataLabel";
 
 const passport = [
@@ -41,7 +41,7 @@ export default function LiveEventSection() {
 
       <div className="live-grid" style={{ display: "grid", gridTemplateColumns: "5fr 4fr", gap: 32, marginTop: 56, alignItems: "start" }}>
         {/* Passport journey */}
-        <div>
+        <Reveal>
           <GlassCard padding={28}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
               <span style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 600, color: "var(--text)" }}>
@@ -49,9 +49,9 @@ export default function LiveEventSection() {
               </span>
               <SampleDataLabel />
             </div>
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <RevealGroup stagger={0.14} delay={0.2} style={{ display: "flex", flexDirection: "column" }}>
               {passport.map((p, i) => (
-                <div key={p.l} style={{ display: "flex", gap: 16 }}>
+                <RevealItem key={p.l} y={10} style={{ display: "flex", gap: 16 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                     <div style={{ width: 24, height: 24, borderRadius: "50%", background: p.done ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--surface-elev)", border: p.done ? "none" : "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {p.done ? <Check size={13} color="#0A0A0A" strokeWidth={3} /> : <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--text-muted)" }} />}
@@ -62,51 +62,55 @@ export default function LiveEventSection() {
                     <div style={{ fontSize: 14, fontWeight: p.done ? 600 : 400, color: p.done ? "var(--text)" : "var(--text-2)" }}>{p.l}</div>
                     <div style={{ fontSize: 11.5, color: "var(--text-muted)", marginTop: 1 }}>{p.done ? p.t : "Upcoming"}</div>
                   </div>
-                </div>
+                </RevealItem>
               ))}
-            </div>
+            </RevealGroup>
             <p style={{ marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--border)", fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>
               A student attends a resume workshop, completes a mock interview, checks into Fintech firm, visits Consulting firm, and sends a
               follow-up. <strong style={{ color: "var(--text)" }}>GradLeap turns each action into a signal.</strong>
             </p>
           </GlassCard>
-        </div>
+        </Reveal>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* Leaderboard */}
-          <div>
+          <Reveal delay={0.1}>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Engagement Leaderboard</span>
                 <Badge tone="teal" pulse>Live</Badge>
               </div>
-              {leaderboard.map((s) => (
-                <div key={s.r} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", borderBottom: "1px solid var(--border)", background: s.r === 1 ? "rgba(255,255,255,0.06)" : "transparent" }}>
-                  <span style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-muted)", width: 16 }}>{s.r}</span>
-                  <span style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{s.n}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-2)" }}>{s.s}</span>
-                </div>
-              ))}
+              <RevealGroup stagger={0.08} delay={0.25}>
+                {leaderboard.map((s) => (
+                  <RevealItem key={s.r} y={8} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", borderBottom: "1px solid var(--border)", background: s.r === 1 ? "rgba(255,255,255,0.06)" : "transparent" }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: 12, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-muted)", width: 16 }}>{s.r}</span>
+                    <span style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{s.n}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: s.r === 1 ? "var(--accent-2)" : "var(--text-2)" }}>{s.s}</span>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
             </GlassCard>
-          </div>
+          </Reveal>
 
           {/* Scan feed */}
-          <div>
+          <Reveal delay={0.2}>
             <GlassCard padding={0} style={{ overflow: "hidden" }}>
               <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)" }}>
                 <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}>Recent Recruiter Scans</span>
               </div>
-              {scans.map((row, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 20px", borderBottom: i < scans.length - 1 ? "1px solid var(--border)" : "none" }}>
-                  <div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text)" }}>{row.s}</div>
-                    <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{row.c} · {row.t}</div>
-                  </div>
-                  <Badge tone={row.status === "Shortlisted" ? "teal" : "muted"}>{row.status}</Badge>
-                </div>
-              ))}
+              <RevealGroup stagger={0.08} delay={0.35}>
+                {scans.map((row, i) => (
+                  <RevealItem key={i} y={8} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 20px", borderBottom: i < scans.length - 1 ? "1px solid var(--border)" : "none" }}>
+                    <div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text)" }}>{row.s}</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{row.c} · {row.t}</div>
+                    </div>
+                    <Badge tone={row.status === "Shortlisted" ? "teal" : "muted"}>{row.status}</Badge>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
             </GlassCard>
-          </div>
+          </Reveal>
         </div>
       </div>
 
