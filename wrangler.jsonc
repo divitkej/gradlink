@@ -34,12 +34,12 @@
   },
 
   // Résumés, brochures and logos.
-  // Namespace "gradlink-UPLOADS" in the GradLink owner's Cloudflare account
-  // (the one serving gradlink.bharatg0904.workers.dev).
+  // Namespace "UPLOADS" in the owner's Cloudflare account (the one serving
+  // gradlink.divitkej.workers.dev and the gradleap.online zone).
   "kv_namespaces": [
     {
       "binding": "UPLOADS",
-      "id": "98b70a47d074491cbf9d5f6c5b388ba7"
+      "id": "c980a36355cf49e0836f8d9fff403b69"
     }
   ],
 

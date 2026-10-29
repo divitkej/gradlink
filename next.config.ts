@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     // One public address: www and the workers.dev address go to the domain.
-    return ["www.gradleap.online", "gradlink.bharatg0904.workers.dev"].map((host) => ({
+    return ["www.gradleap.online", "gradlink.divitkej.workers.dev"].map((host) => ({
       source: "/:path*",
       has: [{ type: "host" as const, value: host }],
       destination: "https://gradleap.online/:path*",

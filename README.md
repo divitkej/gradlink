@@ -139,8 +139,8 @@ and both only run in a visible tab.
 ## Cloudflare
 
 `wrangler.jsonc` defines one Worker, `gradlink`, on the owner's Cloudflare
-account (the one serving `*.bharatg0904.workers.dev`), with static assets and
-one KV namespace, `gradlink-UPLOADS`, whose id is already in `wrangler.jsonc`.
+account (the one serving `*.divitkej.workers.dev` and the `gradleap.online`
+zone), with static assets and one KV namespace, `UPLOADS`, whose id is already in `wrangler.jsonc`.
 It runs next to the Neon database (`placement` in `wrangler.jsonc`), because
 each API request makes several queries in a row.
 

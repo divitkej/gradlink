@@ -38,7 +38,7 @@ Update this file in the same commit as the fix.
 
 ## Needs doing outside the code (before launch)
 
-- [x] **Set `APP_URL`** in `wrangler.jsonc`. Reset emails, upload links and Stripe return URLs use it. Set to `https://gradlink.bharatg0904.workers.dev`; change it with the `SITE_URL` fallback when the custom domain goes live (see `launch.md`). `wrangler.jsonc` · Done in "Move GradLink to the new owner's Neon project and Cloudflare account"
+- [x] **Set `APP_URL`** in `wrangler.jsonc`. Reset emails, upload links and Stripe return URLs use it. Set to `https://gradleap.online`, the same as the `SITE_URL` fallback. `wrangler.jsonc` · Done in "Move GradLink to the new owner's Neon project and Cloudflare account"
 - [x] **Run `npm run db:migrate`** against production Neon to create the `rate_limits` table. Until it exists the per-IP limits are skipped and the Worker logs a warning. Checked on 2026-10-12: `rate_limits` exists on production Neon. No commit (database change)
 - [ ] **Optional, after the custom domain is connected:** add a Cloudflare WAF rate limiting rule on `/api/auth/*` as a second layer. WAF rules attach to your own domain, so they cannot cover the workers.dev address.
 - [x] **Least-privilege database role.** In the Neon project `gradlink`, the role `gradlink_app` has only select, insert, update and delete on the app tables (and on tables `gradlink_owner` creates later), is not a member of `neon_superuser`, and is refused when it tries to create a table. It is the role the app connects as; `gradlink_owner` is kept for `npm run db:migrate` only. Checked on 2026-10-15 by running the whole app as `gradlink_app` against the new database. Done on 2026-10-15, no commit (database change)
