@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Section } from "../ui/Section";
 import { GlassCard } from "../ui/primitives";
 import SampleDataLabel from "./SampleDataLabel";
-import { SectionHeading, AnimatedBar, Reveal } from "../anim/primitives";
+import { SectionHeading, AnimatedBar, Reveal, FILL_EASE, FILL_DURATION, FILL_MARGIN } from "../anim/primitives";
 import HoverExpandStats, { type StatPanel } from "../anim/HoverExpandStats";
 
 const outcomePanels: StatPanel[] = [
@@ -178,8 +178,8 @@ export default function AnalyticsSection() {
               <motion.div
                 initial="hidden"
                 whileInView="show"
-                viewport={{ once: true, margin: "-40px" }}
-                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.3 } } }}
+                viewport={{ once: true, margin: FILL_MARGIN }}
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } } }}
                 style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 96 }}
               >
                 {activity.map((b) => (
@@ -188,7 +188,7 @@ export default function AnalyticsSection() {
                       <motion.div
                         variants={{
                           hidden: { scaleY: 0 },
-                          show: { scaleY: 1, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } },
+                          show: { scaleY: 1, transition: { duration: FILL_DURATION, ease: FILL_EASE } },
                         }}
                         style={{
                           width: "100%",
