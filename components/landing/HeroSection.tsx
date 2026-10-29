@@ -129,7 +129,7 @@ export default function HeroSection() {
               </Button>
             </Magnetic>
             <Magnetic>
-              <Button href="#product" variant="secondary">Explore Platform</Button>
+              <Button href="#platform" variant="secondary">Explore Platform</Button>
             </Magnetic>
           </motion.div>
 

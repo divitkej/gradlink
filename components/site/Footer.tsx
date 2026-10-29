@@ -6,7 +6,7 @@ import Logo from "../Logo";
 const columns: Record<string, { label: string; href: string }[]> = {
   Product: [
     { label: "How it works", href: "/#journey" },
-    { label: "Platform", href: "/#product" },
+    { label: "Platform", href: "/#platform" },
     { label: "Live events", href: "/#live" },
     { label: "Pricing", href: "/pricing" },
   ],
