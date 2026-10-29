@@ -52,7 +52,7 @@ const sections: LegalSection[] = [
           <li>To calculate your résumé, readiness and engagement scores. They are worked out automatically from fixed rules about your profile and event activity. They are guidance only and do not decide anything about you by themselves.</li>
           <li>To check that a coding profile, course certificate or badge you add is real and yours, by looking it up on the site that issued it.</li>
           <li>To keep GradLeap secure, for example locking an account after repeated wrong passwords.</li>
-          <li>To send account emails, such as a link to confirm your email address or reset your password, once email sending is switched on. We will name the service that sends them in this policy before it starts.</li>
+          <li>To send account emails, such as a link to confirm your email address or reset your password.</li>
           <li>To take payment for Placement Pro and keep records the law requires.</li>
           <li>To answer you when you contact us.</li>
         </ul>
@@ -98,6 +98,7 @@ const sections: LegalSection[] = [
           <li><strong>Neon</strong> stores the GradLeap database, in Singapore.</li>
           <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network. Its Web Analytics records the page you visit, the page you came from, your browser, operating system and device type, your country and how fast the page loaded. It sets no cookies, stores nothing in your browser and does not identify you.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
+          <li><strong>Hostinger</strong> sends our account emails, such as email confirmation and password reset links, from no-reply@gradleap.online. It receives your name, email address and the email itself.</li>
           <li>
             <strong>LeetCode, Codeforces, Coursera and Credly</strong>: when you add a coding profile, certificate or badge, our server looks it
             up on that site to check it. We send only the username, certificate code or badge id you entered.
@@ -111,7 +112,7 @@ const sections: LegalSection[] = [
     heading: "Data stored outside the UAE",
     body: (
       <p>
-        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare and Stripe operate. The lookups
+        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare, Stripe and Hostinger operate. The lookups
         described above go to the servers of the site being checked.
         We use these providers because they apply strong security and data protection commitments to the data they hold.
       </p>
