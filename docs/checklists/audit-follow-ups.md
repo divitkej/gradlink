@@ -31,9 +31,9 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 ## Sign in
 
 - [x] **Signed-in people can still open the sign-in page.** `/sign-in` now sends anyone already signed in to their dashboard.
-  `components/gradlink/GradLinkSignIn.tsx` · Phase 4 · Done in "Send signed-in people from the sign-in page to their dashboard"
+  `components/gradleap/GradLeapSignIn.tsx` · Phase 4 · Done in "Send signed-in people from the sign-in page to their dashboard"
 - [x] **Signing in from a scanned QR loses the profile.** The sign-in gate now links to `/sign-in?next=` with the scanned address (including its `?eventId`), and sign-in returns there. Only paths on this site are followed.
-  `components/scan/ViewerGate.tsx`, `components/gradlink/GradLinkSignIn.tsx`, `components/gradlink/SignUpForm.tsx` · Phase 4 · Done in "Return to the scanned profile after signing in from a QR" · Signing up from the gate returns there too, in "Return to the scanned profile after signing up from a QR"
+  `components/scan/ViewerGate.tsx`, `components/gradleap/GradLeapSignIn.tsx`, `components/gradleap/SignUpForm.tsx` · Phase 4 · Done in "Return to the scanned profile after signing in from a QR" · Signing up from the gate returns there too, in "Return to the scanned profile after signing up from a QR"
 
 ## Messages
 

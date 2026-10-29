@@ -76,7 +76,7 @@ export default function Navbar() {
           }}
           aria-label="Main"
         >
-          <Link href="/" onClick={onLogoClick} style={{ textDecoration: "none" }} aria-label="GradLink home">
+          <Link href="/" onClick={onLogoClick} style={{ textDecoration: "none" }} aria-label="GradLeap home">
             <Logo size={22} />
           </Link>
 

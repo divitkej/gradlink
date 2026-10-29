@@ -1,9 +1,9 @@
-import AuthShell from "@/components/gradlink/AuthShell";
-import RoleSelect from "@/components/gradlink/RoleSelect";
+import AuthShell from "@/components/gradleap/AuthShell";
+import RoleSelect from "@/components/gradleap/RoleSelect";
 
 export const metadata = {
-  title: "Join GradLink",
-  description: "Create your GradLink account as a student or a company.",
+  title: "Join GradLeap",
+  description: "Create your GradLeap account as a student or a company.",
 };
 
 export default function SignUp() {

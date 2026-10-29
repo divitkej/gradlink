@@ -13,6 +13,8 @@
    is fetched is built here.
    ============================================================ */
 
+import { SITE_URL } from "@/lib/site";
+
 export interface CredlyBadge {
   id: string;
   name: string;
@@ -27,7 +29,7 @@ export interface CredlyBadge {
 
 export class CredlyError extends Error {}
 
-const UA = "Mozilla/5.0 (compatible; GradLink certificate check; +https://gradlink.app)";
+const UA = `Mozilla/5.0 (compatible; GradLeap certificate check; +${SITE_URL})`;
 const DOWN = "Credly didn't respond. Please try again in a minute.";
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 

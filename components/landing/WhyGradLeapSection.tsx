@@ -14,12 +14,12 @@ const reasons = [
   { icon: CalendarRange, title: "Useful all year round", body: "Workshops, alumni mentoring, internships, employer relations, and outcome reporting." },
 ];
 
-export default function WhyGradLinkSection() {
+export default function WhyGradLeapSection() {
   return (
     <Section id="why" bg="var(--bg-2)">
       <SectionHeading
-        badge="Why GradLink"
-        title="Why choose GradLink for your next campus career fair?"
+        badge="Why GradLeap"
+        title="Why choose GradLeap for your next campus career fair?"
         subtitle="Because a career fair should produce more than attendance numbers. It should produce preparation, engagement, follow-ups, and measurable outcomes."
       />
 

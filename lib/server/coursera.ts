@@ -14,6 +14,8 @@
    the Worker anywhere else.
    ============================================================ */
 
+import { SITE_URL } from "@/lib/site";
+
 export interface VerifiedCertificate {
   code: string;
   /** As shown on the certificate, middle name included. */
@@ -37,7 +39,7 @@ export interface CatalogCourse {
 
 export class CourseraError extends Error {}
 
-const UA = "Mozilla/5.0 (compatible; GradLink certificate check; +https://gradlink.app)";
+const UA = `Mozilla/5.0 (compatible; GradLeap certificate check; +${SITE_URL})`;
 
 /** The certificate code from any of Coursera's certificate link formats. */
 export function certificateCode(link: string): string | null {

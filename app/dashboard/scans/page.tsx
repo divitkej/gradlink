@@ -57,7 +57,7 @@ export default function ScansPage() {
             return (
               <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 22px", borderTop: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", gap: 11, alignItems: "center" }}>
-                  <Avatar name={other?.name ?? "GradLink"} size={32} tone={other?.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
+                  <Avatar name={other?.name ?? "GradLeap"} size={32} tone={other?.role === "company" ? "var(--accent-2)" : "var(--accent)"} />
                   <div>
                     <div style={{ fontSize: 13.5, color: "var(--text)", fontWeight: 500 }}>{mineScanner ? `You scanned ${other?.name ?? "a profile"}` : `${other?.name ?? "Someone"} scanned you`}</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{scanLabel(s.scan_context)}{s.notes ? ` · ${s.notes}` : ""}</div>

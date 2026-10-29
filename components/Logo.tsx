@@ -26,7 +26,7 @@ export default function Logo({ size = 26 }: { size?: number }) {
           color: "var(--text)",
         }}
       >
-        GradLink
+        GradLeap
       </span>
     </span>
   );

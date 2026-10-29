@@ -27,7 +27,7 @@ export default function CTASection() {
           {/* Particle headline */}
           <div>
             <div style={{ marginBottom: 8 }}>
-              <ParticleText text="GradLink" fontSize={64} height={96} color="#FFFFFF" />
+              <ParticleText text="GradLeap" fontSize={64} height={96} color="#FFFFFF" />
             </div>
           </div>
 
@@ -45,7 +45,7 @@ export default function CTASection() {
 
           <div>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: "var(--text-2)", maxWidth: 580, margin: "0 auto 32px" }}>
-              GradLink gives colleges the system to run better events, support students earlier, help employers follow up
+              GradLeap gives colleges the system to run better events, support students earlier, help employers follow up
               faster, and measure what happens after the fair.
             </p>
           </div>

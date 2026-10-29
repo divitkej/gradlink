@@ -33,7 +33,7 @@ export function handleError(scope: string, err: unknown): Response {
   if (err instanceof HttpError) return json({ error: err.message, ...(err.code && { code: err.code }) }, { status: err.status });
   if (err instanceof NotConfiguredError || err instanceof ConfigError) {
     console.error(`[${scope}] not configured:`, err.message);
-    return json({ error: "GradLink isn't connected yet. The server is missing its configuration." }, { status: 503 });
+    return json({ error: "GradLeap isn't connected yet. The server is missing its configuration." }, { status: 503 });
   }
   console.error(`[${scope}]`, err);
   recordError(scope, err);

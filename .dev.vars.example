@@ -1,4 +1,4 @@
-# Local server configuration for GradLink (Cloudflare Workers + Neon).
+# Local server configuration for GradLeap (Cloudflare Workers + Neon).
 #
 #   cp .dev.vars.example .dev.vars
 #
@@ -24,7 +24,7 @@ SMTP_USER=you@gmail.com
 SMTP_PASS=<GMAIL_APP_PASSWORD>
 # Or, once there is a verified domain, Resend instead of SMTP:
 # RESEND_API_KEY=<RESEND_API_KEY>
-# EMAIL_FROM=GradLink <no-reply@your-verified-domain.example>
+# EMAIL_FROM=GradLeap <no-reply@your-verified-domain.example>
 
 # Owner pages under /admin: the owner dashboard and college domain approvals.
 # Comma-separated. These emails also skip the sign-up email rules, so set this

@@ -1,12 +1,12 @@
 /**
- * GradLinkBackground — ONE continuous fixed backdrop rendered behind the
+ * GradLeapBackground — ONE continuous fixed backdrop rendered behind the
  * entire site (mounted once in layout). Every section is transparent so this
  * shows through top-to-bottom, eliminating per-section seams.
  *
  * Matte by design: a still monochrome gradient, a very faint grain, and an
  * edge vignette. No glows and no motion.
  */
-export default function GradLinkBackground() {
+export default function GradLeapBackground() {
   return (
     <div
       aria-hidden

@@ -127,7 +127,7 @@ function SiteCard({ site, row, onSaved, onToggle, onRemove, setMessage }: {
           </ol>
         ) : (
           <ol style={{ ...muted, color: "var(--text-2)", paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
-            <li>Signed in as {row.handle}, submit any code that does not compile to <a href="https://codeforces.com/problemset/problem/4/A" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text)", textDecoration: "underline" }}>problem 4A</a>. A single line like <code style={{ fontSize: 12.5, color: "var(--text)" }}>gradlink</code> in C++ works. It does not affect your rating.</li>
+            <li>Signed in as {row.handle}, submit any code that does not compile to <a href="https://codeforces.com/problemset/problem/4/A" target="_blank" rel="noopener noreferrer" style={{ color: "var(--text)", textDecoration: "underline" }}>problem 4A</a>. A single line like <code style={{ fontSize: 12.5, color: "var(--text)" }}>gradleap</code> in C++ works. It does not affect your rating.</li>
             <li>When Codeforces shows &quot;Compilation error&quot;, press Check below.</li>
           </ol>
         )}

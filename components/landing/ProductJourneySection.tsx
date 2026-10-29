@@ -39,7 +39,7 @@ export default function ProductJourneySection() {
         badge="How It Works"
         align="center"
         title="One platform for the complete career journey."
-        subtitle="GradLink connects preparation, live engagement, follow-up, and outcome reporting in one continuous loop."
+        subtitle="GradLeap connects preparation, live engagement, follow-up, and outcome reporting in one continuous loop."
       />
 
       <div style={{ position: "relative", marginTop: 64 }}>

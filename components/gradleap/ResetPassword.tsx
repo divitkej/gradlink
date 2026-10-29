@@ -85,7 +85,7 @@ export default function ResetPassword() {
         ) : (
           <>
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: 25, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text)", textAlign: "center", marginBottom: 6 }}>Set a new password</h1>
-            <p style={{ fontSize: 13.5, color: "var(--text-muted)", textAlign: "center", marginBottom: 24 }}>Choose a strong password for your GradLink account.</p>
+            <p style={{ fontSize: 13.5, color: "var(--text-muted)", textAlign: "center", marginBottom: 24 }}>Choose a strong password for your GradLeap account.</p>
 
             {!hasSession && (
               <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "var(--amber)", background: "rgba(247,201,72,0.08)", border: "1px solid rgba(247,201,72,0.25)", borderRadius: "var(--r-sm)", padding: "10px 12px", marginBottom: 16 }}>

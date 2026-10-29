@@ -7,7 +7,7 @@ import type { AppRole } from "./session";
    Event lifecycle — creating events, joining them, and listing
    the ones a given person can see.
 
-   GradLink used to be pinned to a single hardcoded event id. Events
+   GradLeap used to be pinned to a single hardcoded event id. Events
    are now real records owned by the college that created them, and
    students and employers join one with a short code.
 
@@ -46,7 +46,7 @@ export const EVENT_STATUS_LABEL: Record<EventStatus, string> = {
 };
 
 function log(scope: string, error: unknown) {
-  if (error) console.warn(`[gradlink/events] ${scope}:`, error);
+  if (error) console.warn(`[gradleap/events] ${scope}:`, error);
 }
 
 /* ---------------- read ---------------- */

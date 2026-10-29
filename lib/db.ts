@@ -4,7 +4,7 @@ import { rpc, api } from "./api-client";
 import type { EngagementCounts } from "./engagement";
 
 /* ============================================================
-   GradLink event-platform data access layer.
+   GradLeap event-platform data access layer.
 
    Each function is a call to the Worker (/api/rpc → lib/server/rpc.ts),
    which runs the query against Neon Postgres and checks that the
@@ -242,7 +242,7 @@ export interface StudentInsights {
 type Result<K extends string, T> = { ok: true } & { [key in K]: T } | { ok: false; error: string };
 
 function log(scope: string, error: unknown) {
-  if (error) console.warn(`[gradlink/db] ${scope}:`, error);
+  if (error) console.warn(`[gradleap/db] ${scope}:`, error);
 }
 
 /** Run an op, logging and falling back to `fallback` on any failure. */

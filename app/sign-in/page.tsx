@@ -1,10 +1,10 @@
-import GradLinkSignIn from "@/components/gradlink/GradLinkSignIn";
+import GradLeapSignIn from "@/components/gradleap/GradLeapSignIn";
 
 export const metadata = {
-  title: "Sign in · GradLink",
-  description: "Sign in to your GradLink career intelligence dashboard.",
+  title: "Sign in · GradLeap",
+  description: "Sign in to your GradLeap career intelligence dashboard.",
 };
 
 export default function SignIn() {
-  return <GradLinkSignIn />;
+  return <GradLeapSignIn />;
 }

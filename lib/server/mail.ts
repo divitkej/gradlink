@@ -23,7 +23,7 @@ export function emailEnabled(): boolean {
  * Two providers, tried in this order:
  *   1. SMTP through an ordinary mailbox (Gmail + app password), over a Workers
  *      TCP socket (lib/server/smtp.ts). Needs no domain. SMTP_USER + SMTP_PASS.
- *   2. Resend's HTTP API, once GradLink has a verified domain.
+ *   2. Resend's HTTP API, once GradLeap has a verified domain.
  *      RESEND_API_KEY + EMAIL_FROM.
  *
  * Returns false when nothing is configured or the provider refused, so the
@@ -41,7 +41,7 @@ export async function sendEmail(msg: { to: string; subject: string; html: string
           port: Number(env.SMTP_PORT) || 465,
           user: env.SMTP_USER!,
           pass: env.SMTP_PASS!,
-          from: env.EMAIL_FROM || `GradLink <${env.SMTP_USER}>`,
+          from: env.EMAIL_FROM || `GradLeap <${env.SMTP_USER}>`,
         },
         msg,
       );

@@ -1,4 +1,4 @@
-// GradLink on Cloudflare Workers — Workers FREE plan only.
+// GradLeap on Cloudflare Workers — Workers FREE plan only.
 //
 // Everything below is available on the Free plan: static assets, Workers KV,
 // workers.dev hosting and Workers Logs. Nothing here needs Workers Paid, and

@@ -50,7 +50,7 @@ export default function ReadinessSection() {
           <SectionHeading
             badge="Student Readiness"
             title="Know who is ready before recruiters arrive."
-            subtitle="GradLink helps career centers identify which students need support before they walk into the fair."
+            subtitle="GradLeap helps career centers identify which students need support before they walk into the fair."
           />
           <div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 40 }}>

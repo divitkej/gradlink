@@ -40,7 +40,7 @@ function Field({
   );
 }
 
-export default function GradLinkSignIn() {
+export default function GradLeapSignIn() {
   const router = useRouter();
   const { session, ready } = useSession();
   const [email, setEmail] = useState("");
@@ -179,7 +179,7 @@ export default function GradLinkSignIn() {
         </p>
 
         <p style={{ fontSize: 13.5, color: "var(--text-2)", textAlign: "center", marginTop: 16 }}>
-          New to GradLink?{" "}
+          New to GradLeap?{" "}
           <CarryNextLink href="/sign-up" className="gl-link" style={{ color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>Create an account</CarryNextLink>
         </p>
 

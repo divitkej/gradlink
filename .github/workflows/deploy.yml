@@ -1,4 +1,4 @@
-# Deploys GradLink to the `gradlink` Worker after every push to main:
+# Deploys GradLeap to the `gradlink` Worker after every push to main:
 #
 #   push to main ─► typecheck + lint ─► Neon schema ─► OpenNext build ─► wrangler deploy ─► health check
 #
@@ -6,7 +6,7 @@
 # Launch board commits carry [skip ci] and do not trigger a deploy.
 #
 # Repository secrets (Settings, Secrets and variables, Actions):
-#   CLOUDFLARE_API_TOKEN   API token with "Edit Cloudflare Workers" on the GradLink account
+#   CLOUDFLARE_API_TOKEN   API token with "Edit Cloudflare Workers" on the GradLeap account
 #   CLOUDFLARE_ACCOUNT_ID  that account's id
 #   NEON_MIGRATE_URL       optional: the Neon owner role's connection string, used only
 #                          for `npm run db:migrate`. The Worker itself uses the

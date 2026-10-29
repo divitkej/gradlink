@@ -76,5 +76,5 @@ These are service promises, not features. Confirm each is true before launch or 
 
 ## Resolved claims
 
-- [x] **"GradLink Technologies LLC" in the footer.** The company is not registered yet, so the footer now reads "© GradLink". Put the registered name back once it exists. Done in "Drop the unregistered company name from the footer"
+- [x] **"GradLink Technologies LLC" in the footer.** The company is not registered yet, so the footer now reads "© GradLeap". Put the registered name back once it exists. Done in "Drop the unregistered company name from the footer"
 - [x] **"UAE data residency" in the CTA section.** False, data is stored in Singapore. Replaced with "Free for students and employers". Done in "Add Privacy Policy and Terms pages"
