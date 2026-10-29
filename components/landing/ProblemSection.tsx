@@ -40,9 +40,15 @@ const stages = [
  */
 function Stage({ stage, index, offset }: { stage: (typeof stages)[number]; index: number; offset: number }) {
   const t = (s: number) => ({ duration: 0.5, ease: EASE, delay: offset + s });
+  // Items appear, hold long enough to read, then are struck one at a time.
   const listStart = 0.55;
-  const strikeStart = listStart + stage.missing.length * 0.12 + 0.35;
-  const verdictAt = strikeStart + stage.missing.length * 0.1 + 0.35;
+  const appearGap = 0.15;
+  const strikeStart = listStart + stage.missing.length * appearGap + 0.7;
+  const strikeGap = 0.45;
+  const strikeTime = 0.6;
+  const verdictAt = strikeStart + (stage.missing.length - 1) * strikeGap + strikeTime + 0.3;
+  const appearAt = (i: number) => listStart + i * appearGap;
+  const strikeAt = (i: number) => strikeStart + i * strikeGap;
 
   return (
     <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.5 }}>
@@ -72,43 +78,47 @@ function Stage({ stage, index, offset }: { stage: (typeof stages)[number]; index
       </motion.p>
 
       <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
-        {stage.missing.map((item, i) => (
-          <motion.li
-            key={item}
-            variants={{
-              hidden: { opacity: 0, x: -8 },
-              show: {
-                opacity: [0, 1, 1, 0.5],
-                x: 0,
-                transition: {
-                  duration: strikeStart + i * 0.1 + 0.4 - (listStart + i * 0.12),
-                  times: [0, 0.15, 0.85, 1],
-                  delay: offset + listStart + i * 0.12,
-                  x: { duration: 0.4, ease: EASE, delay: offset + listStart + i * 0.12 },
-                },
-              },
-            }}
-            style={{ fontSize: 15, color: "var(--text)", width: "fit-content", position: "relative" }}
-          >
-            {item}
-            <motion.span
-              aria-hidden
+        {stage.missing.map((item, i) => {
+          // One opacity track per item: fade in, hold, then dim as its strike draws.
+          const span = strikeAt(i) + strikeTime - appearAt(i);
+          return (
+            <motion.li
+              key={item}
               variants={{
-                hidden: { scaleX: 0 },
-                show: { scaleX: 1, transition: { duration: 0.35, ease: "easeOut", delay: offset + strikeStart + i * 0.1 } },
+                hidden: { opacity: 0, x: -8 },
+                show: {
+                  opacity: [0, 1, 1, 0.5],
+                  x: 0,
+                  transition: {
+                    duration: span,
+                    times: [0, 0.4 / span, (strikeAt(i) - appearAt(i)) / span, 1],
+                    delay: offset + appearAt(i),
+                    x: { duration: 0.4, ease: EASE, delay: offset + appearAt(i) },
+                  },
+                },
               }}
-              style={{
-                position: "absolute",
-                left: -2,
-                right: -2,
-                top: "54%",
-                height: 1.5,
-                background: "var(--text)",
-                transformOrigin: "left center",
-              }}
-            />
-          </motion.li>
-        ))}
+              style={{ fontSize: 15, color: "var(--text)", width: "fit-content", position: "relative" }}
+            >
+              {item}
+              <motion.span
+                aria-hidden
+                variants={{
+                  hidden: { scaleX: 0 },
+                  show: { scaleX: 1, transition: { duration: strikeTime, ease: "easeInOut", delay: offset + strikeAt(i) } },
+                }}
+                style={{
+                  position: "absolute",
+                  left: -2,
+                  right: -2,
+                  top: "54%",
+                  height: 1.5,
+                  background: "var(--text)",
+                  transformOrigin: "left center",
+                }}
+              />
+            </motion.li>
+          );
+        })}
       </ul>
 
       <motion.div
@@ -157,7 +167,7 @@ export default function ProblemSection() {
         }}
       >
         {stages.map((s, i) => (
-          <Stage key={s.phase} stage={s} index={i} offset={wide ? i * 1.4 : 0} />
+          <Stage key={s.phase} stage={s} index={i} offset={wide ? i * 2.6 : 0} />
         ))}
       </div>
 
