@@ -67,7 +67,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
   `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 - [x] **Mobile menu at 375px.** Automated check: opens, closes with X, tapping a link closes it and lands on the section, no horizontal scroll anywhere on the page (fixed a 56px overflow from the sample-data labels).
   `components/site/Navbar.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
-- [x] **Hero and CTA buttons.** Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#product`.
+- [x] **Hero and CTA buttons.** Automated check: Get Started goes to `/sign-up`, Explore Platform goes to `#platform` (renamed from `#product` in "Rename the landing page product anchor to platform").
   `components/landing/HeroSection.tsx`, `CTASection.tsx` · Done in "Fix landing links, sample-data labels and SEO basics"
 
 - [x] **Employer CRM mockup promised scores to employers.** Filters for GPA, readiness score, résumé score and event activity, and a readiness and résumé score on each candidate, contradicted the decision that employers see strengths only. Now shows degree, year, skills, target role and stage filters, and each candidate's target role and skills.
