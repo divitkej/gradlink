@@ -84,7 +84,7 @@ into the build.
 | `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
 | `RESEND_API_KEY` | no | Alternative to SMTP once GradLeap has a verified domain |
 | `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend |
-| `APP_URL` | yes | Public origin used in password-reset links, upload URLs and the Stripe return URL. Set in `wrangler.jsonc` `vars` to `https://gradlink.bharatg0904.workers.dev` until the custom domain is attached. Falls back to the request origin when empty |
+| `APP_URL` | yes | Public origin used in password-reset links, upload URLs and the Stripe return URL. Set in `wrangler.jsonc` `vars` to `https://gradleap.online`. Falls back to the request origin when empty |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can open the owner dashboard at `/admin` and approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Sign up with the email right after setting it, so nobody else can register it. Secret |
 | `NEXT_PUBLIC_SITE_URL` | recommended | **Build-time**, public. Canonical URL for share metadata — see `.env.example` |
@@ -97,11 +97,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
 
 ## Neon
 
-Production database: Neon project `gradlink` (id `round-sun-26602992`) in the
-owner's Neon organisation, Free plan, region `aws-ap-southeast-1` (Singapore,
-as the Privacy Policy states), branch `production`, database `gradlink`.
+Production database: Neon project `Gradlink` (id `plain-tooth-17985241`) in the
+owner's own Neon organisation, Free plan, region `aws-ap-southeast-1`
+(Singapore, as the Privacy Policy states), branch `production`, database
+`neondb`. It has only the `neondb_owner` role so far; give the Worker a
+least-privilege role as below (`gradlink_app`, with `neondb_owner` in place of
+`gradlink_owner` and `neondb` in place of `gradlink`).
 
-It has two roles:
+The intended setup has two roles:
 
 | Role | Can | Used by |
 |---|---|---|
@@ -139,8 +142,8 @@ and both only run in a visible tab.
 ## Cloudflare
 
 `wrangler.jsonc` defines one Worker, `gradlink`, on the owner's Cloudflare
-account (the one serving `*.bharatg0904.workers.dev`), with static assets and
-one KV namespace, `gradlink-UPLOADS`, whose id is already in `wrangler.jsonc`.
+account (the one serving `*.divitkej.workers.dev` and the `gradleap.online`
+zone), with static assets and one KV namespace, `UPLOADS`, whose id is already in `wrangler.jsonc`.
 It runs next to the Neon database (`placement` in `wrangler.jsonc`), because
 each API request makes several queries in a row.
 
@@ -161,7 +164,7 @@ until `DATABASE_URL` and `AUTH_SECRET` are set). Secrets are kept across deploys
 ## Deploy
 
 ```bash
-npm run deploy      # opennextjs-cloudflare build && deploy → https://gradlink.bharatg0904.workers.dev
+npm run deploy      # opennextjs-cloudflare build && deploy → https://gradleap.online
 npm run upload      # same build, uploaded as a preview version without going live
 ```
 

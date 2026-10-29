@@ -31,7 +31,7 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  PRODUCTION_URL: https://gradlink.bharatg0904.workers.dev
+  PRODUCTION_URL: https://gradleap.online
 
 jobs:
   deploy:

@@ -47,6 +47,15 @@ const nextConfig: NextConfig = {
     // on a PDF response can stop the browser's built-in PDF viewer.
     return [{ source: "/:path((?!api/files/).*)", headers: securityHeaders }];
   },
+  async redirects() {
+    // One public address: www and the workers.dev address go to the domain.
+    return ["www.gradleap.online", "gradlink.divitkej.workers.dev"].map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      destination: "https://gradleap.online/:path*",
+      permanent: true,
+    }));
+  },
 };
 
 export default nextConfig;
