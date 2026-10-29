@@ -111,7 +111,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
   background-size: 48px 48px;
 }
 
-.matte-card:hover { border-color: var(--border-strong) !important; }
 
 .text-gradient {
   background: var(--mono-gradient);

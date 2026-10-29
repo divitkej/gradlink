@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ClipboardCheck, Radio, MessageSquareReply, TrendingUp } from "lucide-react";
 import { Section } from "../ui/Section";
-import MatteCard from "./MatteCard";
 import { SectionHeading, RevealGroup, RevealItem } from "../anim/primitives";
 
 const steps = [
@@ -55,62 +54,31 @@ export default function ProductJourneySection() {
           style={{
             transformOrigin: "left center",
             position: "absolute",
-            top: 38,
+            top: 5,
             left: "12.5%",
             right: "12.5%",
-            height: 2,
-            background: "linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent)",
-            opacity: 0.5,
+            height: 1,
+            background: "var(--border-strong)",
           }}
         />
         <div
           className="journey-grid"
-          style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, position: "relative" }}
+          style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 28, position: "relative" }}
         >
           {steps.map((s) => {
             const Icon = s.icon;
             return (
               <RevealItem key={s.n}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-                  {/* Node */}
-                  <div
-                    style={{
-                      width: 76,
-                      height: 76,
-                      borderRadius: "50%",
-                      background: "var(--surface)",
-                      border: "1px solid var(--border-strong)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 22,
-                      boxShadow: "0 0 0 6px rgba(255,255,255,0.05)",
-                      position: "relative",
-                    }}
-                  >
-                    <Icon size={26} color="var(--accent)" strokeWidth={1.5} />
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: -8,
-                        right: -8,
-                        fontFamily: "var(--font-display)",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "var(--accent-2)",
-                        background: "var(--bg)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "var(--r-full)",
-                        padding: "2px 8px",
-                      }}
-                    >
-                      {s.n}
-                    </span>
-                  </div>
-                  <MatteCard style={{ padding: 22, width: "100%" }}>
-                    <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{s.phase}</h3>
-                    <p style={{ fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)" }}>{s.body}</p>
-                  </MatteCard>
+                  {/* Dot on the line */}
+                  <span
+                    aria-hidden
+                    style={{ width: 11, height: 11, borderRadius: "50%", background: "var(--accent)", marginBottom: 26 }}
+                  />
+                  <Icon size={24} color="var(--accent)" strokeWidth={1.5} style={{ marginBottom: 16 }} />
+                  <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", color: "var(--text-muted)", marginBottom: 8 }}>{s.n}</div>
+                  <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--text)", marginBottom: 10 }}>{s.phase}</h3>
+                  <p style={{ fontSize: 13.5, lineHeight: 1.7, color: "var(--text-2)", maxWidth: 260 }}>{s.body}</p>
                 </div>
               </RevealItem>
             );
@@ -120,7 +88,7 @@ export default function ProductJourneySection() {
 
       <style>{`
         @media (max-width: 980px) {
-          .journey-grid { grid-template-columns: 1fr 1fr !important; gap: 32px 20px !important; }
+          .journey-grid { grid-template-columns: 1fr 1fr !important; gap: 48px 24px !important; }
           .journey-line { display: none !important; }
         }
         @media (max-width: 560px) { .journey-grid { grid-template-columns: 1fr !important; } }

@@ -235,10 +235,6 @@ export function SectionHeading({
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: accent,
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid var(--border-strong)",
-            borderRadius: "var(--r-full)",
-            padding: "5px 14px",
             marginBottom: 20,
           }}
         >

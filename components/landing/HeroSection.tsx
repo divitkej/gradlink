@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import AnimatedTextCycle from "../anim/AnimatedTextCycle";
 import Magnetic from "../anim/Magnetic";
 import HeroDashboard from "./HeroDashboard";
-import { Button, Badge } from "../ui/primitives";
+import { Button } from "../ui/primitives";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -47,7 +47,10 @@ export default function HeroSection() {
         {/* Left copy */}
         <div>
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
-            <Badge tone="cyan" pulse>Career Event Intelligence · UAE</Badge>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--accent)" }}>
+              <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)" }} />
+              Career Event Intelligence · UAE
+            </span>
           </motion.div>
 
           <motion.h1
