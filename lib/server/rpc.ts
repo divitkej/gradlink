@@ -14,6 +14,8 @@ import {
 } from "./coding";
 import { CODING_SITE_LABEL } from "../scores";
 import { CredlyError, credlyBadgeId, fetchCredlyBadge, emailMatches } from "./credly";
+import { domainStatusFor } from "./college-domains";
+import { OPERATOR } from "../site";
 
 /* ============================================================
    /api/rpc: every data operation the browser asks for, run in the
@@ -905,7 +907,11 @@ export const ops: Record<string, Op> = {
     const found = await resolveCode(c);
     return found ? forViewer(u, found.event) : null;
   },
-  /** Any college can create an event; it is always owned by the caller. */
+  /**
+   * A college creates events once the owner has approved its students' email
+   * domain, so an unreviewed account can't invite employers to an event.
+   * Owner addresses (ADMIN_EMAILS) are exempt. The event is always owned by the caller.
+   */
   async createEvent(u, [input]) {
     const i = (input ?? {}) as Row;
     const title = s(i.title).trim().slice(0, 200);
@@ -913,6 +919,17 @@ export const ops: Record<string, Op> = {
     if (!i.createdBy) return { ok: false, error: "We couldn't tell which account is creating this event." };
     isMe(u, i.createdBy);
     if (u.role !== "event_manager") throw forbidden();
+    if (!isAdmin(u)) {
+      const reg = await domainStatusFor(u.id);
+      if (reg?.status !== "approved") {
+        return {
+          ok: false,
+          error: reg?.status === "pending"
+            ? `You can create events once your students' email domain @${reg.domain} is approved. It is being reviewed now.`
+            : `Your college isn't approved to create events yet. Email ${OPERATOR.email} from your official address to have it reviewed.`,
+        };
+      }
+    }
     const status = EVENT_STATUSES.includes(s(i.status)) ? s(i.status) : "upcoming";
 
     const sql = db();
