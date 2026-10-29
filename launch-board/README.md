@@ -4,14 +4,15 @@
 
 ![Launch progress](progress.svg)
 
-**146 of 166 done (88%).** 0 in progress, 20 left. Checklists last changed 2026-10-29.
+**146 of 166 done (88%).** 2 in progress, 20 left. Checklists last changed 2026-10-29.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "Needs the owner" : 14
+  "In progress" : 2
+  "Needs the owner" : 12
   "To do" : 1
   "Verify live" : 3
   "Parked by decision" : 2
@@ -26,7 +27,7 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 87% | 13 | 0 | 2 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 74% | 39 | 0 | 14 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 74% | 39 | 2 | 14 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `████████████` 97% | 63 | 0 | 2 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 75% | 6 | 0 | 2 |
@@ -90,12 +91,15 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 39 of 53 done, 0 in progress, 14 left.
+**Ongoing.** 39 of 53 done, 2 in progress, 14 left.
+
+**Ongoing**
+
+- [ ] Point deploys and secrets at the divitkej account · [PR #51](https://github.com/divitkej/gradlink/pull/51) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)
+- [ ] Custom domain · [PR #51](https://github.com/divitkej/gradlink/pull/51) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)
 
 **Left**
 
-- [ ] Point deploys and secrets at the divitkej account · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)
-- [ ] Custom domain · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)
 - [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
 - [ ] Optional, after the custom domain is connected · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L43)
 - [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L45)
@@ -293,14 +297,13 @@ Features that should work, checked once on a real device or the live site.
 
 ## In progress
 
-Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
+- [ ] **Point deploys and secrets at the divitkej account** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17) · [PR #51](https://github.com/divitkej/gradlink/pull/51)<br><sub>Owner action. In GitHub (Settings, Secrets and variables, Actions) replace `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` with a token and id from the divitkej account; the… · id `launch/point-deploys-and-secrets-at-the`</sub>
+- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26) · [PR #51](https://github.com/divitkej/gradlink/pull/51)<br><sub>`gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in "Serve GradLink… · id `launch/custom-domain`</sub>
 
 ## Left to do
 
-### Needs the owner (14)
+### Needs the owner (12)
 
-- [ ] **Point deploys and secrets at the divitkej account** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)<br><sub>Owner action. In GitHub (Settings, Secrets and variables, Actions) replace `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` with a token and id from the divitkej account; the… · id `launch/point-deploys-and-secrets-at-the`</sub>
-- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)<br><sub>`gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in "Serve GradLink… · id `launch/custom-domain`</sub>
 - [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>

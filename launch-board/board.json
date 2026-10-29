@@ -6,8 +6,8 @@
     "open": 20,
     "percent": 88,
     "counts": {
-      "in_progress": 0,
-      "owner": 14,
+      "in_progress": 2,
+      "owner": 12,
       "todo": 1,
       "verify": 3,
       "parked": 2,
@@ -20,8 +20,8 @@
       "name": "Launch",
       "total": 14,
       "counts": {
-        "in_progress": 0,
-        "owner": 3,
+        "in_progress": 2,
+        "owner": 1,
         "todo": 1,
         "verify": 0,
         "parked": 0,
@@ -183,8 +183,8 @@
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
       "total": 53,
       "counts": {
-        "in_progress": 0,
-        "owner": 12,
+        "in_progress": 2,
+        "owner": 10,
         "todo": 1,
         "verify": 0,
         "parked": 1,
@@ -246,10 +246,16 @@
       "line": 17,
       "title": "Point deploys and secrets at the divitkej account",
       "detail": "Owner action. In GitHub (Settings, Secrets and variables, Actions) replace `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` with a token and id from the divitkej account; the token needs Workers Scripts edit, Workers KV edit, and Zone DNS edit plus Workers Routes edit on `gradleap.online`. The divitkej `gradlink` Worker already has `ADMIN_EMAILS`, `AUTH_SECRET` and `DATABASE_URL`. By decision its `DATABASE_URL` stays as it is, on the owner's own Neon project `Gradlink` (`plain-tooth-17985241`), not the bharatg0904 copy's data; `db/schema.sql` was applied there on 2026-10-29 (adds `alumni` and `offers`) after a backup branch `backup-before-gradleap-2026-10-29`. That project has only the `neondb_owner` role, so the Worker's `DATABASE_URL` is most likely the owner role: create `gradlink_app` there (README.md, Neon) and switch the secret to it. Add any other secret from README.md (Cloudflare) the site needs, such as Stripe.",
-      "state": "owner",
+      "state": "in_progress",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/point-deploys-and-secrets-at-the"
+      "id": "launch/point-deploys-and-secrets-at-the",
+      "pr": {
+        "number": 51,
+        "title": "Fix the www home page redirect and keep workers.dev redirecting",
+        "url": "https://github.com/divitkej/gradlink/pull/51",
+        "draft": false
+      }
     },
     {
       "area": "launch",
@@ -258,10 +264,16 @@
       "line": 26,
       "title": "Custom domain",
       "detail": "`gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in \"Serve GradLink on gradleap.online\": `wrangler.jsonc` attaches `gradleap.online` and `www.gradleap.online` to the `gradlink` Worker on deploy, `APP_URL`, the `SITE_URL` fallback and the deploy health check use it, and www and the workers.dev address redirect to it (`next.config.ts`). The zone is active in the divitkej Cloudflare account, the same account as the Worker. Still open, owner action before merging: in Cloudflare DNS delete the parked-page `A gradleap.online 2.57.91.91` record and the `CNAME www` record (keep the Hostinger MX, SPF, DMARC, DKIM, autoconfig and autodiscover records), and finish the item above. Then merge to main and check `https://gradleap.online/api/health`. `wrangler.jsonc`, `lib/site.ts`, `next.config.ts`, `.github/workflows/deploy.yml`",
-      "state": "owner",
+      "state": "in_progress",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/custom-domain"
+      "id": "launch/custom-domain",
+      "pr": {
+        "number": 51,
+        "title": "Fix the www home page redirect and keep workers.dev redirecting",
+        "url": "https://github.com/divitkej/gradlink/pull/51",
+        "draft": false
+      }
     },
     {
       "area": "launch",
