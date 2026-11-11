@@ -48,6 +48,9 @@
   // DNS records and certificates. The zone must be in the same Cloudflare
   // account, and no other A, AAAA or CNAME record may exist for either name.
   // www redirects to the bare domain (next.config.ts).
+  // Keep the workers.dev address on, so old links redirect there too: adding
+  // routes turns it off unless workers_dev is set.
+  "workers_dev": true,
   "routes": [
     { "pattern": "gradleap.online", "custom_domain": true },
     { "pattern": "www.gradleap.online", "custom_domain": true }
