@@ -98,7 +98,7 @@ const sections: LegalSection[] = [
           <li><strong>Neon</strong> stores the GradLeap database, in Singapore.</li>
           <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network. Its Web Analytics records the page you visit, the page you came from, your browser, operating system and device type, your country and how fast the page loaded. It sets no cookies, stores nothing in your browser and does not identify you.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
-          <li><strong>Hostinger</strong> sends our account emails, such as email confirmation and password reset links, from no-reply@gradleap.online. It receives your name, email address and the email itself.</li>
+          <li><strong>Hostinger</strong> sends our account emails, such as email confirmation and password reset links, from contact@gradleap.online. It receives your name, email address and the email itself.</li>
           <li>
             <strong>LeetCode, Codeforces, Coursera and Credly</strong>: when you add a coding profile, certificate or badge, our server looks it
             up on that site to check it. We send only the username, certificate code or badge id you entered.
