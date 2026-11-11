@@ -7,9 +7,9 @@
     "percent": 88,
     "counts": {
       "in_progress": 0,
-      "owner": 11,
+      "owner": 10,
       "todo": 1,
-      "verify": 6,
+      "verify": 7,
       "parked": 2,
       "done": 153
     }
@@ -112,9 +112,9 @@
       "total": 30,
       "counts": {
         "in_progress": 0,
-        "owner": 4,
+        "owner": 3,
         "todo": 0,
-        "verify": 1,
+        "verify": 2,
         "parked": 0,
         "done": 25
       }
@@ -184,9 +184,9 @@
       "total": 59,
       "counts": {
         "in_progress": 0,
-        "owner": 9,
+        "owner": 8,
         "todo": 1,
-        "verify": 3,
+        "verify": 4,
         "parked": 1,
         "done": 45
       },
@@ -315,18 +315,6 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 49,
-      "title": "Account verification",
-      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Still open: confirming the email itself needs a working sender. Hostinger SMTP cannot be reached from the Worker, so the fix is Resend (see `launch.md`, account email).",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/account-verification"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
       "line": 50,
       "title": "Revoke the exposed 21st.dev API key",
       "detail": "It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev account that issued it (it was committed by the previous owner): revoke it at 21st.dev, create a new one and keep it in the `TWENTY_FIRST_API_KEY` environment variable. The git history is not rewritten: checked on 2026-10-29, 46 of the 60 pull request refs on GitHub (`refs/pull/*/head`) hold the key, and GitHub keeps those read-only, so a rewrite of `main` would break every branch and clone and still leave the key public. Revoking it is the fix.",
@@ -377,7 +365,7 @@
       "section": "Domain and email",
       "line": 31,
       "title": "Account email: confirm email and password reset",
-      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: `contact@gradleap.online`. Hostinger SMTP was switched on with the `SMTP_PASS` secret on 2026-11-11 but cannot work: `smtp.hostinger.com` and every other Hostinger mail host sit on Cloudflare IP addresses, which Worker TCP sockets are not allowed to reach, so every send failed (a live reset request returned 502). Email now goes through Resend's HTTP API from the same address (`wrangler.jsonc`, Privacy Policy names Resend), in \"Send account email through Resend\". The owner added `gradleap.online` in Resend and its DNS records (`resend._domainkey`, `send`) on 2026-11-11, with the Hostinger MX records kept. Still open: confirm the `RESEND_API_KEY` secret is set and the item below passes. Done in \"Send account email through Gmail and require email confirmation\" · Moved to Resend in \"Send account email through Resend\"",
+      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: `contact@gradleap.online`. Hostinger SMTP was switched on with the `SMTP_PASS` secret on 2026-11-11 but cannot work: `smtp.hostinger.com` and every other Hostinger mail host sit on Cloudflare IP addresses, which Worker TCP sockets are not allowed to reach, so every send failed (a live reset request returned 502). Email now goes through Resend's HTTP API from the same address (`wrangler.jsonc`, Privacy Policy names Resend), in \"Send account email through Resend\". The owner added `gradleap.online` in Resend and its DNS records (`resend._domainkey`, `send`) on 2026-11-11, with the Hostinger MX records kept. Checked on 2026-11-11 after the Resend deploy (22:25 UTC): the live site has email switched on, and with the SMTP settings gone only `RESEND_API_KEY` can do that, so the key is set. Still open: the item below passes. The unused `SMTP_PASS` secret can be deleted with `npx wrangler secret delete SMTP_PASS`. Done in \"Send account email through Gmail and require email confirmation\" · Moved to Resend in \"Send account email through Resend\"",
       "state": "todo",
       "doneIn": "Send account email through Gmail and require email confirmation",
       "phase": "3",
@@ -401,7 +389,7 @@
       "section": "Domain and email",
       "line": 33,
       "title": "Verify live: a confirm email and a reset email arrive",
-      "detail": "A new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
+      "detail": "Urgent: email is on, so a new account cannot sign in until its confirm link arrives, and a broken sender blocks every sign-up. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
       "state": "verify",
       "doneIn": null,
       "phase": "3",
@@ -442,6 +430,18 @@
       "doneIn": null,
       "phase": "5",
       "id": "student-dashboard/two-account-run-on-real-phones"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 49,
+      "title": "Account verification",
+      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Email now goes through Resend and is switched on (checked on 2026-11-11). Still open: one real confirm email arrives (`launch.md`, verify live: a confirm email and a reset email arrive).",
+      "state": "verify",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/account-verification"
     },
     {
       "area": "security",
