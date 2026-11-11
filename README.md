@@ -28,7 +28,7 @@ no always-on database compute.
 | Auth | Email + password in `lib/server/auth-api.ts`; HttpOnly signed session cookie |
 | Authorization | Per-operation checks in `lib/server/rpc.ts` |
 | File uploads | Workers KV namespace `UPLOADS` (`lib/server/files.ts`) |
-| Account email (confirm email, password reset) | SMTP from the Worker (`lib/server/smtp.ts`) through the Hostinger mailbox `contact@gradleap.online`; Resend is the alternative (`lib/server/mail.ts`) |
+| Account email (confirm email, password reset) | Resend's HTTP API from `contact@gradleap.online` (`lib/server/mail.ts`); SMTP over a Worker socket is the alternative (`lib/server/smtp.ts`) |
 | Payments | Stripe Checkout + webhook (`app/api/checkout`, `app/api/stripe/webhook`) |
 
 ## Stack
@@ -61,7 +61,7 @@ links are printed to the dev server console instead of emailed (SMTP needs the
 Workers runtime, so use `npm run preview` to send real mail locally).
 
 Email confirmation is enforced only when the server can send email. Without
-`SMTP_PASS` (or Resend) new accounts are confirmed on creation.
+`RESEND_API_KEY` (or SMTP) new accounts are confirmed on creation.
 
 To run the real Workers build locally (workerd, same as production):
 
@@ -79,11 +79,11 @@ into the build.
 |---|---|---|
 | `DATABASE_URL` | yes | Neon **pooled** connection string for the `gradlink_app` role (see Neon below). Use the owner role only for `npm run db:migrate` |
 | `AUTH_SECRET` | yes | ≥32 random characters; signs session cookies |
-| `SMTP_USER` | for account email | Mailbox that sends mail. Set in `wrangler.jsonc` `vars` to `contact@gradleap.online` (Hostinger Mail) |
-| `SMTP_PASS` | for account email | That mailbox's password. Secret. Email stays off until it is set |
-| `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465`. Set in `wrangler.jsonc` to `smtp.hostinger.com` and `465` |
-| `RESEND_API_KEY` | no | Alternative to SMTP once GradLeap has a verified domain |
-| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend. Set in `wrangler.jsonc` to `GradLeap <contact@gradleap.online>` |
+| `SMTP_USER` | no | Alternative to Resend: mailbox that sends mail over SMTP (e.g. a Gmail). Not set in production. Hostinger's SMTP servers can't be used, because Worker sockets can't reach Cloudflare IP addresses and Hostinger's mail servers sit on them |
+| `SMTP_PASS` | no | That mailbox's password (a Gmail app password). Secret. Takes priority over Resend when `SMTP_USER` is also set |
+| `SMTP_HOST`, `SMTP_PORT` | no | Default `smtp.gmail.com` and `465` |
+| `RESEND_API_KEY` | for account email | Resend API key with sending access for the verified domain `gradleap.online`. Secret. Email stays off until it is set |
+| `EMAIL_FROM` | no | Sender shown in email. Defaults to `GradLeap <SMTP_USER>`; required with Resend. Set in `wrangler.jsonc` `vars` to `GradLeap <contact@gradleap.online>` |
 | `APP_URL` | yes | Public origin used in password-reset links, upload URLs and the Stripe return URL. Set in `wrangler.jsonc` `vars` to `https://gradleap.online`. Falls back to the request origin when empty |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PRO` | for Placement Pro | Stripe keys |
 | `ADMIN_EMAILS` | for `/admin` | Comma-separated emails that can open the owner dashboard at `/admin` and approve college domains at `/admin/colleges`. These emails also skip the sign-up email rules. Sign up with the email right after setting it, so nobody else can register it. Secret |
@@ -154,8 +154,15 @@ npx wrangler login
 npx wrangler secret put DATABASE_URL          # gradlink_app's pooled connection string
 npx wrangler secret put AUTH_SECRET           # a new random value (command above)
 npx wrangler secret put ADMIN_EMAILS          # your email, then sign up with it straight away
-npx wrangler secret put SMTP_PASS             # contact@gradleap.online's password; turns on email confirmation and password reset
+npx wrangler secret put RESEND_API_KEY        # Resend API key; turns on email confirmation and password reset
 ```
+
+Account email goes out through Resend from `contact@gradleap.online`. In
+Resend, add the domain `gradleap.online` and add the DNS records it lists
+(`resend._domainkey` and the `send` subdomain) in Cloudflare DNS, DNS only.
+They leave the Hostinger MX records alone, so replies still reach the
+`contact@gradleap.online` inbox at Hostinger. Set `RESEND_API_KEY` only once
+the domain shows Verified, since sign-ups wait for the confirmation email.
 
 If the Worker does not exist yet, `wrangler secret put` offers to create it;
 or run `npm run deploy` first and set the secrets after (the site answers 503

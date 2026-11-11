@@ -22,7 +22,7 @@ APP_URL=http://localhost:3000
 # Workers runtime, so real mail only goes out from `npm run preview` or deploy.
 SMTP_USER=you@gmail.com
 SMTP_PASS=<GMAIL_APP_PASSWORD>
-# Or, once there is a verified domain, Resend instead of SMTP:
+# Or Resend instead of SMTP (production uses Resend):
 # RESEND_API_KEY=<RESEND_API_KEY>
 # EMAIL_FROM=GradLeap <no-reply@your-verified-domain.example>
 
