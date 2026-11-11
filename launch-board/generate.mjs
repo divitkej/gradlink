@@ -139,7 +139,7 @@ function parseChecklist(file) {
     if (!cur) return;
     const body = [cur.rest, ...cur.cont].join(" ").replace(/\s+/g, " ").trim();
     const doneIn = (body.match(/Done in "([^"]+)"/) || [])[1] || null;
-    const state = cur.checked ? "done" : classify(body, cur.section);
+    const state = cur.checked ? "done" : classify(`${cur.title} ${body}`, cur.section);
     items.push({
       area: key, areaName: area, section: cur.section, line: cur.line,
       title: cleanTitle(cur.title), detail: body, state, doneIn, kind: "checkbox",

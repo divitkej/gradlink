@@ -4,18 +4,17 @@
 
 ![Launch progress](progress.svg)
 
-**152 of 170 done (89%).** 0 in progress, 18 left. Checklists last changed 2026-11-11.
+**155 of 173 done (90%).** 0 in progress, 18 left. Checklists last changed 2026-11-11.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "Needs the owner" : 11
-  "To do" : 2
-  "Verify live" : 3
+  "Needs the owner" : 10
+  "Verify live" : 6
   "Parked by decision" : 2
-  "Done" : 152
+  "Done" : 155
 ```
 
 ## By phase
@@ -26,7 +25,7 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 87% | 13 | 0 | 2 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 79% | 44 | 0 | 12 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `██████████░░` 80% | 47 | 0 | 12 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `████████████` 97% | 63 | 0 | 2 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 78% | 7 | 0 | 2 |
@@ -90,24 +89,24 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 44 of 56 done, 0 in progress, 12 left.
+**Ongoing.** 47 of 59 done, 0 in progress, 12 left.
 
 **Left**
 
-- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
+- [ ] Least-privilege database role · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)
+- [ ] Test accounts in the production database · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)
 - [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)
 - [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)
-- [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)
 - [ ] Revoke the exposed 21st.dev API key · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L50)
-- [ ] Verify live · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L52)
 - [ ] Confirm the claim "Setup in 48 hours" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)
 - [ ] Confirm the claim "No contract lock-in" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)
 - [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
-- [ ] Least-privilege database role · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)
-- [ ] Verify live · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)
+- [ ] Verify live · Verify live · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)
+- [ ] Verify live: a confirm email and a reset email arrive · Verify live · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)
+- [ ] Verify live: QR scanner camera on a phone · Verify live · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L53)
 - [ ] Promises features that are not built · Parked by decision · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)
 
-<details><summary>Done (44)</summary>
+<details><summary>Done (47)</summary>
 
 - [x] Neon project and tables created
 - [x] Worker points at the owner's KV namespace
@@ -116,6 +115,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [x] Only Neon and Cloudflare in the repo
 - [x] Cloudflare GitHub builds fail on every commit
 - [x] Custom domain
+- [x] Account email: confirm email and password reset
 - [x] Privacy Policy page
 - [x] Terms and Conditions page
 - [x] "UAE data residency" claim removed
@@ -150,7 +150,9 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [x] Run `npm run db:migrate`
 - [x] Cloudflare WAF rate limit on the auth endpoints
 - [x] Least-privilege database role
+- [x] Account verification
 - [x] Email authentication (DKIM)
+- [x] Verify live: security headers
 - [x] "GradLink Technologies LLC" in the footer
 - [x] "UAE data residency" in the CTA section
 
@@ -283,48 +285,45 @@ Features that should work, checked once on a real device or the live site.
 
 | Area | Progress | Done | Left | Checklist |
 |---|---|---|---|---|
-| Launch | `██████████░░` 80% | 12 | 3 | [launch.md](../docs/checklists/launch.md) |
+| Launch | `█████████░░░` 76% | 13 | 4 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 84% | 16 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 91% | 10 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
 | Dashboard | `███████████░` 93% | 13 | 1 | [dashboard.md](../docs/checklists/dashboard.md) |
 | Audit follow-ups | `███████████░` 92% | 11 | 1 | [audit-follow-ups.md](../docs/checklists/audit-follow-ups.md) |
 | Student dashboard | `████████████` 97% | 32 | 1 | [student-dashboard.md](../docs/checklists/student-dashboard.md) |
-| Security | `██████████░░` 83% | 24 | 5 | [security.md](../docs/checklists/security.md) |
+| Security | `██████████░░` 87% | 26 | 4 | [security.md](../docs/checklists/security.md) |
 | Features to build | `████████░░░░` 70% | 7 | 3 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `███████████░` **89%** | **152** | **18** | |
+| **All** | `███████████░` **90%** | **155** | **18** | |
 
 ## In progress
 
-Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
+Open pull requests were not read on this run (no GitHub token), so nothing shows as in progress.
 
 ## Left to do
 
-### Needs the owner (11)
+### Needs the owner (10)
 
-- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
+- [ ] **Least-privilege database role** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)<br><sub>`gradlink_app` was created on the `production` branch of `Gradlink` on 2026-10-29 (select, insert, update and delete on all 35 tables, no admin rights). Checked on 2026-11-11:… · id `launch/least-privilege-database-role`</sub>
+- [ ] **Test accounts in the production database** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>Checked on 2026-11-11: four of the six accounts in production are on `example.com` (one company, two colleges and one student, all created on 2026-10-06 during testing), so they… · id `launch/test-accounts-in-the-production-database`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)<br><sub>Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which… · id `security/backups`</sub>
 - [ ] **Secrets** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)<br><sub>Confirm `AUTH_SECRET` is 32+ random characters and differs between local and production. Use Stripe live keys only in production. Checked on 2026-10-29: the Worker's secrets are… · id `security/secrets`</sub>
-- [ ] **Account verification** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)<br><sub>Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that… · id `security/account-verification`</sub>
 - [ ] **Revoke the exposed 21st.dev API key** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L50)<br><sub>It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev… · id `security/revoke-the-exposed-21st-dev-api`</sub>
-- [ ] **Verify live** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L52)<br><sub>after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone. · id `security/verify-live`</sub>
 - [ ] **Confirm the claim "Setup in 48 hours"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)<br><sub>Where: CTA section · id `features-to-build/setup-in-48-hours`</sub>
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
 
-### To do (2)
+### Verify live (6)
 
-- [ ] **Least-privilege database role** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)<br><sub>The `Gradlink` project has only the `neondb_owner` role, so the Worker's `DATABASE_URL` is most likely the owner role. Create `gradlink_app` there (README.md, Neon), switch the… · id `launch/least-privilege-database-role`</sub>
 - [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)<br><sub>After the first deploy, `https://gradleap.online/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in… · id `launch/verify-live`</sub>
-
-### Verify live (3)
-
+- [ ] **Verify live: a confirm email and a reset email arrive** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)<br><sub>Now that email is on, a new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Two password reset links were requested on 2026-11-11… · id `launch/verify-live-a-confirm-email-and`</sub>
 - [ ] **Opening hero on a low-end phone** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L58)<br><sub>WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU… · id `landing-page/opening-hero-on-a-low-end-phone`</sub>
 - [ ] **Link preview card** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)<br><sub>Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in "Replace the G logo with a graduation cap");… · id `landing-page/link-preview-card`</sub>
 - [ ] **Two-account run on real phones** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L93)<br><sub>Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live · id `student-dashboard/two-account-run-on-real-phones`</sub>
+- [ ] **Verify live: QR scanner camera on a phone** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L53)<br><sub>Open the scanner on a real phone, allow the camera, and scan an event QR code. · id `security/verify-live-qr-scanner-camera-on`</sub>
 
 ### Parked by decision (2)
 
@@ -333,7 +332,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ## Done
 
-<details><summary><b>Launch</b>: 12 done</summary>
+<details><summary><b>Launch</b>: 13 done</summary>
 
 - [x] Neon project and tables created
 - [x] Worker points at the owner's KV namespace <sub>Done in "Move the Worker back to the divitkej Cloudflare account"</sub>
@@ -342,6 +341,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] Only Neon and Cloudflare in the repo <sub>Done in "Remove Vercel, Supabase and Firebase leftovers"</sub>
 - [x] Cloudflare GitHub builds fail on every commit <sub>Done in "Deploy from main with GitHub Actions and add a health check"</sub>
 - [x] Custom domain <sub>Done in "Serve GradLink on gradleap.online"</sub>
+- [x] Account email: confirm email and password reset <sub>Done in "Send account email through Gmail and require email confirmation"</sub>
 - [x] Privacy Policy page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] Terms and Conditions page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] "UAE data residency" claim removed <sub>Done in "Add Privacy Policy and Terms pages"</sub>
@@ -473,7 +473,7 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 </details>
 
-<details><summary><b>Security</b>: 24 done</summary>
+<details><summary><b>Security</b>: 26 done</summary>
 
 - [x] Event data was readable by any signed-in account <sub>Done in "Lock down the data API, uploads and response headers"</sub>
 - [x] A replaced student code kept working on older events <sub>Done in "Make a replaced join code stop working on older events"</sub>
@@ -498,7 +498,9 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [x] Run `npm run db:migrate`
 - [x] Cloudflare WAF rate limit on the auth endpoints
 - [x] Least-privilege database role
+- [x] Account verification <sub>Done in "Refresh the launch checklists from live checks"</sub>
 - [x] Email authentication (DKIM)
+- [x] Verify live: security headers <sub>Done in "Refresh the launch checklists from live checks"</sub>
 
 </details>
 
