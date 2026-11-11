@@ -2,16 +2,16 @@
   "updated": "2026-11-11",
   "totals": {
     "total": 173,
-    "done": 155,
-    "open": 18,
-    "percent": 90,
+    "done": 153,
+    "open": 20,
+    "percent": 88,
     "counts": {
       "in_progress": 0,
-      "owner": 10,
+      "owner": 12,
       "todo": 0,
       "verify": 6,
       "parked": 2,
-      "done": 155
+      "done": 153
     }
   },
   "areas": [
@@ -21,11 +21,11 @@
       "total": 17,
       "counts": {
         "in_progress": 0,
-        "owner": 2,
+        "owner": 3,
         "todo": 0,
         "verify": 2,
         "parked": 0,
-        "done": 13
+        "done": 12
       }
     },
     {
@@ -112,11 +112,11 @@
       "total": 30,
       "counts": {
         "in_progress": 0,
-        "owner": 3,
+        "owner": 4,
         "todo": 0,
         "verify": 1,
         "parked": 0,
-        "done": 26
+        "done": 25
       }
     },
     {
@@ -184,11 +184,11 @@
       "total": 59,
       "counts": {
         "in_progress": 0,
-        "owner": 8,
+        "owner": 10,
         "todo": 0,
         "verify": 3,
         "parked": 1,
-        "done": 47
+        "done": 45
       },
       "status": "Ongoing"
     },
@@ -264,6 +264,18 @@
       "id": "launch/test-accounts-in-the-production-database"
     },
     {
+      "area": "launch",
+      "areaName": "Launch",
+      "section": "Domain and email",
+      "line": 31,
+      "title": "Account email: confirm email and password reset",
+      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender chosen: `contact@gradleap.online`, set in `wrangler.jsonc` with Hostinger named in the Privacy Policy, in \"Send account email from contact@gradleap.online\". The owner set `SMTP_PASS` on 2026-11-11, which switched email on, but every send fails: `smtp.hostinger.com` and every other Hostinger mail host sit on Cloudflare IP addresses, which Worker TCP sockets are not allowed to reach. Two reset links requested on 2026-11-11 were never opened. While this is the case, a new account cannot receive its confirm link and cannot sign in (checked on 2026-11-11: no account is stuck yet). Owner action now: run `npx wrangler secret delete SMTP_PASS` so new accounts are confirmed on creation again. Fix: the open pull request \"Send account email through Resend\" moves sending to Resend; after it merges, add `gradleap.online` in Resend and its DNS records in Cloudflare, wait for Verified, then set the `RESEND_API_KEY` secret. Done in \"Send account email through Gmail and require email confirmation\" · Paused in \"Pause account email from the personal Gmail\"",
+      "state": "owner",
+      "doneIn": "Send account email through Gmail and require email confirmation",
+      "phase": "3",
+      "id": "launch/account-email-confirm-email-and-password"
+    },
+    {
       "area": "organiser-access",
       "areaName": "Organiser access",
       "section": "Owner actions before deploying",
@@ -310,6 +322,18 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/secrets"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 49,
+      "title": "Account verification",
+      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Still open: confirming the email itself needs a working sender. Hostinger SMTP cannot be reached from the Worker, so the fix is Resend (see `launch.md`, account email).",
+      "state": "owner",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/account-verification"
     },
     {
       "area": "security",
@@ -377,7 +401,7 @@
       "section": "Domain and email",
       "line": 33,
       "title": "Verify live: a confirm email and a reset email arrive",
-      "detail": "Now that email is on, a new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Two password reset links were requested on 2026-11-11 and neither has been opened yet. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
+      "detail": "Once a working sender is on, a new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
       "state": "verify",
       "doneIn": null,
       "phase": "3",
@@ -538,18 +562,6 @@
       "doneIn": "Serve GradLink on gradleap.online",
       "phase": "3",
       "id": "launch/custom-domain"
-    },
-    {
-      "area": "launch",
-      "areaName": "Launch",
-      "section": "Domain and email",
-      "line": 31,
-      "title": "Account email: confirm email and password reset",
-      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: the Hostinger mailbox `contact@gradleap.online`, set in `wrangler.jsonc` with Hostinger named in the Privacy Policy, in \"Send account email from contact@gradleap.online\". The domain's DKIM records were fixed on 2026-10-29 (`security.md`). The owner set the mailbox password as the Worker's `SMTP_PASS` secret: checked on 2026-11-11, \"Forgot password\" on the live site no longer answers \"isn't set up yet\", so email is switched on and new accounts must confirm their email before signing in. Done in \"Send account email through Gmail and require email confirmation\" · Switched on live, checked in \"Refresh the launch checklists from live checks\"",
-      "state": "done",
-      "doneIn": "Send account email through Gmail and require email confirmation",
-      "phase": "3",
-      "id": "launch/account-email-confirm-email-and-password"
     },
     {
       "area": "launch",
@@ -2002,18 +2014,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/least-privilege-database-role"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 49,
-      "title": "Account verification",
-      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Email confirmation is on: the sender `contact@gradleap.online` was switched on by setting `SMTP_PASS` (checked live on 2026-11-11), so a new account must open its confirm link before it can sign in. Delivery is checked in `launch.md` (verify live: a confirm email and a reset email arrive). Done in \"Refresh the launch checklists from live checks\"",
-      "state": "done",
-      "doneIn": "Refresh the launch checklists from live checks",
-      "phase": "3",
-      "id": "security/account-verification"
     },
     {
       "area": "security",
