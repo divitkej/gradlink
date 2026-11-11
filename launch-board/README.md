@@ -4,19 +4,18 @@
 
 ![Launch progress](progress.svg)
 
-**150 of 169 done (89%).** 2 in progress, 19 left. Checklists last changed 2026-10-29.
+**152 of 170 done (89%).** 0 in progress, 18 left. Checklists last changed 2026-11-12.
 
 Open the interactive version: download [`index.html`](index.html) and open it in a browser.
 
 ```mermaid
 pie showData
   title Where everything stands
-  "In progress" : 2
   "Needs the owner" : 11
-  "To do" : 1
+  "To do" : 2
   "Verify live" : 3
   "Parked by decision" : 2
-  "Done" : 150
+  "Done" : 152
 ```
 
 ## By phase
@@ -27,7 +26,7 @@ pie showData
 |---|---|---|---|---|---|
 | [Phase 1: Core loop](#phase-1-core-loop) | **Done** | `████████████` 100% | 15 | 0 | 0 |
 | [Phase 2: Dead and misleading UI](#phase-2-dead-and-misleading-ui) | **Ongoing** | `██████████░░` 87% | 13 | 0 | 2 |
-| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 76% | 42 | 2 | 13 |
+| [Phase 3: Launch readiness](#phase-3-launch-readiness) | **Ongoing** | `█████████░░░` 79% | 44 | 0 | 12 |
 | [Phase 4: Polish and SEO](#phase-4-polish-and-seo) | **Done** | `████████████` 100% | 10 | 0 | 0 |
 | [Phase 5: Product build-out](#phase-5-product-build-out) | **Ongoing** | `████████████` 97% | 63 | 0 | 2 |
 | [Test pass](#test-pass) | **Ongoing** | `█████████░░░` 78% | 7 | 0 | 2 |
@@ -91,16 +90,11 @@ Every visible button works, nothing claims what the app does not do.
 
 Hosting, domain, email, legal pages, honest claims and security before the public launch.
 
-**Ongoing.** 42 of 55 done, 2 in progress, 13 left.
-
-**Ongoing**
-
-- [ ] Point deploys and secrets at the divitkej account · [PR #51](https://github.com/divitkej/gradlink/pull/51) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17)
-- [ ] Custom domain · [PR #51](https://github.com/divitkej/gradlink/pull/51) · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26)
+**Ongoing.** 44 of 56 done, 0 in progress, 12 left.
 
 **Left**
 
-- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)
+- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)
 - [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)
 - [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)
 - [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)
@@ -109,16 +103,19 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [ ] Confirm the claim "Setup in 48 hours" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)
 - [ ] Confirm the claim "No contract lock-in" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)
 - [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
-- [ ] Verify live · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L18)
+- [ ] Least-privilege database role · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)
+- [ ] Verify live · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)
 - [ ] Promises features that are not built · Parked by decision · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L46)
 
-<details><summary>Done (42)</summary>
+<details><summary>Done (44)</summary>
 
 - [x] Neon project and tables created
 - [x] Worker points at the owner's KV namespace
 - [x] Tested on the Workers runtime against the new database
+- [x] Point deploys and secrets at the divitkej account
 - [x] Only Neon and Cloudflare in the repo
 - [x] Cloudflare GitHub builds fail on every commit
+- [x] Custom domain
 - [x] Privacy Policy page
 - [x] Terms and Conditions page
 - [x] "UAE data residency" claim removed
@@ -286,7 +283,7 @@ Features that should work, checked once on a real device or the live site.
 
 | Area | Progress | Done | Left | Checklist |
 |---|---|---|---|---|
-| Launch | `█████████░░░` 71% | 10 | 4 | [launch.md](../docs/checklists/launch.md) |
+| Launch | `██████████░░` 80% | 12 | 3 | [launch.md](../docs/checklists/launch.md) |
 | Landing page | `██████████░░` 84% | 16 | 3 | [landing-page.md](../docs/checklists/landing-page.md) |
 | Core loop | `████████████` 100% | 11 | 0 | [core-loop.md](../docs/checklists/core-loop.md) |
 | Organiser access | `███████████░` 91% | 10 | 1 | [organiser-access.md](../docs/checklists/organiser-access.md) |
@@ -296,18 +293,17 @@ Features that should work, checked once on a real device or the live site.
 | Security | `██████████░░` 83% | 24 | 5 | [security.md](../docs/checklists/security.md) |
 | Features to build | `████████░░░░` 70% | 7 | 3 | [features-to-build.md](../docs/checklists/features-to-build.md) |
 | Company dashboard | `████████████` 100% | 16 | 0 | [company-dashboard.md](../docs/checklists/company-dashboard.md) |
-| **All** | `███████████░` **89%** | **150** | **19** | |
+| **All** | `███████████░` **89%** | **152** | **18** | |
 
 ## In progress
 
-- [ ] **Point deploys and secrets at the divitkej account** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L17) · [PR #51](https://github.com/divitkej/gradlink/pull/51)<br><sub>Owner action. In GitHub (Settings, Secrets and variables, Actions) replace `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` with a token and id from the divitkej account; the… · id `launch/point-deploys-and-secrets-at-the`</sub>
-- [ ] **Custom domain** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L26) · [PR #51](https://github.com/divitkej/gradlink/pull/51)<br><sub>`gradleap.online` is registered at Hostinger and its nameservers already point at Cloudflare (`celeste` and `david.ns.cloudflare.com`). The repo side is done in "Serve GradLink… · id `launch/custom-domain`</sub>
+Nothing is in progress right now. Open a pull request that ticks an item, or put `board: <id>` in its description, and it shows here.
 
 ## Left to do
 
 ### Needs the owner (11)
 
-- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L28)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
+- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L30)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)<br><sub>Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which… · id `security/backups`</sub>
@@ -319,9 +315,10 @@ Features that should work, checked once on a real device or the live site.
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
 
-### To do (1)
+### To do (2)
 
-- [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L18)<br><sub>After the first deploy, `https://gradleap.online/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in… · id `launch/verify-live`</sub>
+- [ ] **Least-privilege database role** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)<br><sub>The `Gradlink` project has only the `neondb_owner` role, so the Worker's `DATABASE_URL` is most likely the owner role. Create `gradlink_app` there (README.md, Neon), switch the… · id `launch/least-privilege-database-role`</sub>
+- [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)<br><sub>After the first deploy, `https://gradleap.online/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in… · id `launch/verify-live`</sub>
 
 ### Verify live (3)
 
@@ -336,13 +333,15 @@ Features that should work, checked once on a real device or the live site.
 
 ## Done
 
-<details><summary><b>Launch</b>: 10 done</summary>
+<details><summary><b>Launch</b>: 12 done</summary>
 
 - [x] Neon project and tables created
 - [x] Worker points at the owner's KV namespace <sub>Done in "Move the Worker back to the divitkej Cloudflare account"</sub>
 - [x] Tested on the Workers runtime against the new database
+- [x] Point deploys and secrets at the divitkej account <sub>Done in "Move the Worker back to the divitkej Cloudflare account"</sub>
 - [x] Only Neon and Cloudflare in the repo <sub>Done in "Remove Vercel, Supabase and Firebase leftovers"</sub>
 - [x] Cloudflare GitHub builds fail on every commit <sub>Done in "Deploy from main with GitHub Actions and add a health check"</sub>
+- [x] Custom domain <sub>Done in "Serve GradLink on gradleap.online"</sub>
 - [x] Privacy Policy page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] Terms and Conditions page <sub>Done in "Add Privacy Policy and Terms pages"</sub>
 - [x] "UAE data residency" claim removed <sub>Done in "Add Privacy Policy and Terms pages"</sub>
