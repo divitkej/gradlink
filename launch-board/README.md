@@ -11,7 +11,8 @@ Open the interactive version: download [`index.html`](index.html) and open it in
 ```mermaid
 pie showData
   title Where everything stands
-  "Needs the owner" : 12
+  "Needs the owner" : 11
+  "To do" : 1
   "Verify live" : 6
   "Parked by decision" : 2
   "Done" : 153
@@ -95,7 +96,6 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 
 - [ ] Least-privilege database role · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)
 - [ ] Test accounts in the production database · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)
-- [ ] Account email: confirm email and password reset · Needs the owner · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L31)
 - [ ] Backups · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)
 - [ ] Secrets · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L48)
 - [ ] Account verification · Needs the owner · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L49)
@@ -103,6 +103,7 @@ Hosting, domain, email, legal pages, honest claims and security before the publi
 - [ ] Confirm the claim "Setup in 48 hours" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L73)
 - [ ] Confirm the claim "No contract lock-in" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)
 - [ ] Confirm the claim "Dedicated onboarding" · Needs the owner · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)
+- [ ] Account email: confirm email and password reset · To do · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L31)
 - [ ] Verify live · Verify live · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)
 - [ ] Verify live: a confirm email and a reset email arrive · Verify live · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)
 - [ ] Verify live: QR scanner camera on a phone · Verify live · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L53)
@@ -303,11 +304,10 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 
 ## Left to do
 
-### Needs the owner (12)
+### Needs the owner (11)
 
 - [ ] **Least-privilege database role** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L19)<br><sub>`gradlink_app` was created on the `production` branch of `Gradlink` on 2026-10-29 (select, insert, update and delete on all 35 tables, no admin rights). Checked on 2026-11-11:… · id `launch/least-privilege-database-role`</sub>
 - [ ] **Test accounts in the production database** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L21)<br><sub>Checked on 2026-11-11: four of the six accounts in production are on `example.com` (one company, two colleges and one student, all created on 2026-10-06 during testing), so they… · id `launch/test-accounts-in-the-production-database`</sub>
-- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L31)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
 - [ ] **Set `ADMIN_EMAILS`, then sign up with that email straight away** · Organiser access · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/organiser-access.md?plain=1#L34)<br><sub>`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address… · id `organiser-access/set-admin-emails-then-sign-up`</sub>
 - [ ] **College sidebar has no Messages or Profile link** · Audit follow-ups · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/audit-follow-ups.md?plain=1#L26)<br><sub>Messages is now in the college sidebar ("Add Messages and Scan History to the dashboard sidebar"). Profile is left out by owner decision pending: `/dashboard/profile` has nothing… · id `audit-follow-ups/college-sidebar-has-no-messages-or`</sub>
 - [ ] **Backups** · Security · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/security.md?plain=1#L47)<br><sub>Confirm Neon's restore window covers at least 7 days. It cannot on the Free plan: the new `gradlink` project keeps 6 hours of history (`history_retention_seconds` 21600), which… · id `security/backups`</sub>
@@ -318,10 +318,14 @@ Nothing is in progress right now. Open a pull request that ticks an item, or put
 - [ ] **Confirm the claim "No contract lock-in"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L74)<br><sub>Where: CTA section · id `features-to-build/no-contract-lock-in`</sub>
 - [ ] **Confirm the claim "Dedicated onboarding"** · Features to build · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/features-to-build.md?plain=1#L75)<br><sub>Where: CTA section · id `features-to-build/dedicated-onboarding`</sub>
 
+### To do (1)
+
+- [ ] **Account email: confirm email and password reset** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L31)<br><sub>Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and "Forgot password" emails a reset link.… · id `launch/account-email-confirm-email-and-password`</sub>
+
 ### Verify live (6)
 
 - [ ] **Verify live** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L20)<br><sub>After the first deploy, `https://gradleap.online/api/health` answers `{"ok":true,"database":"connected"}`, the public pages return 200, and one test account signs up, signs in… · id `launch/verify-live`</sub>
-- [ ] **Verify live: a confirm email and a reset email arrive** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)<br><sub>Once a working sender is on, a new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Sign up with a test address and request a… · id `launch/verify-live-a-confirm-email-and`</sub>
+- [ ] **Verify live: a confirm email and a reset email arrive** · Launch · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/launch.md?plain=1#L33)<br><sub>A new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Sign up with a test address and request a reset, check both emails arrive… · id `launch/verify-live-a-confirm-email-and`</sub>
 - [ ] **Opening hero on a low-end phone** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L58)<br><sub>WebGL shader background plus canvas particle text. Now pauses when scrolled past or the tab is hidden, and renders at 1x on phones (4x fewer pixels). The test machine has no GPU… · id `landing-page/opening-hero-on-a-low-end-phone`</sub>
 - [ ] **Link preview card** · Landing page · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/landing-page.md?plain=1#L60)<br><sub>Share image regenerated with the graduation-cap logo (`app/opengraph-image.png`, source `docs/brand/opengraph-image.tsx`, in "Replace the G logo with a graduation cap");… · id `landing-page/link-preview-card`</sub>
 - [ ] **Two-account run on real phones** · Student dashboard · [source](https://github.com/divitkej/gradlink/blob/main/docs/checklists/student-dashboard.md?plain=1#L93)<br><sub>Student books a full session, organiser marks attendance, student sees the passport stop and score change. Verify live · id `student-dashboard/two-account-run-on-real-phones`</sub>
