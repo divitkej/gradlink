@@ -12,7 +12,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 | Partial | Works, but misses part of what the UI promises |
 | Done | Fixed, commit noted |
 
-## Progress: 11 / 12 done
+## Progress: 11 / 12 done, 1 needs the owner
 
 ## Pricing
 

@@ -1,31 +1,31 @@
 {
   "updated": "2026-11-11",
   "totals": {
-    "total": 170,
-    "done": 152,
+    "total": 173,
+    "done": 155,
     "open": 18,
-    "percent": 89,
+    "percent": 90,
     "counts": {
       "in_progress": 0,
-      "owner": 11,
-      "todo": 2,
-      "verify": 3,
+      "owner": 10,
+      "todo": 0,
+      "verify": 6,
       "parked": 2,
-      "done": 152
+      "done": 155
     }
   },
   "areas": [
     {
       "key": "launch",
       "name": "Launch",
-      "total": 15,
+      "total": 17,
       "counts": {
         "in_progress": 0,
-        "owner": 1,
-        "todo": 2,
-        "verify": 0,
+        "owner": 2,
+        "todo": 0,
+        "verify": 2,
         "parked": 0,
-        "done": 12
+        "done": 13
       }
     },
     {
@@ -109,14 +109,14 @@
     {
       "key": "security",
       "name": "Security",
-      "total": 29,
+      "total": 30,
       "counts": {
         "in_progress": 0,
-        "owner": 5,
+        "owner": 3,
         "todo": 0,
-        "verify": 0,
+        "verify": 1,
         "parked": 0,
-        "done": 24
+        "done": 26
       }
     },
     {
@@ -181,14 +181,14 @@
       "key": "3",
       "name": "Phase 3: Launch readiness",
       "goal": "Hosting, domain, email, legal pages, honest claims and security before the public launch.",
-      "total": 56,
+      "total": 59,
       "counts": {
         "in_progress": 0,
-        "owner": 9,
-        "todo": 2,
-        "verify": 0,
+        "owner": 8,
+        "todo": 0,
+        "verify": 3,
         "parked": 1,
-        "done": 44
+        "done": 47
       },
       "status": "Ongoing"
     },
@@ -242,14 +242,26 @@
     {
       "area": "launch",
       "areaName": "Launch",
-      "section": "Domain and email",
-      "line": 30,
-      "title": "Account email: confirm email and password reset",
-      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sending through `divitkej@gmail.com` is paused by decision, so no sender is configured: accounts are confirmed on creation and \"Forgot password\" says it is not set up. To turn it on, pick a sender (a dedicated Gmail with an app password as `SMTP_USER` + `SMTP_PASS`, or Resend once the domain exists), then add it to the Privacy Policy's list of services. Sender chosen: the existing Hostinger mailbox `contact@gradleap.online`, set in `wrangler.jsonc` with Hostinger named in the Privacy Policy, in \"Send account email from contact@gradleap.online\" (it replaced `no-reply@gradleap.online`, which was never created). The domain's DKIM records were fixed on 2026-10-29 (`security.md`). Still open, owner action: set that mailbox's password as the `gradlink` Worker's `SMTP_PASS` secret, which switches email on. Done in \"Send account email through Gmail and require email confirmation\" · Paused in \"Pause account email from the personal Gmail\"",
+      "section": "Hosting and database",
+      "line": 19,
+      "title": "Least-privilege database role",
+      "detail": "`gradlink_app` was created on the `production` branch of `Gradlink` on 2026-10-29 (select, insert, update and delete on all 35 tables, no admin rights). Checked on 2026-11-11: the live site still connects as `neondb_owner` (every database session the Worker opened was the owner role). Owner action: set the Worker's `DATABASE_URL` to the pooled `gradlink_app` connection string with `npx wrangler secret put DATABASE_URL`, and add any other secret from README.md (Cloudflare) the site needs, such as Stripe.",
       "state": "owner",
-      "doneIn": "Send account email through Gmail and require email confirmation",
+      "doneIn": null,
       "phase": "3",
-      "id": "launch/account-email-confirm-email-and-password"
+      "id": "launch/least-privilege-database-role"
+    },
+    {
+      "area": "launch",
+      "areaName": "Launch",
+      "section": "Hosting and database",
+      "line": 21,
+      "title": "Test accounts in the production database",
+      "detail": "Checked on 2026-11-11: four of the six accounts in production are on `example.com` (one company, two colleges and one student, all created on 2026-10-06 during testing), so they are test data, not users. Owner decision: delete them, and anything they created, before the public launch, after taking a backup branch.",
+      "state": "owner",
+      "doneIn": null,
+      "phase": "3",
+      "id": "launch/test-accounts-in-the-production-database"
     },
     {
       "area": "organiser-access",
@@ -257,7 +269,7 @@
       "section": "Owner actions before deploying",
       "line": 34,
       "title": "Set `ADMIN_EMAILS`, then sign up with that email straight away",
-      "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages. While account email is off, only the first owner address can be registered this way; any other address in ADMIN_EMAILS can only register once email confirmation is on.",
+      "detail": "`npx wrangler secret put ADMIN_EMAILS` with your email. Sign-up now only accepts campus and company domains, and emails in `ADMIN_EMAILS` skip that rule, so a personal address can only register once it is listed. Sign up right after setting it, so nobody else can register that address and see the owner pages. Checked on 2026-10-29: `ADMIN_EMAILS` is set on the Worker. Still open, owner action: confirm you can open `/admin` signed in with that address. Account email is on now, so any other address added to `ADMIN_EMAILS` later has to confirm its email before it can sign in.",
       "state": "owner",
       "doneIn": null,
       "phase": "5",
@@ -303,18 +315,6 @@
       "area": "security",
       "areaName": "Security",
       "section": "Needs doing outside the code (before launch)",
-      "line": 49,
-      "title": "Account verification",
-      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Still open: confirming the email itself needs a sender (see `launch.md`, account email).",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/account-verification"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
       "line": 50,
       "title": "Revoke the exposed 21st.dev API key",
       "detail": "It sits in every commit of this public repository since the baseline, so taking it out of `.mcp.json` does not make it secret again. Owner action, by whoever holds the 21st.dev account that issued it (it was committed by the previous owner): revoke it at 21st.dev, create a new one and keep it in the `TWENTY_FIRST_API_KEY` environment variable. The git history is not rewritten: checked on 2026-10-29, 46 of the 60 pull request refs on GitHub (`refs/pull/*/head`) hold the key, and GitHub keeps those read-only, so a rewrite of `main` would break every branch and clone and still leave the key public. Revoking it is the fix.",
@@ -322,18 +322,6 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/revoke-the-exposed-21st-dev-api"
-    },
-    {
-      "area": "security",
-      "areaName": "Security",
-      "section": "Needs doing outside the code (before launch)",
-      "line": 52,
-      "title": "Verify live",
-      "detail": "after deploy, check the headers with https://securityheaders.com and test the QR scanner camera on a phone.",
-      "state": "owner",
-      "doneIn": null,
-      "phase": "3",
-      "id": "security/verify-live"
     },
     {
       "area": "features-to-build",
@@ -375,25 +363,25 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
-      "line": 19,
-      "title": "Least-privilege database role",
-      "detail": "The `Gradlink` project has only the `neondb_owner` role, so the Worker's `DATABASE_URL` is most likely the owner role. Create `gradlink_app` there (README.md, Neon), switch the secret to it with `npx wrangler secret put DATABASE_URL`, and add any other secret from README.md (Cloudflare) the site needs, such as Stripe.",
-      "state": "todo",
+      "line": 20,
+      "title": "Verify live",
+      "detail": "After the first deploy, `https://gradleap.online/api/health` answers `{\"ok\":true,\"database\":\"connected\"}`, the public pages return 200, and one test account signs up, signs in and is deleted again. Checked on 2026-11-11: the health check answers connected and the home, Privacy and Terms pages return 200. Still open: the test account run, now including the confirm email.",
+      "state": "verify",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/least-privilege-database-role"
+      "id": "launch/verify-live"
     },
     {
       "area": "launch",
       "areaName": "Launch",
-      "section": "Hosting and database",
-      "line": 20,
-      "title": "Verify live",
-      "detail": "After the first deploy, `https://gradleap.online/api/health` answers `{\"ok\":true,\"database\":\"connected\"}`, the public pages return 200, and one test account signs up, signs in and is deleted again.",
-      "state": "todo",
+      "section": "Domain and email",
+      "line": 33,
+      "title": "Verify live: a confirm email and a reset email arrive",
+      "detail": "Now that email is on, a new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. Two password reset links were requested on 2026-11-11 and neither has been opened yet. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
+      "state": "verify",
       "doneIn": null,
       "phase": "3",
-      "id": "launch/verify-live"
+      "id": "launch/verify-live-a-confirm-email-and"
     },
     {
       "area": "landing-page",
@@ -430,6 +418,18 @@
       "doneIn": null,
       "phase": "5",
       "id": "student-dashboard/two-account-run-on-real-phones"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 53,
+      "title": "Verify live: QR scanner camera on a phone",
+      "detail": "Open the scanner on a real phone, allow the camera, and scan an event QR code.",
+      "state": "verify",
+      "doneIn": null,
+      "phase": "3",
+      "id": "security/verify-live-qr-scanner-camera-on"
     },
     {
       "area": "landing-page",
@@ -507,7 +507,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
-      "line": 21,
+      "line": 22,
       "title": "Only Neon and Cloudflare in the repo",
       "detail": "Every file, script, setting and mention of earlier hosts removed, along with the old data export that was never imported into Neon. Done in \"Remove Vercel, Supabase and Firebase leftovers\"",
       "state": "done",
@@ -519,7 +519,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Hosting and database",
-      "line": 23,
+      "line": 24,
       "title": "Cloudflare GitHub builds fail on every commit",
       "detail": "The previous owner's `gradlink` Worker is connected to this repo through Cloudflare Workers Builds, and every build since PR #5 has failed; its logs are in that account, which this project no longer uses. Deploys to the new Worker now run from GitHub Actions instead, the same way the owner's other Workers deploy: typecheck and lint, `npm run db:migrate`, `npm run deploy`, then wait for `/api/health` to report the database connected. The job skips with a notice until the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets exist. Now that the site deploys to the divitkej `gradlink` Worker again, its Workers Builds connection is still on and still fails within a second on every push (\"Workers Builds: gradlink\" on PR #49), so GitHub Actions and Workers Builds would both have deployed the same Worker. The owner disconnected it on 2026-10-29 (Workers & Pages, `gradlink`, Settings, Build). `.github/workflows/deploy.yml`, `app/api/health/route.ts` · Done in \"Deploy from main with GitHub Actions and add a health check\"",
       "state": "done",
@@ -531,7 +531,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Domain and email",
-      "line": 28,
+      "line": 29,
       "title": "Custom domain",
       "detail": "`gradleap.online` (registered at Hostinger, nameservers on Cloudflare, zone in the divitkej account) is attached to the `gradlink` Worker with `www.gradleap.online`. The parked-page `A` and `CNAME www` records were deleted and the Hostinger mail records kept. `APP_URL`, the `SITE_URL` fallback and the deploy health check use it, and www and `gradlink.divitkej.workers.dev` redirect to it. Live on 2026-10-29: home, Privacy, Terms, sitemap and `icon.svg` return 200 and `/api/health` reports the database connected. `wrangler.jsonc`, `lib/site.ts`, `next.config.ts`, `.github/workflows/deploy.yml` · Done in \"Serve GradLink on gradleap.online\" and \"Fix the www home page redirect and keep workers.dev redirecting\"",
       "state": "done",
@@ -542,8 +542,20 @@
     {
       "area": "launch",
       "areaName": "Launch",
+      "section": "Domain and email",
+      "line": 31,
+      "title": "Account email: confirm email and password reset",
+      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: the Hostinger mailbox `contact@gradleap.online`, set in `wrangler.jsonc` with Hostinger named in the Privacy Policy, in \"Send account email from contact@gradleap.online\". The domain's DKIM records were fixed on 2026-10-29 (`security.md`). The owner set the mailbox password as the Worker's `SMTP_PASS` secret: checked on 2026-11-11, \"Forgot password\" on the live site no longer answers \"isn't set up yet\", so email is switched on and new accounts must confirm their email before signing in. Done in \"Send account email through Gmail and require email confirmation\" · Switched on live, checked in \"Refresh the launch checklists from live checks\"",
+      "state": "done",
+      "doneIn": "Send account email through Gmail and require email confirmation",
+      "phase": "3",
+      "id": "launch/account-email-confirm-email-and-password"
+    },
+    {
+      "area": "launch",
+      "areaName": "Launch",
       "section": "Legal and claims",
-      "line": 35,
+      "line": 37,
       "title": "Privacy Policy page",
       "detail": "Written from what the app stores and who can read it (`db/schema.sql`, `lib/server/rpc.ts`, `lib/server/files.ts`), under the UAE Personal Data Protection Law. Operator Divit Kejriwal, Dubai. Linked from the footer and sitemap. When the domain is live, change `OPERATOR.email` in `lib/site.ts` to an address on it. `app/privacy/page.tsx`, `components/legal/PrivacyPolicy.tsx` · Done in \"Add Privacy Policy and Terms pages\" · Brought in line with later features (verified achievements and the sites that check them, scores, applications, who can see what, browser storage) in \"Bring the Privacy Policy in line with what the app does\"",
       "state": "done",
@@ -555,7 +567,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Legal and claims",
-      "line": 37,
+      "line": 39,
       "title": "Terms and Conditions page",
       "detail": "Covers accounts, acceptable use, employer use of student data, Placement Pro billing (AED 3,600 per campus per year, cancel by email, no refunds except as stated), liability cap and Dubai law. Not reviewed by a lawyer: get a one-off review before taking the first payment. `app/terms/page.tsx`, `components/legal/TermsOfService.tsx` · Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
@@ -567,7 +579,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Legal and claims",
-      "line": 39,
+      "line": 41,
       "title": "\"UAE data residency\" claim removed",
       "detail": "Data sits in Singapore and Neon has no UAE region. The chip now reads \"Free for students and employers\", which matches the pricing page. `components/landing/CTASection.tsx` · Done in \"Add Privacy Policy and Terms pages\"",
       "state": "done",
@@ -579,7 +591,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Legal and claims",
-      "line": 41,
+      "line": 43,
       "title": "Unregistered company name removed",
       "detail": "Footer now reads \"© GradLeap\". `components/site/Footer.tsx` · Done in \"Drop the unregistered company name from the footer\"",
       "state": "done",
@@ -591,7 +603,7 @@
       "area": "launch",
       "areaName": "Launch",
       "section": "Legal and claims",
-      "line": 43,
+      "line": 45,
       "title": "Favicon",
       "detail": "`app/icon.svg` and `app/apple-icon.png` served live. The G mark read as a monochrome Google logo, so the logo, favicon, home-screen icon and share images now use a graduation cap whose tassel ends in a dot. `components/Logo.tsx`, `app/icon.svg`, `docs/brand/` · Done in \"Replace the G logo with a graduation cap\"",
       "state": "done",
@@ -1985,11 +1997,23 @@
       "section": "Needs doing outside the code (before launch)",
       "line": 45,
       "title": "Least-privilege database role",
-      "detail": "In the Neon project `gradlink`, the role `gradlink_app` has only select, insert, update and delete on the app tables (and on tables `gradlink_owner` creates later), is not a member of `neon_superuser`, and is refused when it tries to create a table. It is the role the app connects as; `gradlink_owner` is kept for `npm run db:migrate` only. Checked on 2026-10-15 by running the whole app as `gradlink_app` against the new database. Done on 2026-10-15, no commit (database change) - [ ] **Regressed: the live site connects as the owner role.** Checked on 2026-10-29: the live Worker writes to the production branch of Neon project `Gradlink` (`plain-tooth-17985241`), whose only role is `neondb_owner`. `gradlink_app` does not exist there, so the setup above was not carried over in the move to this project. Create the limited role again on this project and set the Worker's `DATABASE_URL` secret to it. `gradlink_app` was created on 2026-10-29 with SQL (not in `neon_superuser`, no create role), with select, insert, update and delete on all 35 tables and default privileges for tables `neondb_owner` creates later; it is refused create, drop, alter and truncate, and the built Worker passed its health check, a sign-in and a data API call with it. Still open: switch the Worker's `DATABASE_URL` secret to it.",
+      "detail": "In the Neon project `gradlink`, the role `gradlink_app` has only select, insert, update and delete on the app tables (and on tables `gradlink_owner` creates later), is not a member of `neon_superuser`, and is refused when it tries to create a table. It is the role the app connects as; `gradlink_owner` is kept for `npm run db:migrate` only. Checked on 2026-10-15 by running the whole app as `gradlink_app` against the new database. Done on 2026-10-15, no commit (database change) - [ ] **Regressed: the live site connects as the owner role.** Checked on 2026-10-29: the live Worker writes to the production branch of Neon project `Gradlink` (`plain-tooth-17985241`), whose only role is `neondb_owner`. `gradlink_app` does not exist there, so the setup above was not carried over in the move to this project. Create the limited role again on this project and set the Worker's `DATABASE_URL` secret to it. `gradlink_app` was created on 2026-10-29 with SQL (not in `neon_superuser`, no create role), with select, insert, update and delete on all 35 tables and default privileges for tables `neondb_owner` creates later; it is refused create, drop, alter and truncate, and the built Worker passed its health check, a sign-in and a data API call with it. Still open: switch the Worker's `DATABASE_URL` secret to it. Checked again on 2026-11-11: the live site still connects as `neondb_owner` (tracked in `launch.md`, least-privilege database role).",
       "state": "done",
       "doneIn": null,
       "phase": "3",
       "id": "security/least-privilege-database-role"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 49,
+      "title": "Account verification",
+      "detail": "Sign-up now refuses personal, throwaway and test addresses for every role; a college gives an example of its students' email at sign-up, and students can only sign up on that student domain once the owner approves it at `/admin/colleges`, and an approved college domain cannot register as an employer (`lib/server/email-domains.ts`, `lib/server/college-domains.ts`, in \"Restrict sign-up to campus and company email domains\"). A college can only create events once its student domain is approved (owner addresses are exempt), in \"Let colleges create events only once their student domain is approved\" (`lib/server/rpc.ts`). Email confirmation is on: the sender `contact@gradleap.online` was switched on by setting `SMTP_PASS` (checked live on 2026-11-11), so a new account must open its confirm link before it can sign in. Delivery is checked in `launch.md` (verify live: a confirm email and a reset email arrive). Done in \"Refresh the launch checklists from live checks\"",
+      "state": "done",
+      "doneIn": "Refresh the launch checklists from live checks",
+      "phase": "3",
+      "id": "security/account-verification"
     },
     {
       "area": "security",
@@ -2002,6 +2026,18 @@
       "doneIn": null,
       "phase": "3",
       "id": "security/email-authentication-dkim"
+    },
+    {
+      "area": "security",
+      "areaName": "Security",
+      "section": "Needs doing outside the code (before launch)",
+      "line": 52,
+      "title": "Verify live: security headers",
+      "detail": "Checked on 2026-11-11 on `https://gradleap.online`: `Content-Security-Policy`, `Strict-Transport-Security` (2 years, subdomains), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy` and `Permissions-Policy` (camera for the site only) are all sent. The CSP still allows inline scripts and styles, which Next.js needs. Done in \"Refresh the launch checklists from live checks\"",
+      "state": "done",
+      "doneIn": "Refresh the launch checklists from live checks",
+      "phase": "3",
+      "id": "security/verify-live-security-headers"
     },
     {
       "area": "features-to-build",
