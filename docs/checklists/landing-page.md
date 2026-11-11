@@ -19,7 +19,7 @@ Update this file in the same commit as the fix. Tick the box, set the status, an
 
 "Automated check" below means a Playwright run against a production build (`next build` + `next start`) at 1440px and 375px.
 
-## Progress: 15 / 18 done, 1 tracked, 2 need a real device or the live site
+## Progress: 16 / 19 done, 1 tracked, 2 need a real device or the live site
 
 ## Phase 2: Navigation fixes
 

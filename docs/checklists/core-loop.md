@@ -18,7 +18,7 @@ Authorization is the per-operation checks in `lib/server/rpc.ts`; the access ite
 | Verify live | Code looks right, must be confirmed on the deployed site |
 | Done | Fixed, commit noted |
 
-## Progress: 11 / 12 done, 1 needs the owner
+## Progress: 11 / 11 done
 
 ## Phase 1: Core loop
 
