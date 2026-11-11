@@ -23,8 +23,9 @@ export function emailEnabled(): boolean {
  * Two providers, tried in this order:
  *   1. SMTP through an ordinary mailbox (Gmail + app password), over a Workers
  *      TCP socket (lib/server/smtp.ts). Needs no domain. SMTP_USER + SMTP_PASS.
- *   2. Resend's HTTP API, once GradLeap has a verified domain.
- *      RESEND_API_KEY + EMAIL_FROM.
+ *   2. Resend's HTTP API with a verified domain. RESEND_API_KEY + EMAIL_FROM.
+ *      Production uses this, from contact@gradleap.online. Hostinger's SMTP
+ *      servers sit on Cloudflare IP addresses, which Worker sockets can't reach.
  *
  * Returns false when nothing is configured or the provider refused, so the
  * caller can say so instead of pretending the email went out.

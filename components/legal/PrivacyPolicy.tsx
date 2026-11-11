@@ -98,7 +98,8 @@ const sections: LegalSection[] = [
           <li><strong>Neon</strong> stores the GradLeap database, in Singapore.</li>
           <li><strong>Cloudflare</strong> hosts the website, stores uploaded files and keeps request logs, on its global network. Its Web Analytics records the page you visit, the page you came from, your browser, operating system and device type, your country and how fast the page loaded. It sets no cookies, stores nothing in your browser and does not identify you.</li>
           <li><strong>Stripe</strong> handles Placement Pro payments.</li>
-          <li><strong>Hostinger</strong> sends our account emails, such as email confirmation and password reset links, from contact@gradleap.online. It receives your name, email address and the email itself.</li>
+          <li><strong>Resend</strong> sends our account emails, such as email confirmation and password reset links, from contact@gradleap.online. It receives your email address and the email itself, which can include your name.</li>
+          <li><strong>Hostinger</strong> hosts our contact@gradleap.online mailbox, so it receives any email you send us.</li>
           <li>
             <strong>LeetCode, Codeforces, Coursera and Credly</strong>: when you add a coding profile, certificate or badge, our server looks it
             up on that site to check it. We send only the username, certificate code or badge id you entered.
@@ -112,7 +113,7 @@ const sections: LegalSection[] = [
     heading: "Data stored outside the UAE",
     body: (
       <p>
-        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare, Stripe and Hostinger operate. The lookups
+        Your data is stored and processed outside the UAE, mainly in Singapore, and wherever Cloudflare, Stripe, Resend and Hostinger operate. The lookups
         described above go to the servers of the site being checked.
         We use these providers because they apply strong security and data protection commitments to the data they hold.
       </p>
@@ -198,7 +199,7 @@ export default function PrivacyPolicy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="29 October 2026"
+      updated="11 November 2026"
       intro={
         <p>
           This policy explains what personal data GradLeap collects, why, who can see it and the choices you have. It applies
