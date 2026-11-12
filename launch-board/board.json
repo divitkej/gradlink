@@ -1,17 +1,17 @@
 {
-  "updated": "2026-11-11",
+  "updated": "2026-11-12",
   "totals": {
     "total": 173,
-    "done": 153,
-    "open": 20,
-    "percent": 88,
+    "done": 154,
+    "open": 19,
+    "percent": 89,
     "counts": {
       "in_progress": 0,
       "owner": 10,
-      "todo": 1,
+      "todo": 0,
       "verify": 7,
       "parked": 2,
-      "done": 153
+      "done": 154
     }
   },
   "areas": [
@@ -22,10 +22,10 @@
       "counts": {
         "in_progress": 0,
         "owner": 2,
-        "todo": 1,
+        "todo": 0,
         "verify": 2,
         "parked": 0,
-        "done": 12
+        "done": 13
       }
     },
     {
@@ -185,10 +185,10 @@
       "counts": {
         "in_progress": 0,
         "owner": 8,
-        "todo": 1,
+        "todo": 0,
         "verify": 4,
         "parked": 1,
-        "done": 45
+        "done": 46
       },
       "status": "Ongoing"
     },
@@ -362,18 +362,6 @@
     {
       "area": "launch",
       "areaName": "Launch",
-      "section": "Domain and email",
-      "line": 31,
-      "title": "Account email: confirm email and password reset",
-      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: `contact@gradleap.online`. Hostinger SMTP was switched on with the `SMTP_PASS` secret on 2026-11-11 but cannot work: `smtp.hostinger.com` and every other Hostinger mail host sit on Cloudflare IP addresses, which Worker TCP sockets are not allowed to reach, so every send failed (a live reset request returned 502). Email now goes through Resend's HTTP API from the same address (`wrangler.jsonc`, Privacy Policy names Resend), in \"Send account email through Resend\". The owner added `gradleap.online` in Resend and its DNS records (`resend._domainkey`, `send`) on 2026-11-11, with the Hostinger MX records kept. Checked on 2026-11-11 after the Resend deploy (22:25 UTC): the live site has email switched on, and with the SMTP settings gone only `RESEND_API_KEY` can do that, so the key is set. Still open: the item below passes. The unused `SMTP_PASS` secret can be deleted with `npx wrangler secret delete SMTP_PASS`. Done in \"Send account email through Gmail and require email confirmation\" · Moved to Resend in \"Send account email through Resend\"",
-      "state": "todo",
-      "doneIn": "Send account email through Gmail and require email confirmation",
-      "phase": "3",
-      "id": "launch/account-email-confirm-email-and-password"
-    },
-    {
-      "area": "launch",
-      "areaName": "Launch",
       "section": "Hosting and database",
       "line": 20,
       "title": "Verify live",
@@ -389,7 +377,7 @@
       "section": "Domain and email",
       "line": 33,
       "title": "Verify live: a confirm email and a reset email arrive",
-      "detail": "Urgent: email is on, so a new account cannot sign in until its confirm link arrives, and a broken sender blocks every sign-up. Sign up with a test address and request a reset, check both emails arrive (inbox, not spam) from `contact@gradleap.online`, and open both links.",
+      "detail": "A new account cannot sign in until its confirm link arrives, so a broken sender blocks every sign-up. The reset email passed on 2026-11-12 (arrived in the Gmail inbox from `contact@gradleap.online`). Still open: sign up with a test address, check the confirm email arrives (inbox, not spam), open its link, then delete the test account.",
       "state": "verify",
       "doneIn": null,
       "phase": "3",
@@ -562,6 +550,18 @@
       "doneIn": "Serve GradLink on gradleap.online",
       "phase": "3",
       "id": "launch/custom-domain"
+    },
+    {
+      "area": "launch",
+      "areaName": "Launch",
+      "section": "Domain and email",
+      "line": 31,
+      "title": "Account email: confirm email and password reset",
+      "detail": "Built and tested (`lib/server/smtp.ts`, `lib/server/mail.ts`, `/verify-email`): sign-up emails a confirm link and sign-in waits for it, and \"Forgot password\" emails a reset link. Sender: `contact@gradleap.online`. Hostinger SMTP was switched on with the `SMTP_PASS` secret on 2026-11-11 but cannot work: `smtp.hostinger.com` and every other Hostinger mail host sit on Cloudflare IP addresses, which Worker TCP sockets are not allowed to reach, so every send failed (a live reset request returned 502). Email now goes through Resend's HTTP API from the same address (`wrangler.jsonc`, Privacy Policy names Resend), in \"Send account email through Resend\". The owner added `gradleap.online` in Resend and its DNS records (`resend._domainkey`, `send`) on 2026-11-11, with the Hostinger MX records kept. Checked on 2026-11-11 after the Resend deploy (22:25 UTC): the live site has email switched on, and with the SMTP settings gone only `RESEND_API_KEY` can do that, so the key is set. The `SMTP_PASS` secret is deleted. On 2026-11-12 a password reset requested for the owner's account arrived in the Gmail inbox (not spam) from `GradLeap <contact@gradleap.online>`, over TLS. Sent mail does not appear in the `contact@gradleap.online` mailbox at Hostinger, because Resend sends it; that mailbox only receives replies. Done in \"Send account email through Gmail and require email confirmation\" · Moved to Resend in \"Send account email through Resend\" · Delivery checked in \"Tick account email after a live Resend delivery\"",
+      "state": "done",
+      "doneIn": "Send account email through Gmail and require email confirmation",
+      "phase": "3",
+      "id": "launch/account-email-confirm-email-and-password"
     },
     {
       "area": "launch",
