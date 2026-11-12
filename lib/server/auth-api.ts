@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword, randomToken, sha256 } from "./crypto";
 import { currentUser, sessionCookie, clearedSessionCookie } from "./session";
 import { HttpError, json } from "./http";
 import { emailEnabled, sendEmail } from "./mail";
+import { renderAccountEmail } from "./email-template";
 import { LIMITS, assertUnderLimit, recordHit, takeHit } from "./rate-limit";
 import { adminAccountExists, checkSignUpEmail, collegeDomainRequest, isAdminEmail, studentDomainFromSample, type SignUpRole } from "./college-domains";
 import type { AppRole } from "../session";
@@ -76,8 +77,11 @@ function appBase(request: Request): string {
   return serverEnv().APP_URL?.replace(/\/$/, "") || new URL(request.url).origin;
 }
 
-const escapeHtml = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+/** "Hi Divit," from a full name, or "Hi," without one. */
+const greeting = (fullName: string) => {
+  const first = fullName.trim().split(/\s+/)[0];
+  return first ? `Hi ${first},` : "Hi,";
+};
 
 /** Creates a confirmation link for this account and emails it. */
 async function sendVerification(request: Request, profileId: string, email: string, name: string): Promise<boolean> {
@@ -86,13 +90,24 @@ async function sendVerification(request: Request, profileId: string, email: stri
     insert into email_verification_tokens (token_hash, profile_id, expires_at)
     values (${await sha256(token)}, ${profileId}, now() + make_interval(hours => ${VERIFY_TTL_HOURS}))
   `;
-  const link = `${appBase(request)}/verify-email?token=${encodeURIComponent(token)}`;
-  const hi = name ? `Hi ${name},` : "Hi,";
+  const base = appBase(request);
+  const link = `${base}/verify-email?token=${encodeURIComponent(token)}`;
   return sendEmail({
     to: email,
-    subject: "Confirm your GradLeap email",
-    text: `${hi}\n\nConfirm your email to finish creating your GradLeap account:\n${link}\n\nThis link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLeap, you can ignore this email.`,
-    html: `<p>${escapeHtml(hi)}</p><p>Confirm your email to finish creating your GradLeap account.</p><p><a href="${link}">Confirm my email</a></p><p>This link expires in ${VERIFY_TTL_HOURS} hours. If you didn't sign up for GradLeap, you can ignore this email.</p>`,
+    subject: "Confirm your email for GradLeap",
+    ...renderAccountEmail({
+      base,
+      preview: "Confirm your email address to activate your GradLeap account.",
+      heading: "Confirm your email address",
+      greeting: greeting(name),
+      intro: [`Thanks for creating a GradLeap account. Confirm that ${email} is your email address to activate it and sign in.`],
+      button: { label: "Confirm email address", url: link },
+      outro: [
+        `This link expires in ${VERIFY_TTL_HOURS} hours and can be used once.`,
+        "If you did not create a GradLeap account, you can ignore this email. No account will be activated.",
+      ],
+      reason: `You are receiving this email because this address was used to sign up for GradLeap.`,
+    }),
   });
 }
 
@@ -317,7 +332,7 @@ async function requestReset(request: Request, body: Body): Promise<Response> {
 
   const sql = db();
   const rows = await sql`
-    select c.profile_id, p.email,
+    select c.profile_id, p.email, p.full_name,
       (select count(*)::int from password_reset_tokens t
         where t.profile_id = c.profile_id and t.created_at > now() - interval '1 hour') as recent
     from auth_credentials c join profiles p on p.id = c.profile_id
@@ -331,12 +346,24 @@ async function requestReset(request: Request, body: Body): Promise<Response> {
       insert into password_reset_tokens (token_hash, profile_id, expires_at)
       values (${await sha256(token)}, ${r.profile_id}, now() + make_interval(mins => ${RESET_TTL_MINUTES}))
     `;
-    const link = `${appBase(request)}/reset-password?token=${encodeURIComponent(token)}`;
+    const base = appBase(request);
+    const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
     const sent = await sendEmail({
       to: r.email as string,
       subject: "Reset your GradLeap password",
-      text: `Someone asked to reset the password for your GradLeap account.\n\nSet a new password: ${link}\n\nThis link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.`,
-      html: `<p>Someone asked to reset the password for your GradLeap account.</p><p><a href="${link}">Set a new password</a></p><p>This link expires in ${RESET_TTL_MINUTES} minutes. If you didn't ask for this, you can ignore this email.</p>`,
+      ...renderAccountEmail({
+        base,
+        preview: "Use this link to choose a new password for your GradLeap account.",
+        heading: "Reset your password",
+        greeting: greeting((r.full_name as string) ?? ""),
+        intro: [`We received a request to reset the password for the GradLeap account linked to ${r.email as string}.`],
+        button: { label: "Reset password", url: link },
+        outro: [
+          `This link expires in ${RESET_TTL_MINUTES} minutes and can be used once.`,
+          "If you did not request a password reset, you can ignore this email. Your password will stay the same.",
+        ],
+        reason: "You are receiving this email because a password reset was requested for your GradLeap account.",
+      }),
     });
     if (!sent) throw new HttpError(502, "Couldn't send the reset email. Please try again.");
   }
