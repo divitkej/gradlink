@@ -1,6 +1,5 @@
 import { db, type Row } from "./sql";
 import { HttpError } from "./http";
-import { serverEnv } from "./env";
 import { isScanKey, scanKey, type AuthUser } from "./session";
 import { CHECKLIST_TEMPLATE } from "./checklist-template";
 import { evaluateResume } from "../resume";
@@ -14,7 +13,7 @@ import {
 } from "./coding";
 import { CODING_SITE_LABEL } from "../scores";
 import { CredlyError, credlyBadgeId, fetchCredlyBadge, emailMatches } from "./credly";
-import { domainStatusFor } from "./college-domains";
+import { domainStatusFor, isAdminEmail } from "./college-domains";
 import { OPERATOR } from "../site";
 
 /* ============================================================
@@ -269,12 +268,6 @@ async function resolveCode(code: string): Promise<{ event: Row; role: "student" 
 }
 
 /* ---------------- owner (admin) ---------------- */
-
-/** The site owner, named by email in the ADMIN_EMAILS secret. */
-function isAdmin(u: AuthUser): boolean {
-  const list = (serverEnv().ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  return !!u.email && list.includes(u.email.toLowerCase());
-}
 
 /** Everything the owner dashboard shows, in one round of queries. */
 async function adminOverview() {
@@ -919,7 +912,7 @@ export const ops: Record<string, Op> = {
     if (!i.createdBy) return { ok: false, error: "We couldn't tell which account is creating this event." };
     isMe(u, i.createdBy);
     if (u.role !== "event_manager") throw forbidden();
-    if (!isAdmin(u)) {
+    if (!isAdminEmail(u.email)) {
       const reg = await domainStatusFor(u.id);
       if (reg?.status !== "approved") {
         return {
@@ -1086,10 +1079,10 @@ export const ops: Record<string, Op> = {
 
   /* Owner dashboard. Anyone else gets a plain 404, so the page doesn't advertise itself. */
   async isAdmin(u) {
-    return isAdmin(u);
+    return isAdminEmail(u.email);
   },
   async adminOverview(u) {
-    if (!isAdmin(u)) throw new HttpError(404, "Not found.");
+    if (!isAdminEmail(u.email)) throw new HttpError(404, "Not found.");
     return adminOverview();
   },
 
